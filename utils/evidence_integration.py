@@ -422,7 +422,7 @@ automatisch mehr.
     "MATHPERS": {
         "name_de": "Mathematische Ausdauer",
         "name_schueler": "Wie lange du bei Mathe-Problemen dranbleibst",
-        
+
         "hattie": {
             "factor": "Deliberate Practice",
             "d": 0.79,
@@ -438,25 +438,25 @@ automatisch mehr.
         },
         "xgboost_rank": 7,
         "intervention_priority": "HOCH",
-        
+
         "erklaerung_schueler": """
-Mathematische Ausdauer ist spezifisch für Mathe: Wie lange arbeitest du 
+Mathematische Ausdauer ist spezifisch für Mathe: Wie lange arbeitest du
 an einem Mathe-Problem, bevor du aufgibst?
 
-Die besten Mathematiker sind nicht die, die sofort die Lösung sehen - 
+Die besten Mathematiker sind nicht die, die sofort die Lösung sehen -
 sondern die, die am längsten nachdenken und verschiedene Wege probieren.
 
-Jedes Mal, wenn du an einem Problem dranbleibst, trainierst du dein 
+Jedes Mal, wenn du an einem Problem dranbleibst, trainierst du dein
 mathematisches Denken!
         """,
-        
+
         "warum_wichtig": """
-Hattie's Forschung zu "Deliberate Practice" (gezieltes Üben) zeigt 
+Hattie's Forschung zu "Deliberate Practice" (gezieltes Üben) zeigt
 eine Effektstärke von d = 0.79 - einer der höchsten Werte!
 
 Es geht nicht darum, MEHR zu üben, sondern AUSDAUERNDER und GEZIELTER.
         """,
-        
+
         "was_tun": {
             "sofort": [
                 "Wenn du nicht weiterkommst: Warte 2 Minuten, bevor du aufgibst",
@@ -474,13 +474,257 @@ Es geht nicht darum, MEHR zu üben, sondern AUSDAUERNDER und GEZIELTER.
                 "Verstehe: Fehler sind der Beweis, dass du es versuchst!"
             ]
         },
-        
+
         "scale_type": "positive",
         "thresholds": {
             "kritisch": 2.0,
             "beobachten": 2.5,
             "gut": 3.0
         }
+    },
+
+    # ============================================
+    # EXTERNE FAKTOREN (nicht aus PISA, aber evidenzbasiert)
+    # ============================================
+
+    "EXT_LEARNSTRAT": {
+        "name_de": "Lernstrategien",
+        "name_schueler": "Cleverer lernen - 7 Techniken die funktionieren",
+
+        "hattie": {
+            "factor": "Transfer Strategies / Study Skills",
+            "d": 0.86,
+            "rank": 5,
+            "category": "Student",
+            "source": "Hattie 2023, Dunlosky et al. 2013"
+        },
+        "pisa": {
+            "correlation": None,
+            "variance_explained": "Nicht direkt gemessen",
+            "points_impact": "Indirekt über andere Faktoren",
+            "source": "Kombinierte Evidenz"
+        },
+        "xgboost_rank": None,
+        "intervention_priority": "SEHR HOCH",
+
+        "erklaerung_schueler": """
+Es gibt Lerntechniken, die wissenschaftlich bewiesen besser funktionieren!
+
+Die 7 wichtigsten:
+1. Active Recall - Sich selbst abfragen (d=0.58)
+2. Spaced Repetition - Zeitversetzt wiederholen (d=0.60)
+3. Feynman-Methode - Einfach erklären (d=0.75)
+4. Loci-Methode - Mit Orten verbinden (d=0.65)
+5. Mind Mapping - Visuell darstellen (d=0.54)
+6. Pomodoro - 25 Min fokussiert, 5 Min Pause (d=0.53)
+7. Lernen durch Lehren - Anderen erklären (d=0.53)
+        """,
+
+        "warum_wichtig": """
+Nicht MEHR lernen, sondern CLEVERER lernen!
+
+Diese Techniken nutzen, wie dein Gehirn wirklich funktioniert.
+Sie sind seit Jahrzehnten erforscht und bestätigt.
+        """,
+
+        "was_tun": {
+            "sofort": [
+                "Statt nur lesen: Buch zuklappen und aufschreiben, was du weißt",
+                "Pomodoro-Timer stellen: 25 Min fokussiert lernen",
+                "Erkläre jemandem (oder dir selbst), was du gelernt hast"
+            ],
+            "diese_woche": [
+                "Probiere Active Recall mit Karteikarten",
+                "Erstelle eine Mind Map zu einem Thema",
+                "Installiere Anki oder Quizlet für Spaced Repetition"
+            ],
+            "langfristig": [
+                "Finde heraus, welche Techniken für dich am besten funktionieren",
+                "Kombiniere mehrere Techniken",
+                "Mache gute Lerngewohnheiten zur Routine"
+            ]
+        },
+
+        "scale_type": "external",
+        "thresholds": None
+    },
+
+    "EXT_METACOG": {
+        "name_de": "Metakognition",
+        "name_schueler": "Über dein Lernen nachdenken",
+
+        "hattie": {
+            "factor": "Metacognitive Strategies",
+            "d": 0.69,
+            "rank": 17,
+            "category": "Student",
+            "source": "Hattie 2023"
+        },
+        "pisa": {
+            "correlation": None,
+            "variance_explained": "Indirekt gemessen",
+            "points_impact": "Hoher indirekter Einfluss",
+            "source": "Kombinierte Evidenz"
+        },
+        "xgboost_rank": None,
+        "intervention_priority": "HOCH",
+
+        "erklaerung_schueler": """
+Metakognition = Über das eigene Lernen nachdenken.
+
+Die 3 Phasen:
+- VOR dem Lernen: Was weiß ich? Was will ich lernen? Welche Strategie?
+- WÄHREND dem Lernen: Verstehe ich? Funktioniert meine Methode?
+- NACH dem Lernen: Was hat funktioniert? Was mache ich anders?
+
+Wer sein Lernen reflektiert, lernt besser!
+        """,
+
+        "warum_wichtig": """
+Hattie d = 0.69 - einer der wichtigsten Schüler-Faktoren!
+
+Metakognition ist wie ein "innerer Coach", der dein Lernen verbessert.
+        """,
+
+        "was_tun": {
+            "sofort": [
+                "Vor dem Lernen: 'Was will ich heute lernen?'",
+                "Zwischendurch: 'Verstehe ich das wirklich?'",
+                "Danach: 'Was war mein größter Lernfortschritt?'"
+            ],
+            "diese_woche": [
+                "Schätze, wie lange eine Aufgabe dauert - dann miss nach",
+                "Schreibe auf, welche Lernmethoden gut funktioniert haben",
+                "Frage dich bei Fehlern: 'Was kann ich daraus lernen?'"
+            ],
+            "langfristig": [
+                "Führe ein kurzes Lerntagebuch",
+                "Entwickle Routinen für Planung und Reflexion",
+                "Werde zum Experten für DEIN Lernen"
+            ]
+        },
+
+        "scale_type": "external",
+        "thresholds": None
+    },
+
+    "EXT_MOTIV": {
+        "name_de": "Lernmotivation",
+        "name_schueler": "Wieder Bock aufs Lernen",
+
+        "hattie": {
+            "factor": "Motivation",
+            "d": 0.48,
+            "rank": 51,
+            "category": "Student",
+            "source": "Hattie 2023"
+        },
+        "pisa": {
+            "correlation": None,
+            "variance_explained": "Ca. 50% berichten Motivationsprobleme",
+            "points_impact": "Hoher Einfluss auf Engagement",
+            "source": "PISA 2022"
+        },
+        "xgboost_rank": None,
+        "intervention_priority": "HOCH",
+
+        "erklaerung_schueler": """
+Ca. 50% der Schüler berichten von fehlender Lernmotivation (PISA 2022).
+
+Du bist also nicht allein! Und Motivation lässt sich aufbauen.
+
+Wichtig: Finde DEINE Gründe zum Lernen - nicht die deiner Eltern oder Lehrer.
+        """,
+
+        "warum_wichtig": """
+Hattie d = 0.48 (Motivation) und d = 0.57 (Mastery Goals)
+
+Motivations-Killer vermeiden:
+- Zu große Ziele
+- Nur auf Noten fokussieren
+- Sich mit anderen vergleichen
+        """,
+
+        "was_tun": {
+            "sofort": [
+                "Frage dich: 'Was interessiert MICH an diesem Thema?'",
+                "Setze dir ein kleines, erreichbares Ziel für heute",
+                "Belohne dich nach getaner Arbeit"
+            ],
+            "diese_woche": [
+                "Finde Verbindungen zwischen Lerninhalten und deinem Leben",
+                "Mache sichtbar, was du schon geschafft hast (Done-Liste)",
+                "Lerne mit anderen zusammen - gemeinsam macht's mehr Spaß"
+            ],
+            "langfristig": [
+                "Finde DEINE Ziele - nicht die deiner Eltern",
+                "Fokussiere auf Lernen, nicht nur auf Noten",
+                "Vergleiche dich mit dir selbst von gestern"
+            ]
+        },
+
+        "scale_type": "external",
+        "thresholds": None
+    },
+
+    "EXT_FOCUS": {
+        "name_de": "Fokus und Konzentration",
+        "name_schueler": "Fokus halten - Ablenkungen besiegen",
+
+        "hattie": {
+            "factor": "Reducing Disruptions",
+            "d": 0.34,
+            "rank": 78,
+            "category": "Classroom",
+            "source": "Hattie 2023"
+        },
+        "pisa": {
+            "correlation": None,
+            "variance_explained": "28% werden durch Geräte abgelenkt",
+            "points_impact": "Negativer Einfluss bei Ablenkung",
+            "source": "PISA 2022 Deutschland"
+        },
+        "xgboost_rank": None,
+        "intervention_priority": "MITTEL",
+
+        "erklaerung_schueler": """
+PISA 2022: 28% der deutschen Schüler können nicht ungestört arbeiten,
+28% werden durch digitale Geräte abgelenkt.
+
+Das ist kein Willens-Problem - es ist ein Umgebungs-Problem!
+
+Mach es dir leicht, fokussiert zu bleiben.
+        """,
+
+        "warum_wichtig": """
+Hattie d = 0.34 - auch "kleinere" Effekte summieren sich!
+
+Forschung zeigt:
+- Allein die Anwesenheit des Handys reduziert Konzentration
+- Multitasking funktioniert nicht - das Gehirn wechselt nur schnell
+- Routinen reduzieren den Bedarf an Willenskraft
+        """,
+
+        "was_tun": {
+            "sofort": [
+                "Handy in anderen Raum legen (nicht nur lautlos!)",
+                "Timer stellen: 25 Min fokussiert, 5 Min Pause",
+                "Schreibtisch aufräumen, bevor du anfängst"
+            ],
+            "diese_woche": [
+                "Installiere einen App-Blocker (Forest, Freedom)",
+                "Finde deinen besten Lernort (wo kannst du dich konzentrieren?)",
+                "Etabliere feste Lernzeiten"
+            ],
+            "langfristig": [
+                "Mache fokussiertes Lernen zur Gewohnheit",
+                "Gestalte deine Umgebung für Konzentration",
+                "Lerne, Ablenkungen zu bemerken und zurückzukommen"
+            ]
+        },
+
+        "scale_type": "external",
+        "thresholds": None
     }
 }
 

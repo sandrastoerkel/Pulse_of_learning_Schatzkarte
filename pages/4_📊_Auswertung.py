@@ -45,7 +45,13 @@ st.set_page_config(
 NEGATIVE_SCALES = ['ANXMAT', 'BULLIED']
 
 # NEU: Skalen mit Ressourcen-Seite verfügbar
-SCALES_WITH_RESOURCES = ['MATHEFF', 'ANXMAT', 'GROSAGR', 'PERSEVAGR', 'TEACHSUP', 'BELONG', 'BULLIED']
+# Enthält sowohl PISA-Skalen als auch externe evidenzbasierte Skalen (EXT_)
+SCALES_WITH_RESOURCES = [
+    # PISA-Skalen
+    'MATHEFF', 'ANXMAT', 'GROSAGR', 'PERSEVAGR', 'TEACHSUP', 'BELONG', 'BULLIED',
+    # Externe evidenzbasierte Skalen
+    'EXT_LEARNSTRAT', 'EXT_METACOG', 'EXT_MOTIV', 'EXT_FOCUS'
+]
 
 # ============================================
 # HELPER FUNCTIONS (Original)

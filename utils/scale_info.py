@@ -311,6 +311,30 @@ SCALE_DESCRIPTIONS = {
         "name_en": "Self-Directed Learning Self-Efficacy",
         "name_de": "Selbstgesteuertes Lernen Selbstwirksamkeit",
         "description_de": "Überzeugung, selbstständig lernen zu können"
+    },
+
+    # ============================================
+    # EXTERNE SKALEN (nicht aus PISA, evidenzbasiert)
+    # ============================================
+    "EXT_LEARNSTRAT": {
+        "name_en": "Learning Strategies",
+        "name_de": "Lernstrategien",
+        "description_de": "Evidenzbasierte Lerntechniken wie Active Recall, Spaced Repetition, Feynman-Methode"
+    },
+    "EXT_METACOG": {
+        "name_en": "Metacognition",
+        "name_de": "Metakognition",
+        "description_de": "Fähigkeit, über das eigene Lernen nachzudenken und es zu steuern"
+    },
+    "EXT_MOTIV": {
+        "name_en": "Learning Motivation",
+        "name_de": "Lernmotivation",
+        "description_de": "Intrinsische und extrinsische Motivation zum Lernen"
+    },
+    "EXT_FOCUS": {
+        "name_en": "Focus and Concentration",
+        "name_de": "Fokus und Konzentration",
+        "description_de": "Fähigkeit, Ablenkungen zu widerstehen und konzentriert zu arbeiten"
     }
 }
 
