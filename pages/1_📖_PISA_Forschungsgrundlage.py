@@ -312,8 +312,8 @@ with tab3:
     fig.add_vline(x=matheff_median, line_dash="dash", line_color="gray", annotation_text="Median Selbstwirksamkeit")
 
     fig.update_layout(height=600)
-    fig.update_xaxis(title="Selbstwirksamkeit (MATHEFF) →")
-    fig.update_yaxis(title="Mathe-Angst (ANXMAT) →")
+    fig.update_xaxes(title="Selbstwirksamkeit (MATHEFF) →")
+    fig.update_yaxes(title="Mathe-Angst (ANXMAT) →")
 
     st.plotly_chart(fig, use_container_width=True)
 
