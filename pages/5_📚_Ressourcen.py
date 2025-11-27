@@ -18,6 +18,16 @@ sys.path.append('..')
 from utils.scale_info import get_scale_info
 from utils.evidence_integration import get_evidence, get_hattie_info, get_pisa_info
 
+# Import aus ausgelagerten Modulen
+from utils.ressourcen.content_database import CONTENT_DATABASE
+from utils.ressourcen.helpers import (
+    embed_youtube,
+    render_video_section,
+    render_tipps_section,
+    render_wissenschaft_section
+)
+from utils.ressourcen.matheff_content import render_matheff_altersstufen
+
 # ============================================
 # PAGE CONFIG
 # ============================================
@@ -51,10 +61,11 @@ except ImportError:
     HAS_GAMIFICATION = False
 
 # ============================================
-# CONTENT DATABASE (inline für Standalone)
+# CONTENT DATABASE - ausgelagert nach utils/ressourcen/content_database.py
 # ============================================
+# CONTENT_DATABASE wird jetzt importiert aus utils.ressourcen.content_database
 
-CONTENT_DATABASE = {
+_INLINE_CONTENT_DATABASE_REMOVED = {
     # ============================================
     # RANG 1: SELBSTWIRKSAMKEIT (d = 0.92)
     # ============================================
@@ -1378,11 +1389,12 @@ CONTENT_DATABASE = {
 }
 
 # ============================================
-# HELPER FUNCTIONS
+# HELPER FUNCTIONS - ausgelagert nach utils/ressourcen/helpers.py
 # ============================================
+# Die Helper-Funktionen werden jetzt importiert aus utils.ressourcen.helpers
 
-def embed_youtube(video_id: str, title: str = ""):
-    """Bettet YouTube-Video ein"""
+def _removed_embed_youtube(video_id: str, title: str = ""):
+    """AUSGELAGERT - Bettet YouTube-Video ein"""
     
     url = f"https://www.youtube.com/watch?v={video_id}"
     
@@ -1392,8 +1404,8 @@ def embed_youtube(video_id: str, title: str = ""):
         # st.video unterstützt YouTube direkt
         st.video(url)
 
-def render_video_section(videos: list, color: str):
-    """Rendert die Video-Sektion"""
+def _removed_render_video_section(videos: list, color: str):
+    """AUSGELAGERT - Rendert die Video-Sektion"""
     
     if not videos:
         st.info("🎬 Videos für diesen Bereich werden gerade analysiert. Schau bald wieder vorbei!")
@@ -1440,8 +1452,8 @@ def render_video_section(videos: list, color: str):
         
         st.markdown("---")
 
-def render_tipps_section(tipps: list, color: str):
-    """Rendert die Tipps-Sektion"""
+def _removed_render_tipps_section(tipps: list, color: str):
+    """AUSGELAGERT - Rendert die Tipps-Sektion"""
     
     if not tipps:
         st.info("💡 Tipps für diesen Bereich werden gerade zusammengestellt.")
@@ -1463,8 +1475,8 @@ def render_tipps_section(tipps: list, color: str):
             with st.expander(f"{tipp.get('titel', 'Tipp')} · ⏱️ {tipp.get('dauer', '')}", expanded=False):
                 st.markdown(tipp.get('beschreibung', ''))
 
-def render_wissenschaft_section(wissenschaft: dict, color: str):
-    """Rendert die Wissenschafts-Sektion"""
+def _removed_render_wissenschaft_section(wissenschaft: dict, color: str):
+    """AUSGELAGERT - Rendert die Wissenschafts-Sektion"""
     
     col1, col2, col3 = st.columns(3)
     
@@ -1491,11 +1503,12 @@ def render_wissenschaft_section(wissenschaft: dict, color: str):
         st.markdown(wissenschaft.get('erklaerung'))
 
 # ============================================
-# SPEZIELLE RENDERING-FUNKTION FÜR MATHEFF (Selbstwirksamkeit)
+# SPEZIELLE RENDERING-FUNKTION FÜR MATHEFF - ausgelagert nach utils/ressourcen/matheff_content.py
 # ============================================
+# render_matheff_altersstufen wird jetzt importiert aus utils.ressourcen.matheff_content
 
-def render_matheff_altersstufen(color: str):
-    """Rendert die Selbstwirksamkeits-Ressource mit Challenges + Theorie-Tabs"""
+def _removed_render_matheff_altersstufen(color: str):
+    """AUSGELAGERT - Rendert die Selbstwirksamkeits-Ressource mit Challenges + Theorie-Tabs"""
 
     tab_interaktiv, tab_theorie = st.tabs([
         "🎮 Challenges",
