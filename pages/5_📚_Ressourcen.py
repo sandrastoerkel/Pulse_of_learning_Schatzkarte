@@ -55,10 +55,25 @@ except ImportError:
 try:
     from utils.hattie_challenge_widget import render_hattie_challenge_widget
     from utils.bandura_sources_widget import render_bandura_sources_widget
-    from utils.user_system import render_user_login, is_logged_in, get_current_user_id
+    from utils.user_system import render_user_login, is_logged_in, get_current_user_id, get_current_user
     HAS_GAMIFICATION = True
 except ImportError:
     HAS_GAMIFICATION = False
+
+# ============================================
+# TRY TO IMPORT LEARNSTRAT CHALLENGES (optional)
+# ============================================
+
+try:
+    from utils.learnstrat_challenges import (
+        render_powertechniken_challenge,
+        render_transfer_challenge,
+        init_learnstrat_tables
+    )
+    import sqlite3
+    HAS_LEARNSTRAT = True
+except ImportError:
+    HAS_LEARNSTRAT = False
 
 # ============================================
 # SPEZIELLE RENDERING-FUNKTION FÜR EXT_LEARNSTRAT (Cleverer lernen)
@@ -73,19 +88,62 @@ def render_learnstrat_altersstufen(color: str):
     ])
 
     # ==========================================
-    # TAB 1: CHALLENGES (Platzhalter)
+    # TAB 1: CHALLENGES
     # ==========================================
     with tab_interaktiv:
-        st.header("🎮 Challenges")
+        if HAS_LEARNSTRAT and HAS_GAMIFICATION and is_logged_in():
+            # User ist eingeloggt - zeige die Challenges
+            user = get_current_user()
+            if user:
+                # DB Connection für die Challenges
+                from utils.gamification_db import get_db_path
+                conn = sqlite3.connect(get_db_path())
 
-        st.info("""
-        🚧 **Hier entstehen bald interaktive Lernstrategie-Challenges!**
+                # XP Callback definieren
+                def award_xp_callback(user_id, xp, reason):
+                    """Vergibt XP an den User."""
+                    from utils.gamification_db import update_user_stats, get_or_create_user
+                    user_data = get_or_create_user(user_id)
+                    current_streak = user_data.get("current_streak", 0)
+                    update_user_stats(user_id, xp, current_streak)
 
-        Geplant:
-        - 📝 Active Recall Challenge
-        - ⏰ Pomodoro-Tracker
-        - 🗺️ Mind Map Creator
-        """)
+                # Sub-Tabs für verschiedene Challenges
+                challenge_tab1, challenge_tab2 = st.tabs([
+                    "💪 Die 7 Powertechniken",
+                    "🚀 Das Geheimnis der Überflieger"
+                ])
+
+                with challenge_tab1:
+                    st.caption("Challenge 1: Wissenschaftlich fundierte Lerntechniken kennenlernen")
+                    render_powertechniken_challenge(
+                        user=user,
+                        conn=conn,
+                        xp_callback=award_xp_callback
+                    )
+
+                with challenge_tab2:
+                    st.caption("Challenge 2: Transfer-Strategien (Effektstärke d=0.86!)")
+                    render_transfer_challenge(
+                        user=user,
+                        conn=conn,
+                        xp_callback=award_xp_callback
+                    )
+
+                conn.close()
+            else:
+                st.warning("Fehler beim Laden des Benutzerprofils.")
+        elif HAS_LEARNSTRAT and HAS_GAMIFICATION and not is_logged_in():
+            # Module vorhanden, aber User nicht eingeloggt
+            st.info("🔐 **Bitte melde dich oben an, um die interaktiven Challenges zu nutzen!**")
+            render_user_login()
+        else:
+            # Module nicht verfügbar - Platzhalter
+            st.header("🎮 Challenges")
+            st.info("""
+            🚧 **Interaktive Lernstrategie-Challenges werden geladen...**
+
+            Falls diese Nachricht bestehen bleibt, fehlen möglicherweise Module.
+            """)
 
     # ==========================================
     # TAB 2: THEORIE DAHINTER (mit Altersstufen-Auswahl)
