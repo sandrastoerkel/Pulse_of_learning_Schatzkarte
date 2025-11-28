@@ -48,6 +48,13 @@ COLORS = {
     "purple_dark": (168, 85, 247),      # #a855f7
     "purple_text": (107, 33, 168),      # #6b21a8
 
+    # Birkenbihl Theme (Deep Violet/Indigo)
+    "violet_light": (237, 233, 254),    # #ede9fe
+    "violet_medium": (221, 214, 254),   # #ddd6fe
+    "violet_dark": (124, 58, 237),      # #7c3aed
+    "violet_text": (91, 33, 182),       # #5b21b6
+    "violet_body": (76, 29, 149),       # #4c1d95
+
     # Allgemein
     "white": (255, 255, 255),
     "black": (0, 0, 0),
@@ -415,6 +422,142 @@ def generate_transfer_certificate(
 
     # Footer Text
     center_text(draw, "🧠 Pulse of Learning – Das Geheimnis der Überflieger", font_small, footer_y, width, COLORS["purple_text"])
+
+    return img
+
+# ============================================
+# BIRKENBIHL ZERTIFIKAT
+# ============================================
+
+def generate_birkenbihl_certificate(
+    user_name: str,
+    total_xp: int,
+    date: Optional[str] = None
+) -> Image.Image:
+    """
+    Generiert ein schönes Birkenbihl-Zertifikat als Bild.
+
+    Args:
+        user_name: Name des Users
+        total_xp: Gesamte verdiente XP
+        date: Optional, Datum (default: heute)
+
+    Returns:
+        PIL Image object
+    """
+    # Bildgröße
+    width, height = 800, 600
+
+    # Hintergrund mit Gradient (Violet Theme)
+    img = create_gradient_background(width, height, COLORS["violet_light"], COLORS["violet_medium"])
+    draw = ImageDraw.Draw(img)
+
+    # Rahmen
+    border_width = 8
+    draw.rectangle(
+        [border_width, border_width, width - border_width, height - border_width],
+        outline=COLORS["violet_dark"],
+        width=border_width
+    )
+
+    # Innerer Rahmen
+    inner_margin = 25
+    draw.rectangle(
+        [inner_margin, inner_margin, width - inner_margin, height - inner_margin],
+        outline=COLORS["violet_dark"],
+        width=2
+    )
+
+    # Fonts laden
+    font_title = get_font(48, bold=True)
+    font_subtitle = get_font(24)
+    font_name = get_font(36, bold=True)
+    font_body = get_font(18)
+    font_small = get_font(14)
+    font_skill = get_font(18)
+    font_quote = get_font(14)
+
+    # === HEADER ===
+    y_pos = 45
+
+    # Emojis
+    draw.text((40, 30), "🧠", font=get_font(40), fill=COLORS["violet_dark"])
+    draw.text((width - 80, 30), "🧵", font=get_font(40), fill=COLORS["violet_dark"])
+
+    # Titel
+    center_text(draw, "ZERTIFIKAT", font_title, y_pos, width, COLORS["violet_text"])
+    y_pos += 55
+
+    # Untertitel
+    center_text(draw, "Birkenbihl-Methode Meister", font_subtitle, y_pos, width, COLORS["violet_dark"])
+    y_pos += 45
+
+    # === BESTÄTIGUNG ===
+    center_text(draw, "Hiermit wird bestätigt, dass", font_body, y_pos, width, COLORS["violet_text"])
+    y_pos += 32
+
+    # Name
+    center_text(draw, user_name, font_name, y_pos, width, COLORS["violet_text"])
+    y_pos += 45
+
+    center_text(draw, "die Birkenbihl-Methode erfolgreich gemeistert hat!", font_body, y_pos, width, COLORS["violet_text"])
+    y_pos += 40
+
+    # === SKILLS BOX ===
+    box_margin = 120
+    box_top = y_pos
+    box_bottom = y_pos + 110
+
+    draw.rounded_rectangle(
+        [box_margin, box_top, width - box_margin, box_bottom],
+        radius=15,
+        fill=COLORS["white"],
+        outline=COLORS["violet_dark"],
+        width=2
+    )
+
+    # Skills Header
+    center_text(draw, "Erlernte Fähigkeiten:", font_body, box_top + 8, width, COLORS["violet_text"])
+
+    # Skills
+    skills = ["Das Faden-Prinzip verstanden", "Eigene Gedanken notieren", "Wissensnetz aufbauen", "Im Alltag anwenden"]
+    skill_y = box_top + 32
+    for skill in skills:
+        center_text(draw, f"* {skill}", font_skill, skill_y, width, COLORS["violet_body"])
+        skill_y += 20
+
+    y_pos = box_bottom + 15
+
+    # === ZITAT ===
+    quote = "Nicht aufschreiben was der andere sagt - sondern was DU denkst!"
+    center_text(draw, f'"{quote}"', font_quote, y_pos, width, COLORS["violet_dark"])
+    center_text(draw, "– Vera F. Birkenbihl", font_small, y_pos + 18, width, COLORS["violet_body"])
+    y_pos += 45
+
+    # === STATS ===
+    stats_y = y_pos
+
+    # XP
+    xp_x = width // 3
+    draw.text((xp_x - 40, stats_y), "Verdiente XP", font=font_small, fill=COLORS["violet_text"])
+    draw.text((xp_x - 20, stats_y + 18), f"{total_xp} XP", font=font_name, fill=COLORS["violet_dark"])
+
+    # Datum
+    if not date:
+        date = datetime.now().strftime("%d.%m.%Y")
+
+    date_x = 2 * width // 3
+    draw.text((date_x - 20, stats_y), "Datum", font=font_small, fill=COLORS["violet_text"])
+    draw.text((date_x - 30, stats_y + 18), date, font=font_subtitle, fill=COLORS["violet_body"])
+
+    # === FOOTER ===
+    footer_y = height - 45
+
+    # Trennlinie
+    draw.line([(100, footer_y - 15), (width - 100, footer_y - 15)], fill=COLORS["violet_dark"], width=2)
+
+    # Footer Text
+    center_text(draw, "🧠 Pulse of Learning – Die Birkenbihl-Methode", font_small, footer_y, width, COLORS["violet_text"])
 
     return img
 

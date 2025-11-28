@@ -68,6 +68,7 @@ try:
     from utils.learnstrat_challenges import (
         render_powertechniken_challenge,
         render_transfer_challenge,
+        render_birkenbihl_challenge,
         init_learnstrat_tables
     )
     import sqlite3
@@ -108,9 +109,10 @@ def render_learnstrat_altersstufen(color: str):
                     update_user_stats(user_id, xp, current_streak)
 
                 # Sub-Tabs für verschiedene Challenges
-                challenge_tab1, challenge_tab2 = st.tabs([
+                challenge_tab1, challenge_tab2, challenge_tab3 = st.tabs([
                     "💪 Die 7 Powertechniken",
-                    "🚀 Das Geheimnis der Überflieger"
+                    "🚀 Das Geheimnis der Überflieger",
+                    "🧠 Die Birkenbihl-Methode"
                 ])
 
                 with challenge_tab1:
@@ -124,6 +126,14 @@ def render_learnstrat_altersstufen(color: str):
                 with challenge_tab2:
                     st.caption("Challenge 2: Transfer-Strategien (Effektstärke d=0.86!)")
                     render_transfer_challenge(
+                        user=user,
+                        conn=conn,
+                        xp_callback=award_xp_callback
+                    )
+
+                with challenge_tab3:
+                    st.caption("Challenge 3: Die Birkenbihl-Methode (nach Vera F. Birkenbihl)")
+                    render_birkenbihl_challenge(
                         user=user,
                         conn=conn,
                         xp_callback=award_xp_callback

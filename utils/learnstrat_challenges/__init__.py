@@ -5,9 +5,9 @@
 Gamifizierte Lernstrategie-Challenges für die Pulse of Learning App.
 
 Challenges:
-1. Die 7 Powertechniken (wissenschaftlich fundierte Lerntechniken)
+1. Die 7 Powertechniken (wissenschaftlich fundierte Lerntechniken) ✅
 2. Das Geheimnis der Überflieger (Transfer-Strategien) ✅
-3. Die Birkenbihl-Methode - Coming Soon
+3. Die Birkenbihl-Methode ✅
 """
 
 # Challenge 1: Powertechniken
@@ -49,6 +49,22 @@ from .transfer_widget import (
     get_transfer_progress,
 )
 
+# Challenge 3: Birkenbihl
+from .birkenbihl_content import (
+    BIRKENBIHL_XP,
+    BIRKENBIHL_BADGES,
+    BIRKENBIHL_CERTIFICATE,
+    BIRKENBIHL_INFO,
+    get_birkenbihl_content_for_age,
+    get_birkenbihl_phase_content,
+)
+
+from .birkenbihl_widget import (
+    render_birkenbihl_challenge,
+    save_birkenbihl_progress,
+    get_birkenbihl_progress,
+)
+
 __all__ = [
     # Challenge 1: Powertechniken Content
     "POWERTECHNIKEN",
@@ -79,4 +95,15 @@ __all__ = [
     "render_transfer_challenge",
     "save_transfer_progress",
     "get_transfer_progress",
+    # Challenge 3: Birkenbihl Content
+    "BIRKENBIHL_XP",
+    "BIRKENBIHL_BADGES",
+    "BIRKENBIHL_CERTIFICATE",
+    "BIRKENBIHL_INFO",
+    "get_birkenbihl_content_for_age",
+    "get_birkenbihl_phase_content",
+    # Challenge 3: Birkenbihl Widget
+    "render_birkenbihl_challenge",
+    "save_birkenbihl_progress",
+    "get_birkenbihl_progress",
 ]
