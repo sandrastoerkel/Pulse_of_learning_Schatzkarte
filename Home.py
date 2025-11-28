@@ -24,6 +24,35 @@ st.set_page_config(
 )
 
 # ============================================
+# PASSWORT-SCHUTZ
+# ============================================
+
+def check_password():
+    """Prüft ob das richtige Passwort eingegeben wurde."""
+    if "password_correct" not in st.session_state:
+        st.session_state.password_correct = False
+
+    if st.session_state.password_correct:
+        return True
+
+    st.title("🔐 Pulse of Learning")
+    st.markdown("### Bitte Passwort eingeben")
+
+    password = st.text_input("Passwort:", type="password", key="password_input")
+
+    if st.button("Einloggen"):
+        if password == "2904":
+            st.session_state.password_correct = True
+            st.rerun()
+        else:
+            st.error("Falsches Passwort!")
+
+    return False
+
+if not check_password():
+    st.stop()
+
+# ============================================
 # DATABASE INITIALIZATION
 # ============================================
 
