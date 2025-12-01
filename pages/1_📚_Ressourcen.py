@@ -28,6 +28,7 @@ from utils.ressourcen.helpers import (
 )
 from utils.ressourcen.matheff_content import render_matheff_altersstufen
 from utils.ressourcen.learnstrat_content import render_learnstrat_altersstufen
+from utils.ressourcen.motivation_content import render_motivation_altersstufen
 
 # ============================================
 # PAGE CONFIG
@@ -153,11 +154,13 @@ st.divider()
 # TABS
 # ============================================
 
-# Spezialbehandlung für MATHEFF (Selbstwirksamkeit) und EXT_LEARNSTRAT (Cleverer lernen) mit Altersstufen-Tabs
+# Spezialbehandlung für Bereiche mit Altersstufen-Tabs
 if factor == "MATHEFF":
     render_matheff_altersstufen(color)
 elif factor == "EXT_LEARNSTRAT":
     render_learnstrat_altersstufen(color)
+elif factor == "EXT_MOTIV":
+    render_motivation_altersstufen(color)
 else:
     # Standard-Tabs für alle anderen Ressourcen
     tab1, tab2, tab3 = st.tabs(["💡 Tipps & Übungen", "🔬 Wissenschaft", "🎬 Videos"])

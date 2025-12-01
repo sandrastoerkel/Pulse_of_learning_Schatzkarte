@@ -651,13 +651,125 @@ CONTENT_DATABASE = {
     },
 
     # ============================================
-    # RANG 6: MOTIVATION (d = 0.48) - NEU!
+    # RANG 6: MOTIVATION (d = 0.48)
     # ============================================
     "EXT_MOTIV": {
         "name_de": "Wieder Bock aufs Lernen (Motivation)",
         "name_schueler": "Wieder Bock aufs Lernen",
         "icon": "🔥",
         "color": "#e74c3c",
+
+        "intro_text": """
+        Ca. **50% der Schüler** berichten von fehlender Lernmotivation (PISA 2022).
+
+        Du bist also nicht allein! Und es gibt Wege, die Motivation wiederzufinden.
+
+        **Kernbotschaft:** Finde DEINE Gründe zum Lernen - nicht die deiner Eltern oder Lehrer.
+
+        *Basiert auf der Selbstbestimmungstheorie (Deci & Ryan) und Birkenbihl-Methoden.*
+        """,
+
+        "videos": [],
+
+        "tipps": [
+            {
+                "titel": "🧠 Die ABC-Liste nach Birkenbihl",
+                "beschreibung": """
+                **Aktiviere dein Vorwissen in 3 Minuten:**
+
+                1. A-Z untereinander schreiben
+                2. Zu jedem Buchstaben ein Wort zum Thema
+                3. Spring rum - nicht von A nach Z!
+                4. VOR und NACH dem Lernen machen
+                5. Differenz = sichtbarer Fortschritt = Motivation!
+
+                *Das ist kein Test - das ist Gehirn-Aufwärmen!*
+                """,
+                "dauer": "3 Min",
+                "schwierigkeit": "leicht",
+                "sofort_umsetzbar": True
+            },
+            {
+                "titel": "🎯 Die WOZU-Frage",
+                "beschreibung": """
+                **Finde deinen persönlichen Grund:**
+
+                Beende diesen Satz: "Wenn ich das kann, dann..."
+
+                - ...kann ich meinen Traumberuf erreichen
+                - ...verstehe ich endlich, wie X funktioniert
+                - ...kann ich anderen helfen
+                - ...bin ich unabhängiger
+
+                *Dein WOZU ist dein Motor!*
+                """,
+                "dauer": "5 Min",
+                "schwierigkeit": "leicht",
+                "sofort_umsetzbar": True
+            },
+            {
+                "titel": "⚡ Die Mikro-Entscheidung",
+                "beschreibung": """
+                **Hol dir Kontrolle zurück:**
+
+                Entscheide selbst:
+                - WANN lerne ich? (nicht "jetzt sofort!")
+                - WO lerne ich? (dein Ort, deine Wahl)
+                - WOMIT fange ich an? (nicht das Schwerste zuerst)
+
+                *Autonomie ist der stärkste Motivator (Deci & Ryan)!*
+                """,
+                "dauer": "2 Min",
+                "schwierigkeit": "leicht",
+                "sofort_umsetzbar": True
+            },
+            {
+                "titel": "🤝 Der Lern-Buddy",
+                "beschreibung": """
+                **Gemeinsam statt einsam:**
+
+                - Schreib JETZT jemandem: "Hey, lernst du auch für X?"
+                - Verabredet euch (auch online)
+                - Erklärt euch gegenseitig
+
+                *Verbundenheit ist eines der 3 Grundbedürfnisse!*
+                """,
+                "dauer": "Diese Woche",
+                "schwierigkeit": "mittel",
+                "sofort_umsetzbar": True
+            }
+        ],
+
+        "wissenschaft": {
+            "hattie_d": 0.48,
+            "hattie_rank": 51,
+            "pisa_impact": "Ca. 50% berichten fehlende Motivation",
+            "erklaerung": """
+            **Selbstbestimmungstheorie (Deci & Ryan, 1985):**
+
+            Motivation entsteht, wenn 3 Grundbedürfnisse erfüllt sind:
+            - **Autonomie** (Ich entscheide selbst)
+            - **Kompetenz** (Ich kann das / werde besser)
+            - **Verbundenheit** (Ich gehöre dazu)
+
+            **Hattie-Forschung:**
+            - Motivation d = 0.48
+            - Mastery Goals d = 0.57
+
+            **Birkenbihl-Methode:**
+            ABC-Listen aktivieren Vorwissen und machen Fortschritt sichtbar.
+            """
+        }
+    },
+
+    # ============================================
+    # ARCHIV: MOTIVATION V1
+    # ============================================
+    "EXT_MOTIV_V1": {
+        "name_de": "Wieder Bock aufs Lernen 1 (Archiv)",
+        "name_schueler": "Wieder Bock aufs Lernen 1",
+        "icon": "📦",
+        "color": "#95a5a6",
 
         "intro_text": """
         Ca. **50% der Schüler** berichten von fehlender Lernmotivation (PISA 2022).
