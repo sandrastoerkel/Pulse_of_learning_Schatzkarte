@@ -220,38 +220,57 @@ def create_challenge(user_id: str, subject: str, prediction: int,
     
     return challenge_id
 
-def complete_challenge(challenge_id: int, actual_result: int, 
+def complete_challenge(challenge_id: int, actual_result: int,
                        reflection: str = "") -> Dict[str, Any]:
     """Schließt eine Challenge ab und berechnet XP (Phase 2: Ergebnis)."""
     conn = sqlite3.connect(get_db_path())
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
-    
+
     # Challenge holen
     c.execute("SELECT * FROM challenges WHERE id = ?", (challenge_id,))
     challenge = c.fetchone()
-    
+
     if not challenge:
         conn.close()
         return {"error": "Challenge nicht gefunden"}
-    
+
     if challenge['completed']:
         conn.close()
         return {"error": "Challenge bereits abgeschlossen"}
-    
+
     user_id = challenge['user_id']
     prediction = challenge['prediction']
-    
+
+    # Typ aus task_description extrahieren (für Note-Umkehrung)
+    task_desc = challenge['task_description'] or ''
+    is_note_type = task_desc.startswith("[note]")
+
     # Outcome bestimmen
-    if actual_result > prediction:
-        outcome = "exceeded"
-        base_xp = XP_CONFIG["challenge_completed"] + XP_CONFIG["exceeded_expectation"]
-    elif actual_result == prediction:
-        outcome = "exact"
-        base_xp = XP_CONFIG["challenge_completed"] + XP_CONFIG["prediction_exact"]
+    # Bei Noten: niedrigere Zahl = besser (Note 1 > Note 2)
+    # Bei Prozent/Punkten: höhere Zahl = besser
+    if is_note_type:
+        # Bei Noten: actual < prediction bedeutet "übertroffen"
+        if actual_result < prediction:
+            outcome = "exceeded"
+            base_xp = XP_CONFIG["challenge_completed"] + XP_CONFIG["exceeded_expectation"]
+        elif actual_result == prediction:
+            outcome = "exact"
+            base_xp = XP_CONFIG["challenge_completed"] + XP_CONFIG["prediction_exact"]
+        else:
+            outcome = "below"
+            base_xp = XP_CONFIG["challenge_completed"]
     else:
-        outcome = "below"
-        base_xp = XP_CONFIG["challenge_completed"]
+        # Bei Prozent/Punkten: actual > prediction bedeutet "übertroffen"
+        if actual_result > prediction:
+            outcome = "exceeded"
+            base_xp = XP_CONFIG["challenge_completed"] + XP_CONFIG["exceeded_expectation"]
+        elif actual_result == prediction:
+            outcome = "exact"
+            base_xp = XP_CONFIG["challenge_completed"] + XP_CONFIG["prediction_exact"]
+        else:
+            outcome = "below"
+            base_xp = XP_CONFIG["challenge_completed"]
     
     # Streak berechnen
     new_streak = calculate_streak(user_id, c)

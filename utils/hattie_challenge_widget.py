@@ -168,70 +168,111 @@ def render_challenge_tab(user_id: str, stats: dict, color: str):
 
 def render_challenge_phase1(user_id: str, stats: dict, color: str):
     """Phase 1: Neue Challenge erstellen (Vorhersage)."""
-    
+
+    # Altersstufe aus Session State holen
+    age_group = st.session_state.get("current_user_age_group", "unterstufe")
+    is_oberstufe = age_group == "oberstufe"
+
     st.markdown("""
     ### 🎯 Starte eine neue Challenge
-    
+
     **So funktioniert's:**
     1. Wähle ein Fach und beschreibe die Aufgabe
-    2. Schätze ehrlich: Wie viele Punkte/Aufgaben wirst du schaffen?
+    2. Schätze ehrlich: Welche Note (oder wie viel Prozent) wirst du erreichen?
     3. Mach die Aufgabe und trag dann dein echtes Ergebnis ein
     """)
-    
+
     with st.form("new_challenge_form"):
         col1, col2 = st.columns(2)
-        
+
         with col1:
             subject = st.selectbox(
                 "📚 Fach",
                 options=SUBJECTS,
                 index=0
             )
-        
+
         with col2:
-            prediction = st.number_input(
-                "🎯 Meine Schätzung (Punkte/Richtige)",
+            # Auswahl: Prozent oder Note/Punkte
+            if is_oberstufe:
+                prediction_type = st.radio(
+                    "📊 Was möchtest du schätzen?",
+                    options=["punkte", "prozent"],
+                    format_func=lambda x: "🎯 Punkte (0-15)" if x == "punkte" else "📈 Prozent richtig",
+                    horizontal=True
+                )
+            else:
+                prediction_type = st.radio(
+                    "📊 Was möchtest du schätzen?",
+                    options=["note", "prozent"],
+                    format_func=lambda x: "🎯 Note (1-6)" if x == "note" else "📈 Prozent richtig",
+                    horizontal=True
+                )
+
+        # Eingabefeld je nach Auswahl
+        if prediction_type == "prozent":
+            prediction = st.slider(
+                "📈 Meine Schätzung: So viel Prozent werde ich richtig haben",
                 min_value=0,
                 max_value=100,
-                value=7,
-                step=1,
-                help="Wie viele Punkte oder richtige Antworten erwartest du?"
+                value=70,
+                step=5,
+                format="%d%%",
+                help="Schätze ehrlich: Wie viel Prozent der Aufgaben wirst du richtig lösen?"
             )
-        
+            prediction_display = f"{prediction}%"
+        elif prediction_type == "punkte":
+            prediction = st.slider(
+                "🎯 Meine Schätzung: Diese Punktzahl werde ich erreichen",
+                min_value=0,
+                max_value=15,
+                value=10,
+                step=1,
+                help="Oberstufen-Punkte von 0 (ungenügend) bis 15 (sehr gut+)"
+            )
+            prediction_display = f"{prediction} Punkte"
+        else:  # note
+            prediction = st.select_slider(
+                "🎯 Meine Schätzung: Diese Note werde ich bekommen",
+                options=[1, 2, 3, 4, 5, 6],
+                value=3,
+                format_func=lambda x: {1: "1 (sehr gut)", 2: "2 (gut)", 3: "3 (befriedigend)",
+                                       4: "4 (ausreichend)", 5: "5 (mangelhaft)", 6: "6 (ungenügend)"}[x],
+                help="Welche Note erwartest du?"
+            )
+            prediction_display = f"Note {prediction}"
+
         task_description = st.text_input(
             "📝 Aufgabe (optional)",
-            placeholder="z.B. '10 Mathe-Aufgaben zum Thema Brüche'",
+            placeholder="z.B. 'Mathe-Test zum Thema Brüche'",
             help="Beschreibe kurz, was du machen wirst"
         )
-        
+
         submitted = st.form_submit_button(
             "🚀 Challenge starten",
             use_container_width=True,
             type="primary"
         )
-        
+
         if submitted:
-            if prediction < 0:
-                st.error("Die Schätzung muss mindestens 0 sein!")
-            else:
-                # Challenge erstellen
-                challenge_id = create_challenge(
-                    user_id=user_id,
-                    subject=subject,
-                    prediction=prediction,
-                    task_description=task_description
-                )
-                
-                st.success(f"""
-                ✅ **Challenge gestartet!**
-                
-                Fach: **{subject}**  
-                Deine Schätzung: **{prediction}**
-                
-                *Mach jetzt deine Aufgabe und komm zurück, um das Ergebnis einzutragen!*
-                """)
-                
-                st.rerun()
+            # Challenge erstellen - speichere auch den Typ
+            challenge_id = create_challenge(
+                user_id=user_id,
+                subject=subject,
+                prediction=prediction,
+                task_description=f"[{prediction_type}] {task_description}" if task_description else f"[{prediction_type}]"
+            )
+
+            st.success(f"""
+            ✅ **Challenge gestartet!**
+
+            Fach: **{subject}**
+            Deine Schätzung: **{prediction_display}**
+
+            *Mach jetzt deine Aufgabe und komm zurück, um das Ergebnis einzutragen!*
+            """)
+
+            st.rerun()
     
     # Wissenschaftlicher Hintergrund
     with st.expander("🔬 Warum funktioniert das?"):
@@ -252,46 +293,92 @@ def render_challenge_phase1(user_id: str, stats: dict, color: str):
 
 def render_challenge_phase2(user_id: str, challenge: dict, color: str):
     """Phase 2: Ergebnis eintragen."""
-    
+
+    # Typ aus task_description extrahieren
+    task_desc = challenge.get('task_description', '') or ''
+    prediction_type = "note"  # Default
+    clean_task_desc = task_desc
+
+    if task_desc.startswith("[prozent]"):
+        prediction_type = "prozent"
+        clean_task_desc = task_desc.replace("[prozent]", "").strip()
+    elif task_desc.startswith("[punkte]"):
+        prediction_type = "punkte"
+        clean_task_desc = task_desc.replace("[punkte]", "").strip()
+    elif task_desc.startswith("[note]"):
+        prediction_type = "note"
+        clean_task_desc = task_desc.replace("[note]", "").strip()
+
+    prediction = challenge.get('prediction', 3)
+
+    # Schätzung formatieren
+    if prediction_type == "prozent":
+        prediction_display = f"{prediction}%"
+    elif prediction_type == "punkte":
+        prediction_display = f"{prediction} Punkte"
+    else:
+        prediction_display = f"Note {prediction}"
+
     st.markdown(f"""
     ### ⏳ Offene Challenge
-    
-    **Fach:** {challenge.get('subject', 'Unbekannt')}  
-    **Deine Schätzung:** {challenge.get('prediction', '?')} Punkte  
-    **Aufgabe:** {challenge.get('task_description', '-') or '-'}
+
+    **Fach:** {challenge.get('subject', 'Unbekannt')}
+    **Deine Schätzung:** {prediction_display}
+    **Aufgabe:** {clean_task_desc if clean_task_desc else '-'}
     """)
-    
+
     st.info("💡 Hast du die Aufgabe gemacht? Trag jetzt dein echtes Ergebnis ein!")
-    
+
     with st.form("complete_challenge_form"):
-        actual_result = st.number_input(
-            "📊 Tatsächliches Ergebnis",
-            min_value=0,
-            max_value=100,
-            value=challenge.get('prediction', 5),
-            step=1,
-            help="Wie viele Punkte oder richtige Antworten hattest du wirklich?"
-        )
-        
+        # Eingabefeld je nach Typ
+        if prediction_type == "prozent":
+            actual_result = st.slider(
+                "📊 Tatsächliches Ergebnis: So viel Prozent hatte ich richtig",
+                min_value=0,
+                max_value=100,
+                value=int(prediction),
+                step=5,
+                format="%d%%",
+                help="Wie viel Prozent hattest du wirklich richtig?"
+            )
+        elif prediction_type == "punkte":
+            actual_result = st.slider(
+                "📊 Tatsächliches Ergebnis: Diese Punktzahl habe ich erreicht",
+                min_value=0,
+                max_value=15,
+                value=min(15, int(prediction)),
+                step=1,
+                help="Wie viele Punkte hast du bekommen?"
+            )
+        else:  # note
+            actual_result = st.select_slider(
+                "📊 Tatsächliches Ergebnis: Diese Note habe ich bekommen",
+                options=[1, 2, 3, 4, 5, 6],
+                value=min(6, max(1, int(prediction))),
+                format_func=lambda x: {1: "1 (sehr gut)", 2: "2 (gut)", 3: "3 (befriedigend)",
+                                       4: "4 (ausreichend)", 5: "5 (mangelhaft)", 6: "6 (ungenügend)"}[x],
+                help="Welche Note hast du bekommen?"
+            )
+
         reflection = st.text_area(
             "💭 Reflexion (optional)",
             placeholder="Was lief gut? Was könntest du verbessern?",
             height=80
         )
-        
+
         col1, col2 = st.columns(2)
-        
+
         with col1:
             submitted = st.form_submit_button(
                 "✅ Ergebnis eintragen",
                 use_container_width=True,
                 type="primary"
             )
-        
+
         with col2:
             # Abbrechen-Button (außerhalb des Forms)
             pass
-        
+
         if submitted:
             # Challenge abschließen
             result = complete_challenge(
