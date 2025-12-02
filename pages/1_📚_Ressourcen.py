@@ -37,7 +37,8 @@ from utils.ressourcen.motivation_content import render_motivation_altersstufen
 st.set_page_config(
     page_title="Ressourcen & Tipps",
     page_icon="📚",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"  # Sidebar startet geöffnet (entfernen für collapsed)
 )
 
 # ============================================
