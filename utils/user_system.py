@@ -330,6 +330,11 @@ def render_user_login(show_stats: bool = True, show_info_bar: bool = True):
     """
     init_user_tables()
 
+    # Preview-Modus hat Vorrang
+    if is_preview_mode():
+        render_preview_banner()
+        return
+
     if is_logged_in():
         user = get_current_user()
         if user:
@@ -345,6 +350,10 @@ def render_user_login(show_stats: bool = True, show_info_bar: bool = True):
 
 def render_user_info_bar():
     """Rendert NUR die User-Info-Bar (Name, Level, XP) - für flexible Platzierung."""
+    # Im Preview-Modus: Preview-Banner wird separat gerendert
+    if is_preview_mode():
+        return
+
     if is_logged_in():
         user = get_current_user()
         if user:
@@ -369,6 +378,16 @@ def render_login_form():
         </p>
     </div>
     """, unsafe_allow_html=True)
+
+    # Preview-Modus Button
+    st.markdown("---")
+    col_preview1, col_preview2, col_preview3 = st.columns([1, 2, 1])
+    with col_preview2:
+        if st.button("👁️ App nur ansehen (Preview-Modus)", use_container_width=True, type="secondary"):
+            start_preview_mode("unterstufe")
+            st.rerun()
+        st.caption("Teste alle Funktionen ohne Anmeldung. Altersstufe jederzeit wechselbar.")
+    st.markdown("---")
 
     # === SCHRITT 1: Name eingeben ===
     if st.session_state.registration_step == 1:
@@ -528,4 +547,148 @@ def render_user_stats_card(user: Dict):
         </div>
     </div>
     """, unsafe_allow_html=True)
+
+
+# ============================================
+# PREVIEW-MODUS
+# ============================================
+
+PREVIEW_USER_ID = "preview_user_001"
+PREVIEW_USER_NAME = "Preview"
+
+def is_preview_mode() -> bool:
+    """Prüft ob der Preview-Modus aktiv ist."""
+    return st.session_state.get("preview_mode", False)
+
+
+def start_preview_mode(age_group: str = "unterstufe"):
+    """Startet den Preview-Modus mit einem temporären User."""
+    init_user_tables()
+
+    # Preview-User erstellen oder aktualisieren
+    conn = sqlite3.connect(get_db_path())
+    c = conn.cursor()
+
+    c.execute("SELECT user_id FROM users WHERE user_id = ?", (PREVIEW_USER_ID,))
+    exists = c.fetchone()
+
+    if exists:
+        # Altersstufe aktualisieren
+        c.execute("""
+            UPDATE users SET age_group = ?, updated_at = ?
+            WHERE user_id = ?
+        """, (age_group, datetime.now().isoformat(), PREVIEW_USER_ID))
+    else:
+        # Neuen Preview-User erstellen
+        c.execute("""
+            INSERT INTO users (user_id, display_name, age_group, avatar_style, level, xp_total,
+                             current_streak, longest_streak, created_at, updated_at)
+            VALUES (?, ?, ?, ?, 1, 0, 0, 0, ?, ?)
+        """, (PREVIEW_USER_ID, PREVIEW_USER_NAME, age_group, "thumbs",
+              datetime.now().isoformat(), datetime.now().isoformat()))
+
+    conn.commit()
+    conn.close()
+
+    # Session State setzen
+    st.session_state.preview_mode = True
+    st.session_state.current_user_id = PREVIEW_USER_ID
+    st.session_state.current_user_name = PREVIEW_USER_NAME
+    st.session_state.current_user_age_group = age_group
+
+
+def end_preview_mode():
+    """Beendet den Preview-Modus."""
+    st.session_state.preview_mode = False
+    st.session_state.current_user_id = None
+    st.session_state.current_user_name = None
+    st.session_state.current_user_age_group = None
+
+
+def reset_preview_data():
+    """Setzt alle Preview-User Daten zurück."""
+    conn = sqlite3.connect(get_db_path())
+    c = conn.cursor()
+
+    # User-Daten zurücksetzen
+    c.execute("""
+        UPDATE users SET level = 1, xp_total = 0, current_streak = 0, longest_streak = 0
+        WHERE user_id = ?
+    """, (PREVIEW_USER_ID,))
+
+    # Challenges löschen
+    c.execute("DELETE FROM challenges WHERE user_id = ?", (PREVIEW_USER_ID,))
+
+    # Badges löschen
+    c.execute("DELETE FROM user_badges WHERE user_id = ?", (PREVIEW_USER_ID,))
+
+    conn.commit()
+    conn.close()
+
+
+def change_preview_age_group(age_group: str):
+    """Ändert die Altersstufe im Preview-Modus."""
+    if is_preview_mode():
+        conn = sqlite3.connect(get_db_path())
+        c = conn.cursor()
+        c.execute("""
+            UPDATE users SET age_group = ?, updated_at = ?
+            WHERE user_id = ?
+        """, (age_group, datetime.now().isoformat(), PREVIEW_USER_ID))
+        conn.commit()
+        conn.close()
+
+        st.session_state.current_user_age_group = age_group
+
+
+def render_preview_banner():
+    """Rendert den Preview-Banner mit Altersstufen-Wechsler."""
+    if not is_preview_mode():
+        return
+
+    current_age = st.session_state.get("current_user_age_group", "unterstufe")
+
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                color: white; padding: 10px 20px; border-radius: 10px; margin-bottom: 15px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <strong>👁️ PREVIEW-MODUS</strong>
+                <span style="opacity: 0.9; margin-left: 10px;">Teste alle Funktionen ohne echten Account</span>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Altersstufen-Wechsler
+    st.markdown("**Altersstufe wechseln:**")
+    cols = st.columns([1, 1, 1, 1, 1, 1])
+
+    age_options = [
+        ("grundschule", "🎒 Grundschule"),
+        ("unterstufe", "📚 Unterstufe"),
+        ("mittelstufe", "🎯 Mittelstufe"),
+        ("oberstufe", "🎓 Oberstufe"),
+    ]
+
+    for idx, (age_key, age_label) in enumerate(age_options):
+        with cols[idx]:
+            is_selected = current_age == age_key
+            btn_type = "primary" if is_selected else "secondary"
+            if st.button(age_label, key=f"preview_age_{age_key}", use_container_width=True, type=btn_type):
+                change_preview_age_group(age_key)
+                st.rerun()
+
+    # Reset und Beenden Buttons
+    with cols[4]:
+        if st.button("🗑️ Reset", key="preview_reset", use_container_width=True):
+            reset_preview_data()
+            st.rerun()
+
+    with cols[5]:
+        if st.button("🚪 Beenden", key="preview_end", use_container_width=True):
+            end_preview_mode()
+            st.rerun()
+
+    st.divider()
 

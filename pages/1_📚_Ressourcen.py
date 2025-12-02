@@ -56,7 +56,7 @@ except ImportError:
 # ============================================
 
 try:
-    from utils.user_system import render_user_login, render_user_info_bar, is_logged_in, get_current_user
+    from utils.user_system import render_user_login, render_user_info_bar, is_logged_in, get_current_user, is_preview_mode
     HAS_GAMIFICATION = True
 except ImportError:
     HAS_GAMIFICATION = False
