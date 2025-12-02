@@ -16,17 +16,53 @@ except ImportError:
 
 
 def render_matheff_altersstufen(color: str):
-    """Rendert die Selbstwirksamkeits-Ressource mit Challenges + Theorie-Tabs"""
+    """Rendert die Selbstwirksamkeits-Ressource mit Challenges + Theorie-Buttons"""
 
-    tab_interaktiv, tab_theorie = st.tabs([
-        "🎮 Challenges",
-        "📚 Theorie dahinter"
-    ])
+    # Session State für Tab-Auswahl
+    if "matheff_tab" not in st.session_state:
+        st.session_state.matheff_tab = "challenges"
+
+    # Große auffällige Auswahl-Buttons
+    col1, col2 = st.columns(2)
+
+    with col1:
+        is_challenges = st.session_state.matheff_tab == "challenges"
+        if is_challenges:
+            st.markdown(f"""
+            <div style="background: {color}; color: white; padding: 20px; border-radius: 12px;
+                        text-align: center; cursor: default;">
+                <div style="font-size: 2em;">🎮</div>
+                <div style="font-size: 1.2em; font-weight: bold;">Challenges</div>
+                <div style="font-size: 0.85em; opacity: 0.9;">Interaktive Übungen</div>
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            if st.button("🎮\nChallenges\nInteraktive Übungen", key="btn_challenges", use_container_width=True):
+                st.session_state.matheff_tab = "challenges"
+                st.rerun()
+
+    with col2:
+        is_theorie = st.session_state.matheff_tab == "theorie"
+        if is_theorie:
+            st.markdown(f"""
+            <div style="background: {color}; color: white; padding: 20px; border-radius: 12px;
+                        text-align: center; cursor: default;">
+                <div style="font-size: 2em;">📚</div>
+                <div style="font-size: 1.2em; font-weight: bold;">Theorie dahinter</div>
+                <div style="font-size: 0.85em; opacity: 0.9;">Wissenschaftlicher Hintergrund</div>
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            if st.button("📚\nTheorie dahinter\nWissenschaftlicher Hintergrund", key="btn_theorie", use_container_width=True):
+                st.session_state.matheff_tab = "theorie"
+                st.rerun()
+
+    st.divider()
 
     # ==========================================
-    # TAB 1: INTERAKTIV (Hattie + Bandura Challenge)
+    # CHALLENGES-Bereich
     # ==========================================
-    with tab_interaktiv:
+    if st.session_state.matheff_tab == "challenges":
         # Gamification Widgets einbinden
         if HAS_GAMIFICATION:
             # Bandura-Challenge
@@ -92,9 +128,9 @@ def render_matheff_altersstufen(color: str):
                 """)
 
     # ==========================================
-    # TAB 2: THEORIE DAHINTER (mit Altersstufen-Auswahl)
+    # THEORIE-Bereich
     # ==========================================
-    with tab_theorie:
+    else:
         # Altersstufen-Auswahl als Buttons
         st.markdown("### Wähle deine Altersstufe:")
 
