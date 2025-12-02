@@ -60,15 +60,15 @@ def render_matheff_altersstufen(color: str):
 
         # Gamification Widgets einbinden
         if HAS_GAMIFICATION:
-            # Hattie-Challenge
-            render_hattie_challenge_widget(compact=False, color=color)
+            # Bandura-Challenge
+            render_bandura_sources_widget(compact=False, color="#9C27B0")
 
             # Trenner zwischen den beiden Challenges
             st.markdown("---")
             st.markdown("")
 
-            # Bandura-Challenge
-            render_bandura_sources_widget(compact=False, color="#9C27B0")
+            # Hattie-Challenge
+            render_hattie_challenge_widget(compact=False, color=color)
         else:
             st.warning("""
             ⚠️ **Gamification-Module nicht gefunden.**
