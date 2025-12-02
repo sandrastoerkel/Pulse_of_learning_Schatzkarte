@@ -553,7 +553,6 @@ def render_user_stats_card(user: Dict):
 # PREVIEW-MODUS
 # ============================================
 
-PREVIEW_USER_ID = "preview_user_001"
 PREVIEW_USER_NAME = "Preview"
 
 def is_preview_mode() -> bool:
@@ -563,45 +562,16 @@ def is_preview_mode() -> bool:
 
 def start_preview_mode(age_group: str = "unterstufe"):
     """Startet den Preview-Modus mit einem temporären User."""
-    init_user_tables()
+    # Nutze die existierende Funktion um den Preview-User zu erstellen/aktualisieren
+    user = get_or_create_user_by_name(PREVIEW_USER_NAME, age_group=age_group)
 
-    # Preview-User erstellen oder aktualisieren
-    conn = sqlite3.connect(get_db_path())
-    c = conn.cursor()
-
-    c.execute("SELECT user_id FROM users WHERE user_id = ?", (PREVIEW_USER_ID,))
-    exists = c.fetchone()
-
-    if exists:
-        # Altersstufe aktualisieren
-        c.execute("""
-            UPDATE users SET age_group = ?, updated_at = ?
-            WHERE user_id = ?
-        """, (age_group, datetime.now().isoformat(), PREVIEW_USER_ID))
-    else:
-        # Neuen Preview-User erstellen (ohne avatar_style, falls Spalte nicht existiert)
-        try:
-            c.execute("""
-                INSERT INTO users (user_id, display_name, age_group, avatar_style, level, xp_total,
-                                 current_streak, longest_streak, created_at, updated_at)
-                VALUES (?, ?, ?, ?, 1, 0, 0, 0, ?, ?)
-            """, (PREVIEW_USER_ID, PREVIEW_USER_NAME, age_group, "thumbs",
-                  datetime.now().isoformat(), datetime.now().isoformat()))
-        except sqlite3.OperationalError:
-            # Fallback ohne avatar_style
-            c.execute("""
-                INSERT INTO users (user_id, display_name, age_group, level, xp_total,
-                                 current_streak, longest_streak, created_at, updated_at)
-                VALUES (?, ?, ?, 1, 0, 0, 0, ?, ?)
-            """, (PREVIEW_USER_ID, PREVIEW_USER_NAME, age_group,
-                  datetime.now().isoformat(), datetime.now().isoformat()))
-
-    conn.commit()
-    conn.close()
+    # Altersstufe aktualisieren falls nötig
+    if user.get("age_group") != age_group:
+        update_user_age_group(user["user_id"], age_group)
 
     # Session State setzen
     st.session_state.preview_mode = True
-    st.session_state.current_user_id = PREVIEW_USER_ID
+    st.session_state.current_user_id = user["user_id"]
     st.session_state.current_user_name = PREVIEW_USER_NAME
     st.session_state.current_user_age_group = age_group
 
@@ -616,20 +586,30 @@ def end_preview_mode():
 
 def reset_preview_data():
     """Setzt alle Preview-User Daten zurück."""
+    user_id = st.session_state.get("current_user_id")
+    if not user_id:
+        return
+
     conn = sqlite3.connect(get_db_path())
     c = conn.cursor()
 
-    # User-Daten zurücksetzen
-    c.execute("""
-        UPDATE users SET level = 1, xp_total = 0, current_streak = 0, longest_streak = 0
-        WHERE user_id = ?
-    """, (PREVIEW_USER_ID,))
+    # User-Daten zurücksetzen (nur Spalten die existieren)
+    try:
+        c.execute("UPDATE users SET xp_total = 0, current_streak = 0, longest_streak = 0 WHERE user_id = ?", (user_id,))
+    except sqlite3.OperationalError:
+        pass  # Spalten existieren möglicherweise nicht
 
     # Challenges löschen
-    c.execute("DELETE FROM challenges WHERE user_id = ?", (PREVIEW_USER_ID,))
+    try:
+        c.execute("DELETE FROM challenges WHERE user_id = ?", (user_id,))
+    except sqlite3.OperationalError:
+        pass
 
     # Badges löschen
-    c.execute("DELETE FROM user_badges WHERE user_id = ?", (PREVIEW_USER_ID,))
+    try:
+        c.execute("DELETE FROM user_badges WHERE user_id = ?", (user_id,))
+    except sqlite3.OperationalError:
+        pass
 
     conn.commit()
     conn.close()
@@ -638,15 +618,9 @@ def reset_preview_data():
 def change_preview_age_group(age_group: str):
     """Ändert die Altersstufe im Preview-Modus."""
     if is_preview_mode():
-        conn = sqlite3.connect(get_db_path())
-        c = conn.cursor()
-        c.execute("""
-            UPDATE users SET age_group = ?, updated_at = ?
-            WHERE user_id = ?
-        """, (age_group, datetime.now().isoformat(), PREVIEW_USER_ID))
-        conn.commit()
-        conn.close()
-
+        user_id = st.session_state.get("current_user_id")
+        if user_id:
+            update_user_age_group(user_id, age_group)
         st.session_state.current_user_age_group = age_group
 
 
