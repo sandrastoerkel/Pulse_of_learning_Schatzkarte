@@ -88,11 +88,54 @@ elif 'selected_factor' not in st.session_state or st.session_state.selected_fact
 factor = st.session_state.selected_factor
 
 # ============================================
-# SIDEBAR-NAVIGATION
+# KACHEL-NAVIGATION (auf der Hauptseite)
+# Zum Entfernen: Diesen Block löschen (bis "# END KACHEL-NAVIGATION")
+# ============================================
+
+st.markdown("### 📚 Wähle einen Bereich:")
+
+# Kacheln in einer Reihe
+cols = st.columns(len(CONTENT_DATABASE))
+for idx, (key, val) in enumerate(CONTENT_DATABASE.items()):
+    with cols[idx]:
+        btn_icon = val.get('icon', '📚')
+        btn_name = val.get('name_schueler', key)
+        btn_color = val.get('color', '#667eea')
+        is_selected = (key == factor)
+
+        # Kachel als Button mit farbigem Hintergrund wenn ausgewählt
+        if is_selected:
+            st.markdown(f"""
+            <div style="background: {btn_color}; color: white; padding: 15px 10px;
+                        border-radius: 12px; text-align: center; margin-bottom: 5px;">
+                <div style="font-size: 1.8em;">{btn_icon}</div>
+                <div style="font-size: 0.9em; font-weight: bold;">{btn_name}</div>
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.markdown(f"""
+            <div style="background: #f0f2f6; color: #333; padding: 15px 10px;
+                        border-radius: 12px; text-align: center; margin-bottom: 5px;
+                        border: 2px solid transparent;">
+                <div style="font-size: 1.8em;">{btn_icon}</div>
+                <div style="font-size: 0.9em;">{btn_name}</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        if st.button("Auswählen" if not is_selected else "✓ Aktiv", key=f"tile_{key}",
+                     use_container_width=True, disabled=is_selected):
+            st.session_state.selected_factor = key
+            st.rerun()
+
+st.divider()
+# END KACHEL-NAVIGATION
+
+# ============================================
+# SIDEBAR-NAVIGATION (zusätzlich)
 # ============================================
 
 with st.sidebar:
-    st.markdown("### 📚 Wähle einen Bereich:")
+    st.markdown("### 📚 Bereiche:")
     for key, val in CONTENT_DATABASE.items():
         btn_icon = val.get('icon', '📚')
         btn_name = val.get('name_schueler', key)
