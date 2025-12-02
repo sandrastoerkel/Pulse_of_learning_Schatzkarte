@@ -101,30 +101,76 @@ def render_learnstrat_altersstufen(color: str):
                     current_streak = user_data.get("current_streak", 0)
                     update_user_stats(user_id, xp, current_streak)
 
-                # Sub-Tabs für verschiedene Challenges
-                challenge_tab1, challenge_tab2, challenge_tab3 = st.tabs([
-                    "💪 Die 7 Powertechniken",
-                    "🚀 Das Geheimnis der Überflieger",
-                    "🧠 Die Birkenbihl-Methode"
-                ])
+                # Session State für Challenge-Auswahl
+                if "learnstrat_challenge" not in st.session_state:
+                    st.session_state.learnstrat_challenge = "powertechniken"
 
-                with challenge_tab1:
+                # Challenge-Auswahl als große Buttons
+                c1, c2, c3 = st.columns(3)
+
+                with c1:
+                    is_selected = st.session_state.learnstrat_challenge == "powertechniken"
+                    if is_selected:
+                        st.markdown("""
+                        <div style="background: #22c55e; color: white; padding: 15px; border-radius: 12px;
+                                    text-align: center;">
+                            <div style="font-size: 1.5em;">💪</div>
+                            <div style="font-size: 0.95em; font-weight: bold;">Die 7 Powertechniken</div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    else:
+                        if st.button("💪\nDie 7 Powertechniken", key="btn_power", use_container_width=True):
+                            st.session_state.learnstrat_challenge = "powertechniken"
+                            st.rerun()
+
+                with c2:
+                    is_selected = st.session_state.learnstrat_challenge == "transfer"
+                    if is_selected:
+                        st.markdown("""
+                        <div style="background: #22c55e; color: white; padding: 15px; border-radius: 12px;
+                                    text-align: center;">
+                            <div style="font-size: 1.5em;">🚀</div>
+                            <div style="font-size: 0.95em; font-weight: bold;">Das Geheimnis der Überflieger</div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    else:
+                        if st.button("🚀\nDas Geheimnis der Überflieger", key="btn_transfer", use_container_width=True):
+                            st.session_state.learnstrat_challenge = "transfer"
+                            st.rerun()
+
+                with c3:
+                    is_selected = st.session_state.learnstrat_challenge == "birkenbihl"
+                    if is_selected:
+                        st.markdown("""
+                        <div style="background: #22c55e; color: white; padding: 15px; border-radius: 12px;
+                                    text-align: center;">
+                            <div style="font-size: 1.5em;">🧠</div>
+                            <div style="font-size: 0.95em; font-weight: bold;">Die Birkenbihl-Methode</div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    else:
+                        if st.button("🧠\nDie Birkenbihl-Methode", key="btn_birkenbihl", use_container_width=True):
+                            st.session_state.learnstrat_challenge = "birkenbihl"
+                            st.rerun()
+
+                st.divider()
+
+                # Challenge-Inhalt anzeigen
+                if st.session_state.learnstrat_challenge == "powertechniken":
                     st.caption("Challenge 1: Wissenschaftlich fundierte Lerntechniken kennenlernen")
                     render_powertechniken_challenge(
                         user=user,
                         conn=conn,
                         xp_callback=award_xp_callback
                     )
-
-                with challenge_tab2:
+                elif st.session_state.learnstrat_challenge == "transfer":
                     st.caption("Challenge 2: Transfer-Strategien (Effektstärke d=0.86!)")
                     render_transfer_challenge(
                         user=user,
                         conn=conn,
                         xp_callback=award_xp_callback
                     )
-
-                with challenge_tab3:
+                else:
                     st.caption("Challenge 3: Die Birkenbihl-Methode (nach Vera F. Birkenbihl)")
                     render_birkenbihl_challenge(
                         user=user,
