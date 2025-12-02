@@ -55,7 +55,7 @@ except ImportError:
 # ============================================
 
 try:
-    from utils.user_system import render_user_login, is_logged_in
+    from utils.user_system import render_user_login, is_logged_in, get_current_user
     HAS_GAMIFICATION = True
 except ImportError:
     HAS_GAMIFICATION = False
@@ -74,8 +74,6 @@ if HAS_GAMIFICATION:
     # Nur fortfahren wenn eingeloggt
     if not is_logged_in():
         st.stop()
-
-st.divider()
 
 # URL-Parameter oder Session State
 query_params = st.query_params
@@ -160,7 +158,32 @@ if factor == "MATHEFF":
 elif factor == "EXT_LEARNSTRAT":
     render_learnstrat_altersstufen(color)
 elif factor == "EXT_MOTIV":
-    render_motivation_altersstufen(color)
+    # Für Motivation-Challenges: Connection und User-Daten übergeben
+    if HAS_GAMIFICATION and is_logged_in():
+        user = get_current_user()
+        if user:
+            from utils.gamification_db import get_db_path, update_user_stats, get_or_create_user
+            import sqlite3
+            conn = sqlite3.connect(get_db_path())
+
+            user_data = {
+                "user_id": user.get("user_id", "anonymous"),
+                "display_name": user.get("display_name", "Lernender"),
+                "age_group": user.get("age_group", "unterstufe")
+            }
+
+            def award_xp_callback(user_id, xp, reason):
+                """Vergibt XP an den User."""
+                u = get_or_create_user(user_id)
+                current_streak = u.get("current_streak", 0)
+                update_user_stats(user_id, xp, current_streak)
+
+            render_motivation_altersstufen(color, conn=conn, user_data=user_data, xp_callback=award_xp_callback)
+            conn.close()
+        else:
+            render_motivation_altersstufen(color)
+    else:
+        render_motivation_altersstufen(color)
 else:
     # Standard-Tabs für alle anderen Ressourcen
     tab1, tab2, tab3 = st.tabs(["💡 Tipps & Übungen", "🔬 Wissenschaft", "🎬 Videos"])

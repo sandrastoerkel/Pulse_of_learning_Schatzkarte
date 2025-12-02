@@ -432,58 +432,34 @@ def render_login_form():
             st.rerun()
 
 def render_logged_in_view(user: Dict, show_stats: bool = True):
-    """Rendert die Ansicht für eingeloggte Benutzer mit Avatar."""
+    """Rendert die Ansicht für eingeloggte Benutzer - kompakt ohne Avatar."""
 
     display_name = user.get('display_name', 'Lernender')
     level = user.get('level', 1)
     xp = user.get('xp_total', 0)
     streak = user.get('current_streak', 0)
-    age_group = user.get('age_group', 'unterstufe')
 
-    # Avatar URL generieren
-    avatar_url = get_avatar_url(user)
+    # Level-Emoji statt Avatar
+    level_emojis = {1: "🌱", 2: "🔍", 3: "📚", 4: "📈", 5: "🚀", 6: "🏆", 7: "⭐", 8: "👑"}
+    level_emoji = level_emojis.get(level, "🌱")
 
-    # Level-Info
-    level_names = {1: "Anfänger", 2: "Entdecker", 3: "Lernender", 4: "Aufsteiger",
-                   5: "Übertreffer", 6: "Meister", 7: "Experte", 8: "Champion"}
-    level_name = level_names.get(level, "Anfänger")
+    # Kompakte Inline-Anzeige
+    col1, col2, col3, col4, col5 = st.columns([3, 1, 1, 1, 0.5])
 
-    # Altersstufen-Label
-    age_label = AVATAR_STYLES_BY_AGE.get(age_group, {}).get('label', '📚 Schüler')
-
-    # Kompakte Header-Leiste mit Avatar
-    st.markdown(f"""
-    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white; padding: 12px 20px; border-radius: 12px; margin-bottom: 20px;
-                display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <img src="{avatar_url}" style="width: 60px; height: 60px; border-radius: 50%;
-                      border: 3px solid rgba(255,255,255,0.5); background: white;">
-            <div>
-                <div style="font-size: 1.1em; font-weight: bold;">Hallo, {display_name}!</div>
-                <div style="font-size: 0.85em; opacity: 0.9;">Level {level} · {level_name}</div>
-                <div style="font-size: 0.75em; opacity: 0.7;">{age_label}</div>
-            </div>
-        </div>
-        <div style="display: flex; gap: 15px; align-items: center;">
-            <div style="text-align: center; background: rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 8px;">
-                <div style="font-size: 1.3em; font-weight: bold;">{xp:,}</div>
-                <div style="font-size: 0.75em; opacity: 0.9;">XP</div>
-            </div>
-            <div style="text-align: center; background: rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 8px;">
-                <div style="font-size: 1.3em; font-weight: bold;">🔥 {streak}</div>
-                <div style="font-size: 0.75em; opacity: 0.9;">Streak</div>
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # Logout-Button
-    col1, col2 = st.columns([6, 1])
+    with col1:
+        st.markdown(f"**{level_emoji} {display_name}** · Level {level}")
     with col2:
-        if st.button("🚪", help="Abmelden / Benutzer wechseln", key="logout_btn"):
+        st.markdown(f"⭐ **{xp:,}** XP")
+    with col3:
+        st.markdown(f"🔥 **{streak}** Streak")
+    with col4:
+        pass  # Platzhalter
+    with col5:
+        if st.button("🚪", help="Abmelden", key="logout_btn"):
             logout_user()
             st.rerun()
+
+    st.divider()
 
 def render_user_stats_card(user: Dict):
     """Rendert eine detaillierte Statistik-Karte."""
