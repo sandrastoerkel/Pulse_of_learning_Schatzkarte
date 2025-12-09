@@ -210,23 +210,28 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# Kurzinfo-Box (vorher in Sidebar)
+# Kurzinfo-Box (vorher in Sidebar) - NICHT für EXT_LEARNSTRAT (da mehrere Bereiche mit unterschiedlichen Hattie-Werten)
 wissenschaft = content.get('wissenschaft', {})
-col_intro, col_info = st.columns([3, 1])
 
-with col_intro:
-    # Intro Text
+if factor == "EXT_LEARNSTRAT":
+    # Für Lernstrategien: Nur Intro-Text, keine Kurzinfo (da 7 Techniken, Transfer, Birkenbihl verschiedene Werte haben)
     st.markdown(content.get('intro_text', ''))
+else:
+    col_intro, col_info = st.columns([3, 1])
 
-with col_info:
-    st.markdown(f"""
-    <div style="background: #f8f9fa; border-radius: 10px; padding: 15px; border-left: 4px solid {color};">
-        <strong>{icon} Kurzinfo</strong><br><br>
-        <strong>Hattie d:</strong> {wissenschaft.get('hattie_d', '?')}<br>
-        <strong>Rang:</strong> #{wissenschaft.get('hattie_rank', '?')} / 252<br>
-        <strong>PISA:</strong> {wissenschaft.get('pisa_impact', '?')}
-    </div>
-    """, unsafe_allow_html=True)
+    with col_intro:
+        # Intro Text
+        st.markdown(content.get('intro_text', ''))
+
+    with col_info:
+        st.markdown(f"""
+        <div style="background: #f8f9fa; border-radius: 10px; padding: 15px; border-left: 4px solid {color};">
+            <strong>{icon} Kurzinfo</strong><br><br>
+            <strong>Hattie d:</strong> {wissenschaft.get('hattie_d', '?')}<br>
+            <strong>Rang:</strong> #{wissenschaft.get('hattie_rank', '?')} / 252<br>
+            <strong>PISA:</strong> {wissenschaft.get('pisa_impact', '?')}
+        </div>
+        """, unsafe_allow_html=True)
 
 st.divider()
 
@@ -290,15 +295,5 @@ else:
 
 st.divider()
 
-col1, col2 = st.columns(2)
-
-with col1:
-    if st.button("⬅️ Zurück zur Auswertung", use_container_width=True):
-        st.switch_page("pages/4_📊_Auswertung.py")
-
-with col2:
-    st.markdown("""
-    <div style="text-align: right; color: #888; font-size: 14px; padding-top: 8px;">
-        💡 Tipp: Fang mit EINEM Video oder EINEM Tipp an!
-    </div>
-    """, unsafe_allow_html=True)
+if st.button("⬅️ Zurück zur Auswertung"):
+    st.switch_page("pages/4_📊_Auswertung.py")

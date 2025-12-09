@@ -49,208 +49,764 @@ PHASE_1_CONTENT = {
     
     "altersstufen": {
         "grundschule": {
-            "intro": """Kennst du diese Kids, die irgendwie ALLES können? 🦸‍♀️🦸‍♂️
+            "title": "Das Transfer-Geheimnis",
+            "icon": "🔮",
 
-Die sind nicht schlauer als du! Die haben ein Geheimnis entdeckt:
-Sie können ihr Wissen wie einen **Zauberspruch** überall einsetzen!
+            "hook": """**Eine Überraschung: Überflieger sind gar nicht schlauer!** 🌟
 
-Stell dir vor: Du lernst einen mega coolen Drachen-Move in einem Spiel. 🐉
-Und plötzlich merkst du: Den gleichen Move kannst du auch beim Fangen spielen benutzen!
+Kennst du Kinder, die in vielen Fächern gut sind?
+Mathe, Deutsch, Sachkunde – sie können einfach alles?
 
-Das nennt man **Transfer** – und DU kannst das auch lernen!""",
-            
-            "story": """**Die Geschichte von Mia und dem Drachen-Geheimnis** 🐲
+Viele glauben: Diese Kinder sind besonders schlau geboren.
+**Das stimmt aber nicht!**
 
-Mia liebte ihr Drachen-Spiel. Sie hatte gelernt, wie man den Drachen im perfekten Moment ausweichen lässt.
+Forscher haben genau hingeschaut.
+Und sie haben etwas Spannendes entdeckt.""",
 
-Eines Tages beim Völkerball merkte sie: "Hey, das ist ja wie beim Drachen!" 
-Sie wich genauso aus – und niemand konnte sie treffen!
+            "mythos_buster": """**Was viele glauben:** "Manche Kinder sind einfach Überflieger."
 
-Ihr Geheimnis? Sie hatte das PRINZIP verstanden: 
-"Beobachte, warte, dann blitzschnell zur Seite!"
+**Was wirklich stimmt:** Überflieger kennen einen besonderen Trick.
+Sie können ihr Wissen ÜBERTRAGEN.
 
-Das funktioniert bei Drachen, beim Völkerball, sogar beim Verstecken!""",
-            
+Das bedeutet: Was sie an einer Stelle lernen, nutzen sie auch woanders.
+Wie ein Schlüssel, der viele Türen öffnet.
+
+**Und das Beste?**
+Diesen Trick kann jeder lernen. Auch du!""",
+
+            "wissenschaft_einfach": """**Was haben Forscher herausgefunden?**
+
+Wissenschaftler haben viele Schüler beobachtet.
+Einige lernten ganz normal. Andere lernten den Transfer-Trick dazu.
+
+Das Ergebnis war erstaunlich:
+Die Kinder mit dem Transfer-Trick waren viel erfolgreicher! 📊
+
+Stell dir das so vor:
+- Ohne Transfer: Du lernst 10 Dinge auswendig.
+- Mit Transfer: Du lernst 10 Dinge und kannst sie in 100 Situationen anwenden!
+
+Das ist, als würdest du ein Werkzeug bekommen, das überall funktioniert.""",
+
+            "gaming_beispiel": """**Kennst du das vom Spielen?** 🎮
+
+Stell dir vor, du lernst ein neues Brettspiel.
+Am Anfang verstehst du die Regeln noch nicht so gut.
+Aber irgendwann macht es "Klick" – du verstehst, wie das Spiel funktioniert!
+
+Ab dann kannst du auch ähnliche Spiele viel schneller lernen.
+Weil du das PRINZIP verstanden hast.
+
+Genau DAS ist Transfer:
+Ein Prinzip einmal verstehen und dann überall anwenden.""",
+
+            "alltag_beispiel": """**Wie Lisa Schwimmen und Radfahren verband** 🚴
+
+Lisa lernte gerade Schwimmen.
+Ihre Trainerin sagte: "Nicht aufgeben! Jeder braucht am Anfang Zeit."
+
+Lisa übte jeden Tag ein bisschen. Brustschwimmen, Kraulen, Tauchen.
+Nach einigen Wochen konnte sie es!
+
+Dann wollte Lisa Fahrradfahren ohne Stützräder lernen.
+Am Anfang wackelte sie und hatte Angst.
+
+Aber dann dachte sie: "Moment mal – das ist ja wie beim Schwimmen!"
+- Nicht aufgeben
+- Jeden Tag ein bisschen üben
+- Es wird langsam besser
+
+**DAS ist Transfer.**
+Was beim Schwimmen half, half auch beim Radfahren!""",
+
+            "story": """**Wie Tim sein Lego-Wissen nutzte** 🧱
+
+Tim baute liebend gern mit Lego.
+Er hatte einen Trick: Erst die Anleitung genau anschauen, dann Schritt für Schritt bauen.
+
+Eines Tages hatte er eine schwere Sachkunde-Aufgabe.
+Er sollte beschreiben, wie eine Pflanze wächst.
+
+Tim überlegte: "Das ist ja wie bei Lego!"
+
+1. ANSCHAUEN: Was soll ich genau machen?
+2. SCHRITT FÜR SCHRITT: Erst der Samen, dann die Wurzeln, dann der Stängel...
+3. FERTIG: Am Ende die Blüte!
+
+Er schrieb alles der Reihe nach auf.
+Seine Lehrerin war begeistert!
+
+**Das Geheimnis?** Der gleiche Trick funktioniert überall!""",
+
+            "mini_experiment": """**Probiere es selbst aus!** 🧪
+
+Denk an etwas, das du richtig gut kannst.
+Vielleicht Fußball? Oder Malen? Oder ein Instrument?
+
+Jetzt überlege:
+Was ist dein besonderer Trick dabei?
+
+Zum Beispiel:
+- Beim Fußball: "Immer zum Ball schauen!"
+- Beim Malen: "Erst grob, dann die Details."
+- Beim Flöte spielen: "Langsam anfangen, dann schneller werden."
+
+Und jetzt die spannende Frage:
+Wo könnte dir der GLEICHE Trick in der Schule helfen?
+
+- Immer hinschauen → Beim Lesen genau auf die Wörter achten?
+- Erst grob, dann Details → Beim Aufsatz erst die Ideen, dann ausformulieren?
+- Langsam anfangen → Beim Rechnen erst die leichten Aufgaben?""",
+
+            "uebertritt_beispiel": """**Das hilft dir beim Übertritt!** 🎒
+
+Bald kommst du auf eine neue Schule.
+Dort gibt es neue Fächer wie Englisch oder Geschichte.
+
+Das klingt vielleicht schwierig.
+Aber mit Transfer wird es leichter!
+
+Denn vieles, was du jetzt schon kannst, hilft dir auch dort:
+- Texte verstehen → Hilft in JEDEM Fach
+- Sauber schreiben → Hilft bei JEDER Arbeit
+- Gut zuhören → Hilft in JEDER Stunde
+
+**Du fängst nicht bei Null an!**
+Du nimmst dein Wissen mit – und wendest es neu an.""",
+
             "exercise": {
-                "title": "Dein erster Transfer-Zauber! ✨",
-                "instruction": "Denk an etwas Cooles, das du richtig gut kannst (Tanzen, Gaming, Sport...). Wo könntest du das GLEICHE Prinzip noch benutzen?",
-                "examples": [
-                    "🎮 Gaming-Reaktionen → Beim Sport schnell reagieren",
-                    "💃 Tanz-Rhythmus → Mathe-Muster erkennen", 
-                    "⚽ Ball-Timing → Musik-Takt treffen",
-                ],
-                "prompt": "Ich kann gut: _______ \nDas gleiche Prinzip hilft mir bei: _______",
+                "title": "Dein Transfer-Moment! ⭐",
+                "instruction": "Fülle die Lücken aus:",
+                "template": """
+**1. Ich bin gut in:** _____________
+(z.B. Fußball, Schwimmen, Lego bauen, Malen, Musik...)
+
+**2. Mein besonderer Trick dabei ist:** _____________
+(Was machst du, damit es gut klappt?)
+
+**3. Dieser Trick könnte mir auch helfen bei:** _____________
+(In welchem Schulfach? Bei welcher Aufgabe?)
+
+**4. Weil:** _____________
+(Warum ist es ähnlich?)
+""",
+                "beispiel_loesung": """
+**1. Ich bin gut in:** Lego bauen
+
+**2. Mein besonderer Trick:** Erst die Anleitung lesen, dann Schritt für Schritt bauen
+
+**3. Das hilft mir auch bei:** Textaufgaben in Mathe
+
+**4. Weil:** Auch da muss ich erst genau lesen, was ich machen soll!
+""",
+                "prompt": "Fülle die Lücken aus:",
             },
-            
-            "fun_fact": "Wissenschaftler haben herausgefunden: Wer Transfer lernt, wird in ALLEN Fächern besser! 🧠✨",
+
+            "take_home": """**Das darfst du dir merken:** 🧠
+
+Überflieger sind nicht schlauer als andere.
+Sie können ihr Wissen einfach gut ÜBERTRAGEN.
+
+Das Geheimnis: Sie erkennen das Prinzip hinter den Dingen.
+Ein Prinzip lernt man einmal.
+Dann kann man es überall anwenden.
+
+**Du kannst das auch lernen!**""",
+
+            "fun_fact": """**Wusstest du das?**
+Wissenschaftler sagen: Wer gut im Übertragen ist, wird in ALLEN Fächern besser!
+Nicht nur in einem – in allen gleichzeitig.
+Das ist fast wie eine Superkraft! 🦸""",
+
+            "eltern_tipp": """💡 **Für Eltern:**
+Fragen Sie beim Üben: "Kennst du etwas Ähnliches? Wo hast du so etwas schon mal gemacht?"
+Das trainiert Transfer ganz automatisch!""",
         },
-        
+
         "unterstufe": {
-            "intro": """Kennst du die Leute, die irgendwie alles checken? 🤔
+            "title": "Das Transfer-Geheimnis",
+            "icon": "🔮",
 
-Die haben ein Geheimnis, das die meisten nicht kennen:
-Sie können ihr Wissen **übertragen** – von einer Situation zur nächsten!
+            "hook": """**Warum verstehen manche Leute einfach ALLES?** 🤔
 
-Das ist wie ein Cheat-Code fürs Lernen. Und das Beste?
-Jeder kann das lernen. Effektstärke d=0.86 – wissenschaftlich bewiesen!
+Du kennst sie. Die, bei denen es einfach klickt.
+Neue Themen? Kein Problem. Andere Fächer? Auch kein Problem.
 
-Das bedeutet: Transfer-Strategien gehören zu den STÄRKSTEN Lernmethoden überhaupt.""",
-            
-            "story": """**Warum Tim plötzlich in Mathe besser wurde** 📈
+Die meisten denken: "Die sind halt schlau."
+**Überraschung: Das stimmt nicht.**
 
-Tim war gut in Fortnite. Er wusste genau, wie man Ressourcen einteilt.
+Forscher haben das untersucht.
+Was sie gefunden haben, ist beeindruckend.""",
 
-Eines Tages in Mathe: Textaufgabe über Taschengeld einteilen.
-Tim dachte: "Moment... das ist ja wie bei meinen Ressourcen!"
+            "mythos_buster": """**Der Mythos:** "Entweder man ist schlau oder nicht."
 
-Er benutzte die GLEICHE Denkweise – und löste die Aufgabe sofort.
+**Die Realität:** Es gibt einen Skill, den fast niemand kennt.
+Er heißt **Transfer**.
 
-Das Prinzip: "Einteilen, priorisieren, nichts verschwenden"
-Funktioniert bei Games, Geld, Zeit, und sogar beim Lernen!""",
-            
+Transfer = Wissen von einer Situation auf andere übertragen.
+
+Das ist kein Talent. Das ist eine Technik.
+Und die kannst du lernen.""",
+
+            "wissenschaft": """**Was sagt die Wissenschaft?**
+
+Forscher haben über 200 Studien ausgewertet.
+Effektstärke von Transfer-Strategien: **d=0.86**
+
+Was heißt das?
+- Durchschnittliche Lernmethode: d=0.40
+- Transfer: d=0.86 = **mehr als doppelt so effektiv!**
+
+Konkret: Wenn du Transfer beherrschst,
+lernst du mit dem gleichen Aufwand VIEL mehr.""",
+
+            "alltag_beispiel": """**So funktioniert das im echten Leben:**
+
+Du lernst in Mathe: Gleichungen lösen.
+"Was ich links mache, muss ich rechts auch machen."
+
+Dann in Physik: Formeln umstellen.
+Moment... das ist ja das GLEICHE Prinzip!
+
+Ohne Transfer: Du lernst beides komplett neu.
+Mit Transfer: Du erkennst das Muster und sparst Zeit.
+
+**Ein Prinzip. Zwei Fächer. Doppelter Nutzen.**""",
+
+            "gaming_beispiel": """**Kennst du das aus Games?** 🎮
+
+In Fortnite lernst du: Ressourcen einteilen.
+Nicht alles auf einmal ausgeben. Priorisieren.
+
+Und dann merkst du:
+Das ist wie Taschengeld einteilen!
+Oder Zeit für Hausaufgaben planen!
+
+**Gaming-Skills sind echte Skills.**
+Du musst sie nur übertragen.""",
+
+            "story": """**Wie Tom durch Minecraft besser in Erdkunde wurde** 🗺️
+
+Tom liebte Minecraft. Er baute riesige Welten.
+Dabei lernte er: Erst erkunden, dann planen, dann bauen.
+
+In Erdkunde sollten sie eine Karte analysieren.
+Die anderen starrten ratlos auf das Blatt.
+
+Tom dachte: "Das ist wie eine neue Minecraft-Welt!"
+Er erkundete systematisch: Flüsse, Berge, Städte.
+Dann plante er seine Antwort. Dann schrieb er.
+
+Seine Lehrerin war beeindruckt.
+Tom grinste. Er hatte transferiert.
+
+**Das Prinzip "Erkunden → Planen → Handeln" funktioniert überall.**""",
+
             "exercise": {
-                "title": "Find den Transfer! 🔍",
-                "instruction": "Nimm etwas, das du in einem Fach gelernt hast. Überlege: Wo könnte das GLEICHE Prinzip in einem anderen Fach helfen?",
-                "examples": [
-                    "📊 Prozentrechnung (Mathe) → Rabatte verstehen (Alltag)",
-                    "🔬 Ursache-Wirkung (Bio) → Geschichtliche Zusammenhänge",
-                    "📝 Textstruktur (Deutsch) → Experiment-Bericht (Chemie)",
+                "title": "Finde deine Transfer-Chancen! 🔍",
+                "instruction": "Denk an etwas, das du außerhalb der Schule gut kannst.",
+                "template": """
+Ich bin gut in: _____________
+(Gaming, Sport, Musik, Kunst, Social Media...)
+
+Das Prinzip dabei ist: _____________
+(Was ist der Trick? Die Strategie?)
+
+Das könnte mir in der Schule helfen bei: _____________
+
+Weil: _____________
+""",
+                "beispiele": [
+                    "YouTube-Videos schneiden → Präsentationen strukturieren (beides braucht guten Aufbau)",
+                    "Social-Media-Trends erkennen → Muster in Geschichte erkennen",
+                    "Minecraft-Redstone → Logik in Mathe verstehen",
                 ],
-                "prompt": "Fach 1: _______ Thema: _______\nGleiches Prinzip in Fach 2: _______",
             },
-            
-            "fun_fact": "Die besten Schüler haben nicht mehr Wissen – sie können es nur besser ANWENDEN! 🎯",
+
+            "take_home": """**Das Wichtigste:**
+
+Transfer ist der Unterschied zwischen
+"viel lernen" und "smart lernen".
+
+Frag dich bei jedem neuen Thema:
+**"Wo hab ich so was Ähnliches schon mal gemacht?"**
+
+Dann bist du auf dem Weg zum Überflieger.""",
+
+            "fun_fact": """**Erstaunlicher Fakt:**
+Die erfolgreichsten Leute sind nicht die mit dem meisten Wissen.
+Es sind die, die ihr Wissen am besten ANWENDEN können.
+Das ist Transfer. Und du lernst es gerade. 💪""",
         },
-        
+
         "mittelstufe": {
-            "intro": """Transfer-Strategien haben eine Effektstärke von **d=0.86** – das ist enorm!
+            "title": "Das Transfer-Geheimnis",
+            "icon": "🔮",
 
-Zum Vergleich: Der Durchschnitt aller Lernmethoden liegt bei d=0.40.
-Transfer ist also mehr als doppelt so effektiv wie eine durchschnittliche Methode.
+            "hook": """**Warum sind manche Leute in fast allem gut?** 🤔
 
-**Was ist Transfer?**
-Die Fähigkeit, Wissen und Fähigkeiten aus einem Kontext 
-in einen neuen, anderen Kontext zu übertragen.
+Das ist keine rhetorische Frage. Forscher haben das untersucht.
+Die Antwort ist überraschend – und sie hat nichts mit IQ zu tun.
 
-**Warum ist das so mächtig?**
-Weil du nicht alles neu lernen musst – du baust auf dem auf, was du schon kannst!""",
-            
-            "story": """**Das Muster hinter dem Erfolg**
+Der Unterschied zwischen durchschnittlichen und herausragenden Lernern
+liegt nicht im WIE VIEL. Sondern im WIE.
 
-Forscher untersuchten, was Top-Performer von anderen unterscheidet.
-Das Ergebnis überraschte: Es war NICHT mehr Intelligenz oder mehr Übung.
+Und dieses WIE hat einen Namen: **Transfer**.""",
 
-Der Unterschied: Sie erkannten **Muster und Prinzipien**, 
-die sie auf neue Situationen übertragen konnten.
+            "wissenschaft": """**Die Zahlen sprechen für sich:**
 
-Ein Beispiel aus der Studie:
-- Schüler A lernt 10 verschiedene Mathe-Formeln auswendig
-- Schüler B versteht DAS PRINZIP hinter den Formeln
+Hattie & Donoghue (2016) haben über 800 Meta-Analysen ausgewertet.
+Das sind Daten von Millionen von Lernenden.
 
-Bei einer neuen, unbekannten Aufgabe?
-Schüler B löst sie – Schüler A ist aufgeschmissen.""",
-            
+**Ergebnis:**
+- Transfer-Strategien: **d=0.86**
+- Durchschnitt aller Lernmethoden: d=0.40
+
+Was bedeutet das konkret?
+Eine Effektstärke von 0.86 entspricht einem Leistungsvorsprung von etwa **1,5 Schuljahren**.
+
+Mit anderen Worten: Wer Transfer beherrscht, lernt so effektiv,
+als hätte er anderthalb Jahre Vorsprung.""",
+
+            "definition": """**Was ist Transfer genau?**
+
+Transfer bezeichnet die Fähigkeit, Wissen und Kompetenzen
+aus einem Kontext in einen neuen, anderen Kontext zu übertragen.
+
+**Zwei Arten:**
+- **Near Transfer:** Zwischen ähnlichen Situationen (leichter)
+- **Far Transfer:** Zwischen verschiedenen Domänen (schwieriger, aber wertvoller)
+
+**Der Kern:** Nicht das Wissen selbst ist entscheidend,
+sondern die Fähigkeit, das zugrundeliegende PRINZIP zu erkennen und anzuwenden.""",
+
+            "mythos_vs_realitaet": """**Mythos vs. Realität:**
+
+❌ **Mythos:** "Manche Menschen sind einfach vielseitig begabt."
+✅ **Realität:** Sie haben gelernt, Muster zu erkennen und zu übertragen.
+
+❌ **Mythos:** "Jedes Fach braucht komplett anderes Wissen."
+✅ **Realität:** Viele Prinzipien sind fächerübergreifend anwendbar.
+
+❌ **Mythos:** "Transfer passiert automatisch, wenn man genug lernt."
+✅ **Realität:** Transfer muss aktiv trainiert werden – er passiert NICHT von selbst.""",
+
+            "relevanz": """**Warum ist das für DICH relevant?**
+
+1. **Schule:** Weniger Lernaufwand bei besseren Ergebnissen
+2. **Prüfungen:** Auch unbekannte Aufgabentypen lösen können
+3. **Zukunft:** In einer sich ändernden Welt ist Anpassungsfähigkeit key
+4. **KI-Zeitalter:** ChatGPT kann Fakten. Menschen können transferieren.
+
+Transfer ist die Kompetenz, die dich von einer KI unterscheidet.
+Und sie ist die Kompetenz, die in Zukunft am meisten zählt.""",
+
+            "beispiel": """**Konkretes Beispiel:**
+
+**Situation:** Du lernst in Physik das Konzept des Gleichgewichts.
+Ein System ist im Gleichgewicht, wenn sich entgegengesetzte Kräfte ausgleichen.
+
+**Near Transfer:**
+Chemie – Chemisches Gleichgewicht (Le Chatelier)
+
+**Far Transfer:**
+- Wirtschaft – Angebot und Nachfrage
+- Politik – Gewaltenteilung
+- Psychologie – Work-Life-Balance
+- Ökosysteme – Räuber-Beute-Verhältnis
+
+**Ein Prinzip. Fünf völlig verschiedene Anwendungen.**""",
+
             "exercise": {
-                "title": "Prinzipien-Extraktion 🧬",
-                "instruction": "Nimm ein Konzept aus deinem aktuellen Unterricht. Extrahiere das zugrundeliegende PRINZIP und finde 2 andere Anwendungen.",
-                "examples": [
-                    "⚖️ Gleichgewicht (Physik) → Chemische Reaktionen, Ökosysteme, Verhandlungen",
-                    "📈 Exponentielles Wachstum (Mathe) → Viren, Zinsen, Social Media",
-                    "🔄 Kreisläufe (Bio) → Wasserkreislauf, Wirtschaftskreislauf, Feedback-Loops",
-                ],
-                "prompt": "Konzept: _______\nPrinzip dahinter: _______\nAnwendung 1: _______\nAnwendung 2: _______",
+                "title": "Transfer-Potenzial erkennen",
+                "instruction": "Wähle ein Konzept aus dem aktuellen Unterricht und analysiere sein Transfer-Potenzial.",
+                "template": """
+**Konzept:** _____________
+**Fach:** _____________
+
+**Das zugrundeliegende Prinzip:** _____________
+
+**Near Transfer (ähnlicher Kontext):** _____________
+
+**Far Transfer (anderer Bereich):** _____________
+
+**Warum funktioniert der Transfer?** _____________
+""",
             },
-            
-            "fun_fact": "Einstein sagte: 'Die Definition von Wahnsinn ist, immer das Gleiche zu tun und andere Ergebnisse zu erwarten.' Transfer ist das Gegenteil! 🧠",
+
+            "take_home": """**Key Takeaway:**
+
+Transfer ist keine Begabung. Es ist ein trainierbarer Skill.
+
+Effektstärke d=0.86 bedeutet:
+Du kannst deine Lerneffizienz mehr als verdoppeln.
+
+**Die Frage ist nicht: "Wie viel weißt du?"
+Die Frage ist: "Wie gut kannst du es anwenden?"**""",
         },
-        
+
         "oberstufe": {
-            "intro": """**Transfer-Strategien: d=0.86 (Hattie, 2023)**
+            "title": "Transfer – Die Metakompetenz",
+            "icon": "🔮",
 
-Transfer ist laut Hattie das "Kennzeichen tiefen Lernens" und kann nicht ohne 
-metakognitives Engagement stattfinden.
+            "hook": """**Eine unbequeme Wahrheit über Bildung:**
 
-**Die drei Ebenen der Metakognition beim Transfer:**
-1. **Planen:** Strategien für neue Herausforderungen auswählen
-2. **Monitoren:** Erkennen, wann eine Strategie im neuen Kontext nützlich ist
-3. **Evaluieren:** Analysieren, wie gut sie funktioniert hat und warum
+Das meiste, was du in der Schule lernst, wirst du vergessen.
+Studien zeigen: Nach einem Jahr sind 60-80% des Faktenwissens weg.
 
-**Near vs. Far Transfer:**
-- Near: Zwischen ähnlichen Kontexten (leichter)
-- Far: Zwischen verschiedenen Domänen (schwieriger, aber wertvoller)
+Aber es gibt etwas, das bleibt: Die Fähigkeit zu transferieren.
 
-Thorndike (1901) zeigte: Transfer hängt von gemeinsamen Elementen ab.
-Perkins & Salomon (1992) entwickelten Hugging & Bridging als Strategien.""",
-            
-            "story": """**Die Forschung hinter dem Transfer**
+Transfer ist keine Lernmethode unter vielen.
+Es ist die Kompetenz, die alle anderen Kompetenzen verbindet.
+Und sie wird in der Schule kaum explizit gelehrt.""",
 
-Eine Metaanalyse von über 200 Studien zeigt:
-Transfer passiert NICHT automatisch – er muss aktiv gefördert werden.
+            "wissenschaftlicher_hintergrund": """**Der wissenschaftliche Hintergrund:**
 
-Drei kritische Erkenntnisse:
+**Hattie & Donoghue (2016): "Learning Strategies: A Synthesis and Conceptual Model"**
+- Metaanalyse von 228 Studien
+- Transfer-Strategien: **d=0.86** (Rang 6 von 252 Faktoren)
+- Zum Vergleich: Durchschnitt aller Interventionen d=0.40
 
-1. **Oberflächliche Ähnlichkeit täuscht**
-   Lernende übertragen oft nicht, weil sie die TIEFE Struktur nicht erkennen.
+**Theoretische Grundlagen:**
 
-2. **Explizites Training wirkt**
-   Wenn Transfer explizit gelehrt wird, steigt die Rate signifikant.
+1. **Thorndike & Woodworth (1901):** Common-Elements Theory
+   - Transfer basiert auf gemeinsamen Elementen zwischen Situationen
+   - Je mehr Überlappung, desto leichter der Transfer
 
-3. **Metakognition ist der Schlüssel**
-   Wer über sein eigenes Denken nachdenkt, transferiert besser.
+2. **Perkins & Salomon (1992):** Hugging & Bridging
+   - Hugging: Lernsituationen der Anwendung ähnlich machen
+   - Bridging: Explizit Verbindungen zwischen Kontexten herstellen
 
-Die Konsequenz: Transfer ist eine erlernbare Fähigkeit, keine Begabung.""",
-            
+3. **Barnett & Ceci (2002):** Taxonomie des Transfers
+   - Systematisierung von Near und Far Transfer
+   - Dimensionen: Wissensdomäne, physischer Kontext, zeitlicher Abstand""",
+
+            "drei_ebenen_modell": """**Hatties Drei-Ebenen-Modell des Lernens:**
+
+**Ebene 1: Surface Learning (Oberflächenlernen)**
+- Fakten, Vokabeln, Prozeduren
+- Wichtig als Grundlage
+- Strategien: Zusammenfassen, Notizen, Mnemoniken
+
+**Ebene 2: Deep Learning (Tiefenlernen)**
+- Zusammenhänge verstehen
+- Konzeptuelle Strukturen erkennen
+- Strategien: Elaboration, Concept Mapping, Selbsterklärung
+
+**Ebene 3: Transfer**
+- Wissen auf neue Kontexte anwenden
+- Metakognition erforderlich
+- Strategien: Analogiebildung, Prinzipienextraktion, Perspektivwechsel
+
+**Kritische Einsicht:**
+Die meisten Prüfungen testen Ebene 1 und 2.
+Aber im Leben brauchst du vor allem Ebene 3.""",
+
+            "metakognition": """**Transfer und Metakognition:**
+
+Transfer ist ohne Metakognition nicht möglich.
+Du musst ÜBER dein Denken nachdenken.
+
+**Die drei metakognitiven Kernprozesse:**
+
+1. **Planen:**
+   - Welche Strategie könnte hier funktionieren?
+   - Was weiß ich bereits, das relevant sein könnte?
+
+2. **Monitoring:**
+   - Funktioniert mein Ansatz?
+   - Erkenne ich relevante Muster?
+
+3. **Evaluieren:**
+   - Hat der Transfer funktioniert?
+   - Was kann ich für die Zukunft lernen?
+
+**Konkretes Beispiel – Mathe-Aufgabe mit Metakognition:**
+
+*Aufgabe: "Finde das Rechteck mit maximalem Flächeninhalt bei gegebenem Umfang."*
+
+**1. Planen (vor dem Lösen):**
+"Das ist eine Optimierungsaufgabe. Ich kenne ähnliche aus der Analysis.
+Prinzip: Extremwertaufgabe → Ableitung = 0 setzen."
+
+**2. Monitoring (während des Lösens):**
+"Ich habe eine Gleichung mit zwei Variablen. Passt das?
+Nein – ich brauche eine Nebenbedingung. Der Umfang ist gegeben!"
+
+**3. Evaluieren (nach dem Lösen):**
+"Meine Analogie zur Analysis hat funktioniert.
+Für die Zukunft: Bei 'maximieren/minimieren' → Extremwertproblem."
+
+**Selbstreflexionsfrage:**
+"Denke ich gerade über das Problem nach – oder über mein Denken über das Problem?"
+Letzteres ist Metakognition.""",
+
+            "implikationen_abitur": """**Implikationen für das Abitur:**
+
+**Das Problem:**
+- Abituraufgaben sind oft neu formuliert
+- Reine Reproduktion reicht nicht
+- Transfer wird implizit gefordert, aber nicht gelehrt
+
+**Die Lösung:**
+- Lerne nicht Aufgabentypen, lerne Prinzipien
+- Übe mit unbekannten Aufgaben, nicht nur mit bekannten
+- Frag bei jedem Thema: "Was ist das Prinzip? Wo gilt es noch?"
+
+**Praktische Abitur-Strategien:**
+
+**1. Aufgaben nach Prinzipien kategorisieren:**
+Beim Lernen nicht fragen "Welches Kapitel?" sondern "Welches Prinzip?"
+→ Erstelle eine Prinzip-Sammlung für deine LKs
+
+**2. Systematisches Variieren beim Üben:**
+- Gleiche Aufgabe mit anderen Zahlen
+- Gleiches Prinzip in anderem Kontext
+- Typische Abituraufgabe umformulieren
+
+**3. Transfer-Fragen beim Lernen:**
+- "Wo habe ich dieses Prinzip schon gesehen?"
+- "In welchem anderen Fach gilt das auch?"
+- "Was wäre, wenn die Aufgabe anders gestellt wäre?"
+
+**Strategischer Vorteil:**
+Wer Transfer beherrscht, kann auch unbekannte Aufgaben lösen.
+Das ist der Unterschied zwischen "gut vorbereitet" und "wirklich kompetent".""",
+
             "exercise": {
-                "title": "Metakognitiver Transfer-Plan 📋",
-                "instruction": "Wähle ein Konzept aus deinem Leistungskurs. Entwickle einen systematischen Transfer-Plan.",
-                "examples": [
-                    "🧮 Differentialrechnung → Optimierungsprobleme in Wirtschaft, Physik, Biologie",
-                    "📜 Rhetorik (Deutsch) → Argumentation in PoWi, Präsentationen, Debatten",
-                    "🔬 Wissenschaftliche Methode → Alle empirischen Fächer, Alltagsentscheidungen",
-                ],
-                "prompt": "Konzept: _______\nTiefenstruktur/Prinzip: _______\nNear Transfer zu: _______\nFar Transfer zu: _______\nMetakognitive Strategie: _______",
+                "title": "Metakognitive Transferanalyse",
+                "instruction": "Wähle ein Konzept aus deinem Leistungskurs und analysiere es systematisch.",
+                "template": """
+**Konzept:** _____________
+**Fach:** _____________
+
+**Oberflächenstruktur:**
+Was sind die offensichtlichen Merkmale? _____________
+
+**Tiefenstruktur:**
+Was ist das zugrundeliegende Prinzip? _____________
+
+**Abstraktionsebenen:**
+- Konkret: _____________
+- Abstrakt: _____________
+- Maximal abstrakt: _____________
+
+**Near Transfer zu:** _____________
+**Far Transfer zu:** _____________
+
+**Metakognitive Reflexion:**
+- Wie bin ich auf diese Verbindungen gekommen?
+- Was hat meinen Denkprozess geleitet?
+""",
+                "beispiel": """
+**BEISPIEL: Gleichungslösen (Mathe LK)**
+
+**Konzept:** Algebraische Gleichungen lösen
+**Fach:** Mathematik
+
+**Oberflächenstruktur:**
+Variablen (x, y), Zahlen, Gleichheitszeichen, Umformungsregeln, Äquivalenzumformungen
+
+**Tiefenstruktur:**
+Das Unbekannte systematisch vom Bekannten isolieren
+
+**Abstraktionsebenen:**
+- Konkret: 2x + 5 = 15 lösen → x = 5
+- Abstrakt: ax + b = c lösen → x = (c-b)/a
+- Maximal abstrakt: "Das Gesuchte von allem anderen trennen"
+
+**Near Transfer zu:** Formeln umstellen in Physik (v = s/t → s = v·t)
+**Far Transfer zu:** Variablenisolation bei Optimierungsaufgaben, Analyse von Argumentationsstrukturen (Prämissen von Schlussfolgerung trennen)
+
+**Metakognitive Reflexion:**
+- Ich erkannte das Muster "Isolieren" aus früheren Algebra-Aufgaben
+- Mein Denkprozess: "Was ist unbekannt? Wie bekomme ich es allein auf eine Seite?"
+- Die Abstraktion "Gesuchtes vom Rest trennen" half mir, auch Nicht-Mathe-Probleme zu strukturieren
+""",
             },
-            
-            "fun_fact": "Feynman war ein Meister des Transfers – er verband Physik mit Biologie, Kunst und sogar Safeknacken! 🎯",
+
+            "take_home": """**Kernaussage:**
+
+Transfer ist die Brücke zwischen Wissen und Kompetenz.
+
+In einer Welt, in der Fakten jederzeit verfügbar sind,
+ist die Fähigkeit zur Anwendung das eigentliche Kapital.
+
+d=0.86 – Das ist nicht nur eine Zahl.
+Das ist der Unterschied zwischen Lernen und Verstehen.""",
         },
-        
+
         "paedagogen": {
-            "intro": """**Transfer-Strategien: d=0.86 (Visible Learning MetaX)**
+            "title": "Transfer – Stand der Forschung",
+            "icon": "🔮",
 
-Transfer ist laut Hattie (2023) das Kennzeichen tiefen Lernens.
-Ohne metakognitives Engagement findet kein echter Transfer statt.
+            "einfuehrung": """**Transfer als Kernkompetenz:**
 
-**Theoretischer Hintergrund:**
-- Thorndike & Woodworth (1901): Common-elements theory
-- Perkins & Salomon (1992): Hugging & Bridging
-- Barnett & Ceci (2002): Taxonomie für Far Transfer
+Transfer ist das zentrale Ziel von Bildung – und gleichzeitig ihr größtes ungelöstes Problem.
 
-**Kritische Erkenntnis:**
-Far Transfer ist selten und schwierig (Sala & Gobet, 2019).
-Near Transfer ist häufiger, aber auch er muss explizit gefördert werden.""",
-            
-            "implementation": """**Strategien für den Unterricht:**
+Hattie (2023) bezeichnet Transfer als "das Kennzeichen tiefen Lernens" und
+weist ihm mit d=0.86 eine der höchsten Effektstärken zu.
 
-1. **Hugging (Perkins & Salomon)**
-   - Lernsituationen so gestalten, dass sie der Anwendung ähneln
-   - Simulationen, authentische Probleme, kontextreiches Lernen
+Dennoch: Transfer wird in den meisten Curricula nicht explizit gelehrt.
+Die Forschung zeigt klar: Transfer passiert NICHT automatisch.
+Er muss aktiv gefördert werden.""",
 
-2. **Bridging**
-   - Explizit Brücken zwischen Kontexten bauen
-   - "Wo könnte dieses Prinzip noch gelten?"
-   - Vergleichende Szenarien anbieten
+            "forschungsstand": """**Übersicht zum Forschungsstand:**
 
-3. **Comparative Analysis**
-   - Venn-Diagramme für Konzeptvergleiche
-   - "Was ist hier gleich, was ist anders?"
+**1. Klassische Theorien:**
 
-4. **Prinzipien-Extraktion**
-   - Vom Spezifischen zum Allgemeinen
-   - "Was ist das Prinzip DAHINTER?"
+**Thorndike & Woodworth (1901): Common-Elements Theory**
+- Transfer basiert auf gemeinsamen Elementen zwischen Situationen
+- Kritik: Zu mechanistisch, erklärt nicht Far Transfer
+- Relevanz: Grundlage für Near Transfer
 
-**Wichtig:** Transfer nicht dem Zufall überlassen – explizit lehren!""",
-            
-            "research_note": "Perkins, D. & Salomon, G. (1992). Transfer of Learning. International Encyclopedia of Education. | Hattie, J. (2023). Visible Learning: The Sequel.",
+**Perkins & Salomon (1992): Hugging & Bridging**
+- Hugging: Lernsituationen der Anwendung ähnlich gestalten
+- Bridging: Explizit Verbindungen zwischen Kontexten herstellen
+- Relevanz: Praktische Unterrichtsstrategien
+
+**Barnett & Ceci (2002): Taxonomie des Transfers**
+- 6 Dimensionen: Wissensdomäne, physischer Kontext, zeitlicher Abstand,
+  funktionaler Kontext, sozialer Kontext, Modalität
+- Relevanz: Systematisierung von Near vs. Far Transfer
+
+**2. Aktuelle Meta-Analysen:**
+
+**Hattie & Donoghue (2016): Learning Strategies: A Synthesis and Conceptual Model**
+- Über 800 Meta-Analysen (aktuell 1.200+)
+- Transfer-Strategien: d=0.86
+- Drei-Phasen-Modell: Surface → Deep → Transfer
+
+**Sala & Gobet (2019): Cognitive training does not enhance general cognition**
+- Far Transfer ist selten und schwierig
+- Kritische Perspektive auf "Gehirntraining"
+- Relevanz: Realistische Erwartungen formulieren""",
+
+            "dreiphasenmodell": """**Hatties Drei-Phasen-Modell im Detail:**
+
+**Phase 1: Surface Learning**
+- Ziel: Grundlegende Fakten und Prozeduren erwerben
+- Effektive Strategien: Zusammenfassen (d=0.79), Unterstreichen (d=0.53),
+  Notizen machen (d=0.50), Mnemoniken (d=0.76)
+- Wichtig: Grundlage für alles Weitere
+
+**Phase 2: Deep Learning**
+- Ziel: Konzeptuelle Zusammenhänge verstehen
+- Effektive Strategien: Elaboration (d=0.75), Organisation (d=0.85),
+  Selbsterklärung (d=0.64), Concept Mapping (d=0.60)
+- Wichtig: Verständnis der Tiefenstruktur
+
+**Phase 3: Transfer**
+- Ziel: Wissen auf neue Kontexte anwenden
+- Effektive Strategien: Ähnlichkeiten/Unterschiede erkennen (d=1.32),
+  Analogien bilden (d=0.84), Problemlösung (d=0.68)
+- Kritisch: Metakognition erforderlich
+
+**Didaktische Implikation:**
+Strategien müssen zur Lernphase passen.
+Analogien in Phase 1 verwirren.
+Mnemoniken in Phase 3 reichen nicht.""",
+
+            "metakognition": """**Die Rolle der Metakognition:**
+
+Transfer erfordert Metakognition (Veenman et al., 2006).
+Metakognition erklärt 17% der Varianz in Schulleistungen –
+unabhängig von Intelligenz.
+
+**Drei Komponenten:**
+1. **Metakognitives Wissen:** Wissen über eigenes Denken
+2. **Metakognitive Regulation:** Planen, Überwachen, Evaluieren
+3. **Metakognitive Erfahrungen:** Bewusstheit während des Denkens
+
+**Förderung im Unterricht:**
+- Lautes Denken modellieren
+- Reflexionsphasen einbauen
+- Strategiewahl explizit thematisieren
+- Selbstbewertung fördern""",
+
+            "forschungsfragen": """**Offene Forschungsfragen:**
+
+1. **Wie weit kann Transfer gehen?**
+   - Far Transfer bleibt kontrovers
+   - Grenzen noch nicht klar definiert
+
+2. **Wie kann Transfer explizit gelehrt werden?**
+   - Verschiedene Programme mit unterschiedlichem Erfolg
+   - Konsens: Explizites Training wirkt
+
+3. **Welche Rolle spielt Expertise?**
+   - Experten transferieren besser
+   - Henne-Ei-Problem: Expertise durch Transfer oder Transfer durch Expertise?
+
+4. **Transfer und KI:**
+   - Was bleibt menschlich, wenn KI Fakten liefert?
+   - Transfer als USP menschlichen Denkens?""",
+
+            "unterrichtssequenz": """**4-Wochen Transfer-Training (Beispiel-Sequenz):**
+
+**Woche 1: Sensibilisierung**
+- Montag: Was ist Transfer? (Hattie-Daten vorstellen)
+- Mittwoch: Near Transfer erkennen (Übungen innerhalb des Fachs)
+- Freitag: Reflexion: "Wo hast du diese Woche transferiert?"
+
+**Woche 2: Near Transfer intensiv**
+- Prinzip identifizieren → in 3 Varianten üben
+- Fächerübergreifende Partnerarbeit: "Wo gilt dieses Prinzip noch?"
+- Lerntagebuch: Transfer-Momente notieren
+
+**Woche 3: Far Transfer einführen**
+- Analogie-Training: Struktur-Mapping üben
+- Hugging (Gemeinsamkeiten) vs. Bridging (abstrahieren)
+- Kreativ-Session: Ungewöhnliche Verbindungen suchen
+
+**Woche 4: Integration & Metakognition**
+- Schüler präsentieren eigene Transfer-Beispiele
+- Reflexion: "Wie hat sich dein Denken verändert?"
+- Checkliste erstellen: "Meine Transfer-Fragen"
+
+**Praxistipp:**
+Venn-Diagramm für Analogie-Training nutzen:
+Zwei Kreise (Domäne A und B), Überlappung = gemeinsames Prinzip""",
+
+            "schueler_diagnose": """**Typische Transfer-Schwierigkeiten (Diagnose):**
+
+**Typ 1: "Erkennt Muster nicht" (30-40% der Schüler)**
+- Symptom: Sieht keine Verbindung zwischen ähnlichen Aufgaben
+- Diagnose: Bei Variation der Oberfläche verloren
+- Intervention: Explizit Tiefenstruktur herausarbeiten, Kategorisieren üben
+
+**Typ 2: "Findet keine Fächer-Verbindungen" (20-30%)**
+- Symptom: "Das ist Mathe, das hat mit Deutsch nichts zu tun"
+- Diagnose: Domänendenken, keine Abstraktion
+- Intervention: Brückenprinzipien explizit einführen, Team-Teaching
+
+**Typ 3: "Analogien sind falsch" (10-15%)**
+- Symptom: Zieht oberflächliche statt strukturelle Parallelen
+- Diagnose: Fokus auf irrelevante Merkmale
+- Intervention: Struktur-Mapping trainieren, Gegenbeispiele diskutieren
+
+**Typ 4: "Transfer-Training bringt nichts" (10-15%)**
+- Symptom: Keine Fortschritte trotz Training
+- Diagnose: Oft fehlt Basiswissen oder metakognitive Kompetenz
+- Intervention: Erst Surface Learning sicherstellen, dann erneut Transfer
+
+**Checkliste für Unterrichtseinheiten:**
+☐ VOR: Ist das Prinzip klar identifiziert?
+☐ WÄHREND: Habe ich das Prinzip explizit benannt?
+☐ NACH: Gab es Transfer-Reflexion?""",
+
+            "literaturhinweise": """**Weiterführende Literatur:**
+
+**Grundlegend:**
+- Hattie, J. (2023). Visible Learning: The Sequel. Routledge.
+- Perkins, D. & Salomon, G. (1992). Transfer of Learning. International Encyclopedia of Education.
+
+**Vertiefend:**
+- Barnett, S.M. & Ceci, S.J. (2002). When and where do we apply what we learn? A taxonomy for far transfer.
+- Bransford, J.D. & Schwartz, D.L. (1999). Rethinking transfer: A simple proposal with multiple implications.
+
+**Kritisch:**
+- Sala, G. & Gobet, F. (2019). Cognitive training does not enhance general cognition.""",
         },
     },
 }
@@ -266,204 +822,600 @@ PHASE_2_CONTENT = {
     
     "altersstufen": {
         "grundschule": {
-            "intro": """**Near Transfer** ist wie ein Level-Up im gleichen Spiel! 🎮
+            "title": "Near Transfer – Ähnliches erkennen",
+            "icon": "🎯",
 
-Du kennst Level 1? Dann ist Level 2 ähnlich – nur ein bisschen schwerer.
-Das PRINZIP bleibt gleich, nur die Details ändern sich.
+            "hook": """**Hast du das auch schon erlebt?** 🎯
 
-Beispiel:
-- Du kannst 3+2 rechnen? 
-- Dann kannst du auch 30+20! (Gleiches Prinzip, größere Zahlen!)""",
-            
-            "exercise": {
-                "title": "Level-Up Challenge! 🆙",
-                "instruction": "Schau dir die Beispiele an. Was ist das GLEICHE Prinzip?",
-                "scenarios": [
+Du lernst etwas Neues – und denkst: "Das kommt mir bekannt vor!"
+Zum Beispiel beim Rechnen: Erst 3 + 4, dann 30 + 40.
+Oder beim Schreiben: Erst "Hund", dann "Mund".
+
+Das Tolle daran: Du musst nicht alles neu lernen!
+Du kannst nutzen, was du schon kannst.
+
+Das nennt man **Near Transfer**.
+"Near" ist Englisch und bedeutet "nah".
+Du überträgst auf etwas Ähnliches.""",
+
+            "was_ist_near_transfer": """**Was ist Near Transfer genau?**
+
+Near Transfer bedeutet: Du erkennst, dass zwei Dinge ähnlich sind.
+Und du nutzt dein Wissen von dem einen für das andere.
+
+Beispiele:
+- Du kannst 3 + 4 rechnen? Dann kannst du auch 30 + 40!
+- Du kannst "Hund" schreiben? Dann kannst du auch "Mund" schreiben!
+- Du kannst langsam Fahrrad fahren? Dann schaffst du es auch schneller!
+
+Das PRINZIP bleibt immer gleich.
+Nur die Zahlen oder Wörter ändern sich.""",
+
+            "gaming_beispiel": """**Kennst du das vom Spielen?** 🎲
+
+Stell dir ein Brettspiel vor:
+- Erst spielst du eine leichte Runde.
+- Dann wird es schwieriger. Aber die Regeln bleiben gleich!
+
+Oder beim Puzzeln:
+- Erst machst du ein kleines Puzzle.
+- Dann ein größeres. Der Trick ist derselbe: Ecken und Ränder zuerst!
+
+**Der Schlüssel:** Finde heraus, was GLEICH bleibt!""",
+
+            "uebertritt_beispiel": """**So hilft dir das in der Schule:** 📚
+
+In Heimat- und Sachkunde hast du gelernt, wie eine Gemeinde funktioniert:
+Bürgermeister, Gemeinderat, Rathaus.
+
+Jetzt lernst du das Thema "Bayern".
+Ist das ganz neu? Nein, nicht wirklich!
+
+- Die Gemeinde hat einen Bürgermeister → Bayern hat einen Ministerpräsidenten
+- Die Gemeinde hat einen Gemeinderat → Bayern hat einen Landtag
+- Die Gemeinde hat ein Rathaus → Bayern hat eine Staatskanzlei
+
+**Das gleiche Prinzip, nur größer!**
+Das ist Near Transfer.""",
+
+            "interaktiv": {
+                "title": "Finde die Ähnlichkeit! 🔍",
+                "intro": "Bei diesen Aufgaben ist das Prinzip gleich:",
+                "aufgaben": [
                     {
-                        "name": "Drachen-Training",
-                        "level_1": "Du weichst einem langsamen Feuerball aus",
-                        "level_2": "Du weichst einem SCHNELLEN Feuerball aus",
-                        "principle": "Beobachten → Timing → Ausweichen",
+                        "level_1": "Du rechnest: 5 + 3 = 8",
+                        "level_2": "Jetzt rechne: 50 + 30 = ?",
+                        "prinzip": "Addieren (Plusrechnen) funktioniert immer gleich!",
+                        "antwort": "80",
+                        "erklaerung": "Du rechnest genauso, nur mit einer Null mehr. Das Prinzip bleibt!",
                     },
                     {
-                        "name": "Tanz-Move",
-                        "level_1": "Du tanzt den Move zum langsamen Song",
-                        "level_2": "Du tanzt den GLEICHEN Move zum schnellen Song",
-                        "principle": "Die Bewegung bleibt gleich, nur das Tempo ändert sich",
+                        "level_1": "Du schreibst eine Geschichte mit Anfang, Mitte und Ende",
+                        "level_2": "Jetzt sollst du einen Bericht schreiben. Was brauchst du auch hier?",
+                        "prinzip": "Texte haben immer eine Struktur!",
+                        "antwort": "Auch Anfang, Mitte und Ende (Einleitung, Hauptteil, Schluss)",
+                        "erklaerung": "Egal ob Geschichte oder Bericht – die Struktur ist gleich!",
                     },
                     {
-                        "name": "Mathe-Trick",
-                        "level_1": "5 + 3 = 8",
-                        "level_2": "50 + 30 = ?",
-                        "principle": "Addieren funktioniert immer gleich!",
-                        "answer": "80",
+                        "level_1": "Du lernst Wörter, indem du sie mehrmals schreibst",
+                        "level_2": "Jetzt sollst du das Einmaleins lernen. Wie machst du das?",
+                        "prinzip": "Wiederholung hilft beim Lernen!",
+                        "antwort": "Auch mehrmals üben und wiederholen!",
+                        "erklaerung": "Die gleiche Methode funktioniert für verschiedene Sachen.",
                     },
                 ],
-                "prompt": "Finde das Prinzip: Was bleibt GLEICH, was ändert sich?",
             },
-            
-            "fun_fact": "Near Transfer ist wie Aufwärmen – es bereitet dich auf die richtig coolen Transfers vor! 💪",
+
+            "fehler_vermeiden": """**Darauf solltest du achten:** ⚠️
+
+Manchmal denken Kinder: "Das ist ja was ganz anderes!"
+Dann fangen sie ganz von vorne an.
+
+Aber halt! Frag dich lieber:
+**"Wo habe ich so etwas Ähnliches schon mal gemacht?"**
+
+Meistens findest du etwas.
+Und dann wird die Aufgabe viel leichter!""",
+
+            "story": """**Wie Finn die Mathe-Probe schaffte** 📈
+
+Finn übte fleißig Textaufgaben.
+Er rechnete: "3 Kinder teilen 12 Gummibärchen. Wie viele bekommt jeder?"
+
+In der Probe stand aber eine andere Aufgabe:
+"4 Freunde teilen 20 Sticker. Wie viele bekommt jeder?"
+
+Finn dachte zuerst: "Oh nein! Das habe ich nie geübt!"
+
+Aber dann erinnerte er sich an Transfer.
+Er fragte sich: "Was ist das PRINZIP dahinter?"
+
+Das Prinzip war: **Teilen** bedeutet Menge geteilt durch Anzahl.
+
+Also rechnete er: 20 : 4 = 5 Sticker für jeden.
+
+Finn hatte die Sticker-Aufgabe nie geübt.
+Aber er kannte das PRINZIP.
+Und das hat gereicht! ✅""",
+
+            "exercise": {
+                "title": "Dein Near-Transfer-Training! ⭐",
+                "instruction": "Finde das gemeinsame Prinzip bei diesen Paaren:",
+                "paare": [
+                    {"a": "Schwimmen lernen", "b": "Fahrrad fahren lernen", "prinzip": "Am Anfang ist es schwer, aber mit Übung wird es leichter"},
+                    {"a": "Lesen üben", "b": "Flöte spielen üben", "prinzip": "Jeden Tag ein bisschen üben bringt am meisten"},
+                    {"a": "Zimmer aufräumen", "b": "Schulranzen packen", "prinzip": "Alles hat seinen festen Platz"},
+                ],
+                "eigene_aufgabe": "Finde selbst zwei Dinge mit dem gleichen Prinzip!",
+                "prompt": "Schreibe hier deine Antwort:",
+            },
+
+            "take_home": """**Das darfst du dir merken:** 🧠
+
+Near Transfer bedeutet:
+Ähnliches erkennen und dein Wissen übertragen.
+
+Frag dich bei neuen Aufgaben immer:
+**"Das kenne ich doch irgendwoher!"**
+
+Dann bist du schon auf dem richtigen Weg.""",
+
+            "fun_fact": """**Wusstest du das?**
+Alle Profis nutzen Near Transfer!
+Fußballspieler übertragen ihre Tricks auf neue Spielsituationen.
+Musiker übertragen Rhythmen auf neue Lieder.
+Und du? Du kannst das auch! ⚽🎵""",
         },
-        
+
         "unterstufe": {
-            "intro": """**Near Transfer** = Wissen auf ähnliche Situationen übertragen
+            "title": "Near Transfer – Das gleiche Prinzip!",
+            "icon": "🎯",
 
-Das ist der "einfache" Transfer – aber auch der wichtigste erste Schritt!
+            "hook": """**Kennst du das Gefühl?** 🎯
 
-Beispiele für Near Transfer:
-- Rechteck-Fläche berechnen → Quadrat-Fläche berechnen (gleiche Formel!)
-- Englisch-Vokabeln lernen → Spanisch-Vokabeln lernen (gleiche Methode!)
-- Fahrrad fahren → E-Scooter fahren (gleiches Gleichgewichtsprinzip!)
+Neue Aufgabe. Aber irgendwie... kommt dir das bekannt vor?
+"Das hab ich doch schon mal gemacht!"
 
-Der Schlüssel: Erkenne, was GLEICH bleibt!""",
-            
-            "exercise": {
+Das ist Near Transfer.
+Und es ist eine wichtige Fähigkeit.""",
+
+            "was_ist_near_transfer": """**Near Transfer = Ähnliches erkennen**
+
+"Near" = nah. Du überträgst auf ähnliche Situationen.
+
+Beispiele:
+- Gleichung lösen (2x + 5 = 15) → Andere Gleichung (3x + 7 = 22)
+- Inhaltsangabe für Geschichte → Inhaltsangabe für Film
+- Vokabeln mit Karteikarten → Formeln mit Karteikarten
+
+**Das Prinzip bleibt gleich. Die Details ändern sich.**""",
+
+            "schul_beispiele": """**Near Transfer in der Schule:**
+
+**Mathe:**
+- Bruchrechnung → Prozentrechnung (beides ist Teile vom Ganzen)
+- Flächenberechnung Rechteck → Flächenberechnung Parallelogramm
+
+**Deutsch:**
+- Gedichtanalyse → Liedtextanalyse (gleiche Stilmittel!)
+- Argumentation schreiben → Debatte führen
+
+**Sprachen:**
+- Englisch-Grammatik → Französisch-Grammatik (ähnliche Strukturen)
+- Vokabel-Lernmethode → Für JEDE Sprache nutzbar""",
+
+            "gaming_connection": """**Near Transfer im Gaming:** 🎮
+
+Level 1 geschafft? Level 2 ist ähnlich, nur schwerer.
+Du musst nicht neu lernen – du TRANSFERIERST.
+
+- Mario Kart: Leichte Strecke → Schwere Strecke (gleiche Steuerung)
+- Fortnite: Normaler Modus → Arena (gleiche Skills, mehr Druck)
+- Minecraft: Kleines Haus → Großes Haus (gleiches Prinzip)
+
+**In der Schule ist es genauso!**""",
+
+            "interaktiv": {
                 "title": "Spot the Transfer! 🔍",
-                "instruction": "Verbinde die Situationen, die das GLEICHE Prinzip nutzen.",
-                "scenarios": [
+                "intro": "Welches Prinzip verbindet diese Paare?",
+                "aufgaben": [
                     {
-                        "situation_a": "Du löst eine Gleichung: 2x + 5 = 15",
-                        "situation_b": "Du löst: 3x + 7 = 22",
-                        "principle": "Gleiche Lösungsstrategie: Isoliere x",
+                        "situation_a": "Gleichung lösen: x isolieren",
+                        "situation_b": "Formel umstellen: gesuchte Größe isolieren",
+                        "prinzip": "Immer die gesuchte Variable alleine auf eine Seite bringen",
                     },
                     {
-                        "situation_a": "Du schreibst eine Inhaltsangabe zu einer Geschichte",
-                        "situation_b": "Du schreibst eine Inhaltsangabe zu einem Film",
-                        "principle": "Gleiches Format: Wer? Was? Wo? Wann? Warum?",
+                        "situation_a": "Buchvorstellung vorbereiten",
+                        "situation_b": "Referat in Bio vorbereiten",
+                        "prinzip": "Struktur: Einleitung, Hauptteil, Schluss + Visualisierung",
                     },
                     {
-                        "situation_a": "Du merkst dir Vokabeln mit Karteikarten",
-                        "situation_b": "Du merkst dir Geschichtsdaten mit Karteikarten",
-                        "principle": "Gleiche Methode: Active Recall + Spaced Repetition",
+                        "situation_a": "Im Fußball: Spielzüge analysieren",
+                        "situation_b": "In Geschichte: Kriegsstrategien analysieren",
+                        "prinzip": "Ursache-Wirkung verstehen, Taktik erkennen",
                     },
                 ],
-                "prompt": "Was ist das gemeinsame PRINZIP?",
             },
-            
-            "fun_fact": "Wenn du Near Transfer beherrschst, hast du schon 50% des Weges geschafft! 🎯",
-        },
-        
-        "mittelstufe": {
-            "intro": """**Near Transfer** bezeichnet den Wissenstransfer zwischen ähnlichen Kontexten.
 
-**Warum ist das wichtig?**
-Near Transfer ist die Grundlage für alles Weitere.
-Wer hier scheitert, wird auch bei Far Transfer Probleme haben.
+            "fehler_vermeiden": """**Typischer Fehler:** ⚠️
 
-**Die Schlüsselfrage:**
-"Was ist hier STRUKTURELL gleich, auch wenn es oberflächlich anders aussieht?"
+"Das ist ein ANDERES Thema, also muss ich neu anfangen."
 
-**Beispiel:**
-Lineare Funktion f(x) = mx + b
-vs.
-Lineare Funktion g(t) = at + c
+**Nope!** Frag dich immer:
+- Was ist hier GLEICH wie vorher?
+- Welche Methode hat schon mal funktioniert?
 
-→ Andere Buchstaben, GLEICHES Prinzip!""",
-            
+Meistens findest du was.
+Und dann sparst du richtig Zeit.""",
+
             "exercise": {
-                "title": "Strukturelle Ähnlichkeit erkennen 🔬",
-                "instruction": "Analysiere die Paare. Identifiziere die gemeinsame TIEFENSTRUKTUR.",
-                "scenarios": [
+                "title": "Dein Near-Transfer-Check! ✅",
+                "instruction": "Nimm ein aktuelles Thema aus der Schule. Finde den Near Transfer!",
+                "template": """
+Aktuelles Thema: _____________
+Fach: _____________
+
+Das ist ähnlich wie: _____________
+(anderes Thema, vielleicht anderes Fach)
+
+Das gemeinsame Prinzip ist: _____________
+
+Diese Methode nutze ich für beides: _____________
+""",
+            },
+
+            "take_home": """**Merksatz:**
+
+Near Transfer = Muster erkennen.
+
+Wenn etwas neu aussieht, frag:
+**"Was ist hier eigentlich GLEICH wie bei dem, was ich schon kann?"**
+
+Das ist der erste Schritt zum Überflieger.""",
+        },
+
+        "mittelstufe": {
+            "title": "Near Transfer – Strukturelle Ähnlichkeit",
+            "icon": "🎯",
+
+            "hook": """**Das Oberflächliche täuscht.** 🎯
+
+Zwei Aufgaben können völlig unterschiedlich AUSSEHEN –
+und trotzdem die GLEICHE Struktur haben.
+
+Experten erkennen das. Anfänger nicht.
+Der Unterschied? Sie schauen auf verschiedene Ebenen.""",
+
+            "theorie": """**Die zwei Ebenen jeder Aufgabe:**
+
+**1. Oberflächenstruktur:**
+- Das Thema, die Begriffe, der Kontext
+- Was sofort ins Auge springt
+- Oft irreführend!
+
+**2. Tiefenstruktur:**
+- Das zugrundeliegende Prinzip
+- Die Lösungsstrategie
+- Die mathematische/logische Struktur
+
+**Der Schlüssel zum Near Transfer:**
+Ignoriere die Oberfläche. Suche die Tiefenstruktur.""",
+
+            "beispiele": """**Beispiele für versteckte Ähnlichkeiten:**
+
+**Mathematik:**
+| Oberfläche (verschieden) | Tiefenstruktur (gleich) |
+|--------------------------|-------------------------|
+| Quadratische Gleichung lösen | Nullstellen einer Parabel | abc-Formel |
+| Prozentrechnung | Zinsrechnung | Anteil vom Ganzen |
+| Pythagoras im Dreieck | Abstand zweier Punkte | a² + b² = c² |
+
+**Deutsch/Sprachen:**
+| Oberfläche (verschieden) | Tiefenstruktur (gleich) |
+|--------------------------|-------------------------|
+| Gedichtanalyse | Redeanalyse | Stilmittel + Intention |
+| Englisch Passiv | Deutsch Passiv | Subjekt-Objekt-Tausch |
+| Erörterung | Debatte | These + Argumente + Fazit |
+
+**Naturwissenschaften:**
+| Oberfläche (verschieden) | Tiefenstruktur (gleich) |
+|--------------------------|-------------------------|
+| pH-Wert (Chemie) | Dezibel (Physik) | Logarithmische Skala |
+| Zellteilung (Bio) | Exponentielles Wachstum (Mathe) | Verdopplung |
+| Energieerhaltung | Massenerhaltung | Erhaltungssatz |""",
+
+            "strategie": """**So trainierst du Near Transfer:**
+
+**Schritt 1: Kategorisieren statt auswendig lernen**
+Frag bei jeder Aufgabe: "Welcher TYP von Aufgabe ist das?"
+
+**Schritt 2: Prinzipien formulieren**
+Schreib das Lösungsprinzip in eigenen Worten auf.
+Nicht die Lösung. Das PRINZIP.
+
+**Schritt 3: Verbindungen suchen**
+"Wo habe ich dieses Prinzip schon mal gesehen?"
+
+**Schritt 4: Bewusst variieren**
+Übe das gleiche Prinzip mit verschiedenen Oberflächen.""",
+
+            "warnung": """**Achtung: Typische Falle!** ⚠️
+
+Viele Schüler lernen Aufgaben statt Prinzipien.
+Sie können Aufgabe 3 aus dem Buch.
+Aber eine leicht veränderte Version? Keine Chance.
+
+**Das Problem:** Sie haben die Oberfläche gelernt, nicht die Struktur.
+
+**Die Lösung:** Frag dich immer:
+"Könnte ich das auch lösen, wenn die Zahlen/Namen/Kontexte anders wären?"
+
+Wenn nein: Du hast noch nicht das Prinzip verstanden.""",
+
+            "exercise": {
+                "title": "Tiefenstruktur-Analyse",
+                "instruction": "Finde die gemeinsame Tiefenstruktur dieser Aufgabenpaare:",
+                "aufgaben": [
                     {
-                        "pair": ["Quadratische Gleichung lösen", "Parabel-Nullstellen finden"],
-                        "surface": "Unterschiedliche Fragestellung",
-                        "deep_structure": "Gleiche mathematische Operation (abc-Formel)",
+                        "aufgabe_a": "Berechne die Fläche eines Trapezes mit a=5, c=3, h=4",
+                        "aufgabe_b": "Berechne den Durchschnitt der Zahlen 5, 5, 3, 3",
+                        "tipp": "Beide verwenden das Konzept des Mittelwerts...",
+                        "loesung": """**Tiefenstruktur:** Mittelwert berechnen
+
+**Trapez:** A = (a+c)/2 × h = (5+3)/2 × 4 = 4 × 4 = 16
+→ Der Durchschnitt der parallelen Seiten wird mit der Höhe multipliziert.
+
+**Zahlen:** (5+5+3+3)/4 = 16/4 = 4
+→ Oder vereinfacht: (5+3)/2 = 4
+
+**Gemeinsames Prinzip:** "Zwei Werte mitteln" ist die Kernoperation bei beiden Aufgaben.""",
                     },
                     {
-                        "pair": ["Gedichtanalyse", "Redeanalyse"],
-                        "surface": "Unterschiedliche Textsorte",
-                        "deep_structure": "Gleiche Analysekategorien (Stilmittel, Intention, Wirkung)",
-                    },
-                    {
-                        "pair": ["pH-Wert berechnen (Chemie)", "Dezibel berechnen (Physik)"],
-                        "surface": "Unterschiedliche Fächer",
-                        "deep_structure": "Gleiche Mathematik (Logarithmus)",
+                        "aufgabe_a": "Analysiere die Metaphern in Goethes Gedicht",
+                        "aufgabe_b": "Analysiere die Werbetechniken in diesem Spot",
+                        "tipp": "Beide fragen nach Stilmitteln und ihrer Wirkung...",
+                        "loesung": """**Tiefenstruktur:** Stilmittel identifizieren und Wirkung analysieren
+
+**Gedicht:** Metaphern → erzeugen emotionale Bilder → Wirkung auf Leser
+
+**Werbung:** Techniken (z.B. Wiederholung, Testimonials) → erzeugen Kaufimpuls → Wirkung auf Zuschauer
+
+**Gemeinsames Prinzip:** "Ein Ausdrucksmittel hat eine beabsichtigte Wirkung auf den Empfänger."
+Analyse-Schema: 1. Mittel identifizieren → 2. Wirkung beschreiben → 3. Intention erklären""",
                     },
                 ],
-                "prompt": "Oberfläche vs. Tiefenstruktur – was ist der Schlüssel?",
             },
-            
-            "fun_fact": "Experten unterscheiden sich von Novizen hauptsächlich durch ihre Fähigkeit, Tiefenstrukturen zu erkennen! 🧠",
+
+            "take_home": """**Merksatz:**
+
+Near Transfer = Tiefenstruktur erkennen.
+
+Experten sehen Muster, wo Anfänger nur Unterschiede sehen.
+Train dein Auge für Strukturen, nicht für Oberflächen.""",
         },
-        
+
         "oberstufe": {
-            "intro": """**Near Transfer: Theoretischer Hintergrund**
+            "title": "Near Transfer – Strukturelle Analogien",
+            "icon": "🎯",
 
-Nach Thorndike & Woodworth (1901) hängt Transfer von 
-gemeinsamen Elementen zwischen Situationen ab.
+            "theorie": """**Theoretischer Rahmen:**
 
-**Near Transfer** zeichnet sich aus durch:
-- Hohe Oberflächenähnlichkeit
-- Gleiche oder ähnliche Prozeduren
-- Verwandte Domänen
+Nach Thorndike & Woodworth (1901) basiert Transfer auf
+gemeinsamen Elementen zwischen Ausgangs- und Zielsituation.
+
+**Je mehr Elemente überlappen, desto wahrscheinlicher der Transfer:**
+- Gleiche Prozeduren
+- Ähnliche Kontexte
+- Verwandte Konzepte
 - Zeitliche Nähe zum Lernen
 
-**Problem:** Selbst Near Transfer passiert nicht automatisch.
-Studien zeigen: Ohne explizite Hinweise übersehen Lernende 
-oft die Verbindung zwischen ähnlichen Aufgaben.
+**Das Problem der oberflächlichen Ähnlichkeit:**
+Lernende werden oft von irrelevanten Oberflächenmerkmalen abgelenkt.
+Experten hingegen erkennen die strukturelle Tiefe.""",
 
-**Lösung:** Aktives Suchen nach strukturellen Ähnlichkeiten.""",
-            
+            "experten_vs_novizen": """**Was unterscheidet Experten von Novizen?**
+
+**Chi, Feltovich & Glaser (1981):** Kategorisierungsstudie
+
+Physik-Aufgaben sollten sortiert werden.
+- **Novizen:** Sortierten nach Oberfläche (Aufgaben mit Rampen, mit Federn...)
+- **Experten:** Sortierten nach Prinzipien (Energieerhaltung, Newton 2...)
+
+**Die Implikation:**
+Experten haben ein anderes mentales Schema.
+Sie sehen Prinzipien, wo Novizen nur Oberflächen sehen.
+
+**Für dich:**
+Trainiere, Aufgaben nach Prinzipien zu kategorisieren.
+Das ist der Weg vom Novizen zum Experten.""",
+
+            "fachuebergreifend": """**Near Transfer in der Oberstufe:**
+
+**Mathematik ↔ Physik:**
+| Mathe-Konzept | Physik-Anwendung |
+|---------------|------------------|
+| Differentialrechnung | Momentangeschwindigkeit |
+| Integralrechnung | Fläche unter v-t-Graph |
+| Vektorrechnung | Kräftezerlegung |
+| Exponentialfunktion | Radioaktiver Zerfall |
+
+**Deutsch ↔ Geschichte/PoWi:**
+| Deutsch-Kompetenz | Transfer |
+|-------------------|----------|
+| Quellenanalyse | Historische Quellenarbeit |
+| Argumentationsstruktur | Politische Analyse |
+| Stilmittel erkennen | Propaganda analysieren |
+
+**Biologie ↔ Chemie:**
+| Bio-Konzept | Chemie-Konzept |
+|-------------|----------------|
+| Enzyme | Katalyse |
+| Osmose | Diffusion |
+| Zellatmung | Redoxreaktion |""",
+
+            "strategie": """**Strategien für systematischen Near Transfer:**
+
+**1. Prinzipien-Inventar anlegen**
+Führe eine Liste der Kernprinzipien pro Fach.
+Suche aktiv nach Überschneidungen.
+
+**2. Aufgabentypen kategorisieren**
+Nicht: "Das ist Aufgabe 5 aus Kapitel 3"
+Sondern: "Das ist ein Optimierungsproblem unter Nebenbedingungen"
+
+**3. Lösungsstrategien abstrahieren**
+Nicht: "Hier muss ich die abc-Formel anwenden"
+Sondern: "Hier muss ich Nullstellen finden"
+
+**4. Bewusst variieren**
+Übe das gleiche Prinzip in verschiedenen Kontexten.
+Das trainiert strukturelles Denken.""",
+
             "exercise": {
-                "title": "Transfer-Mapping 🗺️",
-                "instruction": "Erstelle eine Transfer-Map: Welche Konzepte aus Fach A lassen sich auf Fach B übertragen?",
-                "scenarios": [
-                    {
-                        "domain_a": "Analysis (Mathematik)",
-                        "domain_b": "Kinematik (Physik)",
-                        "transfers": [
-                            "Ableitung → Geschwindigkeit",
-                            "Integral → Zurückgelegte Strecke",
-                            "Extremstellen → Umkehrpunkte",
-                        ],
-                    },
-                    {
-                        "domain_a": "Argumentationstheorie (Deutsch)",
-                        "domain_b": "Wissenschaftliche Methode",
-                        "transfers": [
-                            "These → Hypothese",
-                            "Argument → Evidenz",
-                            "Gegenargument → Falsifikation",
-                        ],
-                    },
-                ],
-                "prompt": "Erstelle deine eigene Transfer-Map für zwei deiner Fächer.",
+                "title": "Prinzipien-Mapping über Fächer",
+                "instruction": "Wähle ein Kernprinzip und finde strukturelle Entsprechungen in mindestens 4 Fächern.",
+                "template": """
+**Gewähltes Prinzip:** _____________
+
+**Anwendung in Mathe:** _____________
+Wie zeigt sich das Prinzip hier? _____________
+
+**Anwendung in Naturwissenschaft:** _____________
+Wie zeigt sich das Prinzip hier? _____________
+
+**Anwendung in Geisteswissenschaft:** _____________
+Wie zeigt sich das Prinzip hier? _____________
+
+**Anwendung in Sprache:** _____________
+Wie zeigt sich das Prinzip hier? _____________
+
+**Gemeinsame Tiefenstruktur:** _____________
+""",
             },
-            
-            "fun_fact": "Interdisziplinäre Forschung basiert auf systematischem Near Transfer zwischen verwandten Feldern! 🔗",
+
+            "take_home": """**Fazit:**
+
+Near Transfer ist trainierbar.
+Der Schlüssel: Strukturelles Denken entwickeln.
+
+Frag bei jeder Aufgabe: "Welches Prinzip steckt dahinter?"
+Frag bei jedem Prinzip: "Wo gilt das noch?"
+
+Das macht den Unterschied zwischen Wissen und Verstehen.""",
         },
-        
+
         "paedagogen": {
-            "intro": """**Near Transfer im Unterricht**
+            "title": "Near Transfer im Unterricht fördern",
+            "icon": "🎯",
 
-Near Transfer ist die Voraussetzung für Far Transfer.
-Ohne sichere Beherrschung von Near Transfer scheitern Lernende 
-oft an komplexeren Transferaufgaben.
+            "strategien_hugging": """**Strategie 1: Hugging (Perkins & Salomon)**
 
-**Didaktische Implikationen:**
-1. Variation innerhalb der Domäne anbieten
-2. Explizit auf strukturelle Ähnlichkeiten hinweisen
-3. "Gleich oder anders?" als Leitfrage etablieren""",
-            
-            "implementation": """**Konkrete Strategien:**
+Hugging bedeutet: Lernsituationen so gestalten, dass sie der späteren
+Anwendungssituation möglichst ähnlich sind.
 
-1. **Aufgaben-Variation**
-   - Gleiche Struktur, andere Zahlen/Namen/Kontexte
-   - Bewusst Oberflächenmerkmale variieren
+**Prinzipien:**
+1. Authentische Probleme verwenden
+2. Kontextreiche Aufgaben stellen
+3. Anwendungssituationen simulieren
+4. Transferierte Situationen in Prüfungen abfragen
 
-2. **Vergleichs-Aufgaben**
-   - "Vergleiche Aufgabe A und B. Was ist gleich?"
-   - Explizite Reflexion über Gemeinsamkeiten
+**Konkrete Umsetzung:**
+- Statt: "Berechne 3x + 5 = 14"
+- Besser: "Du willst dir ein Spiel kaufen. Es kostet X Euro..."
 
-3. **Transfer-Checks**
-   - Nach jeder Einheit: "Wo begegnet dir das noch?"
-   - Schüler Beispiele sammeln lassen
+**Statt:** Abstrakte Grammatikübungen
+**Besser:** Fehlerhafte Texte korrigieren lassen
 
-4. **Fehler als Lernchance**
-   - Wenn Transfer scheitert: "Was hast du übersehen?"
-   - Metakognitive Reflexion fördern""",
-            
-            "research_note": "Barnett, S. M. & Ceci, S. J. (2002). When and Where Do We Apply What We Learn? A Taxonomy for Far Transfer. Psychological Bulletin.",
+**Statt:** Formel anwenden
+**Besser:** Experiment durchführen, bei dem die Formel gilt""",
+
+            "strategien_bridging": """**Strategie 2: Bridging (Perkins & Salomon)**
+
+Bridging bedeutet: Explizit Brücken zwischen Kontexten bauen.
+
+**Leitfragen für Schüler:**
+- "Wo hast du so etwas Ähnliches schon mal gesehen?"
+- "In welchem anderen Fach gilt dieses Prinzip auch?"
+- "Wo im Alltag begegnest du diesem Muster?"
+
+**Konkrete Umsetzung:**
+
+**Am Ende jeder Einheit:**
+"Was ist das Prinzip, das wir gelernt haben?
+Wo könnte es noch gelten?"
+
+**Bei neuem Stoff:**
+"Das ist ähnlich wie... Wer erkennt die Verbindung?"
+
+**Fächerübergreifende Projekte:**
+Explizit die Verbindungen zwischen den Fächern thematisieren.""",
+
+            "vergleichende_analyse": """**Strategie 3: Vergleichende Analyse**
+
+Systematischer Vergleich fördert strukturelles Denken.
+
+**Technik: Venn-Diagramm**
+- Was ist gleich? (Überlappung)
+- Was ist verschieden? (Außenbereiche)
+- Was ist das gemeinsame Prinzip?
+
+**Beispiel Mathematik:**
+Quadratische Gleichungen vs. Parabel-Nullstellen
+- Unterschied: Formulierung, Kontext
+- Gemeinsamkeit: Gleiche Lösungsmethode
+
+**Beispiel Geschichte:**
+Französische Revolution vs. Russische Revolution
+- Unterschiede: Zeit, Ort, Akteure
+- Gemeinsamkeiten: Strukturelle Muster (Unzufriedenheit, Eskalation, Radikalisierung)""",
+
+            "kategorisierung": """**Strategie 4: Prinzipienbasierte Kategorisierung**
+
+Nach Chi et al. (1981): Experten kategorisieren nach Tiefenstruktur,
+Novizen nach Oberflächenmerkmalen.
+
+**Training:**
+1. Aufgabensammlung erstellen
+2. Schüler bitten, diese zu sortieren
+3. Sortierung besprechen: Nach Oberfläche oder Struktur?
+4. Prinzipienbasierte Kategorien einführen
+
+**Beispiel Physik:**
+- Novizen: "Aufgaben mit Rampen", "Aufgaben mit Federn"
+- Experten: "Energieerhaltung", "Impulserhaltung", "Newton 2"
+
+**Konkret im Unterricht:**
+"Welcher AUFGABENTYP ist das?" (nicht: "Welche Formel?")
+"Was ist das PRINZIP dahinter?" (nicht: "Was steht im Buch?")""",
+
+            "uebungsdesign": """**Strategie 5: Transfer-orientiertes Übungsdesign**
+
+**Variierte Übung:**
+Das gleiche Prinzip in verschiedenen Kontexten üben.
+
+Statt: 10 identische Aufgaben
+Besser: 5 Aufgaben mit variierender Oberfläche, gleichem Prinzip
+
+**Interleaved Practice:**
+Verschiedene Aufgabentypen mischen statt blocken.
+
+Forschung zeigt: Kurzfristig schwieriger, langfristig besser für Transfer.
+
+**Elaborative Interrogation:**
+Warum funktioniert das? Warum ist das so?
+
+Diese Fragen fördern tiefes Verständnis und damit Transfer.""",
+
+            "checkliste": """**Checkliste für transferförderlichen Unterricht:**
+
+☐ Werden Prinzipien explizit benannt?
+☐ Werden Verbindungen zu anderen Themen/Fächern hergestellt?
+☐ Werden Aufgaben variiert (gleiche Struktur, andere Oberfläche)?
+☐ Werden Schüler gefragt: "Wo gilt das noch?"
+☐ Wird Kategorisierung nach Prinzipien geübt?
+☐ Sind Prüfungsaufgaben auf Transfer ausgelegt?
+☐ Wird Metakognition thematisiert?
+☐ Werden authentische Anwendungskontexte verwendet?""",
         },
     },
 }
@@ -479,217 +1431,676 @@ PHASE_3_CONTENT = {
     
     "altersstufen": {
         "grundschule": {
-            "intro": """**Far Transfer** ist wie ein Superhelden-Power! 🦸
+            "title": "Far Transfer – Weit übertragen",
+            "icon": "🚀",
 
-Du nimmst etwas, das du in EINER Sache gelernt hast...
-...und benutzt es in einer KOMPLETT ANDEREN Sache!
+            "hook": """**Jetzt wird es richtig spannend!** 🚀
 
-Das ist schwieriger – aber auch VIEL cooler!
+Bei Near Transfer hast du gelernt: Ähnliches erkennen.
+Das war wie kleine Puzzleteile finden.
 
-Beispiel:
-- Du lernst beim Tanzen, auf den Rhythmus zu achten 💃
-- Plötzlich merkst du: Mathe-Muster sind auch wie Rhythmus! 🔢
-- Und beim Seilspringen hilft dir der Rhythmus auch! 🪢""",
-            
+Jetzt kommt Far Transfer!
+"Far" ist Englisch und bedeutet "weit".
+
+Far Transfer heißt: Du nutzt dein Wissen in GANZ ANDEREN Bereichen.
+Zum Beispiel: Was du beim Backen lernst, hilft dir in Mathe!
+
+Klingt seltsam? Ist es aber nicht!
+Das können richtige Überflieger.""",
+
+            "was_ist_far_transfer": """**Was ist Far Transfer genau?**
+
+Far Transfer bedeutet: Du überträgst dein Wissen auf etwas, das ganz anders aussieht.
+
+Das ist schwieriger als Near Transfer.
+Aber es ist auch viel mächtiger!
+
+Beispiele:
+- Du planst beim Schachspielen voraus → Das hilft dir auch, eine Probe vorzubereiten
+- Du lernst beim Fußball im Team zu spielen → Das hilft dir bei der Gruppenarbeit
+- Du bist geduldig beim Angeln → Das hilft dir auch beim Lernen schwieriger Sachen""",
+
+            "gaming_beispiel": """**Was du beim Spielen lernst, hilft dir in der Schule!** 🎲📚
+
+Beim Brettspiel oder Puzzle lernst du:
+
+1. **"Erst überlegen, dann handeln."**
+   → Das hilft auch beim Aufsatz: Erst überlegen, dann schreiben!
+
+2. **"Nicht aufgeben, wenn es schwer wird."**
+   → Das hilft bei schweren Mathe-Aufgaben!
+
+3. **"Die Regeln gut lesen."**
+   → Das hilft auch bei Textaufgaben: Genau lesen, was gefragt ist!
+
+4. **"Einen Plan B haben."**
+   → Das hilft überall: Was machst du, wenn der erste Weg nicht klappt?
+
+Was du beim Spielen lernst, sind echte Lebensweisheiten!""",
+
+            "erstaunliches_beispiel": """**Ein erstaunliches Beispiel:**
+
+Ein Mädchen war sehr gut im Tanzen.
+Sie hatte gelernt: Große Bewegungen in kleine Schritte zerlegen.
+
+Dann hatte sie Schwierigkeiten mit langen Wörtern in Deutsch.
+Sie überlegte: "Moment mal – das ist ja wie beim Tanzen!"
+
+Sie zerlegte die langen Wörter in kleine Teile.
+Wie Tanzschritte: "Don-ners-tag", "Schmet-ter-ling"
+
+**Vom Tanzen zur Rechtschreibung!**
+Das ist Far Transfer. Erstaunlich, oder?""",
+
+            "story": """**Wie Lina durchs Backen besser in Mathe wurde** 🍰📊
+
+Lina half ihrer Oma beim Kuchenbacken.
+Oma sagte: "Heute machen wir das Doppelte. Wir haben ja Besuch."
+
+- 2 Eier wurden zu 4 Eiern
+- 250g Mehl wurden zu 500g Mehl
+- 100ml Milch wurden zu 200ml Milch
+
+Lina verstand: "Ich nehme immer alles mal 2!"
+
+Am nächsten Tag in der Schule: Mathe. Thema Verdoppeln.
+Lina musste lächeln.
+"Das ist ja wie beim Kuchenbacken!"
+
+Sie löste alle Aufgaben richtig.
+
+Dann kam eine schwere Aufgabe zum Halbieren.
+Lina überlegte... "Beim Backen halbieren wir das Rezept manchmal auch..."
+Sie hatte es verstanden!
+
+**Vom Backen zur Mathe und wieder zurück!**
+Das ist die Kraft von Far Transfer.""",
+
+            "prinzipien_finden": """**So findest du Möglichkeiten für Far Transfer:** 🔍
+
+Frag dich bei allem, was du lernst:
+**"Was ist der Trick dahinter?"**
+
+Dann frag:
+**"Wo könnte dieser Trick noch helfen?"**
+
+Beispiele:
+| Das lernst du | Der Trick dahinter | Das hilft auch bei |
+|--------------|-------------|---------------|
+| Teilen in Mathe | "Alles gerecht aufteilen" | Süßigkeiten mit Freunden teilen |
+| Geschichten lesen | "Anfang – Mitte – Ende" | Eigene Geschichten schreiben |
+| Vokabeln lernen | "Oft wiederholen" | Gedichte auswendig lernen |
+""",
+
+            "uebertritt_beispiel": """**Das hilft dir auf der neuen Schule:** 🎒
+
+In der neuen Schule lernst du ganz neue Fächer.
+Zum Beispiel Englisch oder Geschichte.
+
+Aber viele Tricks kennst du schon!
+
+- In Sachkunde hast du gelernt, Texte zu verstehen → Das hilft auch in Geschichte
+- In Deutsch hast du gelernt, Geschichten zu schreiben → Das hilft auch bei englischen Texten
+- In Mathe hast du gelernt, Schritt für Schritt zu rechnen → Das hilft auch in Physik
+
+**Dein Wissen aus der Grundschule ist dein Schatz für die neue Schule!**""",
+
             "exercise": {
-                "title": "Superhelden-Transfer! 🦸‍♀️",
-                "instruction": "Finde die versteckte Verbindung zwischen diesen total verschiedenen Dingen!",
-                "scenarios": [
+                "title": "Deine Far-Transfer-Aufgabe! ⭐",
+                "instruction": "Das ist eine Herausforderung – aber du schaffst das!",
+                "aufgaben": [
                     {
-                        "thing_a": "Minecraft: Du planst, bevor du baust",
-                        "thing_b": "Aufsatz: Du planst, bevor du schreibst",
-                        "hidden_principle": "ERST denken, DANN machen!",
-                        "icon_a": "🎮",
-                        "icon_b": "✍️",
+                        "quelle": "Beim Puzzle spielen lernst du: Erst die Ecken und Ränder suchen.",
+                        "frage": "Wo könnte dir dieser Trick noch helfen?",
+                        "tipp": "Denk daran: Zuerst das Einfache machen, dann das Schwere...",
+                        "moegliche_antworten": [
+                            "Bei den Hausaufgaben: Erst die leichten Aufgaben machen!",
+                            "Beim Aufräumen: Erst den Boden frei räumen!",
+                            "Beim Lesen: Erst die kurzen Wörter lesen!",
+                        ],
                     },
                     {
-                        "thing_a": "Fußball: Du passt den Ball zum freien Spieler",
-                        "thing_b": "Gruppenarbeit: Du gibst die Aufgabe an den, der sie kann",
-                        "hidden_principle": "Finde den besten Weg zum Ziel!",
-                        "icon_a": "⚽",
-                        "icon_b": "👥",
-                    },
-                    {
-                        "thing_a": "TikTok-Tanz: Du übst schwierige Moves extra oft",
-                        "thing_b": "Vokabeln: Du übst schwierige Wörter extra oft",
-                        "hidden_principle": "Mehr üben, was schwer ist!",
-                        "icon_a": "💃",
-                        "icon_b": "📚",
+                        "quelle": "Beim Fußball lernst du: Nicht immer selbst schießen. Manchmal abspielen!",
+                        "frage": "Wo könnte dir dieser Trick noch helfen?",
+                        "tipp": "Denk an: Zusammenarbeiten, nicht alles alleine machen...",
+                        "moegliche_antworten": [
+                            "Bei der Gruppenarbeit: Aufgaben aufteilen!",
+                            "Zu Hause: Geschwister um Hilfe bitten!",
+                            "Bei den Hausaufgaben: Nachfragen, wenn du etwas nicht verstehst!",
+                        ],
                     },
                 ],
-                "challenge": "Jetzt DU: Finde eine Verbindung zwischen deinem Lieblingshobby und der Schule!",
+                "eigene_aufgabe": """
+**Jetzt bist du dran!**
+
+**1. Etwas, das ich gerne in meiner Freizeit mache:** _____________
+(z.B. Fußball, Schwimmen, Malen, Tanzen, Lesen, Basteln...)
+
+**2. Der Trick, den ich dabei gelernt habe:** _____________
+(Was macht dich dabei gut? Was ist dein Geheimnis?)
+
+**3. Das könnte mir in der Schule helfen bei:** _____________
+(Bei welchem Fach? Bei welcher Aufgabe?)
+""",
+                "prompt": "Fülle die Lücken aus:",
             },
-            
-            "fun_fact": "Die besten Erfinder können Far Transfer! Sie verbinden Ideen, die niemand vorher verbunden hat! 💡",
+
+            "take_home": """**Das darfst du dir merken:** 🧠
+
+Far Transfer bedeutet: Dein Wissen überall nutzen.
+
+Beim Spielen, beim Sport, bei deinen Hobbys –
+überall lernst du etwas.
+Und das hilft dir auch in der Schule!
+
+**Finde den Trick. Nutze ihn überall.**""",
+
+            "fun_fact": """**Wusstest du das?**
+Die klügsten Menschen der Welt sind gut in Far Transfer.
+Albert Einstein liebte Musik und verband sie mit Physik.
+Leonardo da Vinci verband Kunst mit Wissenschaft.
+Und du? Du kannst auch Verbindungen finden! 🌟""",
         },
-        
+
         "unterstufe": {
-            "intro": """**Far Transfer** = Wissen auf KOMPLETT ANDERE Situationen übertragen
+            "title": "Far Transfer – Big Brain Move!",
+            "icon": "🚀",
 
-Das ist der Boss-Level des Lernens! 👑
+            "hook": """**Jetzt wird es noch spannender!** 🚀
 
-Warum ist das so mächtig?
-Weil du plötzlich überall Verbindungen siehst, 
-die andere nicht sehen!
+Near Transfer: Ähnliches erkennen. Verstanden.
+Far Transfer: KOMPLETT VERSCHIEDENE Sachen verbinden.
 
-**Beispiele für Far Transfer:**
-- Dreisatz (Mathe) → Rezept umrechnen (Kochen) → Benzinverbrauch berechnen (Alltag)
-- Storytelling (Deutsch) → Präsentationen (alle Fächer) → Social Media Posts
-- Teamwork (Sport) → Gruppenarbeit (Schule) → Später im Job""",
-            
+Das klingt ungewöhnlich. Ist aber der Profi-Schritt.
+Die Leute, die das können, sind die echten Überflieger.""",
+
+            "was_ist_far_transfer": """**Far Transfer = Weit übertragen**
+
+Du nimmst ein Prinzip aus einem Bereich...
+...und nutzt es in einem VÖLLIG anderen Bereich.
+
+Beispiele:
+- Strategie aus Schach → Planen für Klassenarbeit
+- Teamwork aus Fußball → Gruppenarbeit in der Schule
+- Timing aus Musik → Timing beim Präsentieren
+- Kochen nach Rezept → Experimente in Chemie
+
+**Unterschiedliche Welten. Gleiches Prinzip.**""",
+
+            "mind_blowing_beispiel": """**Das eindrucksvollste Beispiel:** 🤯
+
+Ein Mädchen war richtig gut im Tanzen.
+Sie hatte gelernt: Komplizierte Moves in kleine Schritte zerlegen.
+
+Dann hatte sie Probleme mit langen Texten in Deutsch.
+Sie dachte: "Moment... wie beim Tanzen!"
+
+Sie zerlegte den Text in kleine Teile.
+Analysierte jeden Teil einzeln.
+Setzte dann alles zusammen.
+
+**Tanzen → Textanalyse!**
+Völlig verschiedene Welten. Gleiches Prinzip.
+Das ist Far Transfer.""",
+
+            "gaming_zu_schule": """**Von Gaming zur Schule:** 🎮📚
+
+**Minecraft:**
+- "Erst Ressourcen sammeln, dann bauen"
+- → Erst recherchieren, dann Aufsatz schreiben
+
+**Roblox:**
+- "Verschiedene Strategien ausprobieren"
+- → Verschiedene Lösungswege in Mathe testen
+
+**Fortnite:**
+- "Zone beachten, Zeit managen"
+- → Zeitmanagement bei Klassenarbeiten
+
+**YouTube:**
+- "Gutes Thumbnail = Aufmerksamkeit"
+- → Gute Einleitung = Aufmerksamkeit beim Referat""",
+
+            "prinzipien_bibliothek": """**Universelle Prinzipien, die ÜBERALL funktionieren:**
+
+| Prinzip | Gaming-Beispiel | Schul-Beispiel |
+|---------|-----------------|----------------|
+| "Erst erkunden, dann handeln" | Neue Map erkunden | Aufgabe erst lesen, dann lösen |
+| "Übung macht den Meister" | Skills grinden | Vokabeln wiederholen |
+| "Aus Fehlern lernen" | Nach Tod analysieren | Fehler in Arbeit verstehen |
+| "Teile und herrsche" | Boss in Phasen | Großes Projekt in Schritte |
+| "Ressourcen managen" | Inventar organisieren | Zeit einteilen |
+""",
+
+            "story": """**Wie Lisa durch Kochen Chemie verstand** 🧪🍰
+
+Lisa hasste Chemie. "Zu abstrakt!"
+Aber sie liebte Backen.
+
+Ihr Lehrer erklärte chemische Reaktionen.
+Lisa dachte: "Moment... das ist wie Backen!"
+
+- Zutaten = Edukte
+- Mischen + Hitze = Reaktion
+- Kuchen = Produkt
+- Rezept = Reaktionsgleichung
+
+Plötzlich machte Chemie Sinn.
+Sie hatte das Prinzip übertragen.
+
+**Backen → Chemie.** Far Transfer.""",
+
             "exercise": {
-                "title": "Cross-Domain Challenge! 🌍",
-                "instruction": "Nimm ein Prinzip aus Spalte A und finde eine Anwendung in Spalte B!",
-                "column_a": [
-                    {"subject": "Mathe", "concept": "Variablen (x steht für eine Zahl)"},
-                    {"subject": "Sport", "concept": "Aufwärmen vor der Belastung"},
-                    {"subject": "Musik", "concept": "Wiederholung macht den Song eingängig"},
-                ],
-                "column_b": [
-                    {"subject": "Kochen", "hint": "Platzhalter für Zutaten"},
-                    {"subject": "Lernen", "hint": "Bevor es ans Eingemachte geht"},
-                    {"subject": "Präsentieren", "hint": "Was soll hängen bleiben?"},
-                ],
-                "solutions": [
-                    "Variable = Zutat im Rezept (kann man austauschen!)",
-                    "Aufwärmen = Easy Thema zuerst, dann das Schwere",
-                    "Wiederholung = Die Kernbotschaft mehrmals sagen",
-                ],
+                "title": "Dein Far-Transfer-Experiment! 🔬",
+                "instruction": "Das ist die Königsdisziplin. Trau dich!",
+                "template": """
+Etwas, das ich AUSSERHALB der Schule liebe:
+_____________
+
+Das Prinzip/der Trick dabei:
+_____________
+
+Ein Schulfach, das damit NULL zu tun hat:
+_____________
+
+Wie könnte das Prinzip dort trotzdem helfen?
+_____________
+""",
+                "beispiel": """
+Hobby: **Fußball spielen**
+Prinzip: **Position halten, aber flexibel reagieren**
+Schulfach: **Deutsch - Argumentation**
+Transfer: **Meine Hauptthese (Position) halten, aber auf Gegenargumente reagieren!**
+""",
             },
-            
-            "fun_fact": "Steve Jobs verband Kalligraphie mit Computern – das Ergebnis war die erste schöne Schriftart auf dem Mac! ✨",
+
+            "take_home": """**Der Big-Brain-Merksatz:**
+
+Far Transfer = Prinzipien sind universal.
+
+Was du beim Gaming, Sport, Musik lernst –
+das sind ECHTE Skills für ECHTE Situationen.
+
+**Finde das Prinzip. Nutze es überall.**""",
         },
-        
+
         "mittelstufe": {
-            "intro": """**Far Transfer: Die Königsdisziplin**
+            "title": "Far Transfer – Domänenübergreifend denken",
+            "icon": "🚀",
 
-Far Transfer ist schwierig – und genau deshalb so wertvoll!
+            "hook": """**Die Königsdisziplin.** 🚀
 
-**Warum ist Far Transfer schwer?**
-- Die Oberfläche sieht komplett anders aus
-- Man muss das PRINZIP erkennen, nicht die Details
-- Es erfordert Abstraktion und Kreativität
+Near Transfer ist wichtig. Aber Far Transfer ist mächtig.
 
-**Die Schlüsselfrage:**
-"Was ist das UNIVERSELLE Prinzip, das in beiden Situationen gilt?"
+Wenn du Prinzipien aus der Physik in der Psychologie anwendest.
+Wenn Gaming-Strategien dir bei Verhandlungen helfen.
+Wenn Musik dein Mathe-Verständnis verbessert.
 
-**Beispiel:**
-Natürliche Selektion (Biologie) = "Das Passende überlebt"
-→ Wirtschaft: Erfolgreiche Firmen überleben
-→ Sprache: Nützliche Wörter bleiben erhalten
-→ Memes: Lustige Memes werden geteilt und überleben""",
-            
+Das ist Far Transfer. Und es ist schwer – aber trainierbar.""",
+
+            "wissenschaft": """**Was sagt die Forschung?**
+
+Barnett & Ceci (2002) haben Far Transfer systematisch untersucht.
+Ergebnis: Er ist selten – aber wenn er gelingt, extrem wertvoll.
+
+**Warum ist Far Transfer schwierig?**
+1. Die Oberflächen sind KOMPLETT unterschiedlich
+2. Das Prinzip ist stärker abstrahiert
+3. Man muss aktiv nach Verbindungen suchen
+
+**Warum lohnt es sich trotzdem?**
+- Kreativität entsteht durch ungewöhnliche Verbindungen
+- Innovation = Far Transfer
+- Problemlösung in neuen Situationen""",
+
+            "realitaets_check": """**Realitäts-Check: Far Transfer ist selten!** ⚠️
+
+❌ **Mythos:** "Wenn ich gut im Schachspielen bin, werde ich auch besser im logischen Denken."
+✅ **Realität:** Sala & Gobet (2019) zeigen: Far Transfer bei kognitivem Training ist ~0%.
+
+**Was bedeutet das für dich?**
+- Near Transfer funktioniert oft und zuverlässig
+- Far Transfer braucht gezieltes, explizites Training
+- Nicht frustriert sein, wenn es nicht "automatisch" klappt
+
+**Die gute Nachricht:**
+Mit den richtigen Strategien (Abstraktion, Analogien) kannst du Far Transfer trainieren.
+Es ist schwer – aber möglich!""",
+
+            "beispiele": """**Far Transfer in Action:**
+
+**Von Musik zu Mathematik:**
+- Rhythmus = Brüche und Verhältnisse
+- Harmonie = mathematische Frequenzverhältnisse
+- Komposition = Strukturaufbau
+
+**Von Sport zu Lernen:**
+- Periodisierung im Training → Spaced Repetition
+- Technik vor Kraft → Verständnis vor Auswendiglernen
+- Regeneration → Schlaf und Pausen beim Lernen
+
+**Von Gaming zu Projektmanagement:**
+- Quest-Struktur → Aufgaben in Teilziele zerlegen
+- Skill Trees → Lernpfade planen
+- Boss-Strategien → Komplexe Probleme angehen
+
+**Von Kochen zu Wissenschaft:**
+- Rezept = Protokoll
+- Variablen kontrollieren = Zutaten genau abmessen
+- Hypothese testen = Neues Rezept ausprobieren""",
+
+            "abstraktion": """**Der Schlüssel: Abstraktion**
+
+Je abstrakter du ein Prinzip formulierst,
+desto weiter kannst du es transferieren.
+
+**Beispiel – Eskalation der Abstraktion:**
+
+Konkret: "In Mathe isoliere ich x auf eine Seite."
+↓
+Abstrakter: "Ich bringe das Gesuchte alleine auf eine Seite."
+↓
+Noch abstrakter: "Ich isoliere die unbekannte Variable."
+↓
+Maximal abstrakt: "Ich trenne das Relevante vom Rest."
+
+**Je höher die Abstraktionsebene, desto mehr Anwendungen:**
+- Mathe: Variable isolieren
+- Chemie: Stoff extrahieren
+- Deutsch: Kernaussage herausarbeiten
+- Alltag: Das Wesentliche vom Unwichtigen trennen""",
+
+            "kreativitaet": """**Far Transfer und Kreativität:**
+
+Die kreativsten Ideen entstehen durch ungewöhnliche Verbindungen.
+
+**Steve Jobs:** Kombinierte Kalligraphie + Computer = Mac-Typografie
+**Einstein:** Kombinierte Philosophie + Physik = Relativitätstheorie
+**Spotify:** Kombinierte Radio + Internet + Algorithmen = Musik-Streaming
+
+**Deine Chance:**
+Je mehr verschiedene Bereiche du kennst,
+desto mehr Verbindungen kannst du herstellen.
+
+Hobbys sind keine Zeitverschwendung.
+Sie sind Transfer-Ressourcen.""",
+
             "exercise": {
-                "title": "Analogie-Maschine 🔧",
-                "instruction": "Erstelle kreative Analogien zwischen völlig verschiedenen Bereichen!",
-                "template": {
-                    "format": "[Konzept A] ist wie [Konzept B], weil beide [gemeinsames Prinzip]",
-                    "examples": [
-                        {
-                            "concept_a": "Das Immunsystem (Bio)",
-                            "concept_b": "Ein Antivirus-Programm (IT)",
-                            "principle": "Erkennt Eindringlinge und neutralisiert sie",
-                        },
-                        {
-                            "concept_a": "Angebot und Nachfrage (Wirtschaft)",
-                            "concept_b": "Chemisches Gleichgewicht",
-                            "principle": "Systeme streben nach Balance",
-                        },
-                        {
-                            "concept_a": "Feedback-Schleifen (Technik)",
-                            "concept_b": "Lernen aus Fehlern",
-                            "principle": "Output beeinflusst Input für Verbesserung",
-                        },
-                    ],
-                },
-                "challenge": "Erstelle 3 eigene Analogien zwischen Schulfächern und deinem Alltag!",
+                "title": "Far-Transfer-Labor",
+                "instruction": "Wähle ein Prinzip und transferiere es maximal weit.",
+                "template": """
+**Ausgangsprinzip aus Bereich A:** _____________
+
+**Abstrakte Formulierung des Prinzips:** _____________
+
+**Transfer zu Bereich B (komplett anders):** _____________
+
+**Wie funktioniert es dort?** _____________
+
+**Transfer zu Bereich C (noch anders):** _____________
+
+**Was ist die gemeinsame Essenz?** _____________
+""",
+                "beispiel": """
+**BEISPIEL: Schachstrategie → Lernen → Alltag**
+
+**Ausgangsprinzip aus Bereich A (Schach):**
+"Knappe Bedenkzeit optimal auf wichtige Züge verteilen"
+
+**Abstrakte Formulierung des Prinzips:**
+"Begrenzte Ressourcen strategisch auf Prioritäten verteilen"
+
+**Transfer zu Bereich B (Lernen):**
+"Lernzeit auf schwierige Fächer konzentrieren, statt gleichmäßig zu verteilen"
+
+**Wie funktioniert es dort?**
+Wie beim Schach priorisiere ich: Wo bringt mein Einsatz am meisten?
+Schwache Fächer bekommen mehr Zeit, starke Fächer weniger.
+
+**Transfer zu Bereich C (Alltag/Energie):**
+"Energie für wichtige Entscheidungen aufsparen, Routineaufgaben automatisieren"
+
+**Was ist die gemeinsame Essenz?**
+"Ressourcen-Optimierung unter Knappheit" – Ob Zeit, Energie oder Geld:
+Verteile begrenzte Ressourcen dort, wo sie den größten Effekt haben.
+""",
             },
-            
-            "fun_fact": "Die größten wissenschaftlichen Durchbrüche kamen oft durch Far Transfer – Darwin übertrug Wirtschaftstheorie auf Biologie! 🧬",
+
+            "take_home": """**Merksatz:**
+
+Far Transfer = Abstraktion + Kreativität.
+
+Je abstrakter du denkst, desto weiter transferierst du.
+Je mehr Bereiche du kennst, desto mehr Verbindungen möglich.
+
+**Innovation ist nichts anderes als erfolgreicher Far Transfer.**""",
         },
-        
+
         "oberstufe": {
-            "intro": """**Far Transfer: Theoretische Fundierung**
+            "title": "Far Transfer – Domänenübergreifende Innovation",
+            "icon": "🚀",
 
-Far Transfer ist laut Sala & Gobet (2019) selten und schwierig.
-Dennoch ist er das Ziel jeder höheren Bildung.
+            "theorie": """**Die Herausforderung des Far Transfer:**
 
-**Barnett & Ceci (2002) identifizieren Dimensionen:**
-- Wissensdomäne (nah ↔ fern)
-- Physischer Kontext
-- Zeitlicher Kontext
-- Funktionaler Kontext
-- Soziale Modalität
+**Barnett & Ceci (2002)** haben Far Transfer systematisch untersucht.
+Ihr Befund: Er ist selten und schwierig – aber möglich.
 
-**Förderliche Faktoren:**
-1. Tiefes Verständnis der Grundprinzipien
-2. Explizites Abstraktionstraining
-3. Vielfältige Beispiele während des Lernens
-4. Metakognitive Reflexion über Transfer
+**Dimensionen des "Far":**
+- Wissensdomäne: Verschiedene Fachgebiete
+- Physischer Kontext: Schule vs. Alltag vs. Beruf
+- Zeitlicher Abstand: Lange her vs. gerade gelernt
+- Modalität: Visuell vs. auditiv vs. kinästhetisch
+- Funktionalität: Anderer Verwendungszweck
 
-**Die Herausforderung:**
-Oberflächliche Unterschiede übersehen,
-tiefe Strukturen erkennen.""",
-            
+**Je mehr Dimensionen sich unterscheiden, desto schwieriger der Transfer.**""",
+
+            "kreativitaet_und_innovation": """**Far Transfer als Grundlage von Innovation:**
+
+**Kreativität = Verbindung des Unverbundenen**
+
+Die kreativsten Durchbrüche entstanden durch Far Transfer:
+- **Darwin:** Ökonomie → Biologie (Malthus → Evolution)
+- **Einstein:** Philosophie → Physik (Mach → Relativität)
+- **Gutenberg:** Weinpresse → Druckerpresse
+- **Jobs:** Kalligraphie → Computer (Mac-Typografie)
+
+**Das Muster:**
+Wissen aus Bereich A + Wissen aus Bereich B = Innovation
+
+**Die Voraussetzung:**
+Breites Wissen UND die Fähigkeit, Verbindungen zu sehen.""",
+
+            "analogisches_denken": """**Analogisches Denken – Der Motor des Far Transfer:**
+
+**Struktur einer Analogie:**
+Quelle (bekannt) → Mapping → Ziel (unbekannt)
+
+**Beispiel: Rutherford's Atommodell**
+- Quelle: Sonnensystem (bekannt)
+- Mapping: Zentrum mit umkreisenden Objekten
+- Ziel: Atom (Kern + Elektronen)
+
+**Wie trainiert man analogisches Denken?**
+1. Viele verschiedene Domänen kennenlernen
+2. Aktiv nach Strukturähnlichkeiten suchen
+3. Abstraktion üben: "Was ist die Essenz?"
+4. Analogien bewusst generieren und testen
+
+**Warnung:**
+Analogien können auch irreführen.
+Kritische Prüfung: Wo bricht die Analogie?""",
+
+            "transfer_zu_studium_beruf": """**Far Transfer: Schule → Studium → Beruf**
+
+**Was transferiert?**
+- Fachspezifisches Wissen: Teilweise
+- Methoden: Oft
+- Prinzipien: Fast immer
+- Metakognition: Auf jeden Fall
+
+**Konkret:**
+| Schulkompetenz | Studium | Beruf |
+|----------------|---------|-------|
+| Quellenarbeit | Wissenschaftliches Arbeiten | Research |
+| Argumentation | Wissenschaftlicher Diskurs | Verhandlung |
+| Projektarbeit | Gruppenarbeiten | Teamwork |
+| Zeitmanagement | Selbststudium | Deadline-Management |
+| Komplexe Texte verstehen | Paper lesen | Verträge/Reports |
+
+**Die Pointe:**
+Die meisten "Soft Skills" sind transferierte Schulkompetenzen.""",
+
             "exercise": {
-                "title": "Interdisziplinäre Brücken 🌉",
-                "instruction": "Identifiziere ein universelles Prinzip und zeige seine Anwendung in mindestens 3 verschiedenen Domänen.",
-                "example": {
-                    "principle": "Emergenz: Das Ganze ist mehr als die Summe seiner Teile",
-                    "domains": [
-                        {"field": "Biologie", "application": "Bewusstsein aus Neuronen"},
-                        {"field": "Soziologie", "application": "Kultur aus Individuen"},
-                        {"field": "Chemie", "application": "Wasser aus H und O"},
-                        {"field": "Wirtschaft", "application": "Marktverhalten aus Einzelentscheidungen"},
-                    ],
-                },
-                "your_turn": "Wähle: Feedback, Gleichgewicht, Evolution, Netzwerke, Selbstorganisation",
+                "title": "Analogie-Konstruktion",
+                "instruction": "Konstruiere eine kreative Analogie zwischen zwei völlig verschiedenen Domänen.",
+                "template": """
+**Domäne A (bekannt):** _____________
+**Kernstruktur in A:** _____________
+
+**Domäne B (Transfer-Ziel):** _____________
+
+**Die Analogie:**
+"B ist wie A, weil..." _____________
+
+**Was überträgt sich?** _____________
+
+**Wo bricht die Analogie?** _____________
+(Kritische Reflexion: Was funktioniert NICHT?)
+
+**Neues Verständnis von B:** _____________
+""",
             },
-            
-            "fun_fact": "Elon Musk nutzt 'First Principles Thinking' – radikales Abstrahieren auf Grundprinzipien, dann Transfer auf neue Probleme. 🚀",
+
+            "take_home": """**Fazit:**
+
+Far Transfer ist die Basis von Kreativität und Innovation.
+
+Er erfordert:
+- Breites Wissen über verschiedene Domänen
+- Abstraktionsfähigkeit
+- Aktive Suche nach Verbindungen
+- Kritische Prüfung der Analogien
+
+In einer Welt der Spezialisierung ist interdisziplinäres Denken ein Wettbewerbsvorteil.""",
         },
-        
+
         "paedagogen": {
-            "intro": """**Far Transfer im Unterricht**
+            "title": "Far Transfer – Möglichkeiten und Grenzen",
+            "icon": "🚀",
 
-Far Transfer ist das ultimative Ziel, aber auch die größte Herausforderung.
-Forschung zeigt: Ohne explizite Förderung passiert er selten.
+            "realistische_erwartungen": """**Realistische Erwartungen:**
 
-**Hindernisse:**
-- Lernende bleiben an Oberflächen haften
-- Wissen wird kontextgebunden gespeichert
-- Abstraktion erfordert kognitive Anstrengung
+**Was die Forschung sagt:**
+Far Transfer ist schwierig und selten.
 
-**Chancen:**
-- Interdisziplinäres Arbeiten
-- Projektbasiertes Lernen
-- Real-World Problems""",
-            
-            "implementation": """**Strategien für Far Transfer:**
+**Sala & Gobet (2019): "Cognitive training does not enhance general cognition"**
+- Meta-Analyse von Gehirntrainings (Schach, Musik, Videospiele)
+- Far Transfer: **Effekt nahe 0%**
+- Kernaussage: Training in Bereich A verbessert nicht automatisch Bereich B
 
-1. **Bridging (Perkins & Salomon)**
-   - Explizit nach Analogien fragen
-   - "Wo begegnet euch dieses Prinzip noch?"
-   - Bewusst fächerübergreifend denken
+**Realistische Schüler-Quoten bei explizitem Transfer-Training:**
+- Near Transfer: ~70-80% der Schüler zeigen Fortschritte
+- Far Transfer: ~30-50% bei intensivem, explizitem Training
+- Spontaner Far Transfer (ohne Training): ~5-10%
 
-2. **Abstraktion fördern**
-   - Vom Beispiel zum Prinzip
-   - "Was ist die REGEL dahinter?"
-   - Multiple Repräsentationen nutzen
+**Aber:**
+Far Transfer ist nicht unmöglich.
+Er erfordert:
+1. Explizites Training mit Feedback
+2. Hohe Abstraktionsfähigkeit
+3. Metakognitive Kompetenz
+4. Breites Vorwissen
 
-3. **Diverse Beispiele**
-   - Gleiches Prinzip in verschiedenen Kontexten zeigen
-   - Oberfläche variieren, Tiefenstruktur gleich halten
+**Didaktische Konsequenz:**
+Far Transfer als Ziel, nicht als Selbstverständlichkeit.
+Explizit üben, nicht dem Zufall überlassen.
+Realistische Erwartungen an Eltern kommunizieren.""",
 
-4. **Metakognitive Reflexion**
-   - "Warum funktioniert das auch hier?"
-   - Transfer-Tagebuch führen lassen
+            "strategien": """**Strategien zur Förderung von Far Transfer:**
 
-5. **Fächerübergreifende Projekte**
-   - Problem aus der echten Welt
-   - Wissen aus verschiedenen Fächern nötig""",
-            
-            "research_note": "Sala, G. & Gobet, F. (2019). Cognitive Training Does Not Enhance General Cognition. Trends in Cognitive Sciences.",
+**1. Abstraktion trainieren**
+Vom Konkreten zum Allgemeinen:
+- Was ist hier spezifisch?
+- Was ist das allgemeine Prinzip?
+- Wie würde man das abstrakt formulieren?
+
+**2. Analogisches Denken fördern**
+- Explizit Analogien konstruieren lassen
+- Struktur-Mapping: Was entspricht was?
+- Kritische Prüfung: Wo bricht die Analogie?
+
+**3. Interdisziplinäre Projekte**
+- Bewusst fächerübergreifend arbeiten
+- Die Verbindungen explizit thematisieren
+- Transfer als Lernziel formulieren
+
+**4. Breites Vorwissen aufbauen**
+- Je mehr Domänen bekannt, desto mehr Transfer-Ressourcen
+- Allgemeinbildung ist Transfer-Kapital""",
+
+            "analogietraining": """**Analogietraining im Detail:**
+
+**Stufe 1: Analogien erkennen**
+- Vorgegebene Analogien analysieren
+- "Was ist hier gleich, was verschieden?"
+
+**Stufe 2: Analogien konstruieren**
+- Zu einem Konzept Analogien finden
+- Mehrere Domänen durchprobieren
+
+**Stufe 3: Analogien kritisieren**
+- Wo funktioniert die Analogie?
+- Wo bricht sie?
+- Was wäre eine bessere Analogie?
+
+**Stufe 4: Analogien anwenden**
+- Neue Probleme durch Analogie lösen
+- Aus der Analogie Hypothesen ableiten
+
+**Beispiel-Sequenz:**
+1. "Das Atom ist wie ein Sonnensystem. Was entspricht was?"
+2. "Finde eine eigene Analogie für X."
+3. "Wo bricht die Sonnensystem-Analogie?"
+4. "Nutze eine Analogie, um Y zu erklären."
+""",
+
+            "faecheruebergreifend": """**Fächerübergreifende Kooperation:**
+
+**Mögliche Verbindungen:**
+
+| Fach A | Fach B | Gemeinsames Prinzip |
+|--------|--------|---------------------|
+| Mathe: Exponentialfunktion | Bio: Populationswachstum | Exponentielles Wachstum |
+| Physik: Gleichgewicht | Chemie: Le Chatelier | Systemgleichgewicht |
+| Deutsch: Argumentation | PoWi: Debatte | Überzeugungsstruktur |
+| Geschichte: Quellenanalyse | Deutsch: Textinterpretation | Kritische Analyse |
+| Kunst: Komposition | Musik: Harmonie | Ästhetische Struktur |
+
+**Konkrete Ideen:**
+- Team-Teaching zwischen Fächern
+- Gemeinsame Projekte
+- Explizite Brücken im Unterricht
+- Transfer als Prüfungselement""",
+
+            "grenzen": """**Grenzen und Vorsicht:**
+
+**Wann Far Transfer unrealistisch ist:**
+- Wenn Basiswissen fehlt
+- Wenn Metakognition nicht entwickelt ist
+- Wenn die Domänen zu verschieden sind
+- Wenn die Abstraktionsfähigkeit begrenzt ist
+
+**Typische Fehler:**
+1. Annehmen, Transfer passiert automatisch
+2. Far Transfer vor Near Transfer erwarten
+3. Zu wenig Zeit für Abstraktion geben
+4. Nur Fakten abfragen, aber Transfer erwarten
+
+**Realistische Progression:**
+1. Erst solides Fachwissen aufbauen
+2. Dann Near Transfer üben
+3. Dann langsam zu Far Transfer
+4. Immer mit metakognitiver Begleitung""",
         },
     },
 }
@@ -705,216 +2116,619 @@ PHASE_4_CONTENT = {
     
     "altersstufen": {
         "grundschule": {
-            "intro": """**Brückenprinzipien** sind wie Zauberformeln! ✨
+            "title": "Brückenprinzipien – Verbindungen finden",
+            "icon": "🌉",
 
-Ein Brückenprinzip ist eine Regel, die ÜBERALL funktioniert.
+            "hook": """**Stell dir eine Brücke vor!** 🌉
 
-Wenn du sie kennst, kannst du sie immer wieder benutzen –
-egal wo, egal wann!
+Du stehst auf einer Seite eines Flusses.
+Auf der anderen Seite ist dein Ziel.
+Dazwischen ist das Wasser!
 
-**Ein Beispiel:**
-"Teile große Sachen in kleine Stücke!"
+Eine Brücke verbindet beide Seiten.
+Und genau so funktionieren Brückenprinzipien:
+Sie verbinden verschiedene Dinge miteinander.
 
-Das hilft bei:
-- 🍕 Pizza essen (in Stücke schneiden)
-- 📚 Lernen (Thema in kleine Teile)
-- 🧹 Aufräumen (Zimmer in Ecken einteilen)
-- 🎮 Schwierige Level (Schritt für Schritt)""",
-            
+Mit Brückenprinzipien kannst du überall hin!""",
+
+            "was_sind_brueckenprinzipien": """**Was sind Brückenprinzipien?**
+
+Es gibt Weisheiten, die ÜBERALL stimmen.
+Sie gelten in der Schule, zu Hause, beim Spielen – einfach überall!
+
+Beispiele:
+- **"Übung macht den Meister"** – Das gilt beim Sport, bei Musik, in Mathe, überall.
+- **"Erst nachdenken, dann handeln"** – Das gilt bei Spielen, bei Proben, im ganzen Leben.
+- **"Aus Fehlern lernt man"** – Das stimmt immer und überall.
+
+Diese Weisheiten sind wie Brücken.
+Sie verbinden alles miteinander.""",
+
+            "die_wichtigsten_bruecken": """**Deine 5 wichtigsten Brücken:** 🌟
+
+**1. Muster suchen**
+   "Überall gibt es Muster und Regeln."
+   → In Mathe, in der Musik, in der Sprache – finde die Regel!
+
+**2. In kleine Teile aufteilen**
+   "Große Sachen werden leichter, wenn man sie in kleine Teile teilt."
+   → Lange Wörter, schwere Aufgaben, große Projekte.
+
+**3. Vergleichen**
+   "Was ist gleich? Was ist anders?"
+   → Bei neuen Wörtern, bei Tieren, bei Ländern.
+
+**4. Nach dem Grund fragen**
+   "Alles hat einen Grund und eine Wirkung."
+   → In Geschichte, in der Natur, im Alltag.
+
+**5. Üben**
+   "Je mehr du übst, desto besser wirst du."
+   → Das gilt für ALLES!""",
+
+            "gaming_beispiel": """**Weisheiten vom Spielen:** 🎲
+
+Beim Spielen lernst du wichtige Dinge, die überall helfen:
+
+**"Immer wieder versuchen"**
+→ Das hilft auch beim Lernen: Nicht aufgeben!
+
+**"Erst einen Überblick verschaffen"**
+→ Das hilft bei Aufgaben: Erst lesen, dann anfangen!
+
+**"Viel üben bringt viel"**
+→ Das stimmt überall: Übung macht den Meister!
+
+**"Zusammen geht es besser"**
+→ Das hilft auch in der Schule: Arbeitet zusammen!""",
+
+            "story": """**Die Brückenbauerin Marie** 🌉
+
+Marie konnte wunderbar zeichnen.
+Aber Mathe war für sie sehr schwer.
+
+Ihre Lehrerin fragte: "Was machst du beim Zeichnen?"
+Marie überlegte: "Ich schaue ganz genau hin. Ich achte auf jedes kleine Detail."
+
+Die Lehrerin sagte: "Das ist ein Brückenprinzip!"
+
+**Genau hinsehen und auf Details achten**
+
+Das funktioniert auch in Mathe!
+- Genau hinsehen: Was soll ich rechnen?
+- Auf Details achten: Steht da Plus oder Minus?
+
+Marie nutzte ihre Brücke.
+Vom Zeichnen zur Mathe.
+Und ihre Noten wurden besser!
+
+Sie entdeckte: Diese Brücke führt noch viel weiter!
+→ Beim Lesen (genau hinsehen)
+→ In Sachkunde (genau beobachten)
+→ Sogar bei Freundschaften (auf andere achten)
+
+**Eine Brücke. Viele Ziele.**""",
+
+            "uebertritt_beispiel": """**Deine Brücken für die neue Schule:** 🎒
+
+Diese Brückenprinzipien helfen dir beim Übertritt:
+
+**"Schritt für Schritt"**
+In der Grundschule: Aufgaben nacheinander lösen
+Auf der neuen Schule: Genauso! Eine Aufgabe nach der anderen.
+
+**"Fragen stellen"**
+In der Grundschule: Bei der Lehrerin nachfragen
+Auf der neuen Schule: Genauso! Fragen ist erlaubt und wichtig.
+
+**"Ordnung halten"**
+In der Grundschule: Hefte und Bücher sortieren
+Auf der neuen Schule: Genauso! Nur mit mehr Fächern.
+
+**Diese Brücken nimmst du mit!**""",
+
             "exercise": {
-                "title": "Brücken-Sammler! 🌉",
-                "instruction": "Hier sind mächtige Brückenprinzipien. Finde für jedes 3 Anwendungen!",
-                "principles": [
+                "title": "Brückenbauer-Training! 🏗️",
+                "instruction": "Finde die Verbindung zwischen diesen Dingen:",
+                "aufgaben": [
                     {
-                        "principle": "Übung macht den Meister",
-                        "starter_examples": ["Tanzen", "Gaming", "?"],
-                        "icon": "🔄",
+                        "sache_1": "Lego bauen",
+                        "sache_2": "Sätze schreiben",
+                        "bruecke": "Einzelne Teile zu etwas Großem zusammensetzen",
                     },
                     {
-                        "principle": "Erst denken, dann machen",
-                        "starter_examples": ["Malen", "Bauen", "?"],
-                        "icon": "🧠",
+                        "sache_1": "Einen Fehler im Puzzle suchen",
+                        "sache_2": "Einen Fehler in der Hausaufgabe finden",
+                        "bruecke": "Genau hinschauen und suchen: Was stimmt nicht?",
                     },
                     {
-                        "principle": "Zusammen ist man stärker",
-                        "starter_examples": ["Fußball", "Gruppenarbeit", "?"],
-                        "icon": "👥",
+                        "sache_1": "Kekse nach Rezept backen",
+                        "sache_2": "Ein Experiment in Sachkunde machen",
+                        "bruecke": "Die Anleitung Schritt für Schritt befolgen",
                     },
                 ],
-                "your_turn": "Erfinde dein EIGENES Brückenprinzip!",
+                "eigene_bruecke": """
+**Jetzt baust du deine eigene Brücke!**
+
+**1. Etwas, das ich gerne mache:** _____________
+(z.B. Sport, Musik, Basteln, Spielen...)
+
+**2. Etwas aus der Schule:** _____________
+(z.B. Mathe, Deutsch, Sachkunde...)
+
+**3. Die Verbindung (Brücke) ist:** _____________
+(Was haben beide gemeinsam? Welche Regel gilt für beide?)
+""",
+                "prompt": "Fülle die Lücken aus:",
             },
-            
-            "fun_fact": "Die besten Brückenprinzipien passen zu ALLEM – wie ein Universal-Schlüssel! 🔑",
+
+            "bruecken_sammlung": """**Deine Brücken-Sammlung:** 🗝️
+
+Sammle deine eigenen Brücken-Regeln!
+Schreib sie auf und erinnere dich daran.
+
+**Beispiele:**
+- "Übung macht den Meister" (gilt beim Sport UND in der Schule)
+- "Schritt für Schritt" (gilt beim Rezept UND bei Aufgaben)
+- "Erst denken, dann handeln" (gilt beim Spiel UND beim Test)
+
+**Meine Brücken-Regeln:**
+1. _______________________________
+2. _______________________________
+3. _______________________________
+
+**Diese Brücken gehören dir!**
+Sie helfen dir in der Schule UND im Leben.""",
+
+            "take_home": """**Das darfst du dir merken:** 🧠
+
+Brückenprinzipien verbinden ALLES.
+
+Finde sie.
+Sammle sie.
+Nutze sie.
+
+**Eine gute Brücke trägt dich überall hin.**""",
+
+            "fun_fact": """**Wusstest du das?**
+Die besten Erfinder sind Brückenbauer!
+Sie verbinden Ideen aus verschiedenen Bereichen.
+So entstehen die tollsten Erfindungen.
+Und du bist jetzt auch ein Brückenbauer! 🌉""",
         },
-        
+
         "unterstufe": {
-            "intro": """**Brückenprinzipien** = Universelle Regeln, die überall gelten
+            "title": "Brückenprinzipien – Dein Erfolgsgeheimnis!",
+            "icon": "🌉",
 
-Das ist der ultimative Hack: 
-Wenn du das PRINZIP verstehst, brauchst du nicht alles einzeln zu lernen!
+            "hook": """**Was wäre, wenn es Prinzipien gäbe...** 🌉
 
-**Die 3-Schritte-Methode:**
-1. **ERKENNEN:** Was ist das Prinzip dahinter?
-2. **ÜBERTRAGEN:** Wo könnte ich das noch anwenden?
-3. **TESTEN:** Funktioniert es dort auch?
+...die in JEDEM Fach funktionieren?
+...die bei JEDER Aufgabe helfen?
+...die du ein Leben lang nutzen kannst?
 
-**Beispiel-Prinzip: "Feedback nutzen"**
-- Gaming: Aus Fehlern lernen, besser werden
-- Sport: Coach gibt Tipps, du verbesserst dich
-- Schule: Korrektur lesen, nächstes Mal besser machen
-- Social Media: Welche Posts kommen gut an?""",
-            
+Gibt es. Sie heißen Brückenprinzipien.
+Und sie sind wie Erfolgstricks fürs Lernen.""",
+
+            "was_sind_brueckenprinzipien": """**Brückenprinzipien = Universelle Wahrheiten**
+
+Diese Prinzipien funktionieren überall:
+- In jedem Fach
+- Bei jeder Aufgabe
+- Im Gaming
+- Im echten Leben
+
+Sie sind wie Brücken zwischen verschiedenen Welten.
+Wenn du sie kennst, kommst du überall hin.""",
+
+            "die_top_5": """**Die 5 mächtigsten Brückenprinzipien:**
+
+**1️⃣ Das Muster-Prinzip**
+"Überall gibt es Muster und Strukturen."
+→ Mathe, Musik, Sprachen, Geschichte – such das Muster!
+
+**2️⃣ Das Zerlege-Prinzip**
+"Große Probleme in kleine Teile aufteilen."
+→ Schwere Aufgaben, lange Texte, komplexe Themen.
+
+**3️⃣ Das Ursache-Wirkungs-Prinzip**
+"Alles hat einen Grund und eine Folge."
+→ Geschichte, Naturwissenschaften, Alltag.
+
+**4️⃣ Das Vergleichs-Prinzip**
+"Was ist gleich? Was ist anders?"
+→ Vokabeln, Textvergleiche, wissenschaftliches Denken.
+
+**5️⃣ Das Wiederholungs-Prinzip**
+"Übung macht den Meister."
+→ Wirklich ALLES.""",
+
+            "bruecken_in_action": """**Brückenprinzipien in der Praxis:**
+
+**Situation:** Schwere Mathe-Textaufgabe 😰
+
+**Ohne Brückenprinzipien:**
+"Ich versteh das nicht!" *Panik*
+
+**Mit Brückenprinzipien:**
+1. **Zerlege-Prinzip:** Was ist gegeben? Was ist gesucht?
+2. **Muster-Prinzip:** Welche Art von Aufgabe ist das?
+3. **Ursache-Wirkung:** Welcher Rechenweg führt zum Ziel?
+
+Plötzlich: Die Aufgabe ist lösbar.""",
+
+            "gaming_bruecken": """**Brücken aus dem Gaming:** 🎮
+
+Du kennst diese Prinzipien schon – aus Spielen!
+
+- **"Save often"** → Regelmäßig wiederholen beim Lernen
+- **"Erst die Anleitung lesen"** → Erst die Aufgabe richtig lesen
+- **"Level up before boss"** → Erst üben, dann Klassenarbeit
+- **"Look for patterns"** → Muster erkennen
+- **"Don't rage quit"** → Durchhalten, auch wenn's schwer ist""",
+
             "exercise": {
-                "title": "Prinzipien-Detektiv 🔍",
-                "instruction": "Extrahiere das Brückenprinzip aus diesen Situationen!",
-                "cases": [
-                    {
-                        "situation_1": "Du checkst das Wetter, bevor du rausgehst",
-                        "situation_2": "Du liest die Aufgabe, bevor du anfängst",
-                        "situation_3": "Du schaust Rezensionen, bevor du kaufst",
-                        "hidden_principle": "Informiere dich VORHER!",
-                    },
-                    {
-                        "situation_1": "Ein guter Song hat Strophe, Refrain, Strophe",
-                        "situation_2": "Ein guter Aufsatz hat Einleitung, Hauptteil, Schluss",
-                        "situation_3": "Ein gutes Gespräch hat Begrüßung, Inhalt, Verabschiedung",
-                        "hidden_principle": "Struktur macht alles besser!",
-                    },
-                ],
-                "challenge": "Finde ein Prinzip, das in DREI deiner Hobbys vorkommt!",
+                "title": "Bau deine Brücken-Sammlung! 🗂️",
+                "instruction": "Sammle deine eigenen Brückenprinzipien.",
+                "template": """
+**Meine Brückenprinzipien:**
+
+1. _______________________________
+   (Wo funktioniert das? _________)
+
+2. _______________________________
+   (Wo funktioniert das? _________)
+
+3. _______________________________
+   (Wo funktioniert das? _________)
+
+4. _______________________________
+   (Wo funktioniert das? _________)
+
+5. _______________________________
+   (Wo funktioniert das? _________)
+""",
             },
-            
-            "fun_fact": "Warren Buffett (Milliardär) sagt: 'Ich habe nur wenige Prinzipien, aber ich wende sie überall an!' 💰",
+
+            "take_home": """**Der Erfolgstrick-Merksatz:**
+
+Brückenprinzipien sind universal.
+Lerne sie einmal. Nutze sie immer.
+
+**Die beste Investition in dein Gehirn.**""",
         },
-        
+
         "mittelstufe": {
-            "intro": """**Brückenprinzipien: Abstraktion als Superkraft**
+            "title": "Brückenprinzipien – Universelle Denkwerkzeuge",
+            "icon": "🌉",
 
-Ein Brückenprinzip ist eine abstrakte Regel, 
-die in vielen verschiedenen Kontexten gilt.
+            "hook": """**Es gibt Prinzipien, die überall funktionieren.** 🌉
 
-**Warum sind sie so mächtig?**
-- Ein Prinzip ersetzt hunderte Einzelfakten
-- Transfer wird automatisch möglich
-- Du erkennst Zusammenhänge, die andere übersehen
+Nicht in einem Fach. In ALLEN.
+Nicht in einer Situation. In JEDER.
 
-**Beispiel: Das Pareto-Prinzip (80/20-Regel)**
-"80% der Ergebnisse kommen von 20% des Aufwands"
+Diese Prinzipien sind wie mentale Schweizer Taschenmesser.
+Einmal gelernt, immer nützlich.""",
 
-Anwendungen:
-- Lernen: 20% der Themen machen 80% der Prüfung
-- Wirtschaft: 20% der Kunden bringen 80% des Umsatzes
-- Zeit: 20% deiner Aktivitäten bringen 80% deines Erfolgs
-- Programmieren: 20% des Codes enthält 80% der Bugs""",
-            
+            "die_wichtigsten": """**Die wichtigsten Brückenprinzipien:**
+
+**1. Ursache und Wirkung**
+- Physik: Aktion = Reaktion
+- Geschichte: Ereignis → Folgen
+- Biologie: Reiz → Reaktion
+- Wirtschaft: Entscheidung → Konsequenz
+
+**2. Gleichgewicht und Ungleichgewicht**
+- Chemie: Reaktionsgleichgewicht
+- Physik: Kräftegleichgewicht
+- Ökologie: Ökosystem-Balance
+- Politik: Machtgleichgewicht
+
+**3. Struktur und Funktion**
+- Biologie: Form folgt Funktion
+- Architektur: Design bestimmt Nutzung
+- Sprache: Satzstruktur bestimmt Bedeutung
+- Programmierung: Code-Struktur bestimmt Verhalten
+
+**4. Rückkopplung (Feedback)**
+- Biologie: Homöostase
+- Technik: Regelkreise
+- Lernen: Fehler → Anpassung
+- Wirtschaft: Marktmechanismen
+
+**5. Emergenz**
+- Physik: Thermodynamik aus Teilchen
+- Biologie: Bewusstsein aus Neuronen
+- Gesellschaft: Kultur aus Individuen
+- Sprache: Bedeutung aus Wörtern""",
+
+            "anwendung": """**So nutzt du Brückenprinzipien:**
+
+**Schritt 1: Identifizieren**
+Bei neuem Stoff: "Welches Brückenprinzip steckt dahinter?"
+
+**Schritt 2: Aktivieren**
+"Was weiß ich schon über dieses Prinzip aus anderen Bereichen?"
+
+**Schritt 3: Übertragen**
+"Wie funktioniert das Prinzip in diesem neuen Kontext?"
+
+**Schritt 4: Vernetzen**
+"Wie hängt das mit anderen Themen zusammen?"
+
+**Beispiel:**
+Neues Thema: Angebot und Nachfrage (Wirtschaft)
+→ Brückenprinzip: Gleichgewicht
+→ Schon bekannt: Chemisches Gleichgewicht, Kräftegleichgewicht
+→ Transfer: Preis als "Gleichgewichtspunkt" zwischen Angebot und Nachfrage""",
+
+            "denkwerkzeuge": """**Metakognitive Denkwerkzeuge:**
+
+Diese Fragen funktionieren IMMER:
+
+**Analyse:**
+- Was sind die Bestandteile?
+- Wie hängen sie zusammen?
+- Was ist Ursache, was Wirkung?
+
+**Vergleich:**
+- Was ist gleich, was verschieden?
+- Was ist das Muster?
+
+**Bewertung:**
+- Was sind Vor- und Nachteile?
+- Was sind die Konsequenzen?
+
+**Synthese:**
+- Wie kann ich das kombinieren?
+- Was ist die Kernessenz?""",
+
             "exercise": {
-                "title": "Brückenprinzip-Werkstatt 🔧",
-                "instruction": "Entwickle ein eigenes Brückenprinzip und zeige 5 Anwendungen!",
-                "template": {
-                    "step_1": "Beobachte: Was funktioniert in verschiedenen Bereichen gleich?",
-                    "step_2": "Abstrahiere: Was ist das gemeinsame PRINZIP?",
-                    "step_3": "Formuliere: Schreibe es als kurze Regel",
-                    "step_4": "Teste: Finde 5 verschiedene Anwendungen",
-                },
-                "starter_principles": [
-                    "Systeme streben nach Gleichgewicht",
-                    "Kleine Veränderungen können große Auswirkungen haben",
-                    "Diversität erhöht Stabilität",
-                    "Feedback ermöglicht Verbesserung",
-                ],
+                "title": "Brückenprinzip-Mapping",
+                "instruction": "Wähle ein Brückenprinzip und finde 5 verschiedene Anwendungen.",
+                "template": """
+**Gewähltes Brückenprinzip:** _____________
+
+**Anwendung 1 (Naturwissenschaft):** _____________
+
+**Anwendung 2 (Geisteswissenschaft):** _____________
+
+**Anwendung 3 (Alltag):** _____________
+
+**Anwendung 4 (Hobby):** _____________
+
+**Anwendung 5 (Zukunft/Beruf):** _____________
+
+**Was haben alle gemeinsam?** _____________
+""",
             },
-            
-            "fun_fact": "Charlie Munger (Investor) sammelt 'Mental Models' – Brückenprinzipien aus allen Wissenschaften! 🧠",
+
+            "take_home": """**Merksatz:**
+
+Brückenprinzipien sind mentale Werkzeuge, die überall funktionieren.
+
+Wer sie beherrscht, kann sich schneller in neue Themen einarbeiten,
+komplexe Zusammenhänge verstehen und kreative Lösungen finden.
+
+**Investiere in Prinzipien, nicht nur in Fakten.**""",
         },
-        
+
         "oberstufe": {
-            "intro": """**Brückenprinzipien: Mental Models**
+            "title": "Brückenprinzipien – Epistemische Werkzeuge",
+            "icon": "🌉",
 
-Mental Models sind abstrakte Denkmuster, die in vielen Domänen anwendbar sind.
+            "einfuehrung": """**Was sind epistemische Werkzeuge?**
 
-**Kategorien nach Charlie Munger:**
-1. **Aus der Physik:** Hebelwirkung, Trägheit, Kritische Masse
-2. **Aus der Biologie:** Evolution, Nische, Symbiose
-3. **Aus der Psychologie:** Kognitive Verzerrungen, Anreize
-4. **Aus der Mathematik:** Wahrscheinlichkeit, Exponentielles Wachstum
-5. **Aus der Systemtheorie:** Feedback, Emergenz, Netzwerkeffekte
+Epistemische Werkzeuge sind Denkstrukturen,
+die domänenübergreifend Erkenntnis ermöglichen.
 
-**Der Ansatz:**
-- Sammle Prinzipien aus verschiedenen Disziplinen
-- Verknüpfe sie zu einem "Latticework of Mental Models"
-- Wende sie auf neue Probleme an
+Sie sind nicht fachspezifisch, sondern universal.
+Sie funktionieren in Physik wie in Philosophie,
+in Biologie wie in Wirtschaft.
 
-**Ziel:** Denken in Prinzipien statt in Fakten""",
-            
+Wer diese Werkzeuge beherrscht, kann sich in jedes Thema einarbeiten.""",
+
+            "fundamentale_prinzipien": """**Fundamentale Brückenprinzipien:**
+
+**1. Kausalität**
+- Ursache → Wirkung
+- Anwendungen: Alle Naturwissenschaften, Geschichte, Recht, Medizin
+- Fragen: Was verursacht was? Korrelation vs. Kausalität?
+
+**2. Systemdenken**
+- Teile + Beziehungen = Ganzes
+- Anwendungen: Ökologie, Wirtschaft, Soziologie, Technik
+- Fragen: Was sind die Elemente? Wie interagieren sie?
+
+**3. Gleichgewicht und Dynamik**
+- Stabilität vs. Veränderung
+- Anwendungen: Physik, Chemie, Ökonomie, Politik
+- Fragen: Was stabilisiert? Was destabilisiert?
+
+**4. Evolution und Adaption**
+- Variation + Selektion + Zeit = Anpassung
+- Anwendungen: Biologie, Kultur, Technologie, Sprache
+- Fragen: Was variiert? Was wird selektiert? Worauf wird optimiert?
+
+**5. Information und Kommunikation**
+- Sender → Code → Kanal → Empfänger → Dekodierung
+- Anwendungen: Genetik, Linguistik, Technik, Psychologie
+- Fragen: Was ist die Information? Wie wird sie übertragen?""",
+
+            "anwendung": """**Praktische Anwendung:**
+
+**Beispiel: Klimawandel – Multidisziplinäre Analyse**
+
+Mit Brückenprinzipien:
+
+1. **Kausalität:** CO2 → Treibhauseffekt → Erwärmung
+2. **Systemdenken:** Atmosphäre, Ozeane, Eis, Biosphäre als vernetztes System
+3. **Gleichgewicht:** Gestörtes Strahlungsgleichgewicht, Kipppunkte
+4. **Rückkopplung:** Albedo-Effekt, Methan aus Permafrost
+5. **Evolution:** Anpassung von Ökosystemen, Migration
+
+**Der Vorteil:**
+Du kannst das Thema auf mehreren Ebenen verstehen.
+Und du kannst Argumente verschiedener Disziplinen einordnen.""",
+
+            "metakognitive_tools": """**Metakognitive Denkwerkzeuge:**
+
+**Für Analyse:**
+- Was sind die konstituierenden Elemente?
+- Wie ist die kausale Struktur?
+- Welches Modell beschreibt das System?
+
+**Für Synthese:**
+- Was ist die Kernessenz?
+- Wie lässt sich das verallgemeinern?
+- Was ist die abstrakte Struktur?
+
+**Für Evaluation:**
+- Ist das Argument valide?
+- Welche Prämissen werden vorausgesetzt?
+- Wo liegen die Grenzen des Modells?
+
+**Für Kreation:**
+- Welche Analogien sind möglich?
+- Was wäre, wenn...?
+- Wie könnte man das anders denken?""",
+
             "exercise": {
-                "title": "Mental Model Collection 📚",
-                "instruction": "Erstelle deine persönliche Sammlung von Brückenprinzipien aus deinen Fächern.",
-                "format": {
-                    "name": "Name des Prinzips",
-                    "origin": "Ursprüngliche Domäne",
-                    "description": "Kurze Erklärung",
-                    "applications": "3-5 andere Anwendungsbereiche",
-                    "limitations": "Wo gilt es NICHT?",
-                },
-                "examples": [
-                    {
-                        "name": "Regression zur Mitte",
-                        "origin": "Statistik",
-                        "description": "Extreme Werte werden über Zeit moderater",
-                        "applications": ["Sport", "Wirtschaft", "Gesundheit", "Psychologie"],
-                        "limitations": "Bei systematischen Trends",
-                    },
-                    {
-                        "name": "Opportunity Cost",
-                        "origin": "Ökonomie",
-                        "description": "Jede Entscheidung hat versteckte Kosten (was ich NICHT tue)",
-                        "applications": ["Zeit", "Lernen", "Beziehungen", "Karriere"],
-                        "limitations": "Bei unbegrenzten Ressourcen (selten!)",
-                    },
-                ],
+                "title": "Multidimensionale Themenanalyse",
+                "instruction": "Wähle ein komplexes Thema und analysiere es mit verschiedenen Brückenprinzipien.",
+                "template": """
+**Thema:** _____________
+
+**Analyse mit Kausalität:**
+Was sind Ursachen? Was sind Wirkungen?
+_____________
+
+**Analyse mit Systemdenken:**
+Welche Elemente? Welche Beziehungen?
+_____________
+
+**Analyse mit Gleichgewicht:**
+Was stabilisiert? Was destabilisiert?
+_____________
+
+**Analyse mit Evolution:**
+Was entwickelt sich? Wohin?
+_____________
+
+**Synthese:**
+Was ergibt sich aus der Kombination der Perspektiven?
+_____________
+""",
             },
-            
-            "fun_fact": "Elon Musk, Bill Gates und Naval Ravikant – alle sammeln Mental Models als Denk-Werkzeuge! 🛠️",
+
+            "take_home": """**Fazit:**
+
+Brückenprinzipien sind das Betriebssystem des Denkens.
+
+Fachspezifisches Wissen ist die Software – es ändert sich.
+Die Prinzipien sind die Hardware – sie bleiben.
+
+Wer die Prinzipien beherrscht, kann jede Software installieren.""",
         },
-        
+
         "paedagogen": {
-            "intro": """**Brückenprinzipien im Curriculum**
+            "title": "Brückenprinzipien unterrichten",
+            "icon": "🌉",
 
-Brückenprinzipien (Mental Models) sind das Bindegewebe 
-zwischen Fächern und der Schlüssel zu lebenslangem Lernen.
+            "didaktik": """**Didaktik der Brückenprinzipien:**
 
-**Didaktischer Wert:**
-- Reduktion der Stoffmenge bei höherem Transfer
-- Förderung vernetzten Denkens
-- Vorbereitung auf komplexe Probleme
+**Das Ziel:**
+Schüler sollen domänenübergreifende Denkwerkzeuge erwerben.
 
-**Herausforderung:**
-Fächer werden oft isoliert unterrichtet –
-Prinzipien werden nicht explizit gemacht.""",
-            
-            "implementation": """**Integration in den Unterricht:**
+**Das Problem:**
+Die meisten Lehrpläne sind fachspezifisch organisiert.
+Brückenprinzipien werden selten explizit gelehrt.
 
-1. **Prinzipien-basierter Unterricht**
-   - Jede Einheit um ein zentrales Prinzip strukturieren
-   - Prinzip am Anfang benennen, am Ende transferieren
+**Die Lösung:**
+Brückenprinzipien als Meta-Ebene über den Fächern.
+Nicht statt, sondern zusätzlich zum Fachunterricht.""",
 
-2. **Fächerübergreifende Prinzipien-Sammlung**
-   - Schulweite Liste von Brückenprinzipien
-   - Jedes Fach trägt bei und zeigt Anwendungen
+            "kernprinzipien": """**Die wichtigsten Brückenprinzipien für den Unterricht:**
 
-3. **Transfer-Portfolios**
-   - Schüler sammeln Prinzipien über das Schuljahr
-   - Dokumentieren Anwendungen in verschiedenen Fächern
+**1. Kausalität**
+- Ursache → Wirkung
+- Alle Naturwissenschaften, Geschichte, Sozialkunde
+- Fragen: Was verursacht was? Ist das wirklich Kausalität oder nur Korrelation?
 
-4. **Projektarbeit**
-   - Komplexe Probleme, die mehrere Prinzipien erfordern
-   - Explizite Reflexion: "Welche Prinzipien haben geholfen?"
+**2. System und Emergenz**
+- Teile + Beziehungen = Ganzes (oft mehr als Summe)
+- Biologie, Soziologie, Wirtschaft
+- Fragen: Was sind die Elemente? Wie interagieren sie?
 
-5. **Analogie-Training**
-   - Regelmäßig: "Dieses Konzept ist wie... weil..."
-   - Kreativität und Abstraktion fördern""",
-            
-            "research_note": "Munger, C. (1995). The Psychology of Human Misjudgment. | Senge, P. (1990). The Fifth Discipline.",
+**3. Gleichgewicht und Dynamik**
+- Stabilität vs. Veränderung
+- Physik, Chemie, Ökonomie, Politik
+- Fragen: Was stabilisiert? Was bringt Veränderung?
+
+**4. Struktur und Funktion**
+- Form folgt Funktion
+- Biologie, Architektur, Sprache
+- Fragen: Warum ist X so gebaut? Was ermöglicht diese Struktur?
+
+**5. Variation und Selektion**
+- Unterschiede + Auswahl = Entwicklung
+- Evolution, Kultur, Technologie
+- Fragen: Was variiert? Was wird ausgewählt? Worauf wird optimiert?""",
+
+            "vermittlungsstrategien": """**Strategien zur Vermittlung:**
+
+**1. Explizite Benennung**
+Bei jedem Thema: "Das Prinzip dahinter ist..."
+Am Ende: "Wo haben wir dieses Prinzip noch gesehen?"
+
+**2. Spiralcurriculum für Prinzipien**
+Das gleiche Prinzip auf verschiedenen Komplexitätsstufen:
+- Klasse 5: Kausalität in einfachen Experimenten
+- Klasse 8: Kausalität vs. Korrelation
+- Klasse 11: Wissenschaftstheoretische Reflexion von Kausalität
+
+**3. Prinzipien-Portfolio**
+Schüler sammeln Anwendungen der Prinzipien:
+"Wo bin ich dem Prinzip X begegnet?"
+
+**4. Prinzipien-basierte Prüfungsfragen**
+Nicht: "Nenne die Formel für..."
+Sondern: "Welches Prinzip erklärt...? Wo gilt es noch?"
+
+**5. Reflexionsroutinen**
+Regelmäßige Frage: "Was war das Prinzip heute?"
+Wöchentlich: "Welche Verbindungen habe ich diese Woche entdeckt?"
+""",
+
+            "beispiel_einheit": """**Beispiel: Unterrichtseinheit "Gleichgewicht"**
+
+**Woche 1: Physik**
+- Kräftegleichgewicht
+- Hebelgesetz
+- Übung: Gleichgewichtsbedingungen
+
+**Woche 2: Chemie**
+- Chemisches Gleichgewicht
+- Le Chatelier
+- Übung: Gleichgewichtsverschiebung
+
+**Woche 3: Biologie/Ökologie**
+- Ökosystem-Gleichgewichte
+- Räuber-Beute
+- Übung: Störung und Anpassung
+
+**Woche 4: Gesellschaft**
+- Wirtschaftliches Gleichgewicht (Angebot/Nachfrage)
+- Politisches Gleichgewicht (Gewaltenteilung)
+- Übung: Gesellschaftliche Gleichgewichte
+
+**Woche 5: Synthese**
+- Was ist das Prinzip "Gleichgewicht"?
+- Was haben alle Anwendungen gemeinsam?
+- Wo bricht die Analogie?
+- Eigene Anwendungen finden
+
+**Prüfung:** Transfer auf neue Situation""",
         },
     },
 }
@@ -930,23 +2744,166 @@ FINALE_CONTENT = {
     
     "altersstufen": {
         "grundschule": {
-            "challenge": """**Deine Transfer-Prüfung!** 🎯
+            "title": "Transfer-Abschluss – Zeig was du kannst!",
+            "icon": "🏆",
 
-Beantworte diese 3 Fragen:
+            "hook": """**Jetzt kommt die Abschluss-Aufgabe!** 🏆
 
-1. **Near Transfer:** 
-   Du hast gelernt, wie man einen Papierflieger faltet.
-   Was könntest du mit der gleichen Falttechnik NOCH machen?
+Du hast das Transfer-Geheimnis entdeckt.
+Du kennst den kleinen Transfer (ähnliche Aufgaben erkennen).
+Du beherrschst den großen Transfer (weit übertragen).
+Du baust Brücken zwischen verschiedenen Bereichen.
 
-2. **Far Transfer:**
-   Beim Fahrradfahren musst du das Gleichgewicht halten.
-   Wo im Leben musst du sonst noch "im Gleichgewicht" bleiben?
-   (Tipp: Es muss kein echtes Gleichgewicht sein!)
+Jetzt zeigst du, was du alles gelernt hast!
 
-3. **Brückenprinzip:**
-   Nenne EIN Prinzip, das du diese Woche in 3 verschiedenen Situationen benutzen könntest!""",
+**Das hilft dir besonders beim Übertritt:**
+Am Gymnasium musst du oft Wissen aus verschiedenen Fächern verbinden.
+Genau das übst du hier!""",
+
+            "zusammenfassung": """**Alles auf einen Blick:** 📋
+
+**Transfer** = Wissen übertragen.
+Einmal lernen, überall nutzen können.
+
+**Kleiner Transfer** = Ähnliches erkennen.
+Eine Aufgabe gelöst? Dann schaffst du auch ähnliche!
+
+**Großer Transfer** = Weit übertragen.
+Sport, Hobbys, Schule, Alltag – alles hängt zusammen!
+
+**Brücken-Regeln** = Regeln, die überall gelten.
+Sie verbinden ganz verschiedene Bereiche.
+
+**Du** = Bald ein echter Überflieger! 🌟""",
+
+            "uebertritt_bezug": """**Warum ist das für den Übertritt wichtig?**
+
+Am Gymnasium lernst du viele neue Fächer.
+Wer Transfer kann, hat es leichter:
+
+✅ Du erkennst: "Das ist ja wie in Mathe!"
+✅ Du verbindest Fächer miteinander
+✅ Du löst auch unbekannte Aufgaben
+✅ Du lernst schneller, weil du Brücken baust""",
+
+            "final_challenge": {
+                "title": "Die große Transfer-Prüfung!",
+                "intro": "Zeig, dass du Transfer verstanden hast!",
+
+                "aufgaben": [
+                    {
+                        "nummer": 1,
+                        "typ": "Kleinen Transfer erkennen",
+                        "frage": """Du hast gelernt, wie man die Fläche eines Rechtecks berechnet:
+Länge mal Breite
+
+Jetzt sollst du die Fläche eines Quadrats berechnen.
+Was machst du?""",
+                        "antwort": "Das gleiche Prinzip! Seite mal Seite (weil beim Quadrat alle Seiten gleich lang sind)",
+                        "punkte": 25,
+                        "uebertritt_tipp": "Am Gymnasium rechnet man mit Dreiecken, Trapezen und anderen Formen – aber das Prinzip bleibt ähnlich!",
+                    },
+                    {
+                        "nummer": 2,
+                        "typ": "Großen Transfer anwenden",
+                        "frage": """Beim Zähneputzen putzt du der Reihe nach:
+Erst oben rechts, dann oben links, dann unten rechts, dann unten links.
+
+Wie könnte dir diese Ordnung beim Aufräumen deines Zimmers helfen?""",
+                        "antwort": "Auch der Reihe nach vorgehen: Erst eine Ecke, dann die nächste. Nicht alles auf einmal!",
+                        "punkte": 30,
+                        "uebertritt_tipp": "Am Gymnasium musst du viele Hausaufgaben planen – der Reihe nach ist besser als alles durcheinander!",
+                    },
+                    {
+                        "nummer": 3,
+                        "typ": "Brücken-Regel finden",
+                        "frage": """Was ist die gemeinsame Regel bei:
+- Radfahren lernen
+- Schwimmen lernen
+- Lesen lernen""",
+                        "antwort": "Übung macht den Meister! Am Anfang ist es schwer, aber mit Übung wird es immer leichter.",
+                        "punkte": 30,
+                        "uebertritt_tipp": "Das gilt auch für die neue Schule: Am Anfang ist alles neu, aber mit Übung wird es leichter!",
+                    },
+                    {
+                        "nummer": 4,
+                        "typ": "Eigenen Transfer erfinden",
+                        "frage": """Erfinde deinen eigenen Transfer!
+
+Nimm etwas aus deinem Lieblings-Hobby oder -Sport.
+Zeig, wie dir das gleiche Prinzip in der Schule helfen kann.""",
+                        "beispiel": "Beim Fußball lerne ich: Wenn etwas nicht klappt, versuche ich es nochmal anders. Das hilft mir auch bei schweren Mathe-Aufgaben!",
+                        "punkte": 40,
+                        "kreativ_bonus": 15,
+                        "uebertritt_tipp": "Am Gymnasium lernst du viel Neues – deine Hobbys helfen dir dabei!",
+                    },
+                ],
+            },
+
+            "reflexion": """**Dein Transfer-Tagebuch:** 📓
+
+Ab jetzt: Achte auf Transfer in deinem Alltag!
+
+Wenn du merkst: "Das kenne ich doch irgendwoher!"
+Dann hast du Transfer entdeckt!
+
+Schreib es auf:
+- Was war die Situation?
+- Was habe ich übertragen?
+- Was war die Regel dahinter?
+
+**Je mehr du sammelst, desto besser wirst du!**
+
+**Tipp für den Übertritt:**
+Mach dir eine Liste: Was kann ich gut?
+Überlege dann: Wo könnte mir das noch helfen?""",
+
+            "zukunfts_tipps": """**So nutzt du Transfer ab jetzt:** 🌟
+
+**Tipp 1:** Frag bei JEDER neuen Aufgabe:
+"Wo habe ich so etwas Ähnliches schon gemacht?"
+
+**Tipp 2:** Such nach der REGEL, nicht nur nach der Lösung.
+Regeln kannst du immer wieder nutzen!
+
+**Tipp 3:** Sport, Musik, Hobbys –
+das ist nicht nur Spaß! Da lernst du wichtige Regeln.
+
+**Tipp 4:** Erkläre anderen, was du gelernt hast.
+Dabei merkst du die Regeln noch besser!
+
+**Tipp 5:** Fehler sind gut!
+Aus Fehlern lernst du am meisten.
+
+**Für den Übertritt:**
+Wenn am Gymnasium etwas schwer ist, frag dich:
+"Wo habe ich schon mal etwas Ähnliches geschafft?"
+Das gibt dir Mut!""",
+
+            "abschluss_message": """**Herzlichen Glückwunsch!** 🎉
+
+Du bist jetzt ein echter Transfer-Meister.
+
+Das Geheimnis der Überflieger?
+Das kennst du jetzt!
+
+Nutze es:
+- In der Schule
+- Beim Übertritt aufs Gymnasium
+- Im ganzen Leben
+
+**Einmal lernen. Überall nutzen. Das ist dein Vorteil!**
+
+🏆 AUSZEICHNUNG: Transfer-Meister 🏆""",
+
+            "badge_info": {
+                "name": "Transfer-Meister",
+                "icon": "🏆",
+                "beschreibung": "Hat das Geheimnis der Überflieger gelernt!",
+                "xp": 150,
+            },
         },
-        
+
         "unterstufe": {
             "challenge": """**Transfer-Meister-Test!** 🎯
 

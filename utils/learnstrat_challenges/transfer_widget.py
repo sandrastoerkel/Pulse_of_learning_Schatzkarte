@@ -83,14 +83,14 @@ def save_transfer_progress(conn, user_id: str, phase_id: str, xp: int, response:
 def get_transfer_progress(conn, user_id: str) -> List[Dict]:
     """Holt den Transfer-Fortschritt eines Users."""
     c = conn.cursor()
-    
+
     c.execute('''
         SELECT technique_id, xp_earned, reflection, completed_at
         FROM learnstrat_progress
         WHERE user_id = ? AND challenge_id = 'transfer' AND completed = 1
         ORDER BY completed_at
     ''', (user_id,))
-    
+
     results = []
     for row in c.fetchall():
         results.append({
@@ -99,8 +99,19 @@ def get_transfer_progress(conn, user_id: str) -> List[Dict]:
             "response": row[2],
             "completed_at": row[3],
         })
-    
+
     return results
+
+def reset_transfer_phase(conn, user_id: str, phase_id: str):
+    """Setzt eine Transfer-Phase zurück (löscht den Fortschritt)."""
+    c = conn.cursor()
+
+    c.execute('''
+        DELETE FROM learnstrat_progress
+        WHERE user_id = ? AND challenge_id = 'transfer' AND technique_id = ?
+    ''', (user_id, phase_id))
+
+    conn.commit()
 
 # ============================================
 # UI COMPONENTS
@@ -120,43 +131,48 @@ def render_transfer_header():
     """, unsafe_allow_html=True)
 
 def render_phase_progress(current_phase: int, completed_phases: List[str]):
-    """Zeigt den Fortschritt durch die Phasen."""
+    """Zeigt den Fortschritt durch die Phasen mit klickbaren Buttons für abgeschlossene Phasen."""
     phases = [
-        ("phase_1", "🔮", "Geheimnis"),
-        ("phase_2", "🎯", "Near"),
-        ("phase_3", "🚀", "Far"),
-        ("phase_4", "🌉", "Brücken"),
-        ("finale", "🏆", "Check"),
+        ("phase_1", "🔮", "Geheimnis", 1),
+        ("phase_2", "🎯", "Near", 2),
+        ("phase_3", "🚀", "Far", 3),
+        ("phase_4", "🌉", "Brücken", 4),
+        ("finale", "🏆", "Check", 5),
     ]
-    
+
     cols = st.columns(5)
-    
-    for i, (phase_id, icon, label) in enumerate(phases):
+
+    for i, (phase_id, icon, label, phase_num) in enumerate(phases):
         is_complete = phase_id in completed_phases
-        is_current = (i + 1) == current_phase
-        
+        is_current = phase_num == current_phase
+        # Phase ist erreichbar wenn: abgeschlossen ODER aktuelle Phase ODER eine Phase vor der aktuellen
+        is_accessible = is_complete or is_current
+
         with cols[i]:
             if is_complete:
-                bg = "#10b981"
-                border = "#059669"
-                text_color = "white"
+                # Abgeschlossene Phase - klickbar
+                if st.button(f"{icon}\n{label}\n✓", key=f"nav_{phase_id}", use_container_width=True):
+                    st.session_state[STATE_KEYS["current_phase"]] = phase_num
+                    st.session_state["viewing_completed_phase"] = True
+                    st.rerun()
             elif is_current:
-                bg = "#f5576c"
-                border = "#ec4899"
-                text_color = "white"
+                # Aktuelle Phase - hervorgehoben
+                st.markdown(f"""
+                <div style="background: #f5576c; border: 3px solid #ec4899;
+                            padding: 10px; border-radius: 10px; text-align: center;">
+                    <div style="font-size: 1.5em;">{icon}</div>
+                    <div style="font-size: 0.75em; color: white; font-weight: 600;">{label}</div>
+                </div>
+                """, unsafe_allow_html=True)
             else:
-                bg = "#e5e7eb"
-                border = "#d1d5db"
-                text_color = "#6b7280"
-            
-            st.markdown(f"""
-            <div style="background: {bg}; border: 3px solid {border}; 
-                        padding: 10px; border-radius: 10px; text-align: center;">
-                <div style="font-size: 1.5em;">{icon}</div>
-                <div style="font-size: 0.75em; color: {text_color}; font-weight: 600;">{label}</div>
-                {'✓' if is_complete else ''}
-            </div>
-            """, unsafe_allow_html=True)
+                # Noch nicht freigeschaltet - gesperrt
+                st.markdown(f"""
+                <div style="background: #e5e7eb; border: 3px solid #d1d5db;
+                            padding: 10px; border-radius: 10px; text-align: center; opacity: 0.6;">
+                    <div style="font-size: 1.5em;">🔒</div>
+                    <div style="font-size: 0.75em; color: #6b7280; font-weight: 600;">{label}</div>
+                </div>
+                """, unsafe_allow_html=True)
 
 def render_phase_card(phase_data: Dict, phase_num: int):
     """Zeigt die Phasen-Karte mit Titel und Icon."""
@@ -178,22 +194,92 @@ def render_phase_card(phase_data: Dict, phase_num: int):
     """, unsafe_allow_html=True)
 
 def render_intro_section(content: Dict):
-    """Zeigt die Intro-Sektion einer Phase."""
-    intro = content.get("intro", "")
+    """Zeigt die Intro-Sektion einer Phase mit allen neuen Feldern."""
+    # Haupttext: hook (neu) oder einfuehrung (Pädagogen) oder intro (fallback)
+    hook = content.get("hook", "") or content.get("einfuehrung", "") or content.get("intro", "")
+    mythos = content.get("mythos_buster", "") or content.get("mythos_vs_realitaet", "")
+    wissenschaft = (content.get("wissenschaft_einfach") or content.get("wissenschaft", "") or
+                   content.get("wissenschaftlicher_hintergrund", "") or content.get("forschungsstand", ""))
+    gaming = content.get("gaming_beispiel", "")
+    alltag = content.get("alltag_beispiel", "") or content.get("beispiel", "")
     story = content.get("story", "")
-    
-    # Intro
-    st.markdown(f"""
-    <div style="background: white; border: 1px solid #e5e7eb; 
-                padding: 20px; border-radius: 10px; margin-bottom: 15px;">
-        <div style="line-height: 1.8; white-space: pre-line;">{intro}</div>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Story (wenn vorhanden)
+    take_home = content.get("take_home", "") or content.get("zusammenfassung", "")
+
+    # Zusätzliche Felder für verschiedene Altersstufen
+    definition = content.get("definition", "")
+    relevanz = content.get("relevanz", "")
+    drei_ebenen = content.get("drei_ebenen_modell", "") or content.get("dreiphasenmodell", "")
+    metakognition = content.get("metakognition", "")
+    theorie = content.get("theorie", "")
+
+    # 1. Hook/Intro (Haupteinstieg)
+    if hook:
+        st.markdown(f"""
+        <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+                    border-left: 4px solid #0ea5e9;
+                    padding: 20px; border-radius: 10px; margin-bottom: 15px;">
+            <div style="line-height: 1.8; white-space: pre-line;">{hook}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # 2. Definition (wenn vorhanden)
+    if definition:
+        with st.expander("📖 Definition", expanded=False):
+            st.markdown(definition)
+
+    # 3. Mythos-Buster (wenn vorhanden)
+    if mythos:
+        with st.expander("⚠️ Mythos vs. Realität", expanded=False):
+            st.markdown(mythos)
+
+    # 4. Wissenschaft (wenn vorhanden)
+    if wissenschaft:
+        with st.expander("🔬 Was die Wissenschaft sagt", expanded=False):
+            st.markdown(wissenschaft)
+
+    # 5. Drei-Ebenen-Modell / Theorie (wenn vorhanden)
+    if drei_ebenen:
+        with st.expander("📊 Drei-Ebenen-Modell", expanded=False):
+            st.markdown(drei_ebenen)
+
+    if theorie:
+        with st.expander("📚 Theoretischer Rahmen", expanded=False):
+            st.markdown(theorie)
+
+    # 6. Metakognition (wenn vorhanden)
+    if metakognition:
+        with st.expander("🧠 Metakognition", expanded=False):
+            st.markdown(metakognition)
+
+    # 7. Relevanz (wenn vorhanden)
+    if relevanz:
+        with st.expander("🎯 Warum ist das relevant?", expanded=False):
+            st.markdown(relevanz)
+
+    # 8. Gaming-Beispiel (wenn vorhanden)
+    if gaming:
+        with st.expander("🎮 Gaming-Beispiel", expanded=False):
+            st.markdown(gaming)
+
+    # 9. Alltags-Beispiel (wenn vorhanden)
+    if alltag:
+        with st.expander("📚 Alltags-Beispiel", expanded=False):
+            st.markdown(alltag)
+
+    # 10. Story (wenn vorhanden)
     if story:
         with st.expander("📖 Geschichte", expanded=False):
             st.markdown(story)
+
+    # 11. Take-Home (Merksatz)
+    if take_home:
+        st.markdown(f"""
+        <div style="background: #fef3c7; border: 1px solid #f59e0b;
+                    padding: 15px; border-radius: 10px; margin-top: 15px;">
+            <strong>🧠 Merke dir:</strong>
+            <div style="margin-top: 10px; white-space: pre-line;">{take_home}</div>
+        </div>
+        """, unsafe_allow_html=True)
 
 def render_exercise_section(content: Dict, phase_key: str):
     """Zeigt die Übungs-Sektion einer Phase."""
@@ -213,10 +299,27 @@ def render_exercise_section(content: Dict, phase_key: str):
     </div>
     """, unsafe_allow_html=True)
     
-    # Beispiele anzeigen
+    # Alle möglichen Formate extrahieren
     examples = exercise.get("examples", [])
+    beispiele = exercise.get("beispiele", [])  # Phase 1 Unterstufe
+    beispiel = exercise.get("beispiel", "")    # Phase 3 Unterstufe (einzeln)
+    template = exercise.get("template", "")     # Viele Altersstufen
     scenarios = exercise.get("scenarios", [])
-    
+    paare = exercise.get("paare", [])
+    aufgaben = exercise.get("aufgaben", [])
+    eigene_aufgabe = exercise.get("eigene_aufgabe", "")
+    eigene_bruecke = exercise.get("eigene_bruecke", "")
+    beispiel_loesung = exercise.get("beispiel_loesung", "")
+
+    # Template anzeigen (z.B. Lückentext)
+    if template:
+        st.markdown(template)
+
+    # Beispiellösung anzeigen (klappbar)
+    if beispiel_loesung:
+        with st.expander("💡 Beispiellösung anzeigen"):
+            st.markdown(beispiel_loesung)
+
     if examples:
         st.markdown("**Beispiele:**")
         for ex in examples:
@@ -224,7 +327,83 @@ def render_exercise_section(content: Dict, phase_key: str):
                 st.markdown(f"- {ex}")
             elif isinstance(ex, dict):
                 st.markdown(f"- **{ex.get('concept_a', '')}** → **{ex.get('concept_b', '')}**: {ex.get('principle', '')}")
-    
+
+    # Beispiele (Phase 1 Unterstufe - Liste von Strings)
+    if beispiele:
+        st.markdown("**Beispiele:**")
+        for bsp in beispiele:
+            st.markdown(f"- {bsp}")
+
+    # Einzelnes Beispiel (Phase 3 Unterstufe)
+    if beispiel:
+        with st.expander("💡 Beispiel anzeigen"):
+            st.markdown(beispiel)
+
+    # Paare anzeigen (Phase 2 Grundschule)
+    if paare:
+        for i, paar in enumerate(paare):
+            with st.expander(f"🔗 Paar {i+1}", expanded=i==0):
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.markdown(f"**A:** {paar.get('a', '')}")
+                with col2:
+                    st.markdown(f"**B:** {paar.get('b', '')}")
+
+                if st.button(f"💡 Prinzip zeigen", key=f"show_paar_{phase_key}_{i}"):
+                    st.success(f"**Das gemeinsame Prinzip:** {paar.get('prinzip', '')}")
+
+    # Aufgaben anzeigen (Phase 3 & 4 Grundschule - verschiedene Formate)
+    if aufgaben:
+        for i, aufgabe in enumerate(aufgaben):
+            # Phase 4 Format: sache_1, sache_2, bruecke
+            if "sache_1" in aufgabe:
+                with st.expander(f"🔗 Verbindung {i+1}", expanded=i==0):
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.markdown(f"**Sache 1:** {aufgabe.get('sache_1', '')}")
+                    with col2:
+                        st.markdown(f"**Sache 2:** {aufgabe.get('sache_2', '')}")
+
+                    if st.button(f"🌉 Brücke zeigen", key=f"show_bruecke_{phase_key}_{i}"):
+                        st.success(f"**Die Verbindung:** {aufgabe.get('bruecke', '')}")
+
+            # Phase 3 Format: quelle, frage, tipp, moegliche_antworten
+            elif "quelle" in aufgabe:
+                with st.expander(f"📝 Aufgabe {i+1}", expanded=i==0):
+                    st.markdown(f"**Quelle:** {aufgabe.get('quelle', '')}")
+                    st.markdown(f"**Frage:** {aufgabe.get('frage', '')}")
+
+                    if aufgabe.get('tipp'):
+                        st.info(f"💡 **Tipp:** {aufgabe.get('tipp', '')}")
+
+                    if aufgabe.get('moegliche_antworten'):
+                        if st.button(f"🎯 Mögliche Antworten zeigen", key=f"show_antworten_{phase_key}_{i}"):
+                            for antwort in aufgabe.get('moegliche_antworten', []):
+                                st.markdown(f"- {antwort}")
+
+            # Phase 2 Mittelstufe Format: aufgabe_a, aufgabe_b, tipp
+            elif "aufgabe_a" in aufgabe:
+                with st.expander(f"🔗 Aufgabenpaar {i+1}", expanded=i==0):
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.markdown(f"**Aufgabe A:**\n{aufgabe.get('aufgabe_a', '')}")
+                    with col2:
+                        st.markdown(f"**Aufgabe B:**\n{aufgabe.get('aufgabe_b', '')}")
+
+                    if aufgabe.get('tipp'):
+                        if st.button(f"💡 Tipp zeigen", key=f"show_tipp_{phase_key}_{i}"):
+                            st.info(aufgabe.get('tipp', ''))
+
+    # Eigene Aufgabe anzeigen (Phase 3 Grundschule)
+    if eigene_aufgabe:
+        st.markdown("---")
+        st.markdown(eigene_aufgabe)
+
+    # Eigene Brücke anzeigen (Phase 4 Grundschule)
+    if eigene_bruecke:
+        st.markdown("---")
+        st.markdown(eigene_bruecke)
+
     if scenarios:
         for i, scenario in enumerate(scenarios):
             with st.expander(f"📋 Szenario {i+1}: {scenario.get('name', scenario.get('situation_1', '')[:30])}...", expanded=i==0):
@@ -239,7 +418,7 @@ def render_exercise_section(content: Dict, phase_key: str):
                 elif "thing_a" in scenario:
                     st.markdown(f"{scenario.get('icon_a', '')} **{scenario['thing_a']}**")
                     st.markdown(f"{scenario.get('icon_b', '')} **{scenario['thing_b']}**")
-                
+
                 if "hidden_principle" in scenario:
                     if st.button(f"💡 Prinzip zeigen", key=f"show_principle_{phase_key}_{i}"):
                         st.success(f"**Das Prinzip:** {scenario['hidden_principle']}")
@@ -432,65 +611,124 @@ def render_transfer_challenge(user: Dict, conn, xp_callback=None):
     if current_phase <= 4:
         phase_key = f"phase_{current_phase}"
         phase_content = get_phase_content(current_phase, age_group)
-        
+        is_viewing_completed = phase_key in completed
+
         if not phase_content:
             st.error("Phase nicht gefunden!")
             return
-        
+
         # Phase-Card
         render_phase_card(phase_content, current_phase)
-        
-        # Tabs für Intro und Übung
-        tab1, tab2 = st.tabs(["📖 Lernen", "🎯 Übung"])
-        
-        with tab1:
-            render_intro_section(phase_content)
-            render_fun_fact(phase_content)
-        
-        with tab2:
-            user_response = render_exercise_section(phase_content, phase_key)
-        
-        # Navigation
-        st.markdown("---")
-        
-        col1, col2, col3 = st.columns([1, 2, 1])
-        
-        with col1:
-            if current_phase > 1:
-                if st.button("← Zurück", use_container_width=True):
-                    st.session_state[STATE_KEYS["current_phase"]] = current_phase - 1
+
+        # Wenn abgeschlossene Phase angesehen wird: Gespeicherte Antwort zeigen
+        if is_viewing_completed:
+            # Gespeicherte Antwort aus DB holen
+            saved_response = ""
+            for p in db_progress:
+                if p["phase_id"] == phase_key:
+                    saved_response = p.get("response", "")
+                    break
+
+            st.info("📋 **Du schaust dir diese abgeschlossene Phase an.**")
+
+            # Tabs für Lernen, Übung und deine Antwort
+            tab1, tab2, tab3 = st.tabs(["📖 Lernen", "🎯 Übung", "✍️ Deine Antwort"])
+
+            with tab1:
+                render_intro_section(phase_content)
+                render_fun_fact(phase_content)
+
+            with tab2:
+                render_exercise_section(phase_content, phase_key)
+
+            with tab3:
+                if saved_response:
+                    st.markdown("**Deine gespeicherte Antwort:**")
+                    st.markdown(f"""
+                    <div style="background: #f0fdf4; border: 2px solid #22c55e;
+                                padding: 15px; border-radius: 10px; white-space: pre-wrap;">
+                        {saved_response}
+                    </div>
+                    """, unsafe_allow_html=True)
+                else:
+                    st.markdown("*Keine Antwort gespeichert.*")
+
+            # Navigation für abgeschlossene Phase
+            st.markdown("---")
+
+            col1, col2, col3 = st.columns([1, 1, 1])
+
+            with col1:
+                # Zur höchsten freigeschalteten Phase zurück
+                highest_phase = len([p for p in completed if p.startswith("phase_")]) + 1
+                if highest_phase > 5:
+                    highest_phase = 5
+                if highest_phase != current_phase:
+                    if st.button("📍 Zur aktuellen Phase", use_container_width=True, type="primary"):
+                        st.session_state[STATE_KEYS["current_phase"]] = highest_phase
+                        st.rerun()
+
+            with col3:
+                if st.button("🔄 Neu machen", use_container_width=True):
+                    # Phase zurücksetzen
+                    reset_transfer_phase(conn, user_id, phase_key)
+                    # Aus completed entfernen
+                    if phase_key in completed:
+                        completed.remove(phase_key)
+                    st.session_state[STATE_KEYS["completed_phases"]] = completed
+                    # XP abziehen
+                    xp_key = f"phase_{'discovery' if current_phase == 1 else 'near' if current_phase == 2 else 'far' if current_phase == 3 else 'bridging'}"
+                    xp = TRANSFER_XP.get(xp_key, 30)
+                    st.session_state[STATE_KEYS["total_xp"]] = max(0, total_xp - xp)
                     st.rerun()
-        
-        with col3:
-            if phase_key in completed:
-                st.success("✅ Abgeschlossen!")
-                if st.button("Weiter →", use_container_width=True, type="primary"):
-                    st.session_state[STATE_KEYS["current_phase"]] = current_phase + 1
-                    st.rerun()
-            else:
+
+        else:
+            # Normale Ansicht für nicht-abgeschlossene Phase
+            # Tabs für Intro und Übung
+            tab1, tab2 = st.tabs(["📖 Lernen", "🎯 Übung"])
+
+            with tab1:
+                render_intro_section(phase_content)
+                render_fun_fact(phase_content)
+
+            with tab2:
+                user_response = render_exercise_section(phase_content, phase_key)
+
+            # Navigation
+            st.markdown("---")
+
+            col1, col2, col3 = st.columns([1, 2, 1])
+
+            with col1:
+                if current_phase > 1:
+                    if st.button("← Zurück", use_container_width=True):
+                        st.session_state[STATE_KEYS["current_phase"]] = current_phase - 1
+                        st.rerun()
+
+            with col3:
                 if st.button("✅ Phase abschließen", use_container_width=True, type="primary"):
                     # XP berechnen
                     xp_key = f"phase_{'discovery' if current_phase == 1 else 'near' if current_phase == 2 else 'far' if current_phase == 3 else 'bridging'}"
                     xp = TRANSFER_XP.get(xp_key, 30)
-                    
+
                     # In DB speichern
                     response = st.session_state.get(f"response_{phase_key}", "")
                     save_transfer_progress(conn, user_id, phase_key, xp, response)
-                    
+
                     # Session State updaten
                     completed.append(phase_key)
                     st.session_state[STATE_KEYS["completed_phases"]] = completed
                     st.session_state[STATE_KEYS["total_xp"]] = total_xp + xp
-                    
+
                     # XP Callback
                     if xp_callback:
                         xp_callback(user_id, xp, f"Transfer Phase {current_phase} abgeschlossen")
-                    
+
                     # Celebration
                     st.session_state["show_celebration"] = True
                     st.session_state["celebration_xp"] = xp
                     st.session_state["celebration_phase"] = phase_content.get("title", f"Phase {current_phase}")
-                    
+
                     # Weiter zur nächsten Phase
                     st.session_state[STATE_KEYS["current_phase"]] = current_phase + 1
                     st.rerun()
@@ -500,52 +738,106 @@ def render_transfer_challenge(user: Dict, conn, xp_callback=None):
     # ─────────────────────────────────────────
     elif current_phase == 5:
         finale_content = get_phase_content(5, age_group)
-        
-        responses = render_finale_check(finale_content, age_group)
-        
-        st.markdown("---")
-        
-        col1, col2 = st.columns([1, 1])
-        
-        with col1:
-            if st.button("← Zurück zu Phase 4", use_container_width=True):
-                st.session_state[STATE_KEYS["current_phase"]] = 4
-                st.rerun()
-        
-        with col2:
-            # Prüfen ob alle Antworten ausgefüllt
-            all_filled = all([
-                responses.get("near", "").strip(),
-                responses.get("far", "").strip(),
-                responses.get("bridge", "").strip(),
-            ])
-            
-            if all_filled:
-                if st.button("🏆 Challenge abschließen!", use_container_width=True, type="primary"):
-                    xp = TRANSFER_XP.get("transfer_check", 25)
-                    
-                    # Alle Antworten zusammenfassen
-                    full_response = f"Near: {responses['near']}\nFar: {responses['far']}\nBridge: {responses['bridge']}"
-                    
-                    # In DB speichern
-                    save_transfer_progress(conn, user_id, "finale", xp, full_response)
-                    
-                    # Session State updaten
-                    completed.append("finale")
-                    st.session_state[STATE_KEYS["completed_phases"]] = completed
-                    st.session_state[STATE_KEYS["total_xp"]] = total_xp + xp
-                    
-                    # XP Callback
-                    if xp_callback:
-                        xp_callback(user_id, xp, "Transfer-Challenge abgeschlossen!")
-                    
-                    # Zum Zertifikat
-                    st.session_state[STATE_KEYS["current_phase"]] = 6
-                    st.balloons()
-                    st.rerun()
+        is_finale_completed = "finale" in completed
+
+        if is_finale_completed:
+            # Finale bereits abgeschlossen - Ansicht mit gespeicherter Antwort
+            saved_response = ""
+            for p in db_progress:
+                if p["phase_id"] == "finale":
+                    saved_response = p.get("response", "")
+                    break
+
+            st.markdown(f"""
+            <div style="background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+                        color: white; padding: 25px; border-radius: 15px; margin-bottom: 20px;">
+                <h2 style="margin: 0; color: white;">🏆 Der Transfer-Check</h2>
+                <p style="margin: 10px 0 0 0; opacity: 0.9;">
+                    Du hast diese Challenge bereits abgeschlossen!
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+
+            st.info("📋 **Du schaust dir deine abgeschlossene Challenge an.**")
+
+            if saved_response:
+                st.markdown("**Deine gespeicherten Antworten:**")
+                st.markdown(f"""
+                <div style="background: #f0fdf4; border: 2px solid #22c55e;
+                            padding: 15px; border-radius: 10px; white-space: pre-wrap;">
+                    {saved_response}
+                </div>
+                """, unsafe_allow_html=True)
             else:
-                st.button("🏆 Challenge abschließen!", disabled=True, use_container_width=True)
-                st.caption("Bitte fülle alle 3 Antworten aus!")
+                st.markdown("*Keine Antworten gespeichert.*")
+
+            st.markdown("---")
+
+            col1, col2, col3 = st.columns([1, 1, 1])
+
+            with col1:
+                if st.button("🏆 Zum Zertifikat", use_container_width=True, type="primary"):
+                    st.session_state[STATE_KEYS["current_phase"]] = 6
+                    st.rerun()
+
+            with col3:
+                if st.button("🔄 Neu machen", use_container_width=True):
+                    # Finale zurücksetzen
+                    reset_transfer_phase(conn, user_id, "finale")
+                    if "finale" in completed:
+                        completed.remove("finale")
+                    st.session_state[STATE_KEYS["completed_phases"]] = completed
+                    xp = TRANSFER_XP.get("transfer_check", 25)
+                    st.session_state[STATE_KEYS["total_xp"]] = max(0, total_xp - xp)
+                    st.rerun()
+
+        else:
+            # Finale noch nicht abgeschlossen - normale Ansicht
+            responses = render_finale_check(finale_content, age_group)
+
+            st.markdown("---")
+
+            col1, col2 = st.columns([1, 1])
+
+            with col1:
+                if st.button("← Zurück zu Phase 4", use_container_width=True):
+                    st.session_state[STATE_KEYS["current_phase"]] = 4
+                    st.rerun()
+
+            with col2:
+                # Prüfen ob alle Antworten ausgefüllt
+                all_filled = all([
+                    responses.get("near", "").strip(),
+                    responses.get("far", "").strip(),
+                    responses.get("bridge", "").strip(),
+                ])
+
+                if all_filled:
+                    if st.button("🏆 Challenge abschließen!", use_container_width=True, type="primary"):
+                        xp = TRANSFER_XP.get("transfer_check", 25)
+
+                        # Alle Antworten zusammenfassen
+                        full_response = f"Near: {responses['near']}\nFar: {responses['far']}\nBridge: {responses['bridge']}"
+
+                        # In DB speichern
+                        save_transfer_progress(conn, user_id, "finale", xp, full_response)
+
+                        # Session State updaten
+                        completed.append("finale")
+                        st.session_state[STATE_KEYS["completed_phases"]] = completed
+                        st.session_state[STATE_KEYS["total_xp"]] = total_xp + xp
+
+                        # XP Callback
+                        if xp_callback:
+                            xp_callback(user_id, xp, "Transfer-Challenge abgeschlossen!")
+
+                        # Zum Zertifikat
+                        st.session_state[STATE_KEYS["current_phase"]] = 6
+                        st.balloons()
+                        st.rerun()
+                else:
+                    st.button("🏆 Challenge abschließen!", disabled=True, use_container_width=True)
+                    st.caption("Bitte fülle alle 3 Antworten aus!")
     
     # Celebration anzeigen (wenn gerade Phase abgeschlossen)
     if st.session_state.get("show_celebration"):
@@ -555,24 +847,31 @@ def render_transfer_challenge(user: Dict, conn, xp_callback=None):
         )
         st.session_state["show_celebration"] = False
     
-    # Sidebar mit Übersicht
+    # Sidebar mit Übersicht (klickbar für abgeschlossene Phasen)
     with st.sidebar:
         st.markdown("### 🚀 Transfer-Challenge")
-        
+
         phase_info = [
-            ("phase_1", "🔮", "Das Geheimnis", TRANSFER_XP["phase_discovery"]),
-            ("phase_2", "🎯", "Near Transfer", TRANSFER_XP["phase_near"]),
-            ("phase_3", "🚀", "Far Transfer", TRANSFER_XP["phase_far"]),
-            ("phase_4", "🌉", "Brückenprinzipien", TRANSFER_XP["phase_bridging"]),
-            ("finale", "🏆", "Transfer-Check", TRANSFER_XP["transfer_check"]),
+            ("phase_1", "🔮", "Das Geheimnis", TRANSFER_XP["phase_discovery"], 1),
+            ("phase_2", "🎯", "Near Transfer", TRANSFER_XP["phase_near"], 2),
+            ("phase_3", "🚀", "Far Transfer", TRANSFER_XP["phase_far"], 3),
+            ("phase_4", "🌉", "Brückenprinzipien", TRANSFER_XP["phase_bridging"], 4),
+            ("finale", "🏆", "Transfer-Check", TRANSFER_XP["transfer_check"], 5),
         ]
-        
-        for phase_id, icon, name, xp in phase_info:
+
+        for phase_id, icon, name, xp, phase_num in phase_info:
             is_done = phase_id in completed
-            status = "✅" if is_done else "⬜"
             xp_text = f"(+{xp} XP)" if is_done else ""
-            st.markdown(f"{status} {icon} {name} {xp_text}")
-        
+
+            if is_done:
+                # Abgeschlossene Phase - klickbar
+                if st.button(f"✅ {icon} {name} {xp_text}", key=f"sidebar_{phase_id}", use_container_width=True):
+                    st.session_state[STATE_KEYS["current_phase"]] = phase_num
+                    st.rerun()
+            else:
+                # Nicht abgeschlossen - nur Text
+                st.markdown(f"⬜ {icon} {name}")
+
         st.markdown("---")
         st.markdown(f"**Gesamt: {total_xp} XP**")
         st.caption(f"Altersstufe: {age_group.title()}")

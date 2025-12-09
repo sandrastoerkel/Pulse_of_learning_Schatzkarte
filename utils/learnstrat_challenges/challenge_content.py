@@ -57,15 +57,21 @@ POWERTECHNIKEN = {
         "effect_note": "Zeitmanagement-Methode (keine direkte Effektstärke)",
         "core_idea": "25 Minuten fokussiert lernen, dann 5 Minuten Pause",
         "science_fact": "Dein Gehirn kann sich nur 20-45 Minuten voll konzentrieren. Danach braucht es eine Pause!",
+        "anwendung_bei": {
+            "ideal_fuer": ["Alle Lernaufgaben", "Hausaufgaben", "Prüfungsvorbereitung", "Leseaufgaben"],
+            "beispiele": ["Mathe-Hausaufgaben", "Aufsatz schreiben", "Vokabeln lernen", "Präsentation vorbereiten"],
+            "hinweis": "Universell für alle Lernaufgaben geeignet - hilft bei der Konzentration!",
+        },
+        "kurzanleitung": "Timer auf 15-25 Min stellen → fokussiert lernen → 5 Min Pause → wiederholen",
         
         "altersstufen": {
             "grundschule": {
-                "intro": "Stell dir vor, du hast eine magische Tomate! 🍅 Diese Tomate hilft dir, dich beim Lernen zu konzentrieren. So funktioniert's: Du stellst einen Timer auf 15 Minuten und lernst, bis er klingelt. Dann darfst du 5 Minuten spielen!",
+                "intro": "Stell dir vor, du hast eine magische Tomate! 🍅 Diese Tomate hilft dir, dich beim Lernen zu konzentrieren. So funktioniert's: Du stellst einen Timer auf 15 Minuten und lernst, bis er klingelt. Dann darfst du 5 Minuten Pause machen!",
                 "duration": 15,
                 "break_duration": 5,
                 "exercise": {
                     "title": "Deine erste Tomate!",
-                    "instruction": "Male ein Bild von deinem Lieblingstier. Starte den Timer und male, bis er klingelt!",
+                    "instruction": "Nimm dir eine Hausaufgabe oder Lernaufgabe vor (z.B. Vokabeln, Mathe-Aufgaben, Lesen). Starte den Timer und arbeite konzentriert, bis er klingelt. Kein Handy, kein Aufstehen - du schaffst das!",
                     "timer_needed": True,
                 },
                 "fun_fact": "Die Technik heißt 'Pomodoro', weil der Erfinder eine Küchenuhr in Form einer Tomate benutzt hat! 🍅",
@@ -124,6 +130,12 @@ POWERTECHNIKEN = {
         "effect_note": "Practice Testing: d=0.74 (Hattie)",
         "core_idea": "Nicht nur lesen – aktiv aus dem Gedächtnis abrufen!",
         "science_fact": "Jedes Mal, wenn du versuchst, dich zu erinnern, wird die Verbindung im Gehirn stärker!",
+        "anwendung_bei": {
+            "ideal_fuer": ["Vokabeln", "Definitionen", "Fakten", "Formeln", "Geschichtsdaten"],
+            "beispiele": ["Englisch-Vokabeln", "Mathe-Formeln", "HSU-Fakten", "Geschichte-Daten"],
+            "hinweis": "Perfekt für alles, was du auswendig lernen musst!",
+        },
+        "kurzanleitung": "Buch/Heft schließen → aufschreiben was du weißt → vergleichen → Lücken nochmal lernen",
         
         "altersstufen": {
             "grundschule": {
@@ -179,49 +191,59 @@ POWERTECHNIKEN = {
         "icon": "👶",
         "effect_size": 0.56,
         "effect_note": "Elaboration: d=0.56 (Hattie)",
-        "core_idea": "Erkläre es so einfach, dass ein Kind es versteht!",
+        "core_idea": "Erkläre es so einfach, dass es ein Zweitklässler versteht!",
         "science_fact": "Wenn du etwas erklären kannst, hast du es wirklich verstanden. Lücken werden sofort sichtbar!",
-        
+        "anwendung_bei": {
+            "ideal_fuer": ["Komplexe Konzepte verstehen", "Zusammenhänge", "Naturwissenschaften", "Sachthemen"],
+            "beispiele": ["HSU: Wie funktioniert der Wasserkreislauf?", "Mathe: Warum funktioniert Division?", "Sachthemen erklären"],
+            "hinweis": "Funktioniert ALLEINE! Du brauchst keinen echten Zuhörer – nur dich selbst oder ein Kuscheltier.",
+        },
+        "kurzanleitung": "Thema wählen → alleine laut erklären (Kuscheltier/Spiegel) → wo stockst du? → dort nochmal lernen",
+
         "altersstufen": {
             "grundschule": {
-                "intro": "Stell dir vor, du bist Lehrer! 👨‍🏫 Erkläre deinem Kuscheltier, was du gelernt hast. Wenn du nicht weiterkommst, musst du nochmal nachschauen. So merkst du, was du wirklich verstanden hast!",
+                "intro": "Stell dir vor, du erklärst deinem Kuscheltier etwas! 🧸 Das Kuscheltier stellt keine Fragen – du redest einfach drauflos. Wenn du nicht mehr weiterweißt, hast du eine Lücke gefunden! Dann musst du nochmal nachschauen. Diese Methode funktioniert ganz alleine!",
                 "exercise": {
-                    "title": "Teddy-Lehrer",
-                    "instruction": "Erkläre deinem Kuscheltier (oder einem Familienmitglied), warum der Himmel blau ist – so einfach wie möglich!",
-                    "topic_suggestion": "Warum ist der Himmel blau?",
+                    "title": "Teddy-Erklärer",
+                    "instruction": "Setz dich alleine hin und erkläre deinem Kuscheltier (oder dir selbst im Spiegel) dein aktuelles HSU-Thema. Sprich laut! Wo bleibst du hängen? Das musst du nochmal lernen!",
+                    "topic_suggestion": "Dein aktuelles HSU-Thema",
+                    "partner_needed": False,
                 },
                 "fun_fact": "Richard Feynman war ein berühmter Wissenschaftler, der sogar den Nobelpreis gewonnen hat! 🏆",
             },
             "unterstufe": {
-                "intro": "Die Feynman-Methode ist ein Trick vom Nobelpreisträger Richard Feynman: Erkläre ein Thema so, als wärst du ein Lehrer für Grundschüler. Keine Fachbegriffe! Wenn du hängst, hast du's nicht verstanden.",
+                "intro": "Die Feynman-Methode funktioniert ganz alleine! Stell dir vor, du müsstest einem Grundschüler etwas erklären – aber du brauchst keinen echten. Rede laut vor dich hin oder nimm dich mit dem Handy auf. Wo du stockst, hast du eine Wissenslücke gefunden!",
                 "exercise": {
-                    "title": "Erklärbär-Challenge",
-                    "instruction": "Erkläre 'Photosynthese' (oder dein aktuelles Thema) in 3 einfachen Sätzen. Keine Fachbegriffe!",
-                    "topic_suggestion": "Photosynthese",
+                    "title": "Solo-Erklärbär",
+                    "instruction": "Nimm dein Handy und erkläre dein aktuelles Thema in einer Sprachnachricht (nur für dich!). Keine Fachbegriffe – so einfach wie für einen Zweitklässler. Hör es dir an: Wo hast du gestockt?",
+                    "topic_suggestion": "Dein aktuelles Schulthema",
+                    "partner_needed": False,
                 },
                 "fun_fact": "Feynman sagte: 'Ich kann nichts erschaffen, was ich nicht verstehen kann.'",
             },
             "mittelstufe": {
-                "intro": "Die Feynman-Technik in 4 Schritten: 1) Thema wählen, 2) Einem Kind erklären, 3) Lücken identifizieren, 4) Vereinfachen & mit Analogien arbeiten. Effektstärke (Elaboration): d=0.56.",
+                "intro": "Die Feynman-Technik ist dein Selbst-Check! Du brauchst niemanden – nur dich selbst. Erkläre ein Thema laut, als würdest du es einem Kind beibringen. Wo du ins Stocken gerätst, hast du deine Lücken gefunden. Das ist der Unterschied zu 'Lernen durch Lehren': Hier geht es um DEINE Lücken finden, nicht um Dialog.",
                 "exercise": {
-                    "title": "Analogie-Finder",
-                    "instruction": "Wähle ein schwieriges Konzept. Finde 3 Analogien aus dem Alltag, die es erklären.",
-                    "topic_suggestion": "Wie funktioniert das Internet?",
+                    "title": "Lücken-Finder",
+                    "instruction": "Wähle ein schwieriges Thema. Erkläre es 3 Minuten lang laut vor dich hin (oder nimm dich auf). Notiere jeden Moment, wo du unsicher warst – das sind deine Lücken!",
+                    "topic_suggestion": "Ein Thema, das du glaubst verstanden zu haben",
+                    "partner_needed": False,
                 },
                 "fun_fact": "Einstein: 'Wenn du es einem Sechsjährigen nicht erklären kannst, verstehst du es selbst nicht.'",
             },
             "oberstufe": {
-                "intro": "Die Feynman-Technik ist eine elaborative Lernstrategie. Durch das Externalisieren von Wissen werden Verständnislücken sichtbar. Die Verwendung von Analogien aktiviert vorhandenes Wissen und fördert Transfer.",
+                "intro": "Die Feynman-Methode ist eine Solo-Technik zur Identifikation von Verständnislücken. Anders als 'Lernen durch Lehren' brauchst du keinen Partner. Du externalisierst dein Wissen durch lautes Erklären und identifizierst Stellen, an denen dein mentales Modell unvollständig ist.",
                 "exercise": {
-                    "title": "Peer Teaching",
-                    "instruction": "Erkläre einem Mitschüler ein Thema, das du gerade lernst. Lass dir Fragen stellen!",
+                    "title": "Selbst-Audit",
+                    "instruction": "Nimm ein Video von dir auf, in dem du ein Prüfungsthema erklärst (max. 5 Min). Schau es kritisch an: Wo vereinfachst du zu stark? Wo weichst du aus? Das sind deine Schwachstellen.",
                     "topic_suggestion": None,
+                    "partner_needed": False,
                 },
                 "fun_fact": "Feynman-Vorlesungen sind frei auf YouTube – inspirierend und verständlich!",
             },
             "paedagogen": {
-                "intro": "Die Feynman-Methode kombiniert Elaboration (d=0.56) mit Self-Explanation. Sie macht implizites Wissen explizit und identifiziert Verständnislücken durch den Zwang zur Vereinfachung.",
-                "implementation": "Lassen Sie Schüler sich gegenseitig unterrichten (Peer Teaching). Bewerten Sie die Qualität der Erklärung, nicht nur das Fachwissen.",
+                "intro": "Die Feynman-Methode ist eine Solo-Elaborationsstrategie (d=0.56). Im Gegensatz zu 'Lernen durch Lehren' benötigt sie keinen realen Partner. Der Lernende erklärt sich selbst den Stoff und identifiziert dabei Verständnislücken durch den Zwang zur Vereinfachung.",
+                "implementation": "Lassen Sie Schüler sich selbst aufnehmen (Audio/Video). Die Selbstreflexion beim Anhören zeigt Lücken auf. Wichtig: Dies ist eine Einzelübung, kein Peer-Teaching!",
                 "research_note": "Chi, M.T.H. (2000). Self-explaining expository texts. The Journal of the Learning Sciences.",
             },
         },
@@ -238,13 +260,19 @@ POWERTECHNIKEN = {
         "effect_note": "Distributed Practice: d=0.79 – STÄRKSTE TECHNIK!",
         "core_idea": "Wiederhole in wachsenden Abständen: 1 Tag, 3 Tage, 1 Woche, 2 Wochen...",
         "science_fact": "Dein Gehirn vergisst nach einer 'Vergessenskurve' – Spaced Repetition unterbricht sie optimal!",
+        "anwendung_bei": {
+            "ideal_fuer": ["Vokabeln", "Fakten", "Formeln", "Jahreszahlen", "Definitionen"],
+            "beispiele": ["Englisch-Vokabeln", "1x1 festigen", "Geschichtsdaten", "HSU-Fakten für Probe"],
+            "hinweis": "DIE stärkste Technik für langfristiges Behalten! Perfekt für Prüfungsvorbereitung.",
+        },
+        "kurzanleitung": "Heute lernen → morgen wiederholen → in 3 Tagen → in 1 Woche → in 2 Wochen",
         
         "altersstufen": {
             "grundschule": {
-                "intro": "Stell dir vor, du pflanzt ein Sämling 🌱. Du gießt ihn nicht alles auf einmal, sondern jeden Tag ein bisschen. Beim Lernen ist es genauso! Lerne etwas heute, morgen wieder, dann in 3 Tagen. So wächst das Wissen!",
+                "intro": "Stell dir vor, du pflanzt einen Sämling 🌱. Du gießt ihn nicht alles auf einmal, sondern jeden Tag ein bisschen. Beim Lernen ist es genauso! Lerne etwas heute, morgen wieder, dann in 3 Tagen. So wächst das Wissen!",
                 "exercise": {
                     "title": "Wissens-Kalender",
-                    "instruction": "Lerne heute 5 neue Wörter. Schreib in deinen Kalender: Morgen wiederholen, in 3 Tagen nochmal, in 1 Woche nochmal!",
+                    "instruction": "Übe heute eine Einmaleins-Reihe (z.B. die 7er-Reihe), die deutschen Fälle oder Wortarten. Schreib in deinen Kalender: Morgen wiederholen, in 3 Tagen nochmal, in 1 Woche nochmal! Tipp: Lern-Apps wie Anki fragen dich automatisch in den richtigen Abständen ab.",
                     "schedule": ["Tag 1: Lernen", "Tag 2: 1. Wiederholung", "Tag 4: 2. Wiederholung", "Tag 8: 3. Wiederholung"],
                 },
                 "fun_fact": "Wissenschaftler nennen das die 'Vergessenskurve' – aber du kannst sie besiegen! 💪",
@@ -292,51 +320,57 @@ POWERTECHNIKEN = {
         "name": "Lernen durch Lehren",
         "icon": "👥",
         "effect_size": 0.54,
-        "effect_note": "Self-Explanation: d=0.54 (Hattie)",
-        "core_idea": "Erkläre anderen, was du gelernt hast – du lernst dabei am meisten!",
-        "science_fact": "Wer lehrt, muss verstehen. Das Erklären zwingt dich, Lücken zu füllen!",
-        
+        "effect_note": "Peer Tutoring: d=0.54 (Hattie)",
+        "core_idea": "Erkläre einer echten Person – und beantworte ihre Fragen!",
+        "science_fact": "Der Dialog macht den Unterschied: Fragen und Nachfragen vertiefen dein Verständnis!",
+        "anwendung_bei": {
+            "ideal_fuer": ["Alle Themen", "Vertiefung durch Dialog", "Prüfungsvorbereitung zu zweit"],
+            "beispiele": ["Geschwistern Mathe erklären", "Eltern HSU-Thema vorstellen", "Lerngruppe mit Freunden"],
+            "hinweis": "Braucht einen ECHTEN Partner! Der Dialog und die Rückfragen machen diese Methode so stark.",
+        },
+        "kurzanleitung": "Partner finden → Thema erklären → Fragen beantworten → gemeinsam Lücken klären",
+
         "altersstufen": {
             "grundschule": {
-                "intro": "Wusstest du, dass du am meisten lernst, wenn du anderen etwas erklärst? 🤔 Wenn du deiner Mama, deinem Papa oder deinen Freunden zeigst, was du gelernt hast, merkt dein Gehirn es sich viel besser!",
+                "intro": "Diese Technik brauchst du mit jemand anderem zusammen! 👨‍👩‍👧 Erkläre Mama, Papa, Oma oder einem Freund, was du gelernt hast. Das Besondere: Sie dürfen Fragen stellen! Wenn du ihre Fragen beantworten kannst, hast du es richtig verstanden.",
                 "exercise": {
-                    "title": "Mini-Lehrer sein",
-                    "instruction": "Erkläre einem Familienmitglied, was du heute in der Schule gelernt hast. Benutze Bilder oder spiel es vor!",
+                    "title": "Frage-Antwort-Spiel",
+                    "instruction": "Erkläre einem Familienmitglied dein Schulthema. Bitte sie, dir 3 Fragen dazu zu stellen! Kannst du alle beantworten?",
                     "partner_needed": True,
                 },
-                "fun_fact": "Lehrer lernen oft mehr als ihre Schüler – weil sie alles erklären müssen!",
+                "fun_fact": "Lehrer lernen oft mehr als ihre Schüler – weil sie so viele Fragen beantworten müssen!",
             },
             "unterstufe": {
-                "intro": "Der Protégé-Effekt: Wenn du jemandem etwas beibringst, lernst DU am meisten! Dein Gehirn arbeitet härter, weil du Fragen beantworten musst und alles klar erklären willst.",
+                "intro": "Der Unterschied zur Feynman-Methode: Hier brauchst du einen ECHTEN Partner, der Fragen stellt! Dein Gehirn arbeitet härter, weil du nicht weißt, was gefragt wird. Das nennt man den 'Protégé-Effekt' – du lernst durchs Lehren.",
                 "exercise": {
                     "title": "Lern-Tandem",
-                    "instruction": "Finde einen Lernpartner. Ihr erklärt euch gegenseitig ein Thema – ohne Notizen!",
+                    "instruction": "Triff dich mit einem Freund (oder per Video-Call). Erkläre ihm 5 Minuten ein Thema – er darf unterbrechen und Fragen stellen! Dann tauscht ihr.",
                     "partner_needed": True,
                 },
                 "fun_fact": "Studien zeigen: Schüler, die anderen etwas beibringen, behalten 90% – beim Lesen nur 10%!",
             },
             "mittelstufe": {
-                "intro": "Der 'Protégé Effect' zeigt: Wer lehrt, lernt doppelt. Das Vorbereiten einer Erklärung aktiviert tiefe Verarbeitung. Fragen der 'Schüler' decken eigene Lücken auf. Effektstärke (Self-Explanation): d=0.54.",
+                "intro": "Lernen durch Lehren braucht echte Interaktion! Anders als bei Feynman geht es nicht nur ums Erklären, sondern um den Dialog: Fragen beantworten, nachfragen, diskutieren. Erst durch die Rückfragen merkst du, wo dein Verständnis oberflächlich ist.",
                 "exercise": {
-                    "title": "YouTube-Teacher",
-                    "instruction": "Nimm ein 2-Minuten-Erklärvideo auf (nur für dich). Schau es an – wo stockst du?",
-                    "partner_needed": False,
-                },
-                "fun_fact": "Viele YouTuber sagen: 'Ich hab beim Video-Machen mehr gelernt als in der Schule!'",
-            },
-            "oberstufe": {
-                "intro": "Lernen durch Lehren (LdL) kombiniert mehrere wirksame Strategien: Elaboration, Self-Explanation und Social Learning. Die Notwendigkeit, Stoff didaktisch aufzubereiten, erzwingt tiefere kognitive Verarbeitung.",
-                "exercise": {
-                    "title": "Peer-Tutoring",
-                    "instruction": "Organisiere eine Lerngruppe. Jeder bereitet ein Thema vor und 'unterrichtet' es – mit Fragen!",
+                    "title": "Lehrer-Schüler-Wechsel",
+                    "instruction": "Organisiere mit 1-2 Mitschülern: Jeder erklärt 10 Min ein Thema. Die anderen MÜSSEN mindestens 3 Fragen stellen. Dann Rollenwechsel!",
                     "partner_needed": True,
                 },
-                "fun_fact": "Jean-Pol Martin entwickelte LdL in den 80ern für den Französischunterricht – heute weltweit genutzt!",
+                "fun_fact": "Viele Studenten lernen am besten in Lerngruppen – weil sie sich gegenseitig unterrichten!",
+            },
+            "oberstufe": {
+                "intro": "Lernen durch Lehren (LdL) kombiniert Elaboration mit Social Learning. Der entscheidende Unterschied zur Feynman-Methode: Die Interaktion! Rückfragen zwingen dich, flexibel zu denken und verschiedene Erklärungsansätze zu finden.",
+                "exercise": {
+                    "title": "Peer-Tutoring Session",
+                    "instruction": "Organisiere eine Lerngruppe (3-4 Personen). Jeder bereitet ein Thema vor und 'unterrichtet' 15 Min. Regel: Die Zuhörer müssen kritische Fragen stellen!",
+                    "partner_needed": True,
+                },
+                "fun_fact": "Jean-Pol Martin entwickelte LdL in den 80ern – heute nutzen es Universitäten weltweit!",
             },
             "paedagogen": {
-                "intro": "Lernen durch Lehren (LdL) nach Jean-Pol Martin nutzt den Protégé-Effekt: Lehrende strukturieren Wissen tiefer und füllen Lücken proaktiv. Kombiniert mit Peer-Learning entstehen zusätzliche soziale Lerneffekte.",
-                "implementation": "Lassen Sie Schüler Mini-Lektionen vorbereiten und halten. Varianten: Expertengruppen, Lerntandems, gegenseitige Quiz-Erstellung.",
-                "research_note": "Martin, J.-P. (2004). Lernen durch Lehren. Die Schulleitung.",
+                "intro": "Lernen durch Lehren (LdL) nach Jean-Pol Martin nutzt den Protégé-Effekt UND Social Learning. Im Gegensatz zur Feynman-Methode (Solo) ist hier die Interaktion zentral: Fragen, Nachfragen und Diskussion vertiefen das Verständnis beider Seiten.",
+                "implementation": "Strukturieren Sie Peer-Teaching mit klaren Rollen: Erklärer und aktive Zuhörer (mit Fragepflicht!). Varianten: Expertengruppen, Lerntandems, gegenseitige Quiz-Erstellung. Wichtig: Passives Zuhören vermeiden!",
+                "research_note": "Martin, J.-P. (2004). Lernen durch Lehren. Die Schulleitung. / Roscoe & Chi (2007). Tutor learning.",
             },
         },
     },
@@ -352,6 +386,12 @@ POWERTECHNIKEN = {
         "effect_note": "Mnemonics: d=0.50 (Hattie)",
         "core_idea": "Verknüpfe Lernstoff mit Orten in deinem 'Gedächtnispalast'",
         "science_fact": "Dein räumliches Gedächtnis ist extrem stark – nutze es zum Lernen!",
+        "anwendung_bei": {
+            "ideal_fuer": ["Listen", "Reihenfolgen", "Fakten", "Vokabeln", "Namen"],
+            "beispiele": ["HSU: Pflanzennamen", "Geschichte: Ereignisreihenfolge", "Deutsch: Wortarten-Beispiele", "Planeten-Reihenfolge"],
+            "hinweis": "Perfekt für Listen und Reihenfolgen! Je verrückter das Bild, desto besser merkst du es dir.",
+        },
+        "kurzanleitung": "Bekannten Ort vorstellen (z.B. Zimmer) → Lerninhalt an Orte 'legen' → im Kopf durchgehen",
         
         "altersstufen": {
             "grundschule": {
@@ -409,6 +449,12 @@ POWERTECHNIKEN = {
         "effect_note": "Interleaved Practice: d=0.56 (Hattie) – aber Rohrer-Studie: d=1.21!",
         "core_idea": "Mische verschiedene Aufgabentypen – nicht alles nacheinander!",
         "science_fact": "Es fühlt sich schwerer an, ist aber VIEL effektiver! Das Gehirn lernt, Unterschiede zu erkennen.",
+        "anwendung_bei": {
+            "ideal_fuer": ["Mathe-Übungen", "Verschiedene Aufgabentypen", "Prüfungsvorbereitung"],
+            "beispiele": ["Mathe: Plus/Minus/Mal mischen", "Deutsch: verschiedene Grammatikübungen mischen", "Lernfächer abwechseln"],
+            "hinweis": "Besonders stark bei Mathe! Mische verschiedene Aufgabentypen statt 10x das Gleiche.",
+        },
+        "kurzanleitung": "Verschiedene Aufgabentypen mischen → nicht 10x Plus, dann 10x Minus → sondern abwechselnd",
         
         "altersstufen": {
             "grundschule": {
@@ -577,3 +623,194 @@ CERTIFICATE_TEXTS = {
         "description": "und ist bereit, mit wissenschaftlich fundierten Methoden zu lernen!",
     },
 }
+
+# ============================================
+# ANWENDUNGSSZENARIEN - Schüler-Eingaben
+# ============================================
+
+def get_application_prompt(technique_key: str, age_group: str = "grundschule") -> Dict[str, Any]:
+    """
+    Gibt die Prompt-Texte für die Anwendungsszenario-Eingabe zurück.
+    Statt einer Bewertung schreiben Schüler, wo sie die Technik konkret anwenden.
+    """
+    technique = POWERTECHNIKEN.get(technique_key)
+    if not technique:
+        return None
+
+    anwendung = technique.get("anwendung_bei", {})
+
+    # Altersgerechte Prompts
+    prompts = {
+        "grundschule": {
+            "frage": "Bei welcher Lernaufgabe willst du diese Technik diese Woche ausprobieren?",
+            "hinweis": f"💡 Tipp: {anwendung.get('hinweis', 'Diese Technik ist vielseitig einsetzbar!')}",
+            "beispiele_text": "Zum Beispiel: " + ", ".join(anwendung.get("beispiele", [])[:2]),
+            "placeholder": "z.B. Englisch-Vokabeln für den Test am Freitag",
+        },
+        "unterstufe": {
+            "frage": "Für welche konkrete Lernaufgabe wirst du diese Technik in den nächsten Tagen einsetzen?",
+            "hinweis": f"💡 {anwendung.get('hinweis', 'Diese Technik ist vielseitig einsetzbar!')}",
+            "beispiele_text": "Beispiele: " + ", ".join(anwendung.get("beispiele", [])),
+            "placeholder": "z.B. Mathe-Formeln für die Klassenarbeit",
+        },
+        "mittelstufe": {
+            "frage": "Bei welchem Lernvorhaben wirst du diese Technik anwenden?",
+            "hinweis": f"💡 {anwendung.get('hinweis', '')}",
+            "beispiele_text": "Ideal für: " + ", ".join(anwendung.get("ideal_fuer", [])),
+            "placeholder": "z.B. Geschichtsdaten für die Prüfung",
+        },
+        "oberstufe": {
+            "frage": "Für welches konkrete Lernziel wirst du diese Technik einsetzen?",
+            "hinweis": anwendung.get('hinweis', ''),
+            "beispiele_text": "Optimal für: " + ", ".join(anwendung.get("ideal_fuer", [])),
+            "placeholder": "z.B. Abi-Vorbereitung Geschichte",
+        },
+    }
+
+    return {
+        "technique_key": technique_key,
+        "technique_name": technique.get("name"),
+        "technique_icon": technique.get("icon"),
+        "kurzanleitung": technique.get("kurzanleitung", technique.get("core_idea")),
+        "ideal_fuer": anwendung.get("ideal_fuer", []),
+        "beispiele": anwendung.get("beispiele", []),
+        **prompts.get(age_group, prompts["grundschule"])
+    }
+
+
+def generate_techniques_overview(user_applications: Dict[str, str], age_group: str = "grundschule") -> str:
+    """
+    Generiert das persönliche Übersichtsdokument mit allen 7 Techniken
+    und den konkreten Anwendungsszenarien des Schülers.
+
+    Args:
+        user_applications: Dict mit technique_key -> Anwendungsszenario des Schülers
+                          z.B. {"loci": "HSU Pflanzennamen", "pomodoro": "Mathe-Hausaufgaben"}
+        age_group: Altersstufe für altersgerechte Formulierungen
+
+    Returns:
+        Formatierter Text für das Übersichtsdokument
+    """
+    # Header je nach Altersstufe
+    headers = {
+        "grundschule": "🎯 MEINE LERNTECHNIKEN-ÜBERSICHT 🎯",
+        "unterstufe": "📋 MEINE LERNTECHNIKEN-ÜBERSICHT",
+        "mittelstufe": "📋 Persönliche Lerntechniken-Übersicht",
+        "oberstufe": "📋 Individuelle Lernstrategie-Übersicht",
+    }
+
+    overview = f"\n{'='*50}\n"
+    overview += f"{headers.get(age_group, headers['grundschule'])}\n"
+    overview += f"{'='*50}\n\n"
+
+    # Alle Techniken durchgehen (sortiert nach order)
+    for technique_key in ["pomodoro", "active_recall", "feynman", "spaced_repetition", "teaching", "loci", "interleaving"]:
+        technique = POWERTECHNIKEN.get(technique_key)
+        if not technique:
+            continue
+
+        icon = technique.get("icon", "📚")
+        name = technique.get("name", technique_key)
+        kurzanleitung = technique.get("kurzanleitung", technique.get("core_idea", ""))
+        user_anwendung = user_applications.get(technique_key, "")
+
+        overview += f"{icon} {name}\n"
+        overview += f"   Anleitung: {kurzanleitung}\n"
+
+        if user_anwendung:
+            overview += f"   ✅ Anwenden bei: {user_anwendung}\n"
+        else:
+            overview += f"   ⬚ Anwenden bei: (noch nicht festgelegt)\n"
+
+        overview += "\n"
+
+    overview += f"{'='*50}\n"
+
+    # Motivierender Abschluss je nach Altersstufe
+    closings = {
+        "grundschule": "🌟 Super! Du hast jetzt deinen persönlichen Lernplan! 🌟",
+        "unterstufe": "💪 Jetzt hast du deinen persönlichen Werkzeugkasten!",
+        "mittelstufe": "Du bist bereit, mit wissenschaftlich fundierten Methoden zu lernen!",
+        "oberstufe": "Nutze diese evidenzbasierten Strategien für effektives Lernen.",
+    }
+
+    overview += f"\n{closings.get(age_group, closings['grundschule'])}\n"
+
+    return overview
+
+
+def generate_techniques_overview_html(user_applications: Dict[str, str], username: str = "", age_group: str = "grundschule") -> str:
+    """
+    Generiert das Übersichtsdokument als HTML (für PDF-Export oder Anzeige).
+
+    Args:
+        user_applications: Dict mit technique_key -> Anwendungsszenario des Schülers
+        username: Name des Schülers für die Personalisierung
+        age_group: Altersstufe
+
+    Returns:
+        HTML-formatierter String
+    """
+    html = f"""
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h1 style="text-align: center; color: #2c3e50;">🎯 Meine Lerntechniken-Übersicht</h1>
+        {"<p style='text-align: center; font-size: 1.2em;'>für " + username + "</p>" if username else ""}
+        <hr style="border: 2px solid #3498db;">
+    """
+
+    for technique_key in ["pomodoro", "active_recall", "feynman", "spaced_repetition", "teaching", "loci", "interleaving"]:
+        technique = POWERTECHNIKEN.get(technique_key)
+        if not technique:
+            continue
+
+        icon = technique.get("icon", "📚")
+        name = technique.get("name", technique_key)
+        kurzanleitung = technique.get("kurzanleitung", technique.get("core_idea", ""))
+        user_anwendung = user_applications.get(technique_key, "")
+
+        bg_color = "#e8f5e9" if user_anwendung else "#fff3e0"
+
+        html += f"""
+        <div style="background: {bg_color}; border-radius: 10px; padding: 15px; margin: 10px 0;">
+            <h3 style="margin: 0 0 10px 0;">{icon} {name}</h3>
+            <p style="margin: 5px 0; color: #666;"><strong>Anleitung:</strong> {kurzanleitung}</p>
+            <p style="margin: 5px 0; color: #2c3e50;">
+                <strong>{"✅" if user_anwendung else "⬚"} Anwenden bei:</strong>
+                {user_anwendung if user_anwendung else "<em>(noch nicht festgelegt)</em>"}
+            </p>
+        </div>
+        """
+
+    html += """
+        <hr style="border: 2px solid #3498db;">
+        <p style="text-align: center; font-size: 1.1em; color: #27ae60;">
+            🌟 Jetzt hast du deinen persönlichen Lernplan! 🌟
+        </p>
+    </div>
+    """
+
+    return html
+
+
+def get_technique_application_data(technique_key: str) -> Dict[str, Any]:
+    """
+    Gibt alle relevanten Daten für die Anwendungsszenario-Eingabe zurück.
+    Wird im UI verwendet, um die Eingabefelder zu rendern.
+    """
+    technique = POWERTECHNIKEN.get(technique_key)
+    if not technique:
+        return None
+
+    anwendung = technique.get("anwendung_bei", {})
+
+    return {
+        "key": technique_key,
+        "name": technique.get("name"),
+        "icon": technique.get("icon"),
+        "order": technique.get("order"),
+        "kurzanleitung": technique.get("kurzanleitung"),
+        "core_idea": technique.get("core_idea"),
+        "ideal_fuer": anwendung.get("ideal_fuer", []),
+        "beispiele": anwendung.get("beispiele", []),
+        "hinweis": anwendung.get("hinweis", ""),
+    }

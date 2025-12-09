@@ -33,6 +33,107 @@ try:
 except ImportError:
     HAS_LEARNSTRAT = False
 
+# Import Transfer-Content für Tutorial
+try:
+    from utils.learnstrat_challenges.transfer_content import PHASE_1_CONTENT
+    HAS_TRANSFER_CONTENT = True
+except ImportError:
+    HAS_TRANSFER_CONTENT = False
+
+
+def render_transfer_tutorial_section(age_group: str):
+    """Rendert den Transfer-Abschnitt im Tutorial mit altersangepassten Inhalten."""
+    if not HAS_TRANSFER_CONTENT:
+        st.warning("Transfer-Inhalte nicht verfügbar.")
+        return
+
+    # Hole die altersangepassten Inhalte aus PHASE_1_CONTENT
+    content = PHASE_1_CONTENT.get("altersstufen", {}).get(age_group, {})
+    if not content:
+        content = PHASE_1_CONTENT.get("altersstufen", {}).get("unterstufe", {})
+
+    # Haupttext: hook oder einfuehrung
+    hook = content.get("hook", "") or content.get("einfuehrung", "")
+    if hook:
+        st.markdown(f"""
+        <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+                    border-left: 4px solid #0ea5e9;
+                    padding: 20px; border-radius: 10px; margin-bottom: 15px;">
+            <div style="line-height: 1.8; white-space: pre-line;">{hook}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # Mythos-Buster
+    mythos = content.get("mythos_buster", "") or content.get("mythos_vs_realitaet", "")
+    if mythos:
+        with st.expander("⚠️ Mythos vs. Realität", expanded=False):
+            st.markdown(mythos)
+
+    # Wissenschaft
+    wissenschaft = (content.get("wissenschaft_einfach", "") or content.get("wissenschaft", "") or
+                   content.get("wissenschaftlicher_hintergrund", "") or content.get("forschungsstand", ""))
+    if wissenschaft:
+        with st.expander("🔬 Was die Wissenschaft sagt", expanded=False):
+            st.markdown(wissenschaft)
+
+    # Definition (für Mittelstufe+)
+    definition = content.get("definition", "")
+    if definition:
+        with st.expander("📖 Definition", expanded=False):
+            st.markdown(definition)
+
+    # Drei-Ebenen-Modell (für Oberstufe)
+    drei_ebenen = content.get("drei_ebenen_modell", "") or content.get("dreiphasenmodell", "")
+    if drei_ebenen:
+        with st.expander("📊 Drei-Ebenen-Modell", expanded=False):
+            st.markdown(drei_ebenen)
+
+    # Metakognition (für Oberstufe/Pädagogen)
+    metakognition = content.get("metakognition", "")
+    if metakognition:
+        with st.expander("🧠 Metakognition", expanded=False):
+            st.markdown(metakognition)
+
+    # Gaming-Beispiel
+    gaming = content.get("gaming_beispiel", "")
+    if gaming:
+        with st.expander("🎮 Gaming-Beispiel", expanded=False):
+            st.markdown(gaming)
+
+    # Alltags-Beispiel
+    alltag = content.get("alltag_beispiel", "") or content.get("beispiel", "")
+    if alltag:
+        with st.expander("📚 Alltags-Beispiel", expanded=False):
+            st.markdown(alltag)
+
+    # Relevanz (für Mittelstufe)
+    relevanz = content.get("relevanz", "")
+    if relevanz:
+        with st.expander("🎯 Warum ist das relevant?", expanded=False):
+            st.markdown(relevanz)
+
+    # Story
+    story = content.get("story", "")
+    if story:
+        with st.expander("📖 Geschichte", expanded=False):
+            st.markdown(story)
+
+    # Take-Home / Merksatz
+    take_home = content.get("take_home", "")
+    if take_home:
+        st.markdown(f"""
+        <div style="background: #fef3c7; border: 1px solid #f59e0b;
+                    padding: 15px; border-radius: 10px; margin-top: 15px;">
+            <strong>🧠 Merke dir:</strong>
+            <div style="margin-top: 10px; white-space: pre-line;">{take_home}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # Fun Fact
+    fun_fact = content.get("fun_fact", "")
+    if fun_fact:
+        st.info(f"🤓 **Wusstest du?** {fun_fact}")
+
 # ============================================
 # SPEZIELLE RENDERING-FUNKTION FÜR EXT_LEARNSTRAT (Cleverer lernen)
 # ============================================
@@ -201,6 +302,53 @@ def render_learnstrat_altersstufen(color: str):
         # Altersstufe aus User-Profil holen (oben gewählt)
         age_group = st.session_state.get("current_user_age_group", "unterstufe")
 
+        # Session State für Theorie-Unterbereich
+        if "learnstrat_theorie_section" not in st.session_state:
+            st.session_state.learnstrat_theorie_section = "alle"
+
+        # ==========================================
+        # SCHNELLNAVIGATION für alle Altersstufen
+        # ==========================================
+        st.markdown("#### 🎯 Direkt zu:")
+        nav_cols = st.columns(4)
+
+        with nav_cols[0]:
+            if st.session_state.learnstrat_theorie_section == "alle":
+                st.markdown("""<div style="background: #6366f1; color: white; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold;">📚 Alles</div>""", unsafe_allow_html=True)
+            else:
+                if st.button("📚 Alles", key="nav_alle", use_container_width=True):
+                    st.session_state.learnstrat_theorie_section = "alle"
+                    st.rerun()
+
+        with nav_cols[1]:
+            if st.session_state.learnstrat_theorie_section == "techniken":
+                st.markdown("""<div style="background: #6366f1; color: white; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold;">💪 7 Power-Techniken</div>""", unsafe_allow_html=True)
+            else:
+                if st.button("💪 7 Power-Techniken", key="nav_techniken", use_container_width=True):
+                    st.session_state.learnstrat_theorie_section = "techniken"
+                    st.rerun()
+
+        with nav_cols[2]:
+            if st.session_state.learnstrat_theorie_section == "transfer":
+                st.markdown("""<div style="background: #6366f1; color: white; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold;">🚀 Transfer</div>""", unsafe_allow_html=True)
+            else:
+                if st.button("🚀 Transfer", key="nav_transfer", use_container_width=True):
+                    st.session_state.learnstrat_theorie_section = "transfer"
+                    st.rerun()
+
+        with nav_cols[3]:
+            if st.session_state.learnstrat_theorie_section == "birkenbihl":
+                st.markdown("""<div style="background: #6366f1; color: white; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold;">🧵 Birkenbihl</div>""", unsafe_allow_html=True)
+            else:
+                if st.button("🧵 Birkenbihl", key="nav_birkenbihl", use_container_width=True):
+                    st.session_state.learnstrat_theorie_section = "birkenbihl"
+                    st.rerun()
+
+        st.divider()
+
+        # Aktuelle Auswahl merken
+        show_section = st.session_state.learnstrat_theorie_section
+
         # ==========================================
         # GRUNDSCHULE CONTENT (Original MaiThink-Style)
         # ==========================================
@@ -208,50 +356,54 @@ def render_learnstrat_altersstufen(color: str):
             st.header("🧠 CLEVERER LERNEN")
 
             # ========== VIDEO-PLATZHALTER ==========
-            st.info("🎬 **Video kommt bald!** Hier erscheint ein erklärendes Video zum Thema.")
+            if show_section == "alle":
+                st.info("🎬 **Video kommt bald!** Hier erscheint ein erklärendes Video zum Thema.")
             # Später ersetzen mit:
             # st.video("https://youtube.com/watch?v=DEIN_VIDEO_LINK")
             # =======================================
 
-            st.markdown("**Die Wissenschaft sagt: Du machst es falsch. Aber keine Sorge – wir fixen das jetzt.**")
+            if show_section == "alle":
+                st.markdown("**Die Wissenschaft sagt: Du machst es falsch. Aber keine Sorge – wir fixen das jetzt.**")
 
-            # ========== PLOT TWIST INTRO ==========
-            st.markdown("### ⚡ PLOT TWIST: Mehr lernen ≠ Besser lernen")
+            # ========== PLOT TWIST INTRO (nur bei "alle") ==========
+            if show_section == "alle":
+                st.markdown("### ⚡ PLOT TWIST: Mehr lernen ≠ Besser lernen")
 
-            st.markdown("""
-            Stell dir vor, du lernst 5 Stunden für eine Prüfung. Du liest alles dreimal durch, markierst die wichtigsten Stellen gelb, schreibst eine Zusammenfassung. Du fühlst dich super vorbereitet.
-
-            Und dann? Schreibst du eine 4.
-
-            Deine Freundin hat nur 2 Stunden gelernt. Sie schreibt eine 1.
-
-            Ist sie einfach schlauer? **Nein.** Sie lernt nur ANDERS. Und jetzt kommt's: Die Wissenschaft weiß seit über 100 Jahren, welche Methoden funktionieren. Die Schule hat's dir nur nie erzählt.
-            """)
-
-            # ========== INHALTSVERZEICHNIS ==========
-            with st.expander("📋 Was dich erwartet"):
                 st.markdown("""
+                Stell dir vor, du lernst 5 Stunden für eine Prüfung. Du liest alles dreimal durch, markierst die wichtigsten Stellen gelb, schreibst eine Zusammenfassung. Du fühlst dich super vorbereitet.
+
+                Und dann? Schreibst du eine 4.
+
+                Deine Freundin hat nur 2 Stunden gelernt. Sie schreibt eine 1.
+
+                Ist sie einfach schlauer? **Nein.** Sie lernt nur ANDERS. Und jetzt kommt's: Die Wissenschaft weiß seit über 100 Jahren, welche Methoden funktionieren. Die Schule hat's dir nur nie erzählt.
+                """)
+
+                # ========== INHALTSVERZEICHNIS ==========
+                with st.expander("📋 Was dich erwartet"):
+                    st.markdown("""
 - Das Problem: Warum Schule dir das Falsche beibringt
 - Die Wissenschaft: Was WIRKLICH funktioniert (mit Zahlen!)
 - Die 7 Power-Techniken (speziell für dich angepasst)
 - Transfer: Das Geheimnis der Überflieger
 - Birkenbihl-Methoden: Faden-Trick, ABC-Liste, KaWa
 - Das Paradox: Warum sich gutes Lernen schlecht anfühlt
+                    """)
+
+                st.divider()
+
+                # ========== 1. DAS PROBLEM ==========
+                st.markdown("### 1. 🤫 Das wissen sogar die meisten Erwachsenen nicht")
+
+            if show_section == "alle":
+                st.markdown("""
+                *"Schreib das auf, dann merkst du's dir!"*
+
+                Diesen Satz hast du wahrscheinlich tausendmal gehört. Und er ist... falsch. Zumindest so, wie die Schule ihn meint.
                 """)
 
-            st.divider()
-
-            # ========== 1. DAS PROBLEM ==========
-            st.markdown("### 1. 🤫 Das wissen sogar die meisten Erwachsenen nicht")
-
-            st.markdown("""
-            *"Schreib das auf, dann merkst du's dir!"*
-
-            Diesen Satz hast du wahrscheinlich tausendmal gehört. Und er ist... falsch. Zumindest so, wie die Schule ihn meint.
-            """)
-
-            with st.expander("Was die meisten Schüler machen"):
-                st.markdown("""
+                with st.expander("Was die meisten Schüler machen"):
+                    st.markdown("""
 - Text mehrmals durchlesen (*"Wird schon hängenbleiben..."*)
 - Wichtiges gelb markieren (*Sieht produktiv aus!*)
 - Zusammenfassung schreiben (*Dauert ewig...*)
@@ -260,21 +412,21 @@ def render_learnstrat_altersstufen(color: str):
 🎬 **PLOT TWIST:** Alle diese Methoden sind wissenschaftlich gesehen... meh.
 
 Forscher von der Kent State University (Dunlosky et al., 2013) haben 10 beliebte Lerntechniken untersucht. Ergebnis: **Die Techniken, die Schüler am häufigsten nutzen, sind am wenigsten effektiv.** Autsch.
+                    """)
+
+                st.divider()
+
+                # ========== 2. DIE WISSENSCHAFT ==========
+                st.markdown("### 2. 🔬 Die Wissenschaft: Effektstärken erklärt")
+
+                st.markdown("""
+                *"Okay, aber woher weißt du, dass das stimmt?"*
+
+                Gute Frage! Hier kommt **John Hattie** ins Spiel. Der Neuseeländer hat über 1.800 Meta-Studien mit mehr als 300 Millionen Schülern ausgewertet. Das ist wie... ALLE Studien zum Thema Lernen, die es gibt. Zusammengefasst.
                 """)
 
-            st.divider()
-
-            # ========== 2. DIE WISSENSCHAFT ==========
-            st.markdown("### 2. 🔬 Die Wissenschaft: Effektstärken erklärt")
-
-            st.markdown("""
-            *"Okay, aber woher weißt du, dass das stimmt?"*
-
-            Gute Frage! Hier kommt **John Hattie** ins Spiel. Der Neuseeländer hat über 1.800 Meta-Studien mit mehr als 300 Millionen Schülern ausgewertet. Das ist wie... ALLE Studien zum Thema Lernen, die es gibt. Zusammengefasst.
-            """)
-
-            with st.expander("Was ist eine 'Effektstärke' (d)?"):
-                st.markdown("""
+                with st.expander("Was ist eine 'Effektstärke' (d)?"):
+                    st.markdown("""
 Stell dir vor, du misst, wie viel Schüler in einem Jahr lernen. Das ist der Normalfall. Jetzt fragst du: Bringt Methode X mehr oder weniger als dieses eine Jahr?
 
 - **d = 0.40** → Ein Jahr Lernfortschritt (der Durchschnitt)
@@ -291,20 +443,22 @@ Stell dir vor, du misst, wie viel Schüler in einem Jahr lernen. Das ist der Nor
 | Feynman-Methode | d = 0.75 | ⭐⭐⭐ Sehr hoch! |
 | Markieren | d = 0.36 | ❌ Low Utility |
 | Wiederlesen | d = 0.36 | ❌ Low Utility |
-                """)
+                    """)
 
-            st.divider()
+                st.divider()
 
             # ========== 3. DIE 7 POWER-TECHNIKEN ==========
-            st.markdown("### 3. 💪 Die 7 Power-Techniken")
+            if show_section in ["alle", "techniken"]:
+                st.markdown("### 3. 💪 Die 7 Power-Techniken")
 
-            st.markdown("""
-            Jetzt wird's praktisch. Hier sind die 7 Techniken, die nachweislich funktionieren – speziell für dich angepasst!
-            """)
+                st.markdown("""
+                Jetzt wird's praktisch. Hier sind die 7 Techniken, die nachweislich funktionieren – speziell für dich angepasst!
+                """)
 
             # ----- TECHNIK 1: Retrieval Practice -----
-            with st.expander("⚡ **Technik 1: Retrieval Practice (Selbsttest)** – Effektstärke: d = 0.58"):
-                st.markdown("""
+            if show_section in ["alle", "techniken"]:
+                with st.expander("⚡ **Technik 1: Retrieval Practice (Selbsttest)** – Effektstärke: d = 0.58"):
+                    st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
 Jedes Mal, wenn du etwas aus deinem Gedächtnis ABRUFST (statt es nur wieder zu lesen), verstärkst du die Verbindung im Gehirn. Das ist wie ein Trampelpfad: Je öfter du ihn gehst, desto breiter wird er. Wiederlesen ist, als würdest du den Pfad nur anschauen. Abrufen ist, ihn tatsächlich zu gehen.
@@ -317,11 +471,12 @@ Jedes Mal, wenn du etwas aus deinem Gedächtnis ABRUFST (statt es nur wieder zu 
 - Mach ein Spiel daraus: Wer kann sich an die meisten Sachen erinnern?
 - Benutze Bildkarten und dreh sie um – was war auf der Karte?
 - Eltern können fragen: *"Was hast du heute in der Schule gelernt?"* (Und wirklich nachfragen, nicht nur nicken!)
-                """)
+                    """)
 
             # ----- TECHNIK 2: Spaced Repetition -----
-            with st.expander("📅 **Technik 2: Spaced Repetition (Zeitversetzt wiederholen)** – Effektstärke: d = 0.60"):
-                st.markdown("""
+            if show_section in ["alle", "techniken"]:
+                with st.expander("📅 **Technik 2: Spaced Repetition (Zeitversetzt wiederholen)** – Effektstärke: d = 0.60"):
+                    st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
 Dein Gehirn vergisst. Schnell. Die Vergessenskurve (Ebbinghaus, 1885 – ja, das wissen wir seit über 100 Jahren!) zeigt: Nach 24 Stunden hast du 70% vergessen. ABER: Wenn du wiederholst, BEVOR du vergessen hast, wird die Kurve flacher. Mit jeder Wiederholung hält das Wissen länger.
@@ -336,11 +491,12 @@ Dein Gehirn vergisst. Schnell. Die Vergessenskurve (Ebbinghaus, 1885 – ja, das
 - Eltern: Baut kleine Quiz-Momente in den Alltag ein. Beim Abendessen: *"Was war nochmal...?"*
 - Macht einen Wochen-Rückblick am Sonntag: *"Was haben wir diese Woche alles gelernt?"*
 - **Sticker-Kalender:** Jedes Mal, wenn wiederholt wird, gibt's einen Sticker!
-                """)
+                    """)
 
             # ----- TECHNIK 3: Feynman-Methode -----
-            with st.expander("👶 **Technik 3: Feynman-Methode (Erklär's einem 10-Jährigen)** – Effektstärke: d = 0.75"):
-                st.markdown("""
+            if show_section in ["alle", "techniken"]:
+                with st.expander("👶 **Technik 3: Feynman-Methode (Erklär's einem 10-Jährigen)** – Effektstärke: d = 0.75"):
+                    st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
 Richard Feynman war Nobelpreisträger für Physik und legendär dafür, komplizierte Sachen einfach zu erklären. Seine Methode: **Wenn du etwas nicht einfach erklären kannst, hast du es nicht verstanden.**
@@ -354,11 +510,12 @@ Richard Feynman war Nobelpreisträger für Physik und legendär dafür, komplizi
 - **"Erklär's deinem Teddy!"** Oder: Spiel Lehrer! Stell deine Kuscheltiere in eine Reihe und erkläre ihnen, was du gelernt hast.
 - Wenn du stecken bleibst, weißt du, was du nochmal nachschauen musst.
 - **Bonus:** Geschwister unterrichten! (Die fragen nämlich wirklich nach, wenn sie's nicht verstehen.)
-                """)
+                    """)
 
             # ----- TECHNIK 4: Interleaving -----
-            with st.expander("🔀 **Technik 4: Interleaving (Mischen statt Blocken)** – Effektstärke: d = 0.67"):
-                st.markdown("""
+            if show_section in ["alle", "techniken"]:
+                with st.expander("🔀 **Technik 4: Interleaving (Mischen statt Blocken)** – Effektstärke: d = 0.67"):
+                    st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
 Die meisten lernen "geblockt": Erst 20 Mathe-Aufgaben zum Thema A, dann 20 zum Thema B. Fühlt sich effektiv an. **IST ES ABER NICHT.**
@@ -374,11 +531,12 @@ Interleaving heißt: Aufgaben mischen! A, B, C, A, B, C... Warum? Weil du bei je
 - Beim Üben abwechseln: Mal eine Aufgabe Plus, dann Minus, dann Plus, dann Minus. Nicht erst 10x Plus und dann 10x Minus.
 - Bei Vokabeln: Nicht alle Tiere, dann alle Farben – sondern bunt gemischt!
 - Spiele wie **Memory** trainieren das automatisch.
-                """)
+                    """)
 
             # ----- TECHNIK 5: Loci-Methode -----
-            with st.expander("🏰 **Technik 5: Loci-Methode (Gedächtnispalast)** – Effektstärke: d = 0.65"):
-                st.markdown("""
+            if show_section in ["alle", "techniken"]:
+                with st.expander("🏰 **Technik 5: Loci-Methode (Gedächtnispalast)** – Effektstärke: d = 0.65"):
+                    st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
 Diese Methode nutzen Gedächtnis-Weltmeister! Funktioniert so: Du "gehst" im Kopf durch einen bekannten Ort (dein Zimmer, Schulweg) und "platzierst" an jedem Punkt einen Begriff, den du dir merken willst. Warum funktioniert das? Das Gehirn ist super darin, sich Orte zu merken – viel besser als abstrakte Listen.
@@ -390,11 +548,12 @@ Diese Methode nutzen Gedächtnis-Weltmeister! Funktioniert so: Du "gehst" im Kop
 - *"Stell dir vor, ein Apfel liegt auf deinem Bett!"*
 - **Kinderzimmer-Rundgang:** Tür = erste Vokabel, Bett = zweite, Schrank = dritte...
 - Je verrückter die Bilder, desto besser! Der Apfel tanzt auf dem Bett? SUPER, das merkst du dir!
-                """)
+                    """)
 
             # ----- TECHNIK 6: Pomodoro -----
-            with st.expander("🍅 **Technik 6: Pomodoro-Technik (25 + 5)** – Effektstärke: d = 0.53"):
-                st.markdown("""
+            if show_section in ["alle", "techniken"]:
+                with st.expander("🍅 **Technik 6: Pomodoro-Technik (25 + 5)** – Effektstärke: d = 0.53"):
+                    st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
 Das Gehirn kann sich nicht ewig konzentrieren. Nach etwa 25 Minuten lässt die Aufmerksamkeit nach. Die Pomodoro-Technik nutzt das: 25 Min fokussiert arbeiten, dann 5 Min echte Pause (nicht Handy!). Nach 4 Runden: 15-30 Min längere Pause.
@@ -405,11 +564,12 @@ Das Gehirn kann sich nicht ewig konzentrieren. Nach etwa 25 Minuten lässt die A
 
 - **Kürzere Intervalle:** 10-15 Min lernen, dann 5 Min Bewegungspause (Hampelmann, Tanzen, Rennen).
 - Eine Sanduhr oder Timer macht's spannend. *"Schaffst du es, bis die Zeit abläuft konzentriert zu bleiben?"*
-                """)
+                    """)
 
             # ----- TECHNIK 7: Lernen durch Lehren -----
-            with st.expander("👥 **Technik 7: Lernen durch Lehren** – Effektstärke: d = 0.53"):
-                st.markdown("""
+            if show_section in ["alle", "techniken"]:
+                with st.expander("👥 **Technik 7: Lernen durch Lehren** – Effektstärke: d = 0.53"):
+                    st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
 *"Wer lehrt, lernt doppelt."* Das ist nicht nur ein Spruch. Wenn du jemandem etwas erklärst, musst du: 1) Es selbst verstehen, 2) Es in klare Worte fassen, 3) Auf Fragen reagieren. Das ist Elaboration, Retrieval Practice und Metakognition in einem!
@@ -421,40 +581,23 @@ Das Gehirn kann sich nicht ewig konzentrieren. Nach etwa 25 Minuten lässt die A
 - **Geschwister-Schule!** Der Große erklärt dem Kleinen.
 - Oder: Eltern spielen dumm. *"Mama/Papa versteht das nicht, kannst du es mir erklären?"*
 - Das Kind muss erklären, und dabei lernt es selbst am meisten.
-                """)
+                    """)
 
-            st.divider()
+                st.divider()
 
             # ========== 4. TRANSFER ==========
-            st.markdown("### 4. 🎯 Transfer: Das Geheimnis der Überflieger")
-
-            with st.expander("Warum klappt's in der Klausur nicht?"):
-                st.markdown("""
-*"Ich hab's doch gelernt! Warum klappt's in der Klausur nicht?"*
-
-Das ist die Frage aller Fragen. Und die Antwort ist: **TRANSFER**. Transfer bedeutet, Gelerntes in NEUEN Situationen anzuwenden. Und hier ist der Witz: Transfer passiert nicht automatisch. Dein Gehirn klebt Wissen gerne an den Kontext, in dem du es gelernt hast.
-
-**Near Transfer vs. Far Transfer:**
-- **Near Transfer:** Ähnliche Situation. Du lernst 2+3=5, dann kannst du auch 2+4=6 lösen.
-- **Far Transfer:** Ganz andere Situation. Du lernst logisches Denken in Mathe – und wendest es auf ein moralisches Dilemma an.
-
-🎬 **Die unangenehme Wahrheit:** Far Transfer ist SCHWER. Aber trainierbar!
-
-**Wie trainiert man Transfer?**
-- **"Wo noch?"-Frage:** Nach jedem Thema fragen: *"Wo könnte ich das noch anwenden?"*
-- **Prinzipien benennen:** Nicht nur "wie", sondern "warum". Was ist die Regel dahinter?
-- **Verschiedene Kontexte:** Dasselbe Konzept in verschiedenen Situationen üben.
-- **Analogien bilden:** *"Das ist wie..."* Verbindungen zwischen Fächern finden.
-                """)
-
-            st.divider()
+            if show_section in ["alle", "transfer"]:
+                st.markdown("### 4. 🎯 Transfer: Das Geheimnis der Überflieger")
+                render_transfer_tutorial_section("grundschule")
+                st.divider()
 
             # ========== 5. BIRKENBIHL ==========
-            st.markdown("### 5. 🧵 Birkenbihl-Methoden: Gehirn-gerechtes Lernen")
-            st.markdown("*Vera F. Birkenbihl war eine deutsche Lernexpertin, die gezeigt hat, wie man mit dem Gehirn arbeitet – nicht dagegen.*")
+            if show_section in ["alle", "birkenbihl"]:
+                st.markdown("### 5. 🧵 Birkenbihl-Methoden: Gehirn-gerechtes Lernen")
+                st.markdown("*Vera F. Birkenbihl war eine deutsche Lernexpertin, die gezeigt hat, wie man mit dem Gehirn arbeitet – nicht dagegen.*")
 
-            with st.expander("🧶 Der Faden-Trick"):
-                st.markdown("""
+                with st.expander("🧶 Der Faden-Trick"):
+                    st.markdown("""
 *"Schreib nicht auf, was ich sage. Schreib auf, was DU denkst!"*
 
 Birkenbihl sagt: Jede neue Information braucht einen "Faden" – einen Anknüpfungspunkt in deinem bestehenden Wissen. Ohne Faden geht Information *"hier rein, da raus"*. Mit Faden bleibt sie hängen.
@@ -467,8 +610,9 @@ Birkenbihl sagt: Jede neue Information braucht einen "Faden" – einen Anknüpfu
 - Bei neuen Begriffen: Sofort eine Eselsbrücke zu etwas Bekanntem bauen.
                 """)
 
-            with st.expander("🔤 Die ABC-Liste"):
-                st.markdown("""
+            if show_section in ["alle", "birkenbihl"]:
+                with st.expander("🔤 Die ABC-Liste"):
+                    st.markdown("""
 **So funktioniert's:**
 1. Schreibe die Buchstaben A bis Z untereinander auf ein Blatt
 2. Wähle ein Thema (z.B. "Tiere", "Frühling", "Mittelalter")
@@ -489,10 +633,11 @@ F - Fuchs, Farn, Förster
 ```
 
 **💡 Tipp:** Du musst nicht jeden Buchstaben ausfüllen! Manche sind schwer (X, Y, Q) – das ist okay. Es geht darum, dein Gehirn zum Denken anzuregen.
-                """)
+                    """)
 
-            with st.expander("✨ KaWa - Kreative Wort-Assoziationen"):
-                st.markdown("""
+            if show_section in ["alle", "birkenbihl"]:
+                with st.expander("✨ KaWa - Kreative Wort-Assoziationen"):
+                    st.markdown("""
 **KaWa = Kreatives Analograffiti mit Wort-Assoziationen**
 
 **So funktioniert's:**
@@ -516,15 +661,17 @@ N → Nachdenken, Notizen
 - Es macht Spaß und ist kreativ
 
 **💡 Tipp:** Male Bilder zu deinen Wörtern! Das Gehirn liebt Bilder.
-                """)
+                    """)
 
-            st.divider()
+            if show_section in ["alle", "birkenbihl"]:
+                st.divider()
 
             # ========== 6. DAS PARADOX ==========
-            st.markdown("### 6. 🔄 Das Paradox: Warum sich gutes Lernen falsch anfühlt")
+            if show_section == "alle":
+                st.markdown("### 6. 🔄 Das Paradox: Warum sich gutes Lernen falsch anfühlt")
 
-            with st.expander("Das Fluency-Problem"):
-                st.markdown("""
+                with st.expander("Das Fluency-Problem"):
+                    st.markdown("""
 *"Ich hab so viel gelernt und fühle mich trotzdem unsicher..."*
 
 Das ist NORMAL. Und es ist sogar ein GUTES Zeichen!
@@ -553,29 +700,6 @@ Der Psychologe Robert Bjork nennt das "desirable difficulties". Bestimmte Schwie
 **Vertrau der Wissenschaft, nicht deinem Gefühl!**
                 """)
 
-            st.divider()
-
-            # ========== QUICK REFERENCE ==========
-            st.markdown("### ✨ Quick Reference: Alle Techniken auf einen Blick")
-
-            st.markdown("""
-| Technik | Evidenz | Quelle | Tipp für dich |
-|---------|---------|--------|---------------|
-| 🔄 Active Recall | 🟢 HOCH | Dunlosky 2013, Roediger 2006 | Täglich 5 Min Quiz |
-| 📅 Spaced Repetition | 🟢 HOCH | Dunlosky 2013, Cepeda 2006 | Sticker-Kalender |
-| 👶 Feynman-Methode | 🟢 HOCH | Dunlosky 2013 (Elaboration) | Teddy unterrichten |
-| 🏰 Loci-Methode | 🟡 MITTEL | Dunlosky 2013 (Mnemonics) | Zimmer-Rundgang |
-| 🗺️ Mind Mapping | 🟡 MITTEL | Farrand 2002, Nesbit 2006 | Bunte Bilder malen |
-| 🍅 Pomodoro | 🟡 MITTEL | Cirillo 2006 | 10-15 Min + Pause |
-| 👥 Lehren | 🟢 HOCH | Dunlosky 2013, Fiorella 2013 | Geschwister-Schule |
-| 🧵 Birkenbihl (ABC, KaWa) | 🟡 MITTEL | Birkenbihl 2000, Vorwissen-Aktivierung | ABC-Liste malen |
-
-💡 **Zur Einordnung:**
-- 🟢 HOCH = Mehrere hochwertige Studien bestätigen die Wirksamkeit
-- 🟡 MITTEL = Gute Evidenz, aber weniger umfangreich erforscht oder kontextabhängig
-
-🚀 **Jetzt bist du dran.** Pick EINE Technik. Probier sie EINE Woche aus. Und dann: Staune.
-            """)
 
         # ==========================================
         # UNTERSTUFE CONTENT (Original MaiThink-Style)
@@ -676,15 +800,17 @@ Stell dir vor, du misst, wie viel Schüler in einem Jahr lernen. Das ist der Nor
             st.divider()
 
             # ========== 3. DIE 7 POWER-TECHNIKEN ==========
-            st.markdown("### 3. 💪 Die 7 Power-Techniken")
+            if show_section in ["alle", "techniken"]:
+                st.markdown("### 3. 💪 Die 7 Power-Techniken")
 
-            st.markdown("""
-            Jetzt wird's praktisch. Hier sind die 7 Techniken, die nachweislich funktionieren – speziell für dich angepasst!
-            """)
+                st.markdown("""
+                Jetzt wird's praktisch. Hier sind die 7 Techniken, die nachweislich funktionieren – speziell für dich angepasst!
+                """)
 
             # ----- TECHNIK 1: Retrieval Practice -----
-            with st.expander("⚡ **Technik 1: Retrieval Practice (Selbsttest)** – Effektstärke: d = 0.58"):
-                st.markdown("""
+            if show_section in ["alle", "techniken"]:
+                with st.expander("⚡ **Technik 1: Retrieval Practice (Selbsttest)** – Effektstärke: d = 0.58"):
+                    st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
 Jedes Mal, wenn du etwas aus deinem Gedächtnis ABRUFST (statt es nur wieder zu lesen), verstärkst du die Verbindung im Gehirn. Das ist wie ein Trampelpfad: Je öfter du ihn gehst, desto breiter wird er. Wiederlesen ist, als würdest du den Pfad nur anschauen. Abrufen ist, ihn tatsächlich zu gehen.
@@ -700,8 +826,9 @@ Jedes Mal, wenn du etwas aus deinem Gedächtnis ABRUFST (statt es nur wieder zu 
                 """)
 
             # ----- TECHNIK 2: Spaced Repetition -----
-            with st.expander("📅 **Technik 2: Spaced Repetition (Zeitversetzt wiederholen)** – Effektstärke: d = 0.60"):
-                st.markdown("""
+            if show_section in ["alle", "techniken"]:
+                with st.expander("📅 **Technik 2: Spaced Repetition (Zeitversetzt wiederholen)** – Effektstärke: d = 0.60"):
+                    st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
 Dein Gehirn vergisst. Schnell. Die Vergessenskurve (Ebbinghaus, 1885 – ja, das wissen wir seit über 100 Jahren!) zeigt: Nach 24 Stunden hast du 70% vergessen. ABER: Wenn du wiederholst, BEVOR du vergessen hast, wird die Kurve flacher. Mit jeder Wiederholung hält das Wissen länger.
@@ -714,11 +841,12 @@ Dein Gehirn vergisst. Schnell. Die Vergessenskurve (Ebbinghaus, 1885 – ja, das
 
 - **Lernplan erstellen!** Nicht: "Ich lerne am Wochenende vor der Arbeit." Sondern: "Ich lerne heute 30 Min, übermorgen 15 Min, in einer Woche nochmal 10 Min."
 - **Apps helfen:** Anki sagt dir automatisch, wann du was wiederholen sollst. Das nennt sich Spaced Repetition Software (SRS).
-                """)
+                    """)
 
             # ----- TECHNIK 3: Feynman-Methode -----
-            with st.expander("👶 **Technik 3: Feynman-Methode (Erklär's einem 10-Jährigen)** – Effektstärke: d = 0.75"):
-                st.markdown("""
+            if show_section in ["alle", "techniken"]:
+                with st.expander("👶 **Technik 3: Feynman-Methode (Erklär's einem 10-Jährigen)** – Effektstärke: d = 0.75"):
+                    st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
 Richard Feynman war Nobelpreisträger für Physik und legendär dafür, komplizierte Sachen einfach zu erklären. Seine Methode: **Wenn du etwas nicht einfach erklären kannst, hast du es nicht verstanden.**
@@ -732,11 +860,12 @@ Richard Feynman war Nobelpreisträger für Physik und legendär dafür, komplizi
 - Stell dir vor, ein Grundschüler fragt dich: *"Was sind Brüche?"* oder *"Was ist Fotosynthese?"*
 - **Kannst du es SO erklären, dass er es versteht? Ohne Fachbegriffe?**
 - Schreib deine Erklärung auf. Dann lies sie laut vor. Klingt es wie ein Mensch redet? Wenn nicht, vereinfache!
-                """)
+                    """)
 
             # ----- TECHNIK 4: Interleaving -----
-            with st.expander("🔀 **Technik 4: Interleaving (Mischen statt Blocken)** – Effektstärke: d = 0.67"):
-                st.markdown("""
+            if show_section in ["alle", "techniken"]:
+                with st.expander("🔀 **Technik 4: Interleaving (Mischen statt Blocken)** – Effektstärke: d = 0.67"):
+                    st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
 Die meisten lernen "geblockt": Erst 20 Mathe-Aufgaben zum Thema A, dann 20 zum Thema B. Fühlt sich effektiv an. **IST ES ABER NICHT.**
@@ -751,11 +880,12 @@ Interleaving heißt: Aufgaben mischen! A, B, C, A, B, C... Warum? Weil du bei je
 
 - **Erstelle gemischte Übungsblätter!** Statt 10 Bruchaufgaben, dann 10 Dezimalaufgaben → Mische sie!
 - **Bei Sprachen:** Nicht erst alle Verben im Präsens, dann alle im Perfekt. Sondern: Ein Satz Präsens, ein Satz Perfekt, einer Präsens...
-                """)
+                    """)
 
             # ----- TECHNIK 5: Loci-Methode -----
-            with st.expander("🏰 **Technik 5: Loci-Methode (Gedächtnispalast)** – Effektstärke: d = 0.65"):
-                st.markdown("""
+            if show_section in ["alle", "techniken"]:
+                with st.expander("🏰 **Technik 5: Loci-Methode (Gedächtnispalast)** – Effektstärke: d = 0.65"):
+                    st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
 Diese Methode nutzen Gedächtnis-Weltmeister! Funktioniert so: Du "gehst" im Kopf durch einen bekannten Ort (dein Zimmer, Schulweg) und "platzierst" an jedem Punkt einen Begriff, den du dir merken willst. Warum funktioniert das? Das Gehirn ist super darin, sich Orte zu merken – viel besser als abstrakte Listen.
@@ -766,11 +896,12 @@ Diese Methode nutzen Gedächtnis-Weltmeister! Funktioniert so: Du "gehst" im Kop
 
 - **Schulweg nutzen!** Von zuhause bis zum Klassenraum – jede Station = ein Merkpunkt.
 - **Historische Ereignisse?** Häng sie an deinen Schulweg. Die Französische Revolution passiert am Bäcker, Napoleon steht an der Ampel...
-                """)
+                    """)
 
             # ----- TECHNIK 6: Pomodoro -----
-            with st.expander("🍅 **Technik 6: Pomodoro-Technik (25 + 5)** – Effektstärke: d = 0.53"):
-                st.markdown("""
+            if show_section in ["alle", "techniken"]:
+                with st.expander("🍅 **Technik 6: Pomodoro-Technik (25 + 5)** – Effektstärke: d = 0.53"):
+                    st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
 Das Gehirn kann sich nicht ewig konzentrieren. Nach etwa 25 Minuten lässt die Aufmerksamkeit nach. Die Pomodoro-Technik nutzt das: 25 Min fokussiert arbeiten, dann 5 Min echte Pause (nicht Handy!). Nach 4 Runden: 15-30 Min längere Pause.
@@ -783,11 +914,12 @@ Das Gehirn kann sich nicht ewig konzentrieren. Nach etwa 25 Minuten lässt die A
 - **Handy in einen anderen Raum!**
 - Die Pause ist ECHTE Pause: Aufstehen, Wasser holen, Fenster öffnen, Dehnübungen.
 - **NICHT:** Social Media "kurz checken".
-                """)
+                    """)
 
             # ----- TECHNIK 7: Lernen durch Lehren -----
-            with st.expander("👥 **Technik 7: Lernen durch Lehren** – Effektstärke: d = 0.53"):
-                st.markdown("""
+            if show_section in ["alle", "techniken"]:
+                with st.expander("👥 **Technik 7: Lernen durch Lehren** – Effektstärke: d = 0.53"):
+                    st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
 *"Wer lehrt, lernt doppelt."* Das ist nicht nur ein Spruch. Wenn du jemandem etwas erklärst, musst du: 1) Es selbst verstehen, 2) Es in klare Worte fassen, 3) Auf Fragen reagieren. Das ist Elaboration, Retrieval Practice und Metakognition in einem!
@@ -798,40 +930,23 @@ Das Gehirn kann sich nicht ewig konzentrieren. Nach etwa 25 Minuten lässt die A
 
 - **Lerngruppen!** Aber nicht gemeinsam schweigend lernen. Sondern: Jeder wird Experte für ein Thema und erklärt es den anderen.
 - Oder: Sich gegenseitig Quizfragen stellen. **Der Erklärer lernt mehr als der Zuhörer!**
-                """)
+                    """)
 
             st.divider()
 
             # ========== 4. TRANSFER ==========
-            st.markdown("### 4. 🎯 Transfer: Das Geheimnis der Überflieger")
-
-            with st.expander("Warum klappt's in der Klausur nicht?"):
-                st.markdown("""
-*"Ich hab's doch gelernt! Warum klappt's in der Klausur nicht?"*
-
-Das ist die Frage aller Fragen. Und die Antwort ist: **TRANSFER**. Transfer bedeutet, Gelerntes in NEUEN Situationen anzuwenden. Und hier ist der Witz: Transfer passiert nicht automatisch. Dein Gehirn klebt Wissen gerne an den Kontext, in dem du es gelernt hast.
-
-**Near Transfer vs. Far Transfer:**
-- **Near Transfer:** Ähnliche Situation. Du lernst 2+3=5, dann kannst du auch 2+4=6 lösen.
-- **Far Transfer:** Ganz andere Situation. Du lernst logisches Denken in Mathe – und wendest es auf ein moralisches Dilemma an.
-
-🎬 **Die unangenehme Wahrheit:** Far Transfer ist SCHWER. Aber trainierbar!
-
-**Wie trainiert man Transfer?**
-- **"Wo noch?"-Frage:** Nach jedem Thema fragen: *"Wo könnte ich das noch anwenden?"*
-- **Prinzipien benennen:** Nicht nur "wie", sondern "warum". Was ist die Regel dahinter?
-- **Verschiedene Kontexte:** Dasselbe Konzept in verschiedenen Situationen üben.
-- **Analogien bilden:** *"Das ist wie..."* Verbindungen zwischen Fächern finden.
-                """)
-
-            st.divider()
+            if show_section in ["alle", "transfer"]:
+                st.markdown("### 4. 🎯 Transfer: Das Geheimnis der Überflieger")
+                render_transfer_tutorial_section("unterstufe")
+                st.divider()
 
             # ========== 5. BIRKENBIHL ==========
-            st.markdown("### 5. 🧵 Birkenbihl-Methoden: Gehirn-gerechtes Lernen")
-            st.markdown("*Vera F. Birkenbihl war eine deutsche Lernexpertin, die gezeigt hat, wie man mit dem Gehirn arbeitet – nicht dagegen.*")
+            if show_section in ["alle", "birkenbihl"]:
+                st.markdown("### 5. 🧵 Birkenbihl-Methoden: Gehirn-gerechtes Lernen")
+                st.markdown("*Vera F. Birkenbihl war eine deutsche Lernexpertin, die gezeigt hat, wie man mit dem Gehirn arbeitet – nicht dagegen.*")
 
-            with st.expander("🧶 Der Faden-Trick"):
-                st.markdown("""
+                with st.expander("🧶 Der Faden-Trick"):
+                    st.markdown("""
 *"Schreib nicht auf, was ich sage. Schreib auf, was DU denkst!"*
 
 Birkenbihl sagt: Jede neue Information braucht einen "Faden" – einen Anknüpfungspunkt in deinem bestehenden Wissen. Ohne Faden geht Information *"hier rein, da raus"*. Mit Faden bleibt sie hängen.
@@ -844,8 +959,9 @@ Birkenbihl sagt: Jede neue Information braucht einen "Faden" – einen Anknüpfu
 - Bei neuen Begriffen: Sofort eine Eselsbrücke zu etwas Bekanntem bauen.
                 """)
 
-            with st.expander("🔤 Die ABC-Liste"):
-                st.markdown("""
+            if show_section in ["alle", "birkenbihl"]:
+                with st.expander("🔤 Die ABC-Liste"):
+                    st.markdown("""
 **So funktioniert's:**
 1. Schreibe die Buchstaben A bis Z untereinander auf ein Blatt
 2. Wähle ein Thema (z.B. "Tiere", "Frühling", "Mittelalter")
@@ -866,10 +982,11 @@ F - Fuchs, Farn, Förster
 ```
 
 **💡 Tipp:** Du musst nicht jeden Buchstaben ausfüllen! Manche sind schwer (X, Y, Q) – das ist okay. Es geht darum, dein Gehirn zum Denken anzuregen.
-                """)
+                    """)
 
-            with st.expander("✨ KaWa - Kreative Wort-Assoziationen"):
-                st.markdown("""
+            if show_section in ["alle", "birkenbihl"]:
+                with st.expander("✨ KaWa - Kreative Wort-Assoziationen"):
+                    st.markdown("""
 **KaWa = Kreatives Analograffiti mit Wort-Assoziationen**
 
 **So funktioniert's:**
@@ -893,15 +1010,17 @@ N → Nachdenken, Notizen
 - Es macht Spaß und ist kreativ
 
 **💡 Tipp:** Male Bilder zu deinen Wörtern! Das Gehirn liebt Bilder.
-                """)
+                    """)
 
-            st.divider()
+            if show_section in ["alle", "birkenbihl"]:
+                st.divider()
 
             # ========== 6. DAS PARADOX ==========
-            st.markdown("### 6. 🔄 Das Paradox: Warum sich gutes Lernen falsch anfühlt")
+            if show_section == "alle":
+                st.markdown("### 6. 🔄 Das Paradox: Warum sich gutes Lernen falsch anfühlt")
 
-            with st.expander("Das Fluency-Problem"):
-                st.markdown("""
+                with st.expander("Das Fluency-Problem"):
+                    st.markdown("""
 *"Ich hab so viel gelernt und fühle mich trotzdem unsicher..."*
 
 Das ist NORMAL. Und es ist sogar ein GUTES Zeichen!
@@ -930,29 +1049,6 @@ Der Psychologe Robert Bjork nennt das "desirable difficulties". Bestimmte Schwie
 **Vertrau der Wissenschaft, nicht deinem Gefühl!**
                 """)
 
-            st.divider()
-
-            # ========== QUICK REFERENCE ==========
-            st.markdown("### ✨ Quick Reference: Alle Techniken auf einen Blick")
-
-            st.markdown("""
-| Technik | Evidenz | Quelle | Tipp für dich |
-|---------|---------|--------|---------------|
-| 🔄 Active Recall | 🟢 HOCH | Dunlosky 2013, Roediger 2006 | Karteikarten + Quiz |
-| 📅 Spaced Repetition | 🟢 HOCH | Dunlosky 2013, Cepeda 2006 | Anki/Quizlet nutzen |
-| 👶 Feynman-Methode | 🟢 HOCH | Dunlosky 2013 (Elaboration) | Grundschüler erklären |
-| 🏰 Loci-Methode | 🟡 MITTEL | Dunlosky 2013 (Mnemonics) | Schulweg nutzen |
-| 🗺️ Mind Mapping | 🟡 MITTEL | Farrand 2002, Nesbit 2006 | Themen-Mindmap |
-| 🍅 Pomodoro | 🟡 MITTEL | Cirillo 2006 | 25 + 5 |
-| 👥 Lehren | 🟢 HOCH | Dunlosky 2013, Fiorella 2013 | Lerngruppen |
-| 🧵 Birkenbihl (ABC, KaWa) | 🟡 MITTEL | Birkenbihl 2000, Vorwissen-Aktivierung | KaWa zu Vokabeln |
-
-💡 **Zur Einordnung:**
-- 🟢 HOCH = Mehrere hochwertige Studien bestätigen die Wirksamkeit
-- 🟡 MITTEL = Gute Evidenz, aber weniger umfangreich erforscht oder kontextabhängig
-
-🚀 **Jetzt bist du dran.** Pick EINE Technik. Probier sie EINE Woche aus. Und dann: Staune.
-            """)
 
         # ==========================================
         # MITTELSTUFE CONTENT (Original MaiThink-Style)
@@ -1075,8 +1171,9 @@ Jedes Mal, wenn du etwas aus deinem Gedächtnis ABRUFST (statt es nur wieder zu 
                 """)
 
             # ----- TECHNIK 2: Spaced Repetition -----
-            with st.expander("📅 **Technik 2: Spaced Repetition (Zeitversetzt wiederholen)** – Effektstärke: d = 0.60"):
-                st.markdown("""
+            if show_section in ["alle", "techniken"]:
+                with st.expander("📅 **Technik 2: Spaced Repetition (Zeitversetzt wiederholen)** – Effektstärke: d = 0.60"):
+                    st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
 Dein Gehirn vergisst. Schnell. Die Vergessenskurve (Ebbinghaus, 1885 – ja, das wissen wir seit über 100 Jahren!) zeigt: Nach 24 Stunden hast du 70% vergessen. ABER: Wenn du wiederholst, BEVOR du vergessen hast, wird die Kurve flacher. Mit jeder Wiederholung hält das Wissen länger.
@@ -1089,11 +1186,12 @@ Dein Gehirn vergisst. Schnell. Die Vergessenskurve (Ebbinghaus, 1885 – ja, das
 
 - **Baue "Mini-Reviews" in deinen Alltag:** Jeden Tag 10 Minuten alten Stoff durchgehen. Nutze Wartezeiten: Bus, Pause, vor dem Einschlafen.
 - **Pro-Tipp:** Erstelle einen "Spiral-Lernplan" – jede Woche kommt ein altes Thema zurück, während du ein neues lernst.
-                """)
+                    """)
 
             # ----- TECHNIK 3: Feynman-Methode -----
-            with st.expander("👶 **Technik 3: Feynman-Methode (Erklär's einem 10-Jährigen)** – Effektstärke: d = 0.75"):
-                st.markdown("""
+            if show_section in ["alle", "techniken"]:
+                with st.expander("👶 **Technik 3: Feynman-Methode (Erklär's einem 10-Jährigen)** – Effektstärke: d = 0.75"):
+                    st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
 Richard Feynman war Nobelpreisträger für Physik und legendär dafür, komplizierte Sachen einfach zu erklären. Seine Methode: **Wenn du etwas nicht einfach erklären kannst, hast du es nicht verstanden.**
@@ -1111,11 +1209,12 @@ Richard Feynman war Nobelpreisträger für Physik und legendär dafür, komplizi
 4. Zurück zum Material, dann nochmal erklären.
 
 **Pro-Tipp:** Nimm dich dabei auf! Höre dir die Aufnahme an. Wo klingst du unsicher?
-                """)
+                    """)
 
             # ----- TECHNIK 4: Interleaving -----
-            with st.expander("🔀 **Technik 4: Interleaving (Mischen statt Blocken)** – Effektstärke: d = 0.67"):
-                st.markdown("""
+            if show_section in ["alle", "techniken"]:
+                with st.expander("🔀 **Technik 4: Interleaving (Mischen statt Blocken)** – Effektstärke: d = 0.67"):
+                    st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
 Die meisten lernen "geblockt": Erst 20 Mathe-Aufgaben zum Thema A, dann 20 zum Thema B. Fühlt sich effektiv an. **IST ES ABER NICHT.**
@@ -1130,11 +1229,12 @@ Interleaving heißt: Aufgaben mischen! A, B, C, A, B, C... Warum? Weil du bei je
 
 - **Hausaufgaben mischen!** Mach nicht erst alle Mathe-Hausaufgaben, dann alle Deutsch-Hausaufgaben. Wechsle: 15 Min Mathe, 15 Min Deutsch, 15 Min Mathe...
 - Ja, das fühlt sich weniger "effizient" an. Aber dein Gehirn lernt so, zwischen verschiedenen Denkmodi zu wechseln.
-                """)
+                    """)
 
             # ----- TECHNIK 5: Loci-Methode -----
-            with st.expander("🏰 **Technik 5: Loci-Methode (Gedächtnispalast)** – Effektstärke: d = 0.65"):
-                st.markdown("""
+            if show_section in ["alle", "techniken"]:
+                with st.expander("🏰 **Technik 5: Loci-Methode (Gedächtnispalast)** – Effektstärke: d = 0.65"):
+                    st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
 Diese Methode nutzen Gedächtnis-Weltmeister! Funktioniert so: Du "gehst" im Kopf durch einen bekannten Ort (dein Zimmer, Schulweg) und "platzierst" an jedem Punkt einen Begriff, den du dir merken willst. Warum funktioniert das? Das Gehirn ist super darin, sich Orte zu merken – viel besser als abstrakte Listen.
@@ -1145,11 +1245,12 @@ Diese Methode nutzen Gedächtnis-Weltmeister! Funktioniert so: Du "gehst" im Kop
 
 - **Bau mehrere "Paläste"!** Einen fürs Fach A, einen fürs Fach B. Je mehr Details du dir vorstellst (Farben, Geräusche, Gerüche), desto besser.
 - **Pro-Tipp:** Kombiniere mit Interleaving – geh mal rückwärts durch deinen Palast!
-                """)
+                    """)
 
             # ----- TECHNIK 6: Pomodoro -----
-            with st.expander("🍅 **Technik 6: Pomodoro-Technik (25 + 5)** – Effektstärke: d = 0.53"):
-                st.markdown("""
+            if show_section in ["alle", "techniken"]:
+                with st.expander("🍅 **Technik 6: Pomodoro-Technik (25 + 5)** – Effektstärke: d = 0.53"):
+                    st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
 Das Gehirn kann sich nicht ewig konzentrieren. Nach etwa 25 Minuten lässt die Aufmerksamkeit nach. Die Pomodoro-Technik nutzt das: 25 Min fokussiert arbeiten, dann 5 Min echte Pause (nicht Handy!). Nach 4 Runden: 15-30 Min längere Pause.
@@ -1160,11 +1261,12 @@ Das Gehirn kann sich nicht ewig konzentrieren. Nach etwa 25 Minuten lässt die A
 
 - **Variiere:** Schwieriges = kürzere Pomodoros (20 Min). Leichteres = längere (30 Min).
 - **Führe ein Pomodoro-Protokoll:** Wie viele schaffst du pro Lernsession? Versuche, dich selbst zu übertrumpfen.
-                """)
+                    """)
 
             # ----- TECHNIK 7: Lernen durch Lehren -----
-            with st.expander("👥 **Technik 7: Lernen durch Lehren** – Effektstärke: d = 0.53"):
-                st.markdown("""
+            if show_section in ["alle", "techniken"]:
+                with st.expander("👥 **Technik 7: Lernen durch Lehren** – Effektstärke: d = 0.53"):
+                    st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
 *"Wer lehrt, lernt doppelt."* Das ist nicht nur ein Spruch. Wenn du jemandem etwas erklärst, musst du: 1) Es selbst verstehen, 2) Es in klare Worte fassen, 3) Auf Fragen reagieren. Das ist Elaboration, Retrieval Practice und Metakognition in einem!
@@ -1174,40 +1276,23 @@ Das Gehirn kann sich nicht ewig konzentrieren. Nach etwa 25 Minuten lässt die A
 **📘 So geht's für dich (MITTELSTUFE):**
 
 - **"Erklärvideo"-Methode:** Stell dir vor, du machst ein YouTube-Video. Wie würdest du das Thema erklären? Schreib ein Skript. Sprich es laut. Merkst du, wo du unsicher bist? Genau da musst du nochmal nachlesen.
-                """)
+                    """)
 
             st.divider()
 
             # ========== 4. TRANSFER ==========
-            st.markdown("### 4. 🎯 Transfer: Das Geheimnis der Überflieger")
-
-            with st.expander("Warum klappt's in der Klausur nicht?"):
-                st.markdown("""
-*"Ich hab's doch gelernt! Warum klappt's in der Klausur nicht?"*
-
-Das ist die Frage aller Fragen. Und die Antwort ist: **TRANSFER**. Transfer bedeutet, Gelerntes in NEUEN Situationen anzuwenden. Und hier ist der Witz: Transfer passiert nicht automatisch. Dein Gehirn klebt Wissen gerne an den Kontext, in dem du es gelernt hast.
-
-**Near Transfer vs. Far Transfer:**
-- **Near Transfer:** Ähnliche Situation. Du lernst 2+3=5, dann kannst du auch 2+4=6 lösen.
-- **Far Transfer:** Ganz andere Situation. Du lernst logisches Denken in Mathe – und wendest es auf ein moralisches Dilemma an.
-
-🎬 **Die unangenehme Wahrheit:** Far Transfer ist SCHWER. Aber trainierbar!
-
-**Wie trainiert man Transfer?**
-- **"Wo noch?"-Frage:** Nach jedem Thema fragen: *"Wo könnte ich das noch anwenden?"*
-- **Prinzipien benennen:** Nicht nur "wie", sondern "warum". Was ist die Regel dahinter?
-- **Verschiedene Kontexte:** Dasselbe Konzept in verschiedenen Situationen üben.
-- **Analogien bilden:** *"Das ist wie..."* Verbindungen zwischen Fächern finden.
-                """)
-
-            st.divider()
+            if show_section in ["alle", "transfer"]:
+                st.markdown("### 4. 🎯 Transfer: Das Geheimnis der Überflieger")
+                render_transfer_tutorial_section("mittelstufe")
+                st.divider()
 
             # ========== 5. BIRKENBIHL ==========
-            st.markdown("### 5. 🧵 Birkenbihl-Methoden: Gehirn-gerechtes Lernen")
-            st.markdown("*Vera F. Birkenbihl war eine deutsche Lernexpertin, die gezeigt hat, wie man mit dem Gehirn arbeitet – nicht dagegen.*")
+            if show_section in ["alle", "birkenbihl"]:
+                st.markdown("### 5. 🧵 Birkenbihl-Methoden: Gehirn-gerechtes Lernen")
+                st.markdown("*Vera F. Birkenbihl war eine deutsche Lernexpertin, die gezeigt hat, wie man mit dem Gehirn arbeitet – nicht dagegen.*")
 
-            with st.expander("🧶 Der Faden-Trick"):
-                st.markdown("""
+                with st.expander("🧶 Der Faden-Trick"):
+                    st.markdown("""
 *"Schreib nicht auf, was ich sage. Schreib auf, was DU denkst!"*
 
 Birkenbihl sagt: Jede neue Information braucht einen "Faden" – einen Anknüpfungspunkt in deinem bestehenden Wissen. Ohne Faden geht Information *"hier rein, da raus"*. Mit Faden bleibt sie hängen.
@@ -1220,8 +1305,9 @@ Birkenbihl sagt: Jede neue Information braucht einen "Faden" – einen Anknüpfu
 - Bei neuen Begriffen: Sofort eine Eselsbrücke zu etwas Bekanntem bauen.
                 """)
 
-            with st.expander("🔤 Die ABC-Liste"):
-                st.markdown("""
+            if show_section in ["alle", "birkenbihl"]:
+                with st.expander("🔤 Die ABC-Liste"):
+                    st.markdown("""
 **So funktioniert's:**
 1. Schreibe die Buchstaben A bis Z untereinander auf ein Blatt
 2. Wähle ein Thema (z.B. "Tiere", "Frühling", "Mittelalter")
@@ -1242,10 +1328,11 @@ F - Fuchs, Farn, Förster
 ```
 
 **💡 Tipp:** Du musst nicht jeden Buchstaben ausfüllen! Manche sind schwer (X, Y, Q) – das ist okay. Es geht darum, dein Gehirn zum Denken anzuregen.
-                """)
+                    """)
 
-            with st.expander("✨ KaWa - Kreative Wort-Assoziationen"):
-                st.markdown("""
+            if show_section in ["alle", "birkenbihl"]:
+                with st.expander("✨ KaWa - Kreative Wort-Assoziationen"):
+                    st.markdown("""
 **KaWa = Kreatives Analograffiti mit Wort-Assoziationen**
 
 **So funktioniert's:**
@@ -1269,15 +1356,17 @@ N → Nachdenken, Notizen
 - Es macht Spaß und ist kreativ
 
 **💡 Tipp:** Male Bilder zu deinen Wörtern! Das Gehirn liebt Bilder.
-                """)
+                    """)
 
-            st.divider()
+            if show_section in ["alle", "birkenbihl"]:
+                st.divider()
 
             # ========== 6. DAS PARADOX ==========
-            st.markdown("### 6. 🔄 Das Paradox: Warum sich gutes Lernen falsch anfühlt")
+            if show_section == "alle":
+                st.markdown("### 6. 🔄 Das Paradox: Warum sich gutes Lernen falsch anfühlt")
 
-            with st.expander("Das Fluency-Problem"):
-                st.markdown("""
+                with st.expander("Das Fluency-Problem"):
+                    st.markdown("""
 *"Ich hab so viel gelernt und fühle mich trotzdem unsicher..."*
 
 Das ist NORMAL. Und es ist sogar ein GUTES Zeichen!
@@ -1306,29 +1395,6 @@ Der Psychologe Robert Bjork nennt das "desirable difficulties". Bestimmte Schwie
 **Vertrau der Wissenschaft, nicht deinem Gefühl!**
                 """)
 
-            st.divider()
-
-            # ========== QUICK REFERENCE ==========
-            st.markdown("### ✨ Quick Reference: Alle Techniken auf einen Blick")
-
-            st.markdown("""
-| Technik | Evidenz | Quelle | Tipp für dich |
-|---------|---------|--------|---------------|
-| 🔄 Active Recall | 🟢 HOCH | Dunlosky 2013, Roediger 2006 | Blatt-Papier-Methode |
-| 📅 Spaced Repetition | 🟢 HOCH | Dunlosky 2013, Cepeda 2006 | Spiral-Lernplan |
-| 👶 Feynman-Methode | 🟢 HOCH | Dunlosky 2013 (Elaboration) | 4-Schritte-Prozess |
-| 🏰 Loci-Methode | 🟡 MITTEL | Dunlosky 2013 (Mnemonics) | Mehrere Paläste |
-| 🗺️ Mind Mapping | 🟡 MITTEL | Farrand 2002, Nesbit 2006 | Struktur-Mindmap |
-| 🍅 Pomodoro | 🟡 MITTEL | Cirillo 2006 | Protokoll führen |
-| 👥 Lehren | 🟢 HOCH | Dunlosky 2013, Fiorella 2013 | Erklärvideo-Methode |
-| 🧵 Birkenbihl (ABC, KaWa) | 🟡 MITTEL | Birkenbihl 2000, Vorwissen-Aktivierung | ABC-Liste vor Tests |
-
-💡 **Zur Einordnung:**
-- 🟢 HOCH = Mehrere hochwertige Studien bestätigen die Wirksamkeit
-- 🟡 MITTEL = Gute Evidenz, aber weniger umfangreich erforscht oder kontextabhängig
-
-🚀 **Jetzt bist du dran.** Pick EINE Technik. Probier sie EINE Woche aus. Und dann: Staune.
-            """)
 
         # ==========================================
         # OBERSTUFE CONTENT (Original MaiThink-Style)
@@ -1451,8 +1517,9 @@ Jedes Mal, wenn du etwas aus deinem Gedächtnis ABRUFST (statt es nur wieder zu 
                 """)
 
             # ----- TECHNIK 2: Spaced Repetition -----
-            with st.expander("📅 **Technik 2: Spaced Repetition (Zeitversetzt wiederholen)** – Effektstärke: d = 0.60"):
-                st.markdown("""
+            if show_section in ["alle", "techniken"]:
+                with st.expander("📅 **Technik 2: Spaced Repetition (Zeitversetzt wiederholen)** – Effektstärke: d = 0.60"):
+                    st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
 Dein Gehirn vergisst. Schnell. Die Vergessenskurve (Ebbinghaus, 1885 – ja, das wissen wir seit über 100 Jahren!) zeigt: Nach 24 Stunden hast du 70% vergessen. ABER: Wenn du wiederholst, BEVOR du vergessen hast, wird die Kurve flacher. Mit jeder Wiederholung hält das Wissen länger.
@@ -1465,11 +1532,12 @@ Dein Gehirn vergisst. Schnell. Die Vergessenskurve (Ebbinghaus, 1885 – ja, das
 
 - **Erstelle einen Jahres-Lernplan!** Für's Abi: Fang früh an, verteile den Stoff über Monate.
 - **Kombiniere Spaced Repetition mit Retrieval Practice.** Beispiel: Jeden Sonntag 30 Min "Was weiß ich noch von letzter Woche?" + 30 Min "Was weiß ich noch von letztem Monat?"
-                """)
+                    """)
 
             # ----- TECHNIK 3: Feynman-Methode -----
-            with st.expander("👶 **Technik 3: Feynman-Methode (Erklär's einem 10-Jährigen)** – Effektstärke: d = 0.75"):
-                st.markdown("""
+            if show_section in ["alle", "techniken"]:
+                with st.expander("👶 **Technik 3: Feynman-Methode (Erklär's einem 10-Jährigen)** – Effektstärke: d = 0.75"):
+                    st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
 Richard Feynman war Nobelpreisträger für Physik und legendär dafür, komplizierte Sachen einfach zu erklären. Seine Methode: **Wenn du etwas nicht einfach erklären kannst, hast du es nicht verstanden.**
@@ -1482,11 +1550,12 @@ Richard Feynman war Nobelpreisträger für Physik und legendär dafür, komplizi
 
 - **Nächstes Level: Analogien!** Erkläre Quantenphysik mit einer Fußball-Analogie. Erkläre die Französische Revolution mit einem Beispiel aus der Schule. Je verrückter die Analogie, desto besser bleibt's hängen.
 - **Ultramodus:** Erstelle ein YouTube-Erklärvideo (auch wenn du's nicht hochlädst). Die Vorbereitung zwingt dich, ALLES zu verstehen.
-                """)
+                    """)
 
             # ----- TECHNIK 4: Interleaving -----
-            with st.expander("🔀 **Technik 4: Interleaving (Mischen statt Blocken)** – Effektstärke: d = 0.67"):
-                st.markdown("""
+            if show_section in ["alle", "techniken"]:
+                with st.expander("🔀 **Technik 4: Interleaving (Mischen statt Blocken)** – Effektstärke: d = 0.67"):
+                    st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
 Die meisten lernen "geblockt": Erst 20 Mathe-Aufgaben zum Thema A, dann 20 zum Thema B. Fühlt sich effektiv an. **IST ES ABER NICHT.**
@@ -1501,11 +1570,12 @@ Interleaving heißt: Aufgaben mischen! A, B, C, A, B, C... Warum? Weil du bei je
 
 - **"Problem First":** Bei jeder Übungsaufgabe musst du ZUERST identifizieren, welches Konzept überhaupt gefragt ist, bevor du anfängst. Das ist genau das, was in Klausuren passiert – und das musst du trainieren.
 - **Pro-Tipp:** Erstelle "alte Klausuren"-Simulationen mit gemischten Themen aus dem ganzen Jahr.
-                """)
+                    """)
 
             # ----- TECHNIK 5: Loci-Methode -----
-            with st.expander("🏰 **Technik 5: Loci-Methode (Gedächtnispalast)** – Effektstärke: d = 0.65"):
-                st.markdown("""
+            if show_section in ["alle", "techniken"]:
+                with st.expander("🏰 **Technik 5: Loci-Methode (Gedächtnispalast)** – Effektstärke: d = 0.65"):
+                    st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
 Diese Methode nutzen Gedächtnis-Weltmeister! Funktioniert so: Du "gehst" im Kopf durch einen bekannten Ort (dein Zimmer, Schulweg) und "platzierst" an jedem Punkt einen Begriff, den du dir merken willst. Warum funktioniert das? Das Gehirn ist super darin, sich Orte zu merken – viel besser als abstrakte Listen.
@@ -1516,11 +1586,12 @@ Diese Methode nutzen Gedächtnis-Weltmeister! Funktioniert so: Du "gehst" im Kop
 
 - **Für komplexe Systeme (Biologie, Geschichte):** Bau einen "Themenpark" im Kopf. Jede Zone ist ein Unterthema.
 - **Die Zelle? Ein Vergnügungspark.** Der Zellkern ist das Schloss, die Mitochondrien sind die Stromgeneratoren, die Ribosomen die Imbissbuden (sie "produzieren" etwas)...
-                """)
+                    """)
 
             # ----- TECHNIK 6: Pomodoro -----
-            with st.expander("🍅 **Technik 6: Pomodoro-Technik (25 + 5)** – Effektstärke: d = 0.53"):
-                st.markdown("""
+            if show_section in ["alle", "techniken"]:
+                with st.expander("🍅 **Technik 6: Pomodoro-Technik (25 + 5)** – Effektstärke: d = 0.53"):
+                    st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
 Das Gehirn kann sich nicht ewig konzentrieren. Nach etwa 25 Minuten lässt die Aufmerksamkeit nach. Die Pomodoro-Technik nutzt das: 25 Min fokussiert arbeiten, dann 5 Min echte Pause (nicht Handy!). Nach 4 Runden: 15-30 Min längere Pause.
@@ -1531,11 +1602,12 @@ Das Gehirn kann sich nicht ewig konzentrieren. Nach etwa 25 Minuten lässt die A
 
 - **Kombiniere Pomodoro mit anderen Techniken!** Pomodoro 1: Retrieval Practice. Pomodoro 2: Feynman-Methode. Pomodoro 3: Neues Material. Pomodoro 4: Interleaving-Übungen.
 - **Apps wie Forest** machen's zum Spiel – und spenden echte Bäume!
-                """)
+                    """)
 
             # ----- TECHNIK 7: Lernen durch Lehren -----
-            with st.expander("👥 **Technik 7: Lernen durch Lehren** – Effektstärke: d = 0.53"):
-                st.markdown("""
+            if show_section in ["alle", "techniken"]:
+                with st.expander("👥 **Technik 7: Lernen durch Lehren** – Effektstärke: d = 0.53"):
+                    st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
 *"Wer lehrt, lernt doppelt."* Das ist nicht nur ein Spruch. Wenn du jemandem etwas erklärst, musst du: 1) Es selbst verstehen, 2) Es in klare Worte fassen, 3) Auf Fragen reagieren. Das ist Elaboration, Retrieval Practice und Metakognition in einem!
@@ -1546,40 +1618,23 @@ Das Gehirn kann sich nicht ewig konzentrieren. Nach etwa 25 Minuten lässt die A
 
 - **Nachhilfe geben!** Ernsthaft: Den Stoff jüngeren Schülern erklären ist die beste Wiederholung.
 - Oder: **Debattier-Format.** Nimm eine Position ein und verteidige sie. Dann wechsle die Seite und argumentiere dagegen. Das zwingt dich, ALLE Aspekte zu verstehen.
-                """)
+                    """)
 
             st.divider()
 
             # ========== 4. TRANSFER ==========
-            st.markdown("### 4. 🎯 Transfer: Das Geheimnis der Überflieger")
-
-            with st.expander("Warum klappt's in der Klausur nicht?"):
-                st.markdown("""
-*"Ich hab's doch gelernt! Warum klappt's in der Klausur nicht?"*
-
-Das ist die Frage aller Fragen. Und die Antwort ist: **TRANSFER**. Transfer bedeutet, Gelerntes in NEUEN Situationen anzuwenden. Und hier ist der Witz: Transfer passiert nicht automatisch. Dein Gehirn klebt Wissen gerne an den Kontext, in dem du es gelernt hast.
-
-**Near Transfer vs. Far Transfer:**
-- **Near Transfer:** Ähnliche Situation. Du lernst 2+3=5, dann kannst du auch 2+4=6 lösen.
-- **Far Transfer:** Ganz andere Situation. Du lernst logisches Denken in Mathe – und wendest es auf ein moralisches Dilemma an.
-
-🎬 **Die unangenehme Wahrheit:** Far Transfer ist SCHWER. Aber trainierbar!
-
-**Wie trainiert man Transfer?**
-- **"Wo noch?"-Frage:** Nach jedem Thema fragen: *"Wo könnte ich das noch anwenden?"*
-- **Prinzipien benennen:** Nicht nur "wie", sondern "warum". Was ist die Regel dahinter?
-- **Verschiedene Kontexte:** Dasselbe Konzept in verschiedenen Situationen üben.
-- **Analogien bilden:** *"Das ist wie..."* Verbindungen zwischen Fächern finden.
-                """)
-
-            st.divider()
+            if show_section in ["alle", "transfer"]:
+                st.markdown("### 4. 🎯 Transfer: Das Geheimnis der Überflieger")
+                render_transfer_tutorial_section("oberstufe")
+                st.divider()
 
             # ========== 5. BIRKENBIHL ==========
-            st.markdown("### 5. 🧵 Birkenbihl-Methoden: Gehirn-gerechtes Lernen")
-            st.markdown("*Vera F. Birkenbihl war eine deutsche Lernexpertin, die gezeigt hat, wie man mit dem Gehirn arbeitet – nicht dagegen.*")
+            if show_section in ["alle", "birkenbihl"]:
+                st.markdown("### 5. 🧵 Birkenbihl-Methoden: Gehirn-gerechtes Lernen")
+                st.markdown("*Vera F. Birkenbihl war eine deutsche Lernexpertin, die gezeigt hat, wie man mit dem Gehirn arbeitet – nicht dagegen.*")
 
-            with st.expander("🧶 Der Faden-Trick"):
-                st.markdown("""
+                with st.expander("🧶 Der Faden-Trick"):
+                    st.markdown("""
 *"Schreib nicht auf, was ich sage. Schreib auf, was DU denkst!"*
 
 Birkenbihl sagt: Jede neue Information braucht einen "Faden" – einen Anknüpfungspunkt in deinem bestehenden Wissen. Ohne Faden geht Information *"hier rein, da raus"*. Mit Faden bleibt sie hängen.
@@ -1592,8 +1647,9 @@ Birkenbihl sagt: Jede neue Information braucht einen "Faden" – einen Anknüpfu
 - Bei neuen Begriffen: Sofort eine Eselsbrücke zu etwas Bekanntem bauen.
                 """)
 
-            with st.expander("🔤 Die ABC-Liste"):
-                st.markdown("""
+            if show_section in ["alle", "birkenbihl"]:
+                with st.expander("🔤 Die ABC-Liste"):
+                    st.markdown("""
 **So funktioniert's:**
 1. Schreibe die Buchstaben A bis Z untereinander auf ein Blatt
 2. Wähle ein Thema (z.B. "Tiere", "Frühling", "Mittelalter")
@@ -1614,10 +1670,11 @@ F - Fuchs, Farn, Förster
 ```
 
 **💡 Tipp:** Du musst nicht jeden Buchstaben ausfüllen! Manche sind schwer (X, Y, Q) – das ist okay. Es geht darum, dein Gehirn zum Denken anzuregen.
-                """)
+                    """)
 
-            with st.expander("✨ KaWa - Kreative Wort-Assoziationen"):
-                st.markdown("""
+            if show_section in ["alle", "birkenbihl"]:
+                with st.expander("✨ KaWa - Kreative Wort-Assoziationen"):
+                    st.markdown("""
 **KaWa = Kreatives Analograffiti mit Wort-Assoziationen**
 
 **So funktioniert's:**
@@ -1641,15 +1698,17 @@ N → Nachdenken, Notizen
 - Es macht Spaß und ist kreativ
 
 **💡 Tipp:** Male Bilder zu deinen Wörtern! Das Gehirn liebt Bilder.
-                """)
+                    """)
 
-            st.divider()
+            if show_section in ["alle", "birkenbihl"]:
+                st.divider()
 
             # ========== 6. DAS PARADOX ==========
-            st.markdown("### 6. 🔄 Das Paradox: Warum sich gutes Lernen falsch anfühlt")
+            if show_section == "alle":
+                st.markdown("### 6. 🔄 Das Paradox: Warum sich gutes Lernen falsch anfühlt")
 
-            with st.expander("Das Fluency-Problem"):
-                st.markdown("""
+                with st.expander("Das Fluency-Problem"):
+                    st.markdown("""
 *"Ich hab so viel gelernt und fühle mich trotzdem unsicher..."*
 
 Das ist NORMAL. Und es ist sogar ein GUTES Zeichen!
@@ -1678,29 +1737,6 @@ Der Psychologe Robert Bjork nennt das "desirable difficulties". Bestimmte Schwie
 **Vertrau der Wissenschaft, nicht deinem Gefühl!**
                 """)
 
-            st.divider()
-
-            # ========== QUICK REFERENCE ==========
-            st.markdown("### ✨ Quick Reference: Alle Techniken auf einen Blick")
-
-            st.markdown("""
-| Technik | Evidenz | Quelle | Tipp für dich |
-|---------|---------|--------|---------------|
-| 🔄 Active Recall | 🟢 HOCH | Dunlosky 2013, Roediger 2006 | Eigene Prüfungsfragen |
-| 📅 Spaced Repetition | 🟢 HOCH | Dunlosky 2013, Cepeda 2006 | Abi-Jahresplan |
-| 👶 Feynman-Methode | 🟢 HOCH | Dunlosky 2013 (Elaboration) | YouTube-Erklärvideo |
-| 🏰 Loci-Methode | 🟡 MITTEL | Dunlosky 2013 (Mnemonics) | Themenpark im Kopf |
-| 🗺️ Mind Mapping | 🟡 MITTEL | Farrand 2002, Nesbit 2006 | Prüfungs-Mindmap |
-| 🍅 Pomodoro | 🟡 MITTEL | Cirillo 2006 | Mit Techniken kombinieren |
-| 👥 Lehren | 🟢 HOCH | Dunlosky 2013, Fiorella 2013 | Nachhilfe geben |
-| 🧵 Birkenbihl (ABC, KaWa) | 🟡 MITTEL | Birkenbihl 2000, Vorwissen-Aktivierung | KaWa für Klausurthemen |
-
-💡 **Zur Einordnung:**
-- 🟢 HOCH = Mehrere hochwertige Studien bestätigen die Wirksamkeit
-- 🟡 MITTEL = Gute Evidenz, aber weniger umfangreich erforscht oder kontextabhängig
-
-🚀 **Jetzt bist du dran.** Pick EINE Technik. Probier sie EINE Woche aus. Und dann: Staune.
-            """)
 
         # ==========================================
         # PÄDAGOGEN CONTENT
