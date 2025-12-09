@@ -148,15 +148,15 @@ CONTENT_DATABASE = {
     # RANG 2: LERNSTRATEGIEN (d = 0.86) - NEU!
     # ============================================
     "EXT_LEARNSTRAT": {
-        "name_de": "Cleverer lernen - 7 Techniken",
+        "name_de": "Cleverer lernen",
         "name_schueler": "Cleverer lernen",
         "icon": "📚",
         "color": "#3498db",
 
         "intro_text": """
-        Es gibt **7 Lerntechniken**, die wissenschaftlich bewiesen funktionieren!
+        Lerne **wissenschaftlich fundierte Techniken**, die wirklich funktionieren!
 
-        Diese Techniken nutzen, wie dein Gehirn wirklich arbeitet - nicht gegen es, sondern mit ihm.
+        Entdecke die **7 Power-Techniken**, **Transfer-Strategien** und die **Birkenbihl-Methode**.
 
         **Kernbotschaft:** Nicht MEHR lernen, sondern CLEVERER lernen!
         """,
@@ -758,113 +758,6 @@ CONTENT_DATABASE = {
 
             **Birkenbihl-Methode:**
             ABC-Listen aktivieren Vorwissen und machen Fortschritt sichtbar.
-            """
-        }
-    },
-
-    # ============================================
-    # ARCHIV: MOTIVATION V1
-    # ============================================
-    "EXT_MOTIV_V1": {
-        "name_de": "Wieder Bock aufs Lernen 1 (Archiv)",
-        "name_schueler": "Wieder Bock aufs Lernen 1",
-        "icon": "📦",
-        "color": "#95a5a6",
-
-        "intro_text": """
-        Ca. **50% der Schüler** berichten von fehlender Lernmotivation (PISA 2022).
-
-        Du bist also nicht allein! Und es gibt Wege, die Motivation wiederzufinden.
-
-        **Kernbotschaft:** Finde DEINE Gründe zum Lernen - nicht die deiner Eltern oder Lehrer.
-        """,
-
-        "videos": [],
-
-        "tipps": [
-            {
-                "titel": "🎯 Eigene Ziele finden",
-                "beschreibung": """
-                **Nicht nur für Eltern/Lehrer lernen!**
-
-                Frage dich:
-                - Was will ICH erreichen?
-                - Wofür brauche ich das?
-                - Was interessiert MICH daran?
-
-                *Eigene Ziele motivieren viel stärker als Ziele von anderen!*
-                """,
-                "dauer": "10 Min Reflexion",
-                "schwierigkeit": "mittel",
-                "sofort_umsetzbar": True
-            },
-            {
-                "titel": "❓ Relevanz entdecken",
-                "beschreibung": """
-                **"Warum ist das wichtig für MICH?"**
-
-                Suche nach Verbindungen zu:
-                - Deinen Hobbys
-                - Deinem Traumberuf
-                - Alltagssituationen
-
-                *Wenn du den Sinn siehst, lernst du automatisch motivierter!*
-                """,
-                "dauer": "Bei jedem neuen Thema",
-                "schwierigkeit": "leicht",
-                "sofort_umsetzbar": True
-            },
-            {
-                "titel": "✨ Kleine Erfolge sichtbar machen",
-                "beschreibung": """
-                **Jeder Fortschritt zählt!**
-
-                - Führe eine "Done"-Liste (was du geschafft hast)
-                - Nutze Checklisten
-                - Feiere auch kleine Siege
-
-                *Sichtbarer Fortschritt = mehr Motivation für den nächsten Schritt*
-                """,
-                "dauer": "2 Min/Tag",
-                "schwierigkeit": "leicht",
-                "sofort_umsetzbar": True
-            },
-            {
-                "titel": "👥 Mit anderen lernen",
-                "beschreibung": """
-                **Gemeinsam macht's mehr Spaß!**
-
-                - Lerngruppen bilden
-                - Sich gegenseitig erklären
-                - Gemeinsame Ziele setzen
-
-                *Soziale Verbindung ist ein starker Motivator!*
-                """,
-                "dauer": "Diese Woche organisieren",
-                "schwierigkeit": "mittel",
-                "sofort_umsetzbar": False
-            }
-        ],
-
-        "wissenschaft": {
-            "hattie_d": 0.48,
-            "hattie_rank": 51,
-            "pisa_impact": "Ca. 50% berichten fehlende Motivation",
-            "erklaerung": """
-            **Hattie-Forschung zu Motivation:**
-
-            - **Motivation d = 0.48**
-            - **Mastery Goals d = 0.57** (Ziel: etwas LERNEN, nicht nur gute Note)
-
-            **Motivations-Killer vermeiden:**
-            - Zu große Ziele auf einmal
-            - Nur auf Noten fokussieren
-            - Sich mit anderen vergleichen
-
-            **Stattdessen:**
-            - Kleine, erreichbare Ziele
-            - Fokus auf LERNEN, nicht nur Ergebnis
-            - Mit dir selbst von gestern vergleichen
             """
         }
     },
