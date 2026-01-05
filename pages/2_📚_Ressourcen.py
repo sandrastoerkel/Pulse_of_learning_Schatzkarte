@@ -29,6 +29,7 @@ from utils.ressourcen.helpers import (
 from utils.ressourcen.matheff_content import render_matheff_altersstufen
 from utils.ressourcen.learnstrat_content import render_learnstrat_altersstufen
 from utils.ressourcen.motivation_content import render_motivation_altersstufen
+from utils.page_config import get_page_path
 
 # ============================================
 # PAGE CONFIG
@@ -296,4 +297,4 @@ else:
 st.divider()
 
 if st.button("⬅️ Zurück zur Auswertung"):
-    st.switch_page("pages/4_📊_Auswertung.py")
+    st.switch_page(get_page_path("auswertung"))

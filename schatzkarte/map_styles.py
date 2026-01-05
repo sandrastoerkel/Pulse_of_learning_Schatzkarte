@@ -376,5 +376,36 @@ def get_map_css():
 .btn-explore:active {
     transform: translateY(0);
 }
+
+/* ===============================================================
+   KLICKBARE INSEL-KARTEN (NEU)
+   Der Button wird transparent ueber die Karte gelegt.
+   Zum Rueckgaengig machen: Diesen CSS-Block loeschen
+   =============================================================== */
+
+/* Container der sowohl Karte als auch Button enthaelt */
+div[data-testid="column"] > div[data-testid="stVerticalBlockBorderWrapper"] {
+    position: relative;
+}
+
+/* Button absolut positionieren ueber der Karte */
+div[data-testid="column"] .stButton {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 100 !important;
+    margin: 0 !important;
+}
+
+div[data-testid="column"] .stButton button {
+    width: 100% !important;
+    height: 100% !important;
+    opacity: 0 !important;
+    cursor: pointer !important;
+    background: transparent !important;
+    border: none !important;
+}
 </style>
 """

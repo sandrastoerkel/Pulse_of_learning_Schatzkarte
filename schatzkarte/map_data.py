@@ -21,8 +21,19 @@ ISLANDS = {
         "icon": "🚢",
         "color": "#4fc3f7",
         "week": 0,
+        "description": "Willkommen auf deiner Lernreise!",
+        "type": "welcome",
+        "content": {
+            "welcome_video_url": "",  # Platzhalter - URL kommt spaeter
+            "show_group_chat_link": True,
+        },
         "treasures": [
-            {"id": "kompass", "name": "🧭 Kompass", "xp": 20},
+            {
+                "id": "kompass",
+                "name": "🧭 Kompass der Reise",
+                "description": "Dein Wegweiser durch die Schatzkarte",
+                "xp": 20,
+            }
         ]
     },
 
@@ -55,7 +66,7 @@ ISLANDS = {
         "name": "Insel der Faeden",
         "icon": "🧵",
         "color": "#ba68c8",
-        "week": 3,
+        "week": 4,
         "treasures": [
             {"id": "faden", "name": "🧵 Faden-Spule", "xp": 50},
             {"id": "netz", "name": "🕸 Netz-Karte", "xp": 60},
@@ -66,7 +77,7 @@ ISLANDS = {
         "name": "Insel der Bruecken",
         "icon": "🌉",
         "color": "#fff176",
-        "week": 4,
+        "week": 3,
         "treasures": [
             {"id": "bridge_1", "name": "🌉 Teil weg = Minus", "xp": 60},
             {"id": "bridge_2", "name": "🌉 Mehrere gleiche = Mal", "xp": 60},
@@ -80,6 +91,7 @@ ISLANDS = {
         "icon": "🧠",
         "color": "#90caf9",
         "week": None,
+        "type": "flexible",
         "treasures": [
             {"id": "spiegel", "name": "🪞 Spiegel der Erkenntnis", "xp": 50},
         ]
@@ -90,6 +102,7 @@ ISLANDS = {
         "icon": "🔥",
         "color": "#ef5350",
         "week": None,
+        "type": "flexible",
         "treasures": [
             {"id": "flamme", "name": "🔥 Freiheits-Flamme", "xp": 50},
         ]
@@ -100,6 +113,7 @@ ISLANDS = {
         "icon": "😌",
         "color": "#80deea",
         "week": None,
+        "type": "flexible",
         "treasures": [
             {"id": "atem", "name": "🌬 Atem-Brunnen", "xp": 50},
         ]
@@ -110,6 +124,7 @@ ISLANDS = {
         "icon": "🏆",
         "color": "#ffcc80",
         "week": None,
+        "type": "flexible",
         "treasures": [
             {"id": "seil", "name": "🧗 Kletter-Seil", "xp": 50},
         ]
@@ -120,6 +135,7 @@ ISLANDS = {
         "icon": "🎯",
         "color": "#ffab91",
         "week": None,
+        "type": "flexible",
         "treasures": [
             {"id": "licht", "name": "💡 Fokus-Licht", "xp": 50},
         ]
@@ -130,6 +146,7 @@ ISLANDS = {
         "icon": "🌱",
         "color": "#c5e1a5",
         "week": None,
+        "type": "flexible",
         "treasures": [
             {"id": "noch", "name": "🌱 Das Wort 'NOCH'", "xp": 50},
         ]
@@ -140,16 +157,18 @@ ISLANDS = {
         "icon": "🏫",
         "color": "#b39ddb",
         "week": None,
+        "type": "flexible",
         "treasures": [
             {"id": "fragen", "name": "❓ Frage-Schluessel", "xp": 50},
         ]
     },
 
     "wohlfuehl_dorf": {
-        "name": "Wohlfuehl-Dorf",
+        "name": "Wohlfühl-Dorf",
         "icon": "🏠",
         "color": "#a5d6a7",
         "week": None,
+        "type": "flexible",
         "treasures": [
             {"id": "platz", "name": "🏡 Mein Platz", "xp": 50},
         ]
@@ -160,20 +179,37 @@ ISLANDS = {
         "icon": "🛡",
         "color": "#f48fb1",
         "week": None,
+        "type": "flexible",
         "treasures": [
             {"id": "schild", "name": "🛡 Grenzen-Schild", "xp": 50},
         ]
     },
 
-    # ======= FINALE (Woche 14) =======
+    # ======= FINALE (Woche 12) =======
 
     "meister_berg": {
         "name": "Berg der Meisterschaft",
-        "icon": "⛰",
+        "icon": "⛰️",
         "color": "#ffd700",
-        "week": 14,
+        "week": 12,
+        "description": "Du hast es geschafft! Zeit zum Feiern und Reflektieren.",
+        "type": "finale",
+        "content": {
+            "is_group_event": True,
+            "reflection_questions": [
+                "Was habe ich in den 12 Wochen gelernt?",
+                "Welche Technik hat mir am meisten geholfen?",
+                "Was hat sich fuer mich veraendert?",
+                "Was moechte ich weiter anwenden?",
+            ]
+        },
         "treasures": [
-            {"id": "krone", "name": "👑 Meister-Krone", "xp": 100},
+            {
+                "id": "meister_krone",
+                "name": "👑 Meister-Krone",
+                "description": "Du bist jetzt ein Lern-Meister!",
+                "xp": 500,
+            }
         ]
     },
 }

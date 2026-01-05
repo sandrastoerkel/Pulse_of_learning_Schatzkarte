@@ -160,6 +160,9 @@ def init_user_tables():
     if 'avatar_settings' not in columns:
         c.execute("ALTER TABLE users ADD COLUMN avatar_settings TEXT DEFAULT '{}'")
 
+    if 'role' not in columns:
+        c.execute("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'student'")
+
     conn.commit()
     conn.close()
 
@@ -550,6 +553,24 @@ def render_user_stats_card(user: Dict):
 
 
 # ============================================
+# ALTERSSTUFEN-WEICHE
+# ============================================
+
+# Diese Altersstufen sehen die Schatzkarte (gamifiziert)
+SCHATZKARTE_ALTERSSTUFEN = ["grundschule", "unterstufe"]
+
+def zeige_schatzkarte() -> bool:
+    """
+    Prüft ob der aktuelle User die Schatzkarte sehen darf.
+
+    Grundschule und Unterstufe: Schatzkarte (gamifiziert)
+    Mittelstufe, Oberstufe, Pädagogen: Klassische Ressourcen-Seite
+    """
+    age_group = st.session_state.get("current_user_age_group", "unterstufe")
+    return age_group in SCHATZKARTE_ALTERSSTUFEN
+
+
+# ============================================
 # PREVIEW-MODUS
 # ============================================
 
@@ -675,4 +696,109 @@ def render_preview_banner():
             st.rerun()
 
     st.divider()
+
+
+# ============================================
+# ROLLEN-SYSTEM
+# ============================================
+
+# Rollen-Konstanten
+ROLE_STUDENT = 'student'
+ROLE_COACH = 'coach'
+ROLE_ADMIN = 'admin'
+
+
+def get_user_role(user_id: str) -> str:
+    """Gibt die Rolle eines Users zurueck."""
+    init_user_tables()  # Stellt sicher dass role-Spalte existiert
+    conn = sqlite3.connect(get_db_path())
+    c = conn.cursor()
+
+    try:
+        c.execute("SELECT role FROM users WHERE user_id = ?", (user_id,))
+        result = c.fetchone()
+        conn.close()
+        return result[0] if result and result[0] else ROLE_STUDENT
+    except sqlite3.OperationalError:
+        # Falls Spalte trotzdem nicht existiert
+        conn.close()
+        return ROLE_STUDENT
+
+
+def set_user_role(user_id: str, role: str) -> bool:
+    """Setzt die Rolle eines Users."""
+    if role not in [ROLE_STUDENT, ROLE_COACH, ROLE_ADMIN]:
+        return False
+
+    init_user_tables()  # Stellt sicher dass role-Spalte existiert
+    conn = sqlite3.connect(get_db_path())
+    c = conn.cursor()
+
+    try:
+        c.execute("UPDATE users SET role = ? WHERE user_id = ?", (role, user_id))
+        conn.commit()
+        success = c.rowcount > 0
+    except Exception as e:
+        print(f"Error setting role: {e}")
+        success = False
+
+    conn.close()
+    return success
+
+
+def is_coach(user_id: str = None) -> bool:
+    """Prueft ob der User (oder aktuelle User) Coach ist."""
+    if user_id is None:
+        user_id = st.session_state.get("current_user_id")
+    if not user_id:
+        return False
+
+    role = get_user_role(user_id)
+    return role in [ROLE_COACH, ROLE_ADMIN]
+
+
+def is_admin(user_id: str = None) -> bool:
+    """Prueft ob der User Admin ist."""
+    if user_id is None:
+        user_id = st.session_state.get("current_user_id")
+    if not user_id:
+        return False
+
+    return get_user_role(user_id) == ROLE_ADMIN
+
+
+def get_all_coaches() -> list:
+    """Gibt alle Coaches zurueck."""
+    conn = sqlite3.connect(get_db_path())
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    c.execute("""
+        SELECT user_id, display_name, last_login
+        FROM users
+        WHERE role IN ('coach', 'admin')
+        ORDER BY display_name
+    """)
+
+    coaches = [dict(row) for row in c.fetchall()]
+    conn.close()
+    return coaches
+
+
+def get_all_students_list() -> list:
+    """Gibt alle Schueler zurueck (role = student oder NULL)."""
+    conn = sqlite3.connect(get_db_path())
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    c.execute("""
+        SELECT user_id, display_name, age_group, level, xp_total, last_login
+        FROM users
+        WHERE role IS NULL OR role = 'student'
+        ORDER BY display_name
+    """)
+
+    students = [dict(row) for row in c.fetchall()]
+    conn.close()
+    return students
 

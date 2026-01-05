@@ -10,6 +10,7 @@ import sys
 sys.path.append('.')
 
 from utils.coaching_db import init_database
+from utils.page_config import get_page_path
 
 # ============================================
 # PAGE CONFIG
@@ -423,10 +424,10 @@ with cta_col2:
     col_btn1, col_btn2 = st.columns(2)
     with col_btn1:
         if st.button("🚀 Zu den Challenges", type="primary", use_container_width=True):
-            st.switch_page("pages/1_📚_Ressourcen.py")
+            st.switch_page(get_page_path("ressourcen"))
     with col_btn2:
         if st.button("🔍 Erst mal testen, wo ich stehe", use_container_width=True):
-            st.switch_page("pages/3_🔍_Screening_Diagnostik.py")
+            st.switch_page(get_page_path("screening"))
 
 # ============================================
 # FOR PARENTS SECTION
@@ -506,10 +507,10 @@ with st.expander("👨‍👩‍👧 **Für Eltern:** Was steckt dahinter?", exp
     col_parent_btn1, col_parent_btn2 = st.columns(2)
     with col_parent_btn1:
         if st.button("📊 Zur Screening-Diagnostik", use_container_width=True):
-            st.switch_page("pages/3_🔍_Screening_Diagnostik.py")
+            st.switch_page(get_page_path("screening"))
     with col_parent_btn2:
         if st.button("🎓 Zur Elternakademie", use_container_width=True):
-            st.switch_page("pages/2_🎓_Elternakademie.py")
+            st.switch_page(get_page_path("elternakademie"))
 
 # ============================================
 # FOOTER

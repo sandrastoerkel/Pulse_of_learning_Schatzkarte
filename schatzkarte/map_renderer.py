@@ -43,11 +43,12 @@ def render_progress_bar(current: int, total: int):
     """
 
 
-def render_island_card(island_id: str, island: dict, status: str):
+def render_island_card(island_id: str, island: dict, status: str, clickable: bool = False):
     """
     Rendert eine einzelne Insel-Karte.
-    
+
     status: 'locked', 'unlocked', 'current', 'completed'
+    clickable: Wenn True, ist die ganze Karte klickbar (triggert den naechsten Button)
     """
     # CSS-Klasse basierend auf Status
     css_class = "island-card"
@@ -57,11 +58,31 @@ def render_island_card(island_id: str, island: dict, status: str):
         css_class += " island-current"
     elif status == "completed":
         css_class += " island-completed"
-    
+
+    # Klickbare Karten bekommen extra Klasse
+    if clickable and status != "locked":
+        css_class += " island-card-clickable"
+
     treasure_count = len(island.get("treasures", []))
-    
+
+    # onclick-Handler nur fuer klickbare Karten
+    onclick = ""
+    if clickable and status != "locked":
+        # JavaScript: Finde den Button im naechsten Geschwister-div und klicke ihn
+        onclick = f'''onclick="
+            var card = this;
+            var parent = card.parentElement;
+            while(parent && !parent.querySelector('button')) {{
+                parent = parent.parentElement;
+            }}
+            if(parent) {{
+                var btn = parent.querySelector('button');
+                if(btn) btn.click();
+            }}
+        "'''
+
     return f"""
-    <div class="{css_class}" 
+    <div class="{css_class}" {onclick}
          style="background: linear-gradient(135deg, {island['color']}40, {island['color']}20);
                 border-left: 6px solid {island['color']};">
         <span class="island-icon">{island['icon']}</span>

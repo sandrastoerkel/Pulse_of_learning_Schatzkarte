@@ -18,14 +18,15 @@ sys.path.append('..')
 from utils.coaching_db import get_student_by_id, get_latest_assessment
 from utils.scale_info import get_scale_info
 from utils.evidence_integration import (
-    get_evidence, 
-    get_hattie_info, 
+    get_evidence,
+    get_hattie_info,
     get_pisa_info,
     interpret_score_with_evidence,
     get_all_scales_with_evidence,
     format_hattie_badge,
     format_pisa_badge
 )
+from utils.page_config import get_page_path
 
 # ============================================
 # PAGE CONFIG
@@ -216,7 +217,7 @@ def create_bar_chart(scores_df):
 def navigate_to_resources(scale_name):
     """Navigiert zur Ressourcen-Seite für eine bestimmte Skala"""
     st.session_state.selected_factor = scale_name
-    st.switch_page("pages/1_📚_Ressourcen.py")
+    st.switch_page(get_page_path("ressourcen"))
 
 
 # ============================================
@@ -515,11 +516,11 @@ if 'screening_responses' not in st.session_state or not st.session_state.screeni
             st.info(f"📂 Auswertung vom {assessment['assessment_date']} geladen")
         else:
             st.warning("⚠️ Keine Screening-Daten vorhanden. Bitte führe zuerst ein Screening durch.")
-            st.page_link("pages/3_🔍_Screening_Diagnostik.py", label="➡️ Zum Screening", icon="📝")
+            st.page_link(get_page_path("screening"), label="➡️ Zum Screening", icon="📝")
             st.stop()
     else:
         st.warning("⚠️ Kein Schüler ausgewählt.")
-        st.page_link("pages/3_🔍_Screening_Diagnostik.py", label="➡️ Zum Screening", icon="📝")
+        st.page_link(get_page_path("screening"), label="➡️ Zum Screening", icon="📝")
         st.stop()
 
 # Get student info
@@ -996,7 +997,7 @@ st.sidebar.divider()
 
 # Actions
 if st.sidebar.button("🔄 Neues Screening", use_container_width=True):
-    st.switch_page("pages/3_🔍_Screening_Diagnostik.py")
+    st.switch_page(get_page_path("screening"))
 
 st.sidebar.divider()
 

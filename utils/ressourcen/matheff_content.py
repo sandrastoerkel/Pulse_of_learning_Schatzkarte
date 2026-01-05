@@ -68,18 +68,18 @@ def render_matheff_altersstufen(color: str):
 
         # Content basierend auf User-Altersstufe anzeigen
         if age_group == "grundschule":
-            _render_grundschule_content()
+            render_matheff_grundschule()
         elif age_group == "unterstufe":
-            _render_unterstufe_content()
+            render_matheff_unterstufe()
         elif age_group == "mittelstufe":
-            _render_mittelstufe_content()
+            render_matheff_mittelstufe()
         elif age_group == "oberstufe":
-            _render_oberstufe_content()
+            render_matheff_oberstufe()
         elif age_group == "paedagogen":
-            _render_paedagogen_content()
+            render_matheff_paedagogen()
         else:
             # Fallback
-            _render_unterstufe_content()
+            render_matheff_unterstufe()
 
     # ==========================================
     # CHALLENGES-Bereich (kommt nach Theorie)
@@ -164,10 +164,10 @@ def render_matheff_altersstufen(color: str):
 
 
 # ============================================
-# PRIVATE HELPER FUNCTIONS
+# CONTENT-FUNKTIONEN (exportiert fuer Modal)
 # ============================================
 
-def _render_grundschule_content():
+def render_matheff_grundschule():
     """Rendert den Grundschule-Content für Selbstwirksamkeit."""
     st.header("💪 Mental stark – Für kleine Helden")
 
@@ -287,7 +287,7 @@ def _render_grundschule_content():
     st.success("💡 **Das Wichtigste in einem Satz:** Du wirst nicht besser, weil du schlau bist. Du wirst besser, weil du ÜBST und nicht aufgibst!")
 
 
-def _render_unterstufe_content():
+def render_matheff_unterstufe():
     """Rendert den Unterstufe-Content für Selbstwirksamkeit."""
     st.header("💪 Mental stark – Dein Gehirn ist trainierbar")
 
@@ -417,7 +417,7 @@ def _render_unterstufe_content():
     st.success('💡 **Das Wichtigste:** Dein Gehirn glaubt, was du ihm oft genug sagst. Also sag ihm das Richtige.')
 
 
-def _render_mittelstufe_content():
+def render_matheff_mittelstufe():
     """Rendert den Mittelstufe-Content für Selbstwirksamkeit."""
     st.header("💪 Mental stark – Die Psychologie hinter deinem Erfolg")
 
@@ -613,7 +613,7 @@ def _render_mittelstufe_content():
     """)
 
 
-def _render_oberstufe_content():
+def render_matheff_oberstufe():
     """Rendert den Oberstufe-Content für Selbstwirksamkeit."""
     st.header("💪 Mental stark – Selbstwirksamkeit als Meta-Kompetenz")
 
@@ -827,7 +827,7 @@ def _render_oberstufe_content():
     """)
 
 
-def _render_paedagogen_content():
+def render_matheff_paedagogen():
     """Rendert den Pädagogen-Content für Selbstwirksamkeit."""
     st.header("💪 Mental stark – Für Pädagogen")
 
