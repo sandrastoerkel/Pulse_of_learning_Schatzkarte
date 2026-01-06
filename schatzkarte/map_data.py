@@ -90,7 +90,7 @@ Setze das Gelernte im echten Leben um und werde zum Meister.
     },
 
     "festung": {
-        "name": "Festung der Staerke",
+        "name": "Festung der Stärke",
         "icon": "💪",
         "color": "#ffb74d",
         "week": 1,

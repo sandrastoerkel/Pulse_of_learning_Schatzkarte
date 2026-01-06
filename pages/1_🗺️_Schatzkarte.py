@@ -19,6 +19,7 @@ from utils.user_system import (
     get_current_user,
     is_preview_mode,
     render_preview_banner,
+    render_user_login,
     zeige_schatzkarte
 )
 from utils.page_config import get_page_path
@@ -52,11 +53,11 @@ init_map_tables()
 if is_preview_mode():
     user_id = st.session_state.get("current_user_id", "preview_user")
 else:
-    # Echter Modus: Login erforderlich
+    # Login-Formular anzeigen (wie bei Ressourcen)
+    render_user_login(show_info_bar=False)
+
+    # Nur fortfahren wenn eingeloggt
     if not is_logged_in():
-        st.warning("🔒 Bitte zuerst einloggen, um deine Schatzkarte zu sehen!")
-        st.page_link(get_page_path("ressourcen"), label="➡️ Zur Anmeldung")
-        st.info("💡 Tipp: Du kannst auch den **Preview-Modus** nutzen, um die Karte ohne Anmeldung zu testen.")
         st.stop()
 
     # Eingeloggter User

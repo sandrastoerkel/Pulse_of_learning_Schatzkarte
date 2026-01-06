@@ -1,5 +1,5 @@
 # Pulse of Learning - Schatzkarte
-## Dokumentation Stand 5. Januar 2025
+## Dokumentation Stand 6. Januar 2025
 
 ---
 
@@ -21,7 +21,57 @@ Danach hast du Zugang zur **👥 Lerngruppen**-Seite.
 
 ---
 
-# HEUTIGE ÄNDERUNGEN (5. Januar 2025)
+# HEUTIGE ÄNDERUNGEN (6. Januar 2025)
+
+## Superhelden-Quiz mit Leben-System
+
+Das Superhelden-Quiz wurde vollständig in die Schatzkarte integriert!
+
+### Neue Features:
+
+#### 1. Leben-System (3 Herzen)
+- Spieler startet mit 3 Leben (Herzen)
+- Bei falscher Antwort: -1 Leben
+- Bei 0 Leben: Game Over Screen
+- Victory Screen zeigt verbleibende Leben
+
+#### 2. Neue Fragetypen
+- **Single-Choice:** Klassische Multiple-Choice (100 Punkte)
+- **Multi-Select:** Mehrere richtige Antworten wählen (150 Punkte)
+- **Matching:** Power-Ups den Beispielen zuordnen (200 Punkte)
+- **Ordering:** Schritte in richtige Reihenfolge bringen (150 Punkte)
+
+#### 3. Superhelden-Quiz Fragen
+- 10 Fragen in 3 Welten:
+  - **World 1:** Banduras 4 Power-Ups (4 Fragen)
+  - **World 2:** Hattie-Challenge (4 Fragen)
+  - **World 3:** Bonus Boss (2 Fragen)
+
+#### 4. Festung der Stärke - Challenges integriert
+- Bandura-Challenge: 4 Quellen mit Tagebuch-Einträgen
+- Hattie-Challenge: 5-Schritt-Flow (Fach → Aufgabe → Schätzung → Ergebnis → Reflexion)
+- Challenge-Auswahl: Erst Bandura, dann Hattie zur Wahl
+
+#### 5. Selbstcheck für Grundschule
+- Interaktiver Nintendo Switch-Style Quiz am Ende der Erklärung
+- 4 Aussagen mit 1-5 Skala bewerten
+- Automatische Auswertung mit Feedback
+
+### Geänderte/Neue Dateien:
+
+| Datei | Änderung |
+|-------|----------|
+| `frontend/src/types.ts` | Erweitert: QuestionType, MultiSelectQuestion, MatchingQuestion, OrderingQuestion, BattleState mit playerLives |
+| `frontend/src/content/festungQuizContent.ts` | **NEU:** 10 Superhelden-Quiz Fragen |
+| `frontend/src/components/BattleQuiz.tsx` | Erweitert: Leben-System, 4 Fragetypen, Game Over Screen |
+| `frontend/src/components/QuestModal.tsx` | Erweitert: BattleQuiz Integration, Challenge-System |
+| `frontend/src/styles/rpg-theme.css` | Erweitert: ~500 Zeilen für Quiz, Challenges, Selfcheck |
+| `frontend/src/content/festungContent.ts` | Erweitert: Selfcheck-System, Content-Struktur |
+| `schatzkarte/map_data.py` | Fix: "Festung der Stärke" mit Umlaut |
+
+---
+
+# ÄNDERUNGEN VOM 5. Januar 2025
 
 ## Großes Redesign: React Custom Component
 
@@ -153,33 +203,26 @@ Der Starthafen hat jetzt strukturierte Tutorial-Schritte:
 
 ## Was noch TODO ist:
 
-### 1. React-Komponente bauen (WICHTIG!)
-**Problem:** Die React-Komponente muss vor dem ersten Start gebaut werden!
+### 1. Urkunden/Zertifikate für Bandura-Challenge
+**Problem:** Nach Abschluss der Bandura-Challenge soll eine Urkunde erstellt werden können.
 
-**Lösung:**
-```bash
-cd components/rpg_schatzkarte/frontend
-npm install
-npm run build
-```
+**Anforderungen:**
+- PDF-Generator für Urkunden
+- Personalisiert mit Name des Schülers
+- Zeigt abgeschlossene Power-Ups
+- Datum und XP-Punkte
+- Druckbar/Downloadbar
 
-### 2. Inhalte in React einfügen
-**Problem:** Die Inhalte (Videos, Erklärungen, Quiz-Fragen) müssen noch in die React-Komponente eingepflegt werden.
+### 2. Inhalte für weitere Inseln
+**Problem:** Die Content-Dateien für die anderen Inseln müssen noch mit Quiz-Fragen erweitert werden.
 
-**Wo:** `components/rpg_schatzkarte/frontend/src/content/`
+**Bereits fertig:**
+- ✅ Festung der Stärke (festungContent.ts + festungQuizContent.ts)
+- ⏳ Insel der 7 Werkzeuge (werkzeugeContent.ts - Quiz fehlt)
+- ⏳ Insel der Fäden (faedenContent.ts - Quiz fehlt)
+- ⏳ Insel der Brücken (brueckenContent.ts - Quiz fehlt)
 
-### 3. Quiz-System implementieren
-**Problem:** Das Quiz ("battle") ist als Konzept da, aber noch nicht spielbar.
-
-**Lösung:** Quiz-Logik in React implementieren mit:
-- Fragen aus `content/` laden
-- Richtige/Falsche Antworten tracken
-- XP vergeben bei Bestehen
-
-### 4. Bandura & Hattie Schiffe
-**Problem:** Die schwimmenden Schiffe waren im alten System, müssen in React neu gebaut werden.
-
-### 5. Willkommensvideo
+### 3. Willkommensvideo
 **Problem:** URL ist noch leer in `map_data.py`
 
 **Wo:** `schatzkarte/map_data.py` Zeile 27:
@@ -187,10 +230,15 @@ npm run build
 "welcome_video_url": "",  # <-- URL einfügen
 ```
 
-### 6. Gruppenchat-Link
+### 4. Gruppenchat-Link
 **Problem:** Platzhalter für Gruppenchat
 
 **Lösung:** Discord/WhatsApp-Link oder eigenes Chat-System
+
+### 5. Quiz-Daten speichern
+**Problem:** Quiz-Ergebnisse werden noch nicht in der Datenbank gespeichert.
+
+**Lösung:** Python-Endpoint für Quiz-Ergebnisse erweitern
 
 ---
 
@@ -283,36 +331,47 @@ Pulse_of_learning_Schatzkarte/
 
 ---
 
-# NÄCHSTE SCHRITTE (MORGEN)
+# NÄCHSTE SCHRITTE (7. Januar 2025)
 
 ## Hohe Priorität
-1. **React-Komponente bauen** - `npm install && npm run build` im frontend-Ordner
-2. **Testen** - App starten und Schatzkarte ausprobieren
-3. **Inhalte einfügen** - Videos, Erklärungen in React-Content-Ordner
+1. **Urkunden-System für Bandura-Challenge** - PDF-Generator implementieren
+   - Vorlage designen (A4 Querformat)
+   - Name, Datum, Power-Ups, XP einfügen
+   - Download-Button nach Challenge-Abschluss
+2. **Quiz für andere Inseln erstellen** - Werkzeuge, Fäden, Brücken
+3. **Testen** - Superhelden-Quiz durchspielen, alle Fragetypen prüfen
 
 ## Mittlere Priorität
-4. **Quiz-System** - React-Komponente für Quiz-Kämpfe
-5. **Bandura/Hattie Schiffe** - In React neu implementieren
-6. **Design-Feinschliff** - CSS anpassen
+4. **Quiz-Ergebnisse speichern** - Datenbank-Erweiterung
+5. **Willkommensvideo** - YouTube-URL produzieren
+6. **Design-Feinschliff** - CSS anpassen nach Feedback
 
 ## Niedrige Priorität
-7. **Willkommensvideo** - YouTube-URL produzieren
-8. **Gruppenchat** - Lösung finden
+7. **Gruppenchat** - Lösung finden
+8. **Weitere Selfchecks** - Für andere Altersstufen/Inseln
 
 ---
 
 # GIT-STATUS
 
-## Nicht committed:
-- `pages/1_🗺️_Schatzkarte.py` - Komplett neu geschrieben
-- `schatzkarte/map_data.py` - Tutorial-System erweitert
-- `utils/user_system.py` - Kleine Änderungen
-- `components/` - Komplett neuer Ordner (nicht im Git!)
+## Committed am 6. Januar 2025:
+- Superhelden-Quiz mit Leben-System
+- Bandura/Hattie Challenge Integration
+- Selbstcheck für Grundschule
+- Alle Content-Dateien für Festung der Stärke
+- BattleQuiz mit 4 Fragetypen
 
-## Empfehlung:
-```bash
-git add -A
-git commit -m "Feature: React Custom Component für Schatzkarte (RPG-Redesign)"
+## Wichtige Dateien im Repository:
+```
+components/rpg_schatzkarte/frontend/
+├── src/
+│   ├── components/BattleQuiz.tsx      # Quiz mit Leben-System
+│   ├── components/QuestModal.tsx      # Modal mit Challenges
+│   ├── content/festungContent.ts      # Inhalte Festung
+│   ├── content/festungQuizContent.ts  # Quiz-Fragen
+│   ├── types.ts                       # Erweiterte Typen
+│   └── styles/rpg-theme.css           # Alle Styles
+└── build/                              # Kompiliertes Frontend
 ```
 
 ---
@@ -321,6 +380,11 @@ git commit -m "Feature: React Custom Component für Schatzkarte (RPG-Redesign)"
 
 | Datum | Was | Details |
 |-------|-----|---------|
+| **06.01.2025** | **Superhelden-Quiz** | Leben-System (3 Herzen), 4 Fragetypen (single, multi-select, matching, ordering), Game Over Screen |
+| 06.01.2025 | Bandura-Challenge | 4 Quellen mit Tagebuch-Einträgen integriert |
+| 06.01.2025 | Hattie-Challenge | 5-Schritt-Flow komplett implementiert |
+| 06.01.2025 | Selbstcheck | Nintendo Switch-Style interaktiver Quiz für Grundschule |
+| 06.01.2025 | Festung-Content | Umfangreiche Inhalte für alle Altersstufen |
 | **05.01.2025** | **React-Redesign** | Schatzkarte als React Custom Component, Vite+TypeScript, bidirektionale Kommunikation |
 | 05.01.2025 | Tutorial-System | Starthafen mit strukturierten Schritten |
 | 05.01.2025 | Insel-Typen | tutorial, flexible, finale Typen hinzugefügt |
@@ -336,23 +400,24 @@ git commit -m "Feature: React Custom Component für Schatzkarte (RPG-Redesign)"
 ```bash
 cd /Users/sandra/Documents/Pulse_of_learning/Pulse_of_learning_Schatzkarte
 
-# WICHTIG: React bauen (falls noch nicht geschehen)
-cd components/rpg_schatzkarte/frontend
-npm install
-npm run build
-cd ../../..
-
-# App starten
+# App starten (Build ist bereits fertig!)
 streamlit run Home.py
 ```
 
 ## Was als erstes tun?
-1. **React bauen** - Siehe Schnellstart oben
-2. **Testen** - Schatzkarte öffnen, Inseln erkunden
-3. **Console prüfen** - Bei Fehlern: Browser-Konsole (F12) öffnen
+1. **Superhelden-Quiz testen** - Festung der Stärke → Monster besiegen → Quiz starten
+2. **Urkunden-System planen** - Siehe TODO #1
+3. **Weitere Quiz-Fragen** - Für Werkzeuge, Fäden, Brücken erstellen
+
+## Zum Testen des Superhelden-Quiz:
+1. Schatzkarte öffnen
+2. Festung der Stärke anklicken
+3. "Monster besiegen" wählen
+4. "Quiz starten" klicken
+5. Alle 10 Fragen durchspielen (3 Leben!)
 
 ## Bei Problemen
-- **"Component nicht gefunden"?** → `npm run build` ausführen
+- **"Component nicht gefunden"?** → `cd components/rpg_schatzkarte/frontend && npm run build`
 - **Fehler in React?** → Console im Browser prüfen (F12)
 - **Import-Fehler?** → Prüfe ob `components/__init__.py` existiert
 - **DB-Fehler?** → `rm data/hattie_gamification.db` und neu starten
@@ -371,5 +436,5 @@ streamlit run Home.py
 
 ---
 
-**Letzte Bearbeitung:** 5. Januar 2025
-**Nächster Meilenstein:** React-Komponente testen und Inhalte einfügen
+**Letzte Bearbeitung:** 6. Januar 2025
+**Nächster Meilenstein:** Urkunden-System für Bandura-Challenge implementieren

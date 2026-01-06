@@ -24,14 +24,70 @@ export interface Treasure {
 
 export interface Quiz {
   questions: QuizQuestion[];
+  world?: number;  // Optional: für Weltanzeige (1, 2, 3...)
 }
 
+// Fragetypen für erweitertes Quiz
+export type QuestionType = 'single' | 'multi-select' | 'matching' | 'ordering';
+
+// Basis-Frage Interface
 export interface QuizQuestion {
   question: string;
   options: string[];
   correct: number;
   explanation?: string;
+  type?: QuestionType;  // Standard: 'single'
+  world?: number;       // Welt-Nummer (1, 2, 3...)
+  level?: string;       // Level-Anzeige ("1-1", "2-3", "BOSS")
+  title?: string;       // Titel der Frage
 }
+
+// Multi-Select Frage
+export interface MultiSelectQuestion extends Omit<QuizQuestion, 'correct' | 'options'> {
+  type: 'multi-select';
+  options: MultiSelectOption[];
+  correctCount: number;  // Anzahl der richtigen Antworten
+  instruction?: string;  // z.B. "Wähle genau 4 richtige!"
+}
+
+export interface MultiSelectOption {
+  id: string;
+  text: string;
+  correct: boolean;
+}
+
+// Matching/Zuordnungs-Frage
+export interface MatchingQuestion extends Omit<QuizQuestion, 'correct' | 'options'> {
+  type: 'matching';
+  powerUps: MatchingItem[];
+  matches: MatchingTarget[];
+}
+
+export interface MatchingItem {
+  id: number;
+  text: string;
+  correctMatch: number;  // ID des richtigen Match
+}
+
+export interface MatchingTarget {
+  id: number;
+  text: string;
+}
+
+// Ordering/Reihenfolge-Frage
+export interface OrderingQuestion extends Omit<QuizQuestion, 'correct' | 'options'> {
+  type: 'ordering';
+  items: OrderingItem[];
+}
+
+export interface OrderingItem {
+  id: string;
+  text: string;
+  order: number;  // Richtige Position (1, 2, 3...)
+}
+
+// Union Type für alle Fragetypen
+export type ExtendedQuizQuestion = QuizQuestion | MultiSelectQuestion | MatchingQuestion | OrderingQuestion;
 
 // User-Fortschritt
 export interface UserProgress {
@@ -127,6 +183,17 @@ export interface BattleState {
   playerDamage: number;
   isFinished: boolean;
   isVictory: boolean;
+  // Spieler-Leben System
+  playerLives: number;
+  maxPlayerLives: number;
+  isGameOver: boolean;
+}
+
+// Erweitertes Quiz mit allen Fragetypen
+export interface ExtendedQuiz {
+  questions: ExtendedQuizQuestion[];
+  title?: string;
+  worlds?: { id: number; name: string; color: string }[];
 }
 
 // Animation States
