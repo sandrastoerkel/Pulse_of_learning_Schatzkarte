@@ -557,7 +557,9 @@ def render_user_stats_card(user: Dict):
 # ============================================
 
 # Diese Altersstufen sehen die Schatzkarte (gamifiziert)
-SCHATZKARTE_ALTERSSTUFEN = ["grundschule", "unterstufe"]
+# RPG-Elemente funktionieren auch bei aelteren Schuelern gut!
+# Paedagogen/Coaches koennen sie auch sehen (zum Testen/Demonstrieren)
+SCHATZKARTE_ALTERSSTUFEN = ["grundschule", "unterstufe", "mittelstufe", "paedagoge", "coach"]
 
 def zeige_schatzkarte() -> bool:
     """

@@ -22,19 +22,71 @@ ISLANDS = {
         "color": "#4fc3f7",
         "week": 0,
         "description": "Willkommen auf deiner Lernreise!",
-        "type": "welcome",
+        "type": "tutorial",  # Spezieller Typ fuer Tutorial-Insel
         "content": {
             "welcome_video_url": "",  # Platzhalter - URL kommt spaeter
             "show_group_chat_link": True,
         },
+        # Tutorial-Schritte im Nintendo-Stil (eins nach dem anderen)
+        "tutorial_steps": [
+            {
+                "id": "welcome",
+                "title": "🎬 Willkommen, Entdecker!",
+                "type": "video",
+                "description": "Schau dir das kurze Video an und erfahre, was dich erwartet!",
+                "placeholder": True,  # Video kommt spaeter
+            },
+            {
+                "id": "how_it_works",
+                "title": "🗺️ So funktioniert's",
+                "type": "explanation",
+                "content": """
+**Deine Reise in 4 einfachen Schritten:**
+
+🏝️ **1. Inseln erkunden**
+Jede Insel hat ein Thema. Klicke auf eine Insel, um sie zu besuchen.
+
+📺 **2. Video anschauen**
+Auf jeder Insel wartet ein kurzes Video mit spannenden Tipps.
+
+📜 **3. Wissen sammeln**
+Lies die Erklaerung und entdecke neue Strategien.
+
+💎 **4. Schaetze finden**
+Sammle Schaetze und verdiene XP fuer deinen Fortschritt!
+
+---
+
+**🔮 Was noch kommt...**
+
+⚔️ *Quiz-Kaempfe* - Bald kannst du dein Wissen in spannenden Kaempfen testen!
+Wie bei einem Bossfight: Jede richtige Antwort macht Schaden!
+
+🏆 *Challenges* - Wochen-Aufgaben warten auf dich!
+Setze das Gelernte im echten Leben um und werde zum Meister.
+
+*(Diese Features schalten sich frei, wenn du die ersten Inseln erkundet hast)*
+""",
+            },
+            {
+                "id": "group_chat",
+                "title": "👥 Deine Lerngruppe",
+                "type": "link",
+                "description": "Tritt deiner Gruppe bei und tausche dich mit anderen Entdeckern aus!",
+                "placeholder": True,  # Link kommt spaeter
+            },
+        ],
         "treasures": [
             {
                 "id": "kompass",
                 "name": "🧭 Kompass der Reise",
-                "description": "Dein Wegweiser durch die Schatzkarte",
+                "description": "Du hast das Tutorial abgeschlossen! Dein Kompass zeigt dir den Weg.",
                 "xp": 20,
             }
-        ]
+        ],
+        # Keine Quiz/Challenge im Starthafen
+        "has_quiz": False,
+        "has_challenge": False,
     },
 
     "festung": {
