@@ -210,6 +210,34 @@ Das nennt man **Selbstwirksamkeit** – und die hat eine Effektstärke von **0.6
         type: 'success'
       },
       {
+        title: "❓ Was bedeutet 'Effektstärke'?",
+        content: `**Stell dir vor, du testest zwei Gruppen:**
+- Gruppe A lernt mit einer neuen Methode
+- Gruppe B lernt wie immer
+
+Die **Effektstärke** sagt dir: **Wie viel besser wurde Gruppe A im Vergleich zu Gruppe B?**
+
+**So kannst du dir das merken:**
+
+| Effektstärke | Was bedeutet das? | Beispiel |
+|--------------|-------------------|----------|
+| **0.00** | Kein Unterschied | Wie wenn beide gleich abschneiden |
+| **0.20** | Kleiner Effekt | Wie 1 Monat Extra-Lernen |
+| **0.40** | Mittlerer Effekt | Wie 3-4 Monate Extra-Lernen |
+| **0.60+** | Großer Effekt | Wie ein halbes Schuljahr Extra! |
+
+**Selbstwirksamkeit hat 0.63** – das bedeutet:
+Schüler, die an sich glauben, lernen so viel wie andere in einem **halben Schuljahr extra**! 🚀
+
+*Das ist, als würdest du ein Power-Up bekommen, das dich schneller leveln lässt.*`,
+        type: 'expander'
+      },
+      {
+        title: "🧠 Die 4 Quellen deiner Selbstwirksamkeit (Bandura)",
+        content: `Der Psychologe **Albert Bandura** hat erforscht, woher dieses *"Ich-schaff-das-Gefühl"* kommt:`,
+        type: 'info'
+      },
+      {
         title: "🏆 1. Echte Erfolgserlebnisse (Die Stärkste!)",
         content: `Nichts überzeugt dein Gehirn mehr als: **Du hast es selbst geschafft.**
 
@@ -277,20 +305,22 @@ Aber wenn dein Kumpel, der auch Probleme hatte, es erklärt – das wirkt!
       },
       {
         title: "📊 Selbstcheck: Wie ist deine Selbstwirksamkeit?",
-        content: `Beantworte ehrlich (1 = stimmt gar nicht, 5 = stimmt total):
-
-| Aussage | 1 | 2 | 3 | 4 | 5 |
-|---------|---|---|---|---|---|
-| Wenn ich übe, werde ich besser | | | | | |
-| Auch schwere Aufgaben kann ich lösen, wenn ich dranbleibe | | | | | |
-| Fehler sind Teil des Lernens | | | | | |
-| Ich kann mich selbst motivieren | | | | | |
-
-**Auswertung:**
-- **16-20:** Du bist auf einem guten Weg!
-- **11-15:** Da geht noch was – nutze die Strategien!
-- **4-10:** Kein Problem, aber fang HEUTE an, daran zu arbeiten.`,
-        type: 'info'
+        content: `Beantworte ehrlich (1 = stimmt gar nicht, 5 = stimmt total):`,
+        type: 'selfcheck',
+        selfcheck: {
+          statements: [
+            "Wenn ich übe, werde ich besser",
+            "Auch schwere Aufgaben kann ich lösen, wenn ich dranbleibe",
+            "Fehler sind Teil des Lernens",
+            "Ich kann mich selbst motivieren"
+          ],
+          results: [
+            { range: "16-20", message: "Du bist auf einem guten Weg!", emoji: "🌟" },
+            { range: "11-15", message: "Da geht noch was – nutze die Strategien!", emoji: "💪" },
+            { range: "4-10", message: "Kein Problem, aber fang HEUTE an, daran zu arbeiten.", emoji: "🚀" }
+          ],
+          conclusion: "Dein Gehirn glaubt, was du ihm oft genug sagst. Also sag ihm das Richtige!"
+        }
       }
     ]
   },
@@ -463,6 +493,25 @@ Das ist keine Motivation-Trickserei – das ist, wie dein Selbstbild tatsächlic
 **Der Trick:** Schreibe Erfolg deiner Anstrengung zu – das motiviert dich weiterzumachen.
 Und wenn etwas nicht klappt: Es lag an der Strategie, nicht an dir. Strategien kann man ändern.`,
         type: 'info'
+      },
+      {
+        title: "📊 Selbstcheck: Wie ist deine Selbstwirksamkeit?",
+        content: `Beantworte ehrlich (1 = stimmt gar nicht, 5 = stimmt total):`,
+        type: 'selfcheck',
+        selfcheck: {
+          statements: [
+            "Wenn ich übe, werde ich besser",
+            "Auch schwere Aufgaben kann ich lösen, wenn ich dranbleibe",
+            "Fehler sind Teil des Lernens",
+            "Ich kann mich selbst motivieren"
+          ],
+          results: [
+            { range: "16-20", message: "Du bist auf einem guten Weg!", emoji: "🌟" },
+            { range: "11-15", message: "Da geht noch was – nutze die Strategien!", emoji: "💪" },
+            { range: "4-10", message: "Kein Problem, aber fang HEUTE an, daran zu arbeiten.", emoji: "🚀" }
+          ],
+          conclusion: "Dein Gehirn glaubt, was du ihm oft genug sagst. Also sag ihm das Richtige!"
+        }
       }
     ]
   },

@@ -1,16 +1,50 @@
 // ============================================
 // Insel der 7 Werkzeuge - Content nach Altersstufen
 // Thema: Die 7 Power-Techniken (evidenzbasierte Lernstrategien)
-// Quelle: utils/ressourcen/learnstrat_content.py
+// Quelle: Dunlosky et al. (2013), Hattie (2015), Bjork (1994)
 // ============================================
 
 import { AgeGroup } from '../types';
+
+// Effektstärken-Daten für die UI
+export interface EffectSize {
+  value: number;
+  stars: 1 | 2 | 3;
+  label: string;
+}
+
+export const EFFECT_SIZES: Record<string, EffectSize> = {
+  retrieval: { value: 0.58, stars: 3, label: 'High Utility' },
+  spaced: { value: 0.60, stars: 3, label: 'High Utility' },
+  feynman: { value: 0.75, stars: 3, label: 'Sehr hoch!' },
+  interleaving: { value: 0.67, stars: 3, label: 'High Utility' },
+  loci: { value: 0.65, stars: 3, label: 'High Utility' },
+  pomodoro: { value: 0.53, stars: 2, label: 'Moderat' },
+  teaching: { value: 0.53, stars: 2, label: 'Moderat' },
+  marking: { value: 0.36, stars: 1, label: 'Low Utility' },
+  rereading: { value: 0.36, stars: 1, label: 'Low Utility' }
+};
+
+interface Study {
+  authors: string;
+  year: number;
+  finding: string;
+}
+
+interface FunFact {
+  emoji: string;
+  text: string;
+}
 
 interface ContentSection {
   title: string;
   content: string;
   type?: 'info' | 'success' | 'warning' | 'expander';
   expanded?: boolean;
+  effectSize?: EffectSize;
+  study?: Study;
+  funFact?: FunFact;
+  proTip?: string;
 }
 
 interface IslandContent {
@@ -24,6 +58,7 @@ interface IslandContent {
     sections: ContentSection[];
   };
   summary?: string;
+  totalTechniques: number;
 }
 
 // ============================================
@@ -31,12 +66,13 @@ interface IslandContent {
 // ============================================
 const GRUNDSCHULE_CONTENT: IslandContent = {
   title: "Die 7 Power-Techniken - Cleverer lernen",
+  totalTechniques: 7,
   video: {
     url: "",
     placeholder: true
   },
   explanation: {
-    intro: `**Die Wissenschaft sagt: Du machst es falsch. Aber keine Sorge – wir fixen das jetzt!**
+    intro: `**Die Wissenschaft sagt: Die meisten Schüler machen es falsch. Aber keine Sorge – wir fixen das jetzt!**
 
 Stell dir vor, du lernst 5 Stunden für eine Prüfung. Du liest alles dreimal durch, markierst die wichtigsten Stellen gelb, schreibst eine Zusammenfassung. Du fühlst dich super vorbereitet.
 
@@ -49,10 +85,21 @@ Ist sie einfach schlauer? **Nein.** Sie lernt nur ANDERS.
 Die Wissenschaft weiß seit über 100 Jahren, welche Methoden funktionieren. Die Schule hat's dir nur nie erzählt. **Bis jetzt!**`,
     sections: [
       {
-        title: "Was die meisten Schüler falsch machen",
+        title: "Effektstärke",
+        content: `Stell dir vor, du misst, wie viel Schüler in einem Jahr lernen. Das ist der Normalfall. Jetzt fragst du: Bringt Methode X mehr oder weniger als dieses eine Jahr?
+
+- **d = 0.40** → Ein Jahr Lernfortschritt (der Durchschnitt)
+- **d > 0.40** → Mehr als ein Jahr!
+- **d < 0.40** → Weniger als ein Jahr
+- **d = 0.80** → Zwei Jahre Fortschritt in einem Jahr!`,
+        type: 'expander',
+        expanded: false
+      },
+      {
+        title: "Das wissen sogar die meisten Erwachsenen nicht",
         content: `*"Schreib das auf, dann merkst du's dir!"*
 
-Diesen Satz hast du wahrscheinlich tausendmal gehört. Und er ist... falsch.
+Diesen Satz hast du wahrscheinlich tausendmal gehört. Und er ist... falsch. Zumindest so, wie die Schule ihn meint.
 
 **Was die meisten machen:**
 - Text mehrmals durchlesen (*"Wird schon hängenbleiben..."*)
@@ -60,16 +107,31 @@ Diesen Satz hast du wahrscheinlich tausendmal gehört. Und er ist... falsch.
 - Zusammenfassung schreiben (*Dauert ewig...*)
 - Am Abend vorher alles reinprügeln (*Cramming!*)
 
-**PLOT TWIST:** Alle diese Methoden sind wissenschaftlich gesehen... meh.
+**PLOT TWIST:** Alle diese Methoden sind wissenschaftlich gesehen... meh.`,
+        type: 'warning',
+        study: {
+          authors: 'Dunlosky et al.',
+          year: 2013,
+          finding: 'Die Techniken, die Schüler am häufigsten nutzen, sind am wenigsten effektiv.'
+        }
+      },
+      {
+        title: "Die Wissenschaft: Effektstärken erklärt",
+        content: `**John Hattie** hat über 1.800 Meta-Studien mit mehr als 300 Millionen Schülern ausgewertet. Das ist wie... ALLE Studien zum Thema Lernen, die es gibt. Zusammengefasst.
 
-Forscher von der Kent State University haben 10 beliebte Lerntechniken untersucht. Ergebnis: **Die Techniken, die Schüler am häufigsten nutzen, sind am wenigsten effektiv.** Autsch.`,
-        type: 'warning'
+**Was ist eine 'Effektstärke' (d)?**
+
+Stell dir vor, du misst, wie viel Schüler in einem Jahr lernen. Das ist der Normalfall. Jetzt fragst du: Bringt Methode X mehr oder weniger als dieses eine Jahr?
+
+- **d = 0.40** → Ein Jahr Lernfortschritt (der Durchschnitt)
+- **d > 0.40** → Mehr als ein Jahr!
+- **d < 0.40** → Weniger als ein Jahr
+- **d = 0.80** → Zwei Jahre Fortschritt in einem Jahr!`,
+        type: 'info'
       },
       {
         title: "Technik 1: Retrieval Practice (Selbsttest)",
-        content: `**Effektstärke: d = 0.58** ⭐⭐⭐
-
-Jedes Mal, wenn du etwas aus deinem Gedächtnis ABRUFST (statt es nur wieder zu lesen), verstärkst du die Verbindung im Gehirn.
+        content: `Jedes Mal, wenn du etwas aus deinem Gedächtnis ABRUFST (statt es nur wieder zu lesen), verstärkst du die Verbindung im Gehirn.
 
 Das ist wie ein Trampelpfad: Je öfter du ihn gehst, desto breiter wird er.
 Wiederlesen ist, als würdest du den Pfad nur anschauen.
@@ -81,13 +143,12 @@ Abrufen ist, ihn tatsächlich zu gehen.
 - Benutze Bildkarten und dreh sie um – was war auf der Karte?
 - Eltern können fragen: *"Was hast du heute in der Schule gelernt?"*`,
         type: 'expander',
-        expanded: true
+        expanded: true,
+        effectSize: EFFECT_SIZES.retrieval
       },
       {
         title: "Technik 2: Spaced Repetition (Zeitversetzt wiederholen)",
-        content: `**Effektstärke: d = 0.60** ⭐⭐⭐
-
-Dein Gehirn vergisst. Schnell. Nach 24 Stunden hast du 70% vergessen!
+        content: `Dein Gehirn vergisst. Schnell. Nach 24 Stunden hast du 70% vergessen!
 
 ABER: Wenn du wiederholst, BEVOR du vergessen hast, wird die Kurve flacher.
 Mit jeder Wiederholung hält das Wissen länger.
@@ -99,13 +160,17 @@ Mit jeder Wiederholung hält das Wissen länger.
 - Baut kleine Quiz-Momente in den Alltag ein. Beim Abendessen: *"Was war nochmal...?"*
 - Macht einen Wochen-Rückblick am Sonntag: *"Was haben wir diese Woche alles gelernt?"*
 - **Sticker-Kalender:** Jedes Mal, wenn wiederholt wird, gibt's einen Sticker!`,
-        type: 'expander'
+        type: 'expander',
+        effectSize: EFFECT_SIZES.spaced,
+        study: {
+          authors: 'Ebbinghaus',
+          year: 1885,
+          finding: 'Die Vergessenskurve zeigt: Strategisches Wiederholen flacht den Vergessens-Prozess ab.'
+        }
       },
       {
-        title: "Technik 3: Feynman-Methode (Erklär's einem 10-Jährigen)",
-        content: `**Effektstärke: d = 0.75** ⭐⭐⭐ Sehr hoch!
-
-Richard Feynman war Nobelpreisträger für Physik und legendär dafür, komplizierte Sachen einfach zu erklären.
+        title: "Technik 3: Feynman-Methode (Erklär's einem 6-Jährigen)",
+        content: `Richard Feynman war Nobelpreisträger für Physik und legendär dafür, komplizierte Sachen einfach zu erklären.
 
 Seine Methode: **Wenn du etwas nicht einfach erklären kannst, hast du es nicht verstanden.**
 
@@ -115,13 +180,12 @@ Seine Methode: **Wenn du etwas nicht einfach erklären kannst, hast du es nicht 
 - **"Erklär's deinem Teddy!"** Oder: Spiel Lehrer! Stell deine Kuscheltiere in eine Reihe und erkläre ihnen, was du gelernt hast.
 - Wenn du stecken bleibst, weißt du, was du nochmal nachschauen musst.
 - **Bonus:** Geschwister unterrichten! (Die fragen nämlich wirklich nach, wenn sie's nicht verstehen.)`,
-        type: 'expander'
+        type: 'expander',
+        effectSize: EFFECT_SIZES.feynman
       },
       {
         title: "Technik 4: Interleaving (Mischen statt Blocken)",
-        content: `**Effektstärke: d = 0.67** ⭐⭐⭐
-
-Die meisten lernen "geblockt": Erst 20 Mathe-Aufgaben zum Thema A, dann 20 zum Thema B.
+        content: `Die meisten lernen "geblockt": Erst 20 Mathe-Aufgaben zum Thema A, dann 20 zum Thema B.
 Fühlt sich effektiv an. **IST ES ABER NICHT.**
 
 Interleaving heißt: Aufgaben mischen! A, B, C, A, B, C...
@@ -129,19 +193,20 @@ Interleaving heißt: Aufgaben mischen! A, B, C, A, B, C...
 Warum? Weil du bei jeder Aufgabe erst erkennen musst, WELCHES Problem das überhaupt ist.
 Das trainiert dein Gehirn, Unterschiede zu erkennen.
 
-**Fun Fact:** Physik-Studenten, die mit Interleaving lernten, schnitten 125% besser ab – obwohl sie sich schlechter fühlten!
-
 **So geht's für dich:**
 - Beim Üben abwechseln: Mal eine Aufgabe Plus, dann Minus, dann Plus, dann Minus.
 - Bei Vokabeln: Nicht alle Tiere, dann alle Farben – sondern bunt gemischt!
 - Spiele wie **Memory** trainieren das automatisch.`,
-        type: 'expander'
+        type: 'expander',
+        effectSize: EFFECT_SIZES.interleaving,
+        funFact: {
+          emoji: '🔬',
+          text: 'Physik-Studenten, die mit Interleaving lernten, schnitten 125% besser ab – obwohl sie sich schlechter fühlten!'
+        }
       },
       {
         title: "Technik 5: Loci-Methode (Gedächtnispalast)",
-        content: `**Effektstärke: d = 0.65** ⭐⭐⭐
-
-Diese Methode nutzen Gedächtnis-Weltmeister!
+        content: `Diese Methode nutzen Gedächtnis-Weltmeister!
 
 Funktioniert so: Du "gehst" im Kopf durch einen bekannten Ort (dein Zimmer, Schulweg) und "platzierst" an jedem Punkt einen Begriff, den du dir merken willst.
 
@@ -151,35 +216,42 @@ Warum funktioniert das? Das Gehirn ist super darin, sich Orte zu merken – viel
 - *"Stell dir vor, ein Apfel liegt auf deinem Bett!"*
 - **Kinderzimmer-Rundgang:** Tür = erste Vokabel, Bett = zweite, Schrank = dritte...
 - Je verrückter die Bilder, desto besser! Der Apfel tanzt auf dem Bett? SUPER, das merkst du dir!`,
-        type: 'expander'
+        type: 'expander',
+        effectSize: EFFECT_SIZES.loci
       },
       {
-        title: "Technik 6 & 7: Pomodoro + Lernen durch Lehren",
-        content: `**Pomodoro-Technik (d = 0.53):** 🍅
+        title: "Technik 6: Pomodoro-Technik (25 + 5)",
+        content: `Das Gehirn kann sich nicht ewig konzentrieren. Nach etwa 25 Minuten lässt die Aufmerksamkeit nach.
 
-Das Gehirn kann sich nicht ewig konzentrieren. Nach etwa 25 Minuten lässt die Aufmerksamkeit nach.
+Die Pomodoro-Technik nutzt das: 25 Min fokussiert arbeiten, dann 5 Min echte Pause (nicht Handy!). Nach 4 Runden: 15-30 Min längere Pause.
 
-**Für dich:** 10-15 Min lernen, dann 5 Min Bewegungspause (Hampelmann, Tanzen, Rennen).
-Eine Sanduhr oder Timer macht's spannend!
+**So geht's für dich (kürzere Intervalle):**
+- 10-15 Min lernen, dann 5 Min Bewegungspause (Hampelmann, Tanzen, Rennen).
+- Eine Sanduhr oder Timer macht's spannend.
+- *"Schaffst du es, bis die Zeit abläuft konzentriert zu bleiben?"*`,
+        type: 'expander',
+        effectSize: EFFECT_SIZES.pomodoro
+      },
+      {
+        title: "Technik 7: Lernen durch Lehren",
+        content: `*"Wer lehrt, lernt doppelt."*
 
----
-
-**Lernen durch Lehren (d = 0.53):** 👥
-
-*"Wer lehrt, lernt doppelt."*
-
-Wenn du jemandem etwas erklärst, musst du:
+Das ist nicht nur ein Spruch. Wenn du jemandem etwas erklärst, musst du:
 1. Es selbst verstehen
 2. Es in klare Worte fassen
 3. Auf Fragen reagieren
 
-**Für dich:**
+Das ist Elaboration, Retrieval Practice und Metakognition in einem!
+
+**So geht's für dich:**
 - **Geschwister-Schule!** Der Große erklärt dem Kleinen.
-- Oder: Eltern spielen dumm. *"Mama/Papa versteht das nicht, kannst du es mir erklären?"*`,
-        type: 'expander'
+- Oder: Eltern spielen dumm. *"Mama/Papa versteht das nicht, kannst du es mir erklären?"*
+- Das Kind muss erklären, und dabei lernt es selbst am meisten.`,
+        type: 'expander',
+        effectSize: EFFECT_SIZES.teaching
       },
       {
-        title: "Das Paradox: Warum sich gutes Lernen falsch anfühlt",
+        title: "Das Paradox: Warum sich gutes Lernen anstrengend anfühlt",
         content: `*"Ich hab so viel gelernt und fühle mich trotzdem unsicher..."*
 
 Das ist NORMAL. Und es ist sogar ein GUTES Zeichen!
@@ -189,19 +261,17 @@ Wenn du einen Text dreimal durchliest, fühlt er sich "vertraut" an.
 Dein Gehirn sagt: *"Hey, das kenn ich doch! Muss ich also wissen!"*
 Aber: Etwas wiederzuerkennen ist nicht dasselbe wie es zu WISSEN.
 
-**Die Studie, die alles verändert:**
-- Gruppe A: Wiederlesen (fühlte sich gut an)
-- Gruppe B: Retrieval Practice (fühlte sich anstrengend an)
-
-Gruppe A fühlte sich 62% vorbereitet. Gruppe B nur 53%.
-**Aber:** Gruppe B schnitt im Test **54% BESSER** ab!
-
 **Die Take-Away Message:**
 - Wenn Lernen sich leicht anfühlt, lernst du wahrscheinlich nicht viel.
 - Wenn Lernen sich anstrengend anfühlt, bist du auf dem richtigen Weg.
 
 **Vertrau der Wissenschaft, nicht deinem Gefühl!**`,
-        type: 'info'
+        type: 'info',
+        study: {
+          authors: 'Bjork',
+          year: 1994,
+          finding: '"Desirable Difficulties" – Bestimmte Schwierigkeiten beim Lernen sind GUT, weil sie das Gehirn zwingen, härter zu arbeiten.'
+        }
       }
     ]
   },
@@ -213,6 +283,7 @@ Gruppe A fühlte sich 62% vorbereitet. Gruppe B nur 53%.
 // ============================================
 const UNTERSTUFE_CONTENT: IslandContent = {
   title: "Die 7 Power-Techniken - Cleverer lernen",
+  totalTechniques: 7,
   video: {
     url: "",
     placeholder: true
@@ -230,8 +301,21 @@ Ist sie einfach schlauer? **Nein.** Sie lernt nur ANDERS.
 
 **John Hattie** hat über 1.800 Meta-Studien mit mehr als 300 Millionen Schülern ausgewertet. Das sind ALLE Studien zum Thema Lernen, die es gibt. Zusammengefasst.
 
+Siehst du das Muster? Die Methoden, die sich GUT anfühlen, funktionieren oft SCHLECHT. Und die Methoden, die sich ANSTRENGEND anfühlen, funktionieren am BESTEN. Das Gehirn ist ein Troll.
+
 Hier sind die 7 Techniken, die WIRKLICH funktionieren!`,
     sections: [
+      {
+        title: "Effektstärke",
+        content: `Stell dir vor, du misst, wie viel Schüler in einem Jahr lernen. Das ist der Normalfall. Jetzt fragst du: Bringt Methode X mehr oder weniger als dieses eine Jahr?
+
+- **d = 0.40** → Ein Jahr Lernfortschritt (der Durchschnitt)
+- **d > 0.40** → Mehr als ein Jahr!
+- **d < 0.40** → Weniger als ein Jahr
+- **d = 0.80** → Zwei Jahre Fortschritt in einem Jahr!`,
+        type: 'expander',
+        expanded: false
+      },
       {
         title: "Was ist eine 'Effektstärke' (d)?",
         content: `Stell dir vor, du misst, wie viel Schüler in einem Jahr lernen. Das ist der Normalfall.
@@ -246,35 +330,37 @@ Jetzt fragst du: Bringt Methode X mehr oder weniger als dieses eine Jahr?
 
 | Technik | Effektstärke | Bewertung |
 |---------|--------------|-----------|
-| Selbsttest (Retrieval) | d = 0.58 | ⭐⭐⭐ High Utility |
-| Verteiltes Lernen | d = 0.60 | ⭐⭐⭐ High Utility |
 | Feynman-Methode | d = 0.75 | ⭐⭐⭐ Sehr hoch! |
+| Interleaving | d = 0.67 | ⭐⭐⭐ High Utility |
+| Spaced Repetition | d = 0.60 | ⭐⭐⭐ High Utility |
+| Retrieval Practice | d = 0.58 | ⭐⭐⭐ High Utility |
 | Markieren | d = 0.36 | ❌ Low Utility |
 | Wiederlesen | d = 0.36 | ❌ Low Utility |`,
-        type: 'success'
+        type: 'success',
+        study: {
+          authors: 'Dunlosky et al.',
+          year: 2013,
+          finding: 'Diese Meta-Analyse an der Kent State University bewertete 10 beliebte Lerntechniken systematisch.'
+        }
       },
       {
         title: "Technik 1: Retrieval Practice (Selbsttest)",
-        content: `**Effektstärke: d = 0.58** ⭐⭐⭐
-
-Jedes Mal, wenn du etwas aus deinem Gedächtnis ABRUFST (statt es nur wieder zu lesen), verstärkst du die Verbindung im Gehirn.
+        content: `Jedes Mal, wenn du etwas aus deinem Gedächtnis ABRUFST (statt es nur wieder zu lesen), verstärkst du die Verbindung im Gehirn.
 
 Das ist wie ein Trampelpfad: Je öfter du ihn gehst, desto breiter wird er.
 
 **So geht's für dich:**
 - **Karteikarten sind dein bester Freund!** Schreib auf die Vorderseite die Frage, auf die Rückseite die Antwort.
 - **WICHTIG:** Erst versuchen zu antworten, DANN umdrehen.
-- **Apps wie Anki oder Quizlet** machen das automatisch.
-- **Challenge:** Kannst du die ganze Karteikarten-Box durchgehen, ohne zu spicken?`,
+- **Apps wie Anki oder Quizlet** machen das automatisch.`,
         type: 'expander',
-        expanded: true
+        expanded: true,
+        effectSize: EFFECT_SIZES.retrieval,
+        proTip: 'Kannst du die ganze Karteikarten-Box durchgehen, ohne zu spicken? Das ist die ultimative Challenge!'
       },
       {
         title: "Technik 2: Spaced Repetition (Zeitversetzt wiederholen)",
-        content: `**Effektstärke: d = 0.60** ⭐⭐⭐
-
-Dein Gehirn vergisst. Schnell. Die Vergessenskurve (Ebbinghaus, 1885) zeigt:
-Nach 24 Stunden hast du 70% vergessen!
+        content: `Dein Gehirn vergisst. Schnell. Nach 24 Stunden hast du 70% vergessen!
 
 ABER: Wenn du wiederholst, BEVOR du vergessen hast, wird die Kurve flacher.
 
@@ -284,13 +370,17 @@ ABER: Wenn du wiederholst, BEVOR du vergessen hast, wird die Kurve flacher.
 - **Lernplan erstellen!** Nicht: "Ich lerne am Wochenende vor der Arbeit."
 - Sondern: "Ich lerne heute 30 Min, übermorgen 15 Min, in einer Woche nochmal 10 Min."
 - **Apps helfen:** Anki sagt dir automatisch, wann du was wiederholen sollst. Das nennt sich Spaced Repetition Software (SRS).`,
-        type: 'expander'
+        type: 'expander',
+        effectSize: EFFECT_SIZES.spaced,
+        study: {
+          authors: 'Ebbinghaus',
+          year: 1885,
+          finding: 'Die Vergessenskurve – ja, das wissen wir seit über 100 Jahren!'
+        }
       },
       {
         title: "Technik 3: Feynman-Methode",
-        content: `**Effektstärke: d = 0.75** ⭐⭐⭐ Sehr hoch!
-
-Richard Feynman war Nobelpreisträger für Physik.
+        content: `Richard Feynman war Nobelpreisträger für Physik.
 Seine Methode: **Wenn du etwas nicht einfach erklären kannst, hast du es nicht verstanden.**
 
 > *"Was ich nicht erschaffen kann, verstehe ich nicht."* – Richard Feynman
@@ -300,31 +390,31 @@ Seine Methode: **Wenn du etwas nicht einfach erklären kannst, hast du es nicht 
 - **Kannst du es SO erklären, dass er es versteht? Ohne Fachbegriffe?**
 - Schreib deine Erklärung auf. Dann lies sie laut vor.
 - Klingt es wie ein Mensch redet? Wenn nicht, vereinfache!`,
-        type: 'expander'
+        type: 'expander',
+        effectSize: EFFECT_SIZES.feynman
       },
       {
         title: "Technik 4: Interleaving (Mischen statt Blocken)",
-        content: `**Effektstärke: d = 0.67** ⭐⭐⭐
-
-Die meisten lernen "geblockt": Erst 20 Mathe-Aufgaben zum Thema A, dann 20 zum Thema B.
+        content: `Die meisten lernen "geblockt": Erst 20 Mathe-Aufgaben zum Thema A, dann 20 zum Thema B.
 Fühlt sich effektiv an. **IST ES ABER NICHT.**
 
 Interleaving heißt: Aufgaben mischen! A, B, C, A, B, C...
 
 Warum? Weil du bei jeder Aufgabe erst erkennen musst, WELCHES Problem das überhaupt ist.
 
-**Fun Fact:** Physik-Studenten, die mit Interleaving lernten, schnitten 125% besser ab – obwohl sie sich schlechter fühlten!
-
 **So geht's für dich:**
 - **Erstelle gemischte Übungsblätter!** Statt 10 Bruchaufgaben, dann 10 Dezimalaufgaben → Mische sie!
 - **Bei Sprachen:** Nicht erst alle Verben im Präsens, dann alle im Perfekt. Sondern: Ein Satz Präsens, ein Satz Perfekt, einer Präsens...`,
-        type: 'expander'
+        type: 'expander',
+        effectSize: EFFECT_SIZES.interleaving,
+        funFact: {
+          emoji: '🔬',
+          text: 'Physik-Studenten, die mit Interleaving lernten, schnitten 125% besser ab – obwohl sie sich schlechter fühlten!'
+        }
       },
       {
         title: "Technik 5: Loci-Methode (Gedächtnispalast)",
-        content: `**Effektstärke: d = 0.65** ⭐⭐⭐
-
-Diese Methode nutzen Gedächtnis-Weltmeister!
+        content: `Diese Methode nutzen Gedächtnis-Weltmeister!
 
 Funktioniert so: Du "gehst" im Kopf durch einen bekannten Ort (dein Zimmer, Schulweg) und "platzierst" an jedem Punkt einen Begriff, den du dir merken willst.
 
@@ -333,24 +423,23 @@ Warum funktioniert das? Das Gehirn ist super darin, sich Orte zu merken – viel
 **So geht's für dich:**
 - **Schulweg nutzen!** Von zuhause bis zum Klassenraum – jede Station = ein Merkpunkt.
 - **Historische Ereignisse?** Häng sie an deinen Schulweg. Die Französische Revolution passiert am Bäcker, Napoleon steht an der Ampel...`,
-        type: 'expander'
+        type: 'expander',
+        effectSize: EFFECT_SIZES.loci
       },
       {
-        title: "Technik 6 & 7: Pomodoro + Lernen durch Lehren",
-        content: `**Pomodoro-Technik (d = 0.53):** 🍅
-
-Das Gehirn kann sich nicht ewig konzentrieren. Nach etwa 25 Minuten lässt die Aufmerksamkeit nach.
+        title: "Technik 6: Pomodoro-Technik",
+        content: `Das Gehirn kann sich nicht ewig konzentrieren. Nach etwa 25 Minuten lässt die Aufmerksamkeit nach.
 
 **Klassisches Pomodoro:** 25 + 5.
 - **Handy in einen anderen Raum!**
 - Die Pause ist ECHTE Pause: Aufstehen, Wasser holen, Fenster öffnen, Dehnübungen.
-- **NICHT:** Social Media "kurz checken".
-
----
-
-**Lernen durch Lehren (d = 0.53):** 👥
-
-*"Wer lehrt, lernt doppelt."*
+- **NICHT:** Social Media "kurz checken".`,
+        type: 'expander',
+        effectSize: EFFECT_SIZES.pomodoro
+      },
+      {
+        title: "Technik 7: Lernen durch Lehren",
+        content: `*"Wer lehrt, lernt doppelt."*
 
 Wenn du jemandem etwas erklärst, musst du:
 1. Es selbst verstehen
@@ -363,22 +452,17 @@ Das ist Elaboration, Retrieval Practice und Metakognition in einem!
 - **Lerngruppen!** Aber nicht gemeinsam schweigend lernen.
 - Sondern: Jeder wird Experte für ein Thema und erklärt es den anderen.
 - **Der Erklärer lernt mehr als der Zuhörer!**`,
-        type: 'expander'
+        type: 'expander',
+        effectSize: EFFECT_SIZES.teaching,
+        proTip: 'Sich gegenseitig Quizfragen stellen ist wie Retrieval Practice × 2!'
       },
       {
-        title: "Das Paradox: Warum sich gutes Lernen falsch anfühlt",
+        title: "Das Paradox: Warum sich gutes Lernen anstrengend anfühlt",
         content: `**Das Fluency-Problem:**
 
 Wenn du einen Text dreimal durchliest, fühlt er sich "vertraut" an.
 Das nennt man "Fluency". Dein Gehirn sagt: *"Hey, das kenn ich doch!"*
 Aber: Etwas wiederzuerkennen ist nicht dasselbe wie es zu WISSEN.
-
-**Die Studie:**
-- Gruppe A: Wiederlesen (fühlte sich gut an)
-- Gruppe B: Retrieval Practice (fühlte sich anstrengend an)
-
-Gruppe A fühlte sich 62% vorbereitet. Gruppe B nur 53%.
-**Aber:** Gruppe B schnitt im Test **54% BESSER** ab!
 
 **"Desirable Difficulties" (Erwünschte Schwierigkeiten):**
 Bestimmte Schwierigkeiten beim Lernen sind GUT, weil sie das Gehirn zwingen, härter zu arbeiten.
@@ -386,7 +470,12 @@ Bestimmte Schwierigkeiten beim Lernen sind GUT, weil sie das Gehirn zwingen, hä
 **Die Take-Away Message:**
 - Wenn Lernen sich leicht anfühlt, lernst du wahrscheinlich nicht viel.
 - Wenn Lernen sich anstrengend anfühlt, bist du auf dem richtigen Weg.`,
-        type: 'info'
+        type: 'info',
+        study: {
+          authors: 'Rohrer & Taylor',
+          year: 2007,
+          finding: 'Gruppe A (Wiederlesen) fühlte sich 62% vorbereitet. Gruppe B (Retrieval) nur 53%. Aber: Gruppe B schnitt 54% BESSER ab!'
+        }
       }
     ]
   },
@@ -398,6 +487,7 @@ Bestimmte Schwierigkeiten beim Lernen sind GUT, weil sie das Gehirn zwingen, hä
 // ============================================
 const MITTELSTUFE_CONTENT: IslandContent = {
   title: "Die 7 Power-Techniken - Evidenzbasiertes Lernen",
+  totalTechniques: 7,
   video: {
     url: "",
     placeholder: true
@@ -414,11 +504,24 @@ Die Techniken, die Schüler am häufigsten nutzen (Markieren, Wiederlesen, Zusam
 **Die gute Nachricht:**
 Es gibt 7 Techniken mit hohen Effektstärken (d > 0.50), die du sofort anwenden kannst.
 
+Siehst du das Muster? Die Methoden, die sich GUT anfühlen, funktionieren oft SCHLECHT. Und die Methoden, die sich ANSTRENGEND anfühlen, funktionieren am BESTEN. Das Gehirn ist ein Troll.
+
 **Was ist eine Effektstärke?**
 - d = 0.40 → Ein Jahr Lernfortschritt (Durchschnitt)
 - d = 0.80 → Zwei Jahre Fortschritt in einem Jahr!
 - d < 0.40 → Weniger als der Durchschnitt`,
     sections: [
+      {
+        title: "Effektstärke",
+        content: `Stell dir vor, du misst, wie viel Schüler in einem Jahr lernen. Das ist der Normalfall. Jetzt fragst du: Bringt Methode X mehr oder weniger als dieses eine Jahr?
+
+- **d = 0.40** → Ein Jahr Lernfortschritt (der Durchschnitt)
+- **d > 0.40** → Mehr als ein Jahr!
+- **d < 0.40** → Weniger als ein Jahr
+- **d = 0.80** → Zwei Jahre Fortschritt in einem Jahr!`,
+        type: 'expander',
+        expanded: false
+      },
       {
         title: "Die Effektstärken im Vergleich",
         content: `**High Utility Strategien:**
@@ -438,10 +541,15 @@ Es gibt 7 Techniken mit hohen Effektstärken (d > 0.50), die du sofort anwenden 
 | Zusammenfassen | d = 0.50 | Durchschnittlich |
 
 **Die Ironie:** Die Methoden, die sich GUT anfühlen, funktionieren oft SCHLECHT.`,
-        type: 'success'
+        type: 'success',
+        study: {
+          authors: 'Dunlosky et al.',
+          year: 2013,
+          finding: 'Systematische Meta-Analyse der Kent State University zu 10 beliebten Lerntechniken.'
+        }
       },
       {
-        title: "Technik 1: Retrieval Practice (d = 0.58)",
+        title: "Technik 1: Retrieval Practice",
         content: `**Das Prinzip:**
 Jedes Mal, wenn du etwas aus deinem Gedächtnis ABRUFST, verstärkst du die neuronale Verbindung.
 Das ist der **Testing Effect** – einer der robustesten Befunde der Lernpsychologie.
@@ -457,12 +565,14 @@ Das ist der **Testing Effect** – einer der robustesten Befunde der Lernpsychol
 - **Selbstquiz:** Vor dem Lernen Fragen formulieren, nach dem Lernen beantworten
 - **Cornell Notes:** Rand für Fragen, beim Wiederholen nur Fragen ansehen`,
         type: 'expander',
-        expanded: true
+        expanded: true,
+        effectSize: EFFECT_SIZES.retrieval,
+        proTip: 'Bevor du ein neues Thema anfängst, teste dich kurz zum alten Thema. Das nennt man "interleaved retrieval".'
       },
       {
-        title: "Technik 2: Spaced Repetition (d = 0.60)",
+        title: "Technik 2: Spaced Repetition",
         content: `**Das Prinzip:**
-Die Vergessenskurve (Ebbinghaus, 1885) zeigt: Nach 24h sind 70% weg.
+Die Vergessenskurve zeigt: Nach 24h sind 70% weg.
 Aber: Strategisch getimte Wiederholungen flachen die Kurve ab.
 
 **Die goldene Regel:**
@@ -476,10 +586,17 @@ Aber: Strategisch getimte Wiederholungen flachen die Kurve ab.
 - **Anki** (SRS-Software, gratis) – berechnet optimale Wiederholungsintervalle
 - **Leitner-System** mit physischen Karteikarten (5 Fächer)
 - **Nicht:** Alles am Abend vorher "reinprügeln" (Cramming = schnelles Vergessen)`,
-        type: 'expander'
+        type: 'expander',
+        effectSize: EFFECT_SIZES.spaced,
+        proTip: 'Baue "Mini-Reviews" in deinen Alltag: Jeden Tag 10 Minuten alten Stoff durchgehen. Nutze Wartezeiten: Bus, Pause, vor dem Einschlafen.',
+        study: {
+          authors: 'Ebbinghaus',
+          year: 1885,
+          finding: 'Die Vergessenskurve – ein Klassiker der Gedächtnisforschung.'
+        }
       },
       {
-        title: "Technik 3: Feynman-Methode (d = 0.75)",
+        title: "Technik 3: Feynman-Methode",
         content: `**Das Prinzip:**
 "Wenn du etwas nicht einfach erklären kannst, hast du es nicht verstanden." – Richard Feynman
 
@@ -498,17 +615,14 @@ Aber: Strategisch getimte Wiederholungen flachen die Kurve ab.
 - Lernpartner erklären lassen, dann tauschen
 - Erklär-Videos für dich selbst aufnehmen
 - Eltern/Geschwister als "dumme" Zuhörer nutzen`,
-        type: 'expander'
+        type: 'expander',
+        effectSize: EFFECT_SIZES.feynman,
+        proTip: 'Nimm dich beim Erklären auf! Höre dir die Aufnahme an. Wo klingst du unsicher? Da musst du nochmal nachlesen.'
       },
       {
-        title: "Technik 4: Interleaving (d = 0.67)",
+        title: "Technik 4: Interleaving",
         content: `**Das Prinzip:**
 Statt geblocktem Üben (AAABBBCCC) → Mischen (ABCABCABC)
-
-**Die Studie (Rohrer & Taylor, 2007):**
-- Gruppe A: Geblockt (fühlte sich 62% vorbereitet)
-- Gruppe B: Interleaved (fühlte sich 53% vorbereitet)
-- **Ergebnis:** Gruppe B schnitt 125% besser ab!
 
 **Warum es funktioniert:**
 - Zwingt zur Diskrimination (Unterschiede erkennen)
@@ -518,11 +632,22 @@ Statt geblocktem Üben (AAABBBCCC) → Mischen (ABCABCABC)
 **Praktische Umsetzung:**
 - **Mathe:** Plus/Minus/Mal gemischt statt nacheinander
 - **Sprachen:** Zeiten gemischt statt kapitelweise
-- **Geschichte:** Epochen gemischt abfragen`,
-        type: 'expander'
+- **Geschichte:** Epochen gemischt abfragen
+- **Hausaufgaben:** Wechsle alle 15 Min zwischen Fächern!`,
+        type: 'expander',
+        effectSize: EFFECT_SIZES.interleaving,
+        study: {
+          authors: 'Rohrer & Taylor',
+          year: 2007,
+          finding: 'Gruppe A: Geblockt (fühlte sich 62% vorbereitet). Gruppe B: Interleaved (fühlte sich 53% vorbereitet). Ergebnis: Gruppe B schnitt 125% besser ab!'
+        },
+        funFact: {
+          emoji: '🧠',
+          text: 'Ja, das fühlt sich weniger "effizient" an. Aber dein Gehirn lernt so, zwischen verschiedenen Denkmodi zu wechseln.'
+        }
       },
       {
-        title: "Technik 5: Loci-Methode (d = 0.65)",
+        title: "Technik 5: Loci-Methode",
         content: `**Das Prinzip:**
 Nutze die natürliche Stärke des Gehirns für räumliche Erinnerung.
 "Platziere" zu merkende Items an bekannten Orten in deiner Vorstellung.
@@ -537,19 +662,28 @@ Nutze die natürliche Stärke des Gehirns für räumliche Erinnerung.
 2. Definiere 10-20 markante Punkte in fester Reihenfolge
 3. "Platziere" zu merkende Begriffe an diesen Punkten (je bizarrer, desto besser!)
 4. Gehe den Weg mental ab zum Abrufen`,
-        type: 'expander'
+        type: 'expander',
+        effectSize: EFFECT_SIZES.loci,
+        proTip: 'Bau mehrere "Paläste"! Einen fürs Fach A, einen fürs Fach B. Kombiniere mit Interleaving – geh mal rückwärts durch deinen Palast!'
       },
       {
-        title: "Technik 6 & 7: Pomodoro + Lernen durch Lehren",
-        content: `**Pomodoro-Technik (d = 0.53):**
+        title: "Technik 6: Pomodoro-Technik",
+        content: `**Das Prinzip:**
 - 25 Min fokussierte Arbeit → 5 Min Pause → Repeat
 - Nach 4 Zyklen: 15-30 Min längere Pause
 - **Wissenschaft:** Aufmerksamkeit lässt nach ~25 Min nach
 - **Wichtig:** Echte Pause = keine Screens!
 
----
-
-**Lernen durch Lehren (d = 0.53):**
+**Variationen:**
+- Schwieriges = kürzere Pomodoros (20 Min)
+- Leichteres = längere (30 Min)`,
+        type: 'expander',
+        effectSize: EFFECT_SIZES.pomodoro,
+        proTip: 'Führe ein Pomodoro-Protokoll: Wie viele schaffst du pro Lernsession? Versuche, dich selbst zu übertrumpfen.'
+      },
+      {
+        title: "Technik 7: Lernen durch Lehren",
+        content: `**Das Prinzip:**
 Der "Protégé-Effekt" zeigt: Wer lehrt, lernt am meisten.
 
 **Warum:**
@@ -561,7 +695,9 @@ Der "Protégé-Effekt" zeigt: Wer lehrt, lernt am meisten.
 - **Lerngruppen mit Expertenprinzip:** Jeder wird Experte für ein Thema
 - **Erklär-Videos erstellen** (auch ohne Veröffentlichung)
 - **Nachhilfe geben** – der beste Weg, etwas zu meistern`,
-        type: 'expander'
+        type: 'expander',
+        effectSize: EFFECT_SIZES.teaching,
+        proTip: '"Erklärvideo"-Methode: Stell dir vor, du machst ein YouTube-Video. Wie würdest du das Thema erklären? Schreib ein Skript. Sprich es laut.'
       },
       {
         title: "Das Fluency-Problem & Desirable Difficulties",
@@ -585,7 +721,12 @@ Vertrau nicht deinem Gefühl! Vertrau den Effektstärken.
 **Metakognitive Strategie:**
 Nach dem Lernen fragen: "Kann ich das aus dem Kopf?"
 Wenn nein → noch nicht gelernt, nur gelesen.`,
-        type: 'warning'
+        type: 'warning',
+        study: {
+          authors: 'Bjork',
+          year: 1994,
+          finding: '"Desirable Difficulties" – Schwierigkeiten, die das Lernen verbessern, obwohl sie sich schwerer anfühlen.'
+        }
       }
     ]
   },

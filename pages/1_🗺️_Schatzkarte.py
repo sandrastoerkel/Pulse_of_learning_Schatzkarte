@@ -197,9 +197,9 @@ def create_hero_data(user_data):
 # HAUPTBEREICH
 # ===============================================================
 
-# Preview-Banner
-if is_preview_mode():
-    render_preview_banner()
+# Altersstufen-Wechsler Overlay (nur fuer berechtigte Rollen sichtbar)
+# Die Funktion prueft intern: Preview, Coach, Admin, Paedagoge
+render_preview_banner()
 
 # Pruefen ob React-Komponente verfuegbar ist
 if not HAS_REACT_COMPONENT:
@@ -241,19 +241,52 @@ if unlocked_islands:
 # REACT SCHATZKARTE RENDERN
 # ===============================================================
 
-# Minimales CSS fuer Streamlit-Anpassungen
+# CSS fuer Vollbild-Schatzkarte
 st.markdown("""
 <style>
-    /* Streamlit-Container auf volle Breite */
+    /* Streamlit-Container maximieren */
     .stMainBlockContainer {
-        padding-top: 1rem;
-        padding-left: 1rem;
-        padding-right: 1rem;
+        padding-top: 0.5rem !important;
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+        padding-bottom: 0 !important;
+        max-width: 100% !important;
     }
 
-    /* iframe auf volle Hoehe */
+    /* Header-Bereich minimieren */
+    header[data-testid="stHeader"] {
+        height: 2.5rem !important;
+    }
+
+    /* iframe auf volle Bildschirmhoehe */
     iframe[title="components.rpg_schatzkarte.rpg_schatzkarte"] {
-        min-height: 750px !important;
+        min-height: calc(100vh - 60px) !important;
+        height: calc(100vh - 60px) !important;
+        border: none !important;
+    }
+
+    /* Popover fuer Altersstufen-Wechsler positionieren */
+    [data-testid="stPopover"] {
+        position: fixed !important;
+        top: 70px !important;
+        left: 70px !important;
+        z-index: 99998 !important;
+    }
+
+    /* Verstecke Streamlit-Footer */
+    footer {
+        display: none !important;
+    }
+
+    /* Block-Container ohne Gaps */
+    .block-container {
+        padding: 0 !important;
+        max-width: 100% !important;
+    }
+
+    /* Element-Container ohne extra Spacing */
+    .element-container {
+        margin: 0 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -261,7 +294,7 @@ st.markdown("""
 # Altersstufe aus Session-State holen
 age_group = st.session_state.get("current_user_age_group", "unterstufe")
 
-# React-Komponente aufrufen
+# React-Komponente aufrufen (Hoehe wird per CSS auf 100vh gesetzt)
 result = rpg_schatzkarte(
     islands=islands,
     user_progress=user_data.get("progress", {}),
@@ -269,7 +302,7 @@ result = rpg_schatzkarte(
     unlocked_islands=unlocked_islands,
     current_island=current_island,
     age_group=age_group,
-    height=750,
+    height=900,  # Basis-Hoehe, wird per CSS auf calc(100vh - 60px) ueberschrieben
     key="rpg_schatzkarte"
 )
 

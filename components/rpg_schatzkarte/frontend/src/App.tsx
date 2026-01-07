@@ -12,6 +12,8 @@ import { QuestModal } from './components/QuestModal';
 import { BanduraShipModal } from './components/BanduraShipModal';
 import { HattieShipModal } from './components/HattieShipModal';
 import { BanduraSourceId } from './content/banduraContent';
+import { BanduraEntry, BanduraStats, DEFAULT_BANDURA_STATS } from './banduraTypes';
+import { HattieEntry, HattieStats } from './hattieTypes';
 import {
   Island,
   UserProgress,
@@ -20,6 +22,10 @@ import {
   AgeGroup
 } from './types';
 import './styles/rpg-theme.css';
+import './styles/bandura-challenge.css';
+import './styles/hattie-challenge.css';
+import './styles/brainy.css';
+import { Brainy } from './components/Brainy';
 
 // Standard-Held für Preview/Development
 const DEFAULT_HERO: HeroData = {
@@ -94,6 +100,29 @@ function RPGSchatzkarteContent({
   const [showHattieModal, setShowHattieModal] = useState(false);
   const [banduraCompletedToday, setBanduraCompletedToday] = useState<BanduraSourceId[]>([]);
 
+  // Bandura Challenge State
+  const [banduraEntries, setBanduraEntries] = useState<BanduraEntry[]>([]);
+  const [banduraStats, setBanduraStats] = useState<BanduraStats>(DEFAULT_BANDURA_STATS);
+
+  // Hattie Challenge State
+  const [hattieEntries, setHattieEntries] = useState<HattieEntry[]>([]);
+  const [hattieStats, setHattieStats] = useState<HattieStats>({
+    total_entries: 0,
+    pending_entries: 0,
+    completed_entries: 0,
+    exceeded_count: 0,
+    exact_count: 0,
+    success_rate: 0,
+    accuracy_rate: 0,
+    avg_difference: 0,
+    current_streak: 0,
+    longest_streak: 0,
+    best_subject: null,
+    entries_per_subject: {},
+    total_xp: 0,
+    level: 1
+  });
+
   const handleIslandClick = useCallback((islandId: string) => {
     const island = islands.find(i => i.id === islandId);
     if (island) {
@@ -153,6 +182,34 @@ function RPGSchatzkarteContent({
     xp: number
   ) => {
     setBanduraCompletedToday(prev => [...prev, sourceId]);
+
+    // Neuen Eintrag erstellen und zu State hinzufügen
+    const newEntry: BanduraEntry = {
+      id: `bandura-${Date.now()}`,
+      source_type: sourceId,
+      description,
+      created_at: new Date().toISOString(),
+      xp_earned: xp
+    };
+    setBanduraEntries(prev => [newEntry, ...prev]);
+
+    // Stats aktualisieren
+    setBanduraStats(prev => {
+      const newEntriesPerSource = { ...prev.entries_per_source };
+      newEntriesPerSource[sourceId] = (newEntriesPerSource[sourceId] || 0) + 1;
+      const newTotalXp = prev.total_xp + xp;
+      const newLevel = Math.floor(newTotalXp / 100) + 1;
+
+      return {
+        ...prev,
+        total_entries: prev.total_entries + 1,
+        entries_per_source: newEntriesPerSource,
+        total_xp: newTotalXp,
+        level: newLevel,
+        current_streak: prev.current_streak + 1
+      };
+    });
+
     if (onAction) {
       onAction({
         action: 'bandura_entry',
@@ -170,20 +227,121 @@ function RPGSchatzkarteContent({
     setShowHattieModal(true);
   }, []);
 
-  const handleHattieEntry = useCallback((
-    entry: { subject: string; task: string; prediction: number; result?: number; reflection?: string },
-    xp: number
+  // Neue Vorhersage anlegen (pending)
+  const handleNewPrediction = useCallback((
+    entry: Omit<HattieEntry, 'id' | 'created_at'>
   ) => {
+    const newEntry: HattieEntry = {
+      ...entry,
+      id: `hattie-${Date.now()}`,
+      created_at: new Date().toISOString()
+    };
+    setHattieEntries(prev => [newEntry, ...prev]);
+
+    // Stats für pending aktualisieren
+    setHattieStats(prev => ({
+      ...prev,
+      total_entries: prev.total_entries + 1,
+      pending_entries: prev.pending_entries + 1
+    }));
+
     if (onAction) {
       onAction({
-        action: 'hattie_entry',
+        action: 'hattie_prediction',
         islandId: 'hattie_ship',
-        xpEarned: xp,
-        description: `${entry.task}: ${entry.prediction}% -> ${entry.result}%`
+        description: `Neue Vorhersage: ${entry.task} - ${entry.prediction}`
       });
     }
-    console.log('Hattie entry:', { entry, xp });
+    console.log('New Hattie prediction:', entry);
   }, [onAction]);
+
+  // Ergebnis für offene Vorhersage eintragen
+  const handleCompleteEntry = useCallback((
+    entryId: string,
+    result: number,
+    reflection?: string
+  ) => {
+    setHattieEntries(prev => prev.map(entry => {
+      if (entry.id !== entryId) return entry;
+
+      // Berechne ob übertroffen
+      let exceeded = false;
+      if (entry.predictionType === 'note') {
+        exceeded = result < entry.prediction;
+      } else {
+        exceeded = result > entry.prediction;
+      }
+
+      const difference = entry.predictionType === 'note'
+        ? entry.prediction - result
+        : result - entry.prediction;
+
+      // XP berechnen
+      let xp = 15; // base
+      if (exceeded) xp += 25;
+      if (result === entry.prediction) xp += 15;
+      if (entry.task.length > 50) xp += 5;
+      if (reflection && reflection.length > 20) xp += 5;
+
+      return {
+        ...entry,
+        status: 'completed' as const,
+        result,
+        exceeded,
+        difference,
+        reflection,
+        xp_earned: xp,
+        completed_at: new Date().toISOString()
+      };
+    }));
+
+    // Stats aktualisieren
+    setHattieStats(prev => {
+      const completedEntry = hattieEntries.find(e => e.id === entryId);
+      if (!completedEntry) return prev;
+
+      let exceeded = false;
+      if (completedEntry.predictionType === 'note') {
+        exceeded = result < completedEntry.prediction;
+      } else {
+        exceeded = result > completedEntry.prediction;
+      }
+
+      let xp = 15;
+      if (exceeded) xp += 25;
+      if (result === completedEntry.prediction) xp += 15;
+
+      const newTotalXp = prev.total_xp + xp;
+      const newLevel = Math.floor(newTotalXp / 100) + 1;
+      const newExceededCount = exceeded ? prev.exceeded_count + 1 : prev.exceeded_count;
+      const newCompletedEntries = prev.completed_entries + 1;
+
+      return {
+        ...prev,
+        pending_entries: prev.pending_entries - 1,
+        completed_entries: newCompletedEntries,
+        exceeded_count: newExceededCount,
+        success_rate: newCompletedEntries > 0 ? (newExceededCount / newCompletedEntries) * 100 : 0,
+        total_xp: newTotalXp,
+        level: newLevel,
+        current_streak: exceeded ? prev.current_streak + 1 : 0,
+        longest_streak: exceeded
+          ? Math.max(prev.longest_streak, prev.current_streak + 1)
+          : prev.longest_streak
+      };
+    });
+
+    if (onAction) {
+      const entry = hattieEntries.find(e => e.id === entryId);
+      onAction({
+        action: 'hattie_complete',
+        islandId: 'hattie_ship',
+        xpEarned: 15, // Wird oben genauer berechnet
+        description: entry ? `${entry.task}: ${entry.prediction} -> ${result}` : 'Hattie abgeschlossen'
+      });
+    }
+    console.log('Hattie entry completed:', { entryId, result, reflection });
+  }, [onAction, hattieEntries]);
 
   return (
     <div className="rpg-schatzkarte">
@@ -221,19 +379,34 @@ function RPGSchatzkarteContent({
         />
       )}
 
-      {/* Bandura Ship Modal */}
+      {/* Bandura Ship Modal - mit WOW-Effekten */}
       <BanduraShipModal
         isOpen={showBanduraModal}
         completedToday={banduraCompletedToday}
         onClose={() => setShowBanduraModal(false)}
         onEntrySubmit={handleBanduraEntry}
+        banduraEntries={banduraEntries}
+        banduraStats={banduraStats}
+        userName={heroData.name}
       />
 
       {/* Hattie Ship Modal */}
       <HattieShipModal
         isOpen={showHattieModal}
         onClose={() => setShowHattieModal(false)}
-        onEntrySubmit={handleHattieEntry}
+        onNewPrediction={handleNewPrediction}
+        onCompleteEntry={handleCompleteEntry}
+        hattieEntries={hattieEntries}
+        hattieStats={hattieStats}
+        userName={heroData.name}
+      />
+
+      {/* Brainy - Das Maskottchen */}
+      <Brainy
+        mood="happy"
+        message={`Hey ${heroData.name}! Klick auf eine Insel!`}
+        size="medium"
+        position="left"
       />
 
       <footer className="app-footer">

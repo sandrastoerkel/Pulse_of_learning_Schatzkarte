@@ -189,10 +189,10 @@ export function WorldMap({
           title="Bandura-Challenge: Die 4 Quellen der Selbstwirksamkeit"
         >
           <div className="ship-body">
-            <span className="ship-icon">🚢</span>
-            <span className="ship-flag">🔥</span>
+            <span className="ship-icon">🧠</span>
+            <span className="ship-flag">✨</span>
           </div>
-          <div className="ship-label">Bandura</div>
+          <div className="ship-label">Selbstwirksamkeit</div>
           <div className="ship-waves">〰️</div>
         </div>
 
@@ -202,10 +202,10 @@ export function WorldMap({
           title="Hattie-Challenge: Trainiere deine Selbsteinschaetzung"
         >
           <div className="ship-body">
-            <span className="ship-icon">⛵</span>
-            <span className="ship-flag">🎯</span>
+            <span className="ship-icon">🎯</span>
+            <span className="ship-flag">⭐</span>
           </div>
-          <div className="ship-label">Hattie</div>
+          <div className="ship-label">Selbsteinschätzung</div>
           <div className="ship-waves">〰️</div>
         </div>
 

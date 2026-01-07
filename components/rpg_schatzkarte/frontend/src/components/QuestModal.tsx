@@ -11,6 +11,8 @@ import { BANDURA_SOURCES, BANDURA_INFO, BanduraSourceId } from '../content/bandu
 import { HATTIE_CHALLENGE_INFO, HATTIE_SUBJECTS } from '../content/hattieContent';
 import { SUPERHELDEN_QUIZ_QUESTIONS } from '../content/festungQuizContent';
 import { BattleQuiz } from './BattleQuiz';
+import { BanduraChallenge } from './BanduraChallenge';
+import { BanduraEntry, BanduraStats, DEFAULT_BANDURA_STATS } from '../banduraTypes';
 
 interface QuestModalProps {
   island: Island & {
@@ -26,6 +28,10 @@ interface QuestModalProps {
   onQuestComplete: (questType: string, xp: number, gold?: number, itemId?: string) => void;
   onTreasureCollected: (treasureId: string, xp: number) => void;
   onChallengeEntry?: (challengeType: 'bandura' | 'hattie', data: any, xp: number) => void;
+  // NEU: Bandura-Daten von Python
+  banduraEntries?: BanduraEntry[];
+  banduraStats?: BanduraStats;
+  userName?: string;
 }
 
 // Challenge Types
@@ -153,7 +159,10 @@ export function QuestModal({
   onClose,
   onQuestComplete,
   onTreasureCollected,
-  onChallengeEntry
+  onChallengeEntry,
+  banduraEntries,
+  banduraStats,
+  userName
 }: QuestModalProps) {
   const [activeQuest, setActiveQuest] = useState<QuestType | null>(null);
   const [showReward, setShowReward] = useState(false);
@@ -169,6 +178,7 @@ export function QuestModal({
   const [selectedBanduraSource, setSelectedBanduraSource] = useState<BanduraSourceId | null>(null);
   const [banduraDescription, setBanduraDescription] = useState('');
   const [banduraCompleted, setBanduraCompleted] = useState<BanduraSourceId[]>([]);
+  const [showFullBandura, setShowFullBandura] = useState(true);
   const [hattieStep, setHattieStep] = useState<HattieStep>('subject');
   const [hattieEntry, setHattieEntry] = useState<HattieEntry>({ subject: '', task: '', prediction: 0 });
   const [challengeSuccess, setChallengeSuccess] = useState(false);
@@ -671,103 +681,168 @@ export function QuestModal({
                       </div>
                     )}
 
-                    {/* Bandura Challenge */}
+                    {/* Bandura Challenge - ERWEITERT MIT WOW-EFFEKTEN */}
                     {challengeSelection === 'bandura' && !challengeSuccess && (
-                      <div className="bandura-challenge">
-                        <h4>🌟 {BANDURA_INFO.title}</h4>
-                        <p style={{ marginBottom: '15px' }}>{BANDURA_INFO.description}</p>
-
-                        {/* Die 4 Quellen */}
-                        <div className="bandura-sources">
-                          {(Object.keys(BANDURA_SOURCES) as BanduraSourceId[]).map(sourceId => {
-                            const source = BANDURA_SOURCES[sourceId];
-                            const isCompleted = banduraCompleted.includes(sourceId);
-                            const isSelected = selectedBanduraSource === sourceId;
-
-                            return (
-                              <div
-                                key={sourceId}
-                                className={`bandura-source-card ${isSelected ? 'selected' : ''} ${isCompleted ? 'completed' : ''}`}
-                                onClick={() => !isCompleted && setSelectedBanduraSource(sourceId)}
-                                style={{ borderColor: isSelected ? source.color : undefined }}
-                              >
-                                <div className="bandura-source-icon">{source.icon}</div>
-                                <div className="bandura-source-name">{source.name_de}</div>
-                                <div className="bandura-source-xp">+{source.xp} XP</div>
-                                {isCompleted && <div className="check-mark">✓</div>}
-                              </div>
-                            );
-                          })}
-                        </div>
-
-                        {/* Eingabe-Formular */}
-                        {selectedBanduraSource && (
-                          <div className="entry-form" style={{ marginTop: '20px' }}>
-                            <div className="entry-prompt">
-                              <span style={{ fontSize: '24px', marginRight: '10px' }}>
-                                {BANDURA_SOURCES[selectedBanduraSource].icon}
-                              </span>
-                              {BANDURA_SOURCES[selectedBanduraSource].prompt}
-                            </div>
-                            <div className="entry-examples">
-                              Beispiele: {BANDURA_SOURCES[selectedBanduraSource].examples.join(' • ')}
-                            </div>
-                            <textarea
-                              className="entry-textarea"
-                              placeholder="Beschreibe deine Erfahrung..."
-                              value={banduraDescription}
-                              onChange={e => setBanduraDescription(e.target.value)}
-                            />
-                            <button
-                              className="submit-entry-btn"
-                              onClick={() => {
-                                if (banduraDescription.trim().length >= 10) {
-                                  const source = BANDURA_SOURCES[selectedBanduraSource];
-                                  let xp = source.xp;
-                                  if (banduraDescription.length > 50) xp += 5;
-
-                                  setBanduraCompleted(prev => [...prev, selectedBanduraSource]);
-                                  setChallengeXp(xp);
-                                  setChallengeSuccess(true);
-
-                                  if (onChallengeEntry) {
-                                    onChallengeEntry('bandura', {
-                                      sourceId: selectedBanduraSource,
-                                      description: banduraDescription
-                                    }, xp);
-                                  }
-
-                                  setTimeout(() => {
-                                    setChallengeSuccess(false);
-                                    setSelectedBanduraSource(null);
-                                    setBanduraDescription('');
-                                    setChallengeSelection('select');
-                                    handleCompleteQuest('challenge');
-                                  }, 2500);
-                                }
-                              }}
-                              disabled={banduraDescription.trim().length < 10}
-                            >
-                              {banduraDescription.trim().length < 10
-                                ? `Mindestens ${10 - banduraDescription.trim().length} Zeichen...`
-                                : '✓ Eintrag speichern'
+                      <>
+                        {showFullBandura ? (
+                          // Vollständige Bandura-Challenge Komponente mit Animationen
+                          <BanduraChallenge
+                            entries={banduraEntries || []}
+                            stats={banduraStats || DEFAULT_BANDURA_STATS}
+                            userName={userName || 'Lern-Held'}
+                            onNewEntry={(sourceType, description, xp) => {
+                              if (onChallengeEntry) {
+                                onChallengeEntry('bandura', {
+                                  sourceType,
+                                  description,
+                                  xpEarned: xp,
+                                  timestamp: new Date().toISOString()
+                                }, xp);
                               }
+                            }}
+                            onClose={() => setShowFullBandura(false)}
+                          />
+                        ) : (
+                          // Quick-Entry Ansicht mit Button zur vollständigen Ansicht
+                          <div className="bandura-challenge">
+                            <h4>🌟 {BANDURA_INFO.title}</h4>
+                            <p style={{ marginBottom: '15px' }}>{BANDURA_INFO.description}</p>
+
+                            {/* Button zur vollständigen Ansicht */}
+                            <button
+                              className="full-bandura-btn"
+                              onClick={() => setShowFullBandura(true)}
+                              style={{
+                                width: '100%',
+                                padding: '15px',
+                                marginBottom: '20px',
+                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                border: 'none',
+                                borderRadius: '12px',
+                                color: 'white',
+                                fontWeight: 'bold',
+                                fontSize: '1.1em',
+                                cursor: 'pointer',
+                                boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
+                                transition: 'transform 0.2s, box-shadow 0.2s'
+                              }}
+                              onMouseOver={e => {
+                                e.currentTarget.style.transform = 'scale(1.02)';
+                                e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.5)';
+                              }}
+                              onMouseOut={e => {
+                                e.currentTarget.style.transform = 'scale(1)';
+                                e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
+                              }}
+                            >
+                              🧠 Vollständige Bandura-Challenge öffnen
+                              <span style={{ display: 'block', fontSize: '0.85em', opacity: 0.9, marginTop: '5px' }}>
+                                ✨ Mit Portfolio, Übersicht, Urkunde & WOW-Effekten!
+                              </span>
+                            </button>
+
+                            <div style={{
+                              textAlign: 'center',
+                              color: '#666',
+                              fontSize: '0.9em',
+                              margin: '15px 0'
+                            }}>
+                              — oder Quick-Entry —
+                            </div>
+
+                            {/* Die 4 Quellen (Quick-Entry) */}
+                            <div className="bandura-sources">
+                              {(Object.keys(BANDURA_SOURCES) as BanduraSourceId[]).map(sourceId => {
+                                const source = BANDURA_SOURCES[sourceId];
+                                const isCompleted = banduraCompleted.includes(sourceId);
+                                const isSelected = selectedBanduraSource === sourceId;
+
+                                return (
+                                  <div
+                                    key={sourceId}
+                                    className={`bandura-source-card ${isSelected ? 'selected' : ''} ${isCompleted ? 'completed' : ''}`}
+                                    onClick={() => !isCompleted && setSelectedBanduraSource(sourceId)}
+                                    style={{ borderColor: isSelected ? source.color : undefined }}
+                                  >
+                                    <div className="bandura-source-icon">{source.icon}</div>
+                                    <div className="bandura-source-name">{source.name_de}</div>
+                                    <div className="bandura-source-xp">+{source.xp} XP</div>
+                                    {isCompleted && <div className="check-mark">✓</div>}
+                                  </div>
+                                );
+                              })}
+                            </div>
+
+                            {/* Eingabe-Formular */}
+                            {selectedBanduraSource && (
+                              <div className="entry-form" style={{ marginTop: '20px' }}>
+                                <div className="entry-prompt">
+                                  <span style={{ fontSize: '24px', marginRight: '10px' }}>
+                                    {BANDURA_SOURCES[selectedBanduraSource].icon}
+                                  </span>
+                                  {BANDURA_SOURCES[selectedBanduraSource].prompt}
+                                </div>
+                                <div className="entry-examples">
+                                  Beispiele: {BANDURA_SOURCES[selectedBanduraSource].examples.join(' • ')}
+                                </div>
+                                <textarea
+                                  className="entry-textarea"
+                                  placeholder="Beschreibe deine Erfahrung..."
+                                  value={banduraDescription}
+                                  onChange={e => setBanduraDescription(e.target.value)}
+                                />
+                                <button
+                                  className="submit-entry-btn"
+                                  onClick={() => {
+                                    if (banduraDescription.trim().length >= 10) {
+                                      const source = BANDURA_SOURCES[selectedBanduraSource];
+                                      let xp = source.xp;
+                                      if (banduraDescription.length > 50) xp += 5;
+
+                                      setBanduraCompleted(prev => [...prev, selectedBanduraSource]);
+                                      setChallengeXp(xp);
+                                      setChallengeSuccess(true);
+
+                                      if (onChallengeEntry) {
+                                        onChallengeEntry('bandura', {
+                                          sourceId: selectedBanduraSource,
+                                          description: banduraDescription
+                                        }, xp);
+                                      }
+
+                                      setTimeout(() => {
+                                        setChallengeSuccess(false);
+                                        setSelectedBanduraSource(null);
+                                        setBanduraDescription('');
+                                        setChallengeSelection('select');
+                                        handleCompleteQuest('challenge');
+                                      }, 2500);
+                                    }
+                                  }}
+                                  disabled={banduraDescription.trim().length < 10}
+                                >
+                                  {banduraDescription.trim().length < 10
+                                    ? `Mindestens ${10 - banduraDescription.trim().length} Zeichen...`
+                                    : '✓ Eintrag speichern'
+                                  }
+                                </button>
+                              </div>
+                            )}
+
+                            <button
+                              className="back-btn"
+                              onClick={() => {
+                                setChallengeSelection('select');
+                                setSelectedBanduraSource(null);
+                                setBanduraDescription('');
+                              }}
+                              style={{ marginTop: '15px' }}
+                            >
+                              ← Andere Challenge wählen
                             </button>
                           </div>
                         )}
-
-                        <button
-                          className="back-btn"
-                          onClick={() => {
-                            setChallengeSelection('select');
-                            setSelectedBanduraSource(null);
-                            setBanduraDescription('');
-                          }}
-                          style={{ marginTop: '15px' }}
-                        >
-                          ← Andere Challenge wählen
-                        </button>
-                      </div>
+                      </>
                     )}
 
                     {/* Hattie Challenge */}

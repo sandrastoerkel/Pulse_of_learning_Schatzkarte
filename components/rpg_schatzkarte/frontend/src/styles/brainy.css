@@ -1,0 +1,301 @@
+/* ============================================
+   BRAINY - Das Maskottchen CSS
+   Pulse of Learning
+   ============================================ */
+
+/* ============================================
+   WRAPPER & POSITIONING
+   ============================================ */
+.brainy-wrapper {
+  position: fixed;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: auto;
+}
+
+.brainy-position-left {
+  left: 20px;
+  bottom: 20px;
+}
+
+.brainy-position-right {
+  right: 20px;
+  bottom: 20px;
+}
+
+.brainy-position-center {
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+}
+
+/* ============================================
+   BRAINY CONTAINER
+   ============================================ */
+.brainy-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Größen */
+.brainy-small {
+  width: 60px;
+  height: 60px;
+}
+
+.brainy-medium {
+  width: 100px;
+  height: 100px;
+}
+
+.brainy-large {
+  width: 150px;
+  height: 150px;
+}
+
+/* ============================================
+   BRAINY IMAGE
+   ============================================ */
+.brainy-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Glow Effekt hinter Brainy */
+.brainy-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120%;
+  height: 120%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 107, 129, 0.4) 0%,
+    rgba(255, 107, 129, 0.1) 40%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ============================================
+   SPRECHBLASE
+   ============================================ */
+.brainy-speech-bubble {
+  position: relative;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 20px;
+  padding: 12px 18px;
+  margin-bottom: 10px;
+  max-width: 250px;
+  box-shadow:
+    0 4px 15px rgba(0, 0, 0, 0.15),
+    0 0 0 2px rgba(255, 107, 129, 0.3);
+  text-align: center;
+}
+
+.brainy-speech-bubble .bubble-text {
+  color: #333;
+  font-size: 0.95em;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.brainy-speech-bubble .bubble-tail {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 12px solid #ffffff;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.1));
+}
+
+/* ============================================
+   PARTIKEL / EMOJIS
+   ============================================ */
+.brainy-particles {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.brainy-particles .particle {
+  position: absolute;
+  font-size: 1.5em;
+}
+
+/* ============================================
+   SCHLAF ZZZs
+   ============================================ */
+.brainy-zzz {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  font-size: 1.5em;
+  pointer-events: none;
+}
+
+/* ============================================
+   HELPER BUTTON
+   ============================================ */
+.brainy-helper-button {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  z-index: 999;
+}
+
+.brainy-helper-button .helper-label {
+  margin-top: 5px;
+  font-size: 0.75em;
+  color: #666;
+  background: white;
+  padding: 3px 8px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================
+   SPEZIELLE ANIMATIONEN
+   ============================================ */
+
+/* Pulsierender Schatten für aufgeregte Stimmung */
+.brainy-container.excited .brainy-image {
+  animation: brainy-pulse-shadow 0.5s ease-in-out infinite;
+}
+
+@keyframes brainy-pulse-shadow {
+  0%, 100% {
+    filter: drop-shadow(0 4px 12px rgba(255, 107, 129, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 8px 25px rgba(255, 107, 129, 0.6));
+  }
+}
+
+/* Regenbogen-Glow für Feiern */
+.brainy-container.celebrating .brainy-glow {
+  animation: rainbow-glow 2s linear infinite;
+}
+
+@keyframes rainbow-glow {
+  0% {
+    background: radial-gradient(circle, rgba(255, 107, 129, 0.5) 0%, transparent 70%);
+  }
+  25% {
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.5) 0%, transparent 70%);
+  }
+  50% {
+    background: radial-gradient(circle, rgba(76, 175, 80, 0.5) 0%, transparent 70%);
+  }
+  75% {
+    background: radial-gradient(circle, rgba(33, 150, 243, 0.5) 0%, transparent 70%);
+  }
+  100% {
+    background: radial-gradient(circle, rgba(255, 107, 129, 0.5) 0%, transparent 70%);
+  }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  .brainy-wrapper {
+    bottom: 10px;
+  }
+
+  .brainy-position-left {
+    left: 10px;
+  }
+
+  .brainy-position-right {
+    right: 10px;
+  }
+
+  .brainy-small {
+    width: 50px;
+    height: 50px;
+  }
+
+  .brainy-medium {
+    width: 80px;
+    height: 80px;
+  }
+
+  .brainy-large {
+    width: 120px;
+    height: 120px;
+  }
+
+  .brainy-speech-bubble {
+    max-width: 200px;
+    padding: 10px 14px;
+    font-size: 0.85em;
+  }
+}
+
+/* ============================================
+   DARK MODE SUPPORT
+   ============================================ */
+@media (prefers-color-scheme: dark) {
+  .brainy-speech-bubble {
+    background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+    box-shadow:
+      0 4px 15px rgba(0, 0, 0, 0.4),
+      0 0 0 2px rgba(255, 107, 129, 0.4);
+  }
+
+  .brainy-speech-bubble .bubble-text {
+    color: #f0f0f0;
+  }
+
+  .brainy-speech-bubble .bubble-tail {
+    border-top-color: #2d2d2d;
+  }
+
+  .brainy-helper-button .helper-label {
+    background: #2d2d2d;
+    color: #f0f0f0;
+  }
+}
+
+/* ============================================
+   INLINE-BRAINY (für Text-Einbettung)
+   ============================================ */
+.brainy-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  vertical-align: middle;
+}
+
+.brainy-inline .brainy-container {
+  width: 30px;
+  height: 30px;
+}
+
+.brainy-inline .brainy-text {
+  font-style: italic;
+  color: #666;
+}

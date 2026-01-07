@@ -142,7 +142,7 @@ export interface SchatzkarteProp {
 
 // Aktionen die an Python zurueckgegeben werden
 export interface SchatzkartAction {
-  action: 'quest_completed' | 'treasure_collected' | 'xp_earned' | 'item_received' | 'bandura_entry' | 'hattie_entry';
+  action: 'quest_completed' | 'treasure_collected' | 'xp_earned' | 'item_received' | 'bandura_entry' | 'hattie_entry' | 'hattie_prediction' | 'hattie_complete';
   islandId?: string;
   questType?: QuestType;
   treasureId?: string;

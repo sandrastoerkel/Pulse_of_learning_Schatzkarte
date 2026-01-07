@@ -900,6 +900,23 @@ def render_certificate_section(user_id: str, stats: Dict, entries_by_source: Dic
     # Datum
     today = datetime.now().strftime("%d.%m.%Y")
 
+    # Generiere Einträge-HTML für jede Quelle
+    def format_entries(source_key):
+        entries = entries_by_source.get(source_key, [])[:5]
+        if not entries:
+            return '<div style="color: #999; font-style: italic;">Noch keine Einträge</div>'
+        html_parts = []
+        for e in entries:
+            desc = e.get("description", "")
+            short_desc = desc[:50] + "..." if len(desc) > 50 else desc
+            html_parts.append(f'<div style="margin: 4px 0;">• {short_desc}</div>')
+        return ''.join(html_parts)
+
+    mastery_entries_html = format_entries('mastery')
+    vicarious_entries_html = format_entries('vicarious')
+    persuasion_entries_html = format_entries('persuasion')
+    physiological_entries_html = format_entries('physiological')
+
     # Elegante Urkunde als HTML (ohne Kommentare für Streamlit-Kompatibilität)
     certificate_html = f'''
     <div id="certificate" style="background: linear-gradient(145deg, #fffef5 0%, #fdf8e6 50%, #f5edd6 100%); padding: 15px; border-radius: 8px; box-shadow: 0 15px 50px rgba(0,0,0,0.2); margin: 20px auto; max-width: 650px;">
@@ -927,25 +944,41 @@ def render_certificate_section(user_id: str, stats: Dict, entries_by_source: Dic
                 </div>
 
                 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 25px 0;">
-                    <div style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); padding: 15px; border-radius: 8px; border: 1px solid #a5d6a7; text-align: center;">
-                        <div style="font-size: 1.8em; margin-bottom: 5px;">🏆</div>
-                        <div style="font-size: 2em; font-weight: bold; color: #2e7d32;">{counts.get('mastery', 0)}</div>
-                        <div style="font-size: 0.85em; color: #33691e;">Eigene Erfolge</div>
+                    <div style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); padding: 15px; border-radius: 8px; border: 1px solid #a5d6a7; text-align: left;">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #a5d6a7;">
+                            <span style="font-size: 1.5em;">🏆</span>
+                            <span style="font-weight: bold; color: #2e7d32;">Eigene Erfolge</span>
+                        </div>
+                        <div style="font-size: 0.85em; color: #33691e; min-height: 80px;">
+                            {mastery_entries_html}
+                        </div>
                     </div>
-                    <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); padding: 15px; border-radius: 8px; border: 1px solid #90caf9; text-align: center;">
-                        <div style="font-size: 1.8em; margin-bottom: 5px;">👀</div>
-                        <div style="font-size: 2em; font-weight: bold; color: #1565c0;">{counts.get('vicarious', 0)}</div>
-                        <div style="font-size: 0.85em; color: #0d47a1;">Vorbild-Erfahrungen</div>
+                    <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); padding: 15px; border-radius: 8px; border: 1px solid #90caf9; text-align: left;">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #90caf9;">
+                            <span style="font-size: 1.5em;">👀</span>
+                            <span style="font-weight: bold; color: #1565c0;">Vorbild-Erfahrungen</span>
+                        </div>
+                        <div style="font-size: 0.85em; color: #0d47a1; min-height: 80px;">
+                            {vicarious_entries_html}
+                        </div>
                     </div>
-                    <div style="background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); padding: 15px; border-radius: 8px; border: 1px solid #ce93d8; text-align: center;">
-                        <div style="font-size: 1.8em; margin-bottom: 5px;">💬</div>
-                        <div style="font-size: 2em; font-weight: bold; color: #7b1fa2;">{counts.get('persuasion', 0)}</div>
-                        <div style="font-size: 0.85em; color: #4a148c;">Ermutigungen</div>
+                    <div style="background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); padding: 15px; border-radius: 8px; border: 1px solid #ce93d8; text-align: left;">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #ce93d8;">
+                            <span style="font-size: 1.5em;">💬</span>
+                            <span style="font-weight: bold; color: #7b1fa2;">Ermutigungen</span>
+                        </div>
+                        <div style="font-size: 0.85em; color: #4a148c; min-height: 80px;">
+                            {persuasion_entries_html}
+                        </div>
                     </div>
-                    <div style="background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); padding: 15px; border-radius: 8px; border: 1px solid #ffcc80; text-align: center;">
-                        <div style="font-size: 1.8em; margin-bottom: 5px;">🧘</div>
-                        <div style="font-size: 2em; font-weight: bold; color: #e65100;">{counts.get('physiological', 0)}</div>
-                        <div style="font-size: 0.85em; color: #bf360c;">Stress-Strategien</div>
+                    <div style="background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); padding: 15px; border-radius: 8px; border: 1px solid #ffcc80; text-align: left;">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #ffcc80;">
+                            <span style="font-size: 1.5em;">🧘</span>
+                            <span style="font-weight: bold; color: #e65100;">Stress-Strategien</span>
+                        </div>
+                        <div style="font-size: 0.85em; color: #bf360c; min-height: 80px;">
+                            {physiological_entries_html}
+                        </div>
                     </div>
                 </div>
 

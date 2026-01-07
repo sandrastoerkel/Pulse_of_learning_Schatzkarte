@@ -648,56 +648,158 @@ def change_preview_age_group(age_group: str):
 
 
 def render_preview_banner():
-    """Rendert den Preview-Banner mit Altersstufen-Wechsler."""
-    if not is_preview_mode():
+    """Legacy-Funktion - ruft jetzt render_age_switcher_overlay() auf."""
+    render_age_switcher_overlay()
+
+
+def render_age_switcher_overlay():
+    """
+    Rendert den Altersstufen-Wechsler als schwebendes Overlay.
+    Nur sichtbar für: Preview-Modus, Pädagogen, Coaches, Admins.
+    Schüler sehen dieses Menü NICHT.
+    """
+    # Prüfen ob User berechtigt ist
+    is_preview = is_preview_mode()
+    user_id = st.session_state.get("current_user_id")
+
+    # Rolle prüfen (nur wenn nicht Preview und User eingeloggt)
+    user_role = None
+    if user_id and not is_preview:
+        user_role = get_user_role(user_id)
+
+    # Berechtigte Rollen
+    allowed_roles = [ROLE_COACH, ROLE_ADMIN, 'paedagoge', 'pädagoge']
+
+    # Schüler sehen nichts
+    if not is_preview and user_role not in allowed_roles:
         return
 
     current_age = st.session_state.get("current_user_age_group", "unterstufe")
 
+    # Mapping für Anzeige
+    age_labels = {
+        "grundschule": "🎒 GS",
+        "unterstufe": "📚 US",
+        "mittelstufe": "🎯 MS",
+        "oberstufe": "🎓 OS",
+        "paedagogen": "👩‍🏫 Päd",
+    }
+    current_short = age_labels.get(current_age, "📚 US")
+
+    # CSS für schwebendes Overlay-Menü
     st.markdown("""
-    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-                color: white; padding: 10px 20px; border-radius: 10px; margin-bottom: 15px;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <strong>👁️ PREVIEW-MODUS</strong>
-                <span style="opacity: 0.9; margin-left: 10px;">Teste alle Funktionen ohne echten Account</span>
-            </div>
+    <style>
+        /* Schwebendes Overlay-Menü */
+        .age-switcher-overlay {
+            position: fixed;
+            top: 70px;
+            left: 15px;
+            z-index: 99999;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .age-switcher-tab {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            display: inline-block;
+            transition: all 0.2s ease;
+        }
+
+        .age-switcher-tab:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .age-switcher-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 5px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+            padding: 10px;
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+        }
+
+        .age-switcher-overlay:hover .age-switcher-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .age-switcher-title {
+            font-size: 0.75em;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .age-switcher-info {
+            font-size: 0.7em;
+            color: #999;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #eee;
+        }
+    </style>
+
+    <div class="age-switcher-overlay">
+        <div class="age-switcher-tab">
+            👁️ """ + current_short + """
+        </div>
+        <div class="age-switcher-dropdown">
+            <div class="age-switcher-title">Altersstufe wechseln</div>
+            <div class="age-switcher-info">Wähle unten eine Stufe ↓</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-    # Altersstufen-Wechsler
-    st.markdown("**Altersstufe wechseln:**")
-    cols = st.columns([1, 1, 1, 1, 1, 1, 1])
+    # Streamlit-Buttons für Interaktion (in einem Popover)
+    with st.popover("🎚️ Altersstufe", use_container_width=False):
+        st.markdown("**Wähle eine Altersstufe:**")
 
-    age_options = [
-        ("grundschule", "🎒 Grundschule"),
-        ("unterstufe", "📚 Unterstufe"),
-        ("mittelstufe", "🎯 Mittelstufe"),
-        ("oberstufe", "🎓 Oberstufe"),
-        ("paedagogen", "👩‍🏫 Pädagogen"),
-    ]
+        age_options = [
+            ("grundschule", "🎒 Grundschule"),
+            ("unterstufe", "📚 Unterstufe"),
+            ("mittelstufe", "🎯 Mittelstufe"),
+            ("oberstufe", "🎓 Oberstufe"),
+            ("paedagogen", "👩‍🏫 Pädagogen"),
+        ]
 
-    for idx, (age_key, age_label) in enumerate(age_options):
-        with cols[idx]:
+        for age_key, age_label in age_options:
             is_selected = current_age == age_key
             btn_type = "primary" if is_selected else "secondary"
-            if st.button(age_label, key=f"preview_age_{age_key}", use_container_width=True, type=btn_type):
+            if st.button(age_label, key=f"age_switch_{age_key}", use_container_width=True, type=btn_type):
                 change_preview_age_group(age_key)
                 st.rerun()
 
-    # Reset und Beenden Buttons
-    with cols[5]:
-        if st.button("🗑️ Reset", key="preview_reset", use_container_width=True):
-            reset_preview_data()
-            st.rerun()
+        st.divider()
 
-    with cols[6]:
-        if st.button("🚪 Beenden", key="preview_end", use_container_width=True):
-            end_preview_mode()
-            st.rerun()
-
-    st.divider()
+        # Reset und Beenden nur im Preview-Modus
+        if is_preview:
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("🗑️ Reset", key="preview_reset", use_container_width=True):
+                    reset_preview_data()
+                    st.rerun()
+            with col2:
+                if st.button("🚪 Ende", key="preview_end", use_container_width=True):
+                    end_preview_mode()
+                    st.rerun()
 
 
 # ============================================
