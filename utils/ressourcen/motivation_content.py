@@ -293,7 +293,7 @@ def _render_theorie_tab():
     """Rendert den Theorie-Tab basierend auf User-Altersstufe."""
 
     # Altersstufe aus User-Profil holen (oben gewählt)
-    age_group = st.session_state.get("current_user_age_group", "unterstufe")
+    age_group = st.session_state.get("current_user_age_group", "grundschule")
 
     # Content je nach Altersstufe
     if age_group == "grundschule":

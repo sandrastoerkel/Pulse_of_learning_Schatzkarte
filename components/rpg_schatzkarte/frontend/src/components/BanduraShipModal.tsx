@@ -33,9 +33,9 @@ export function BanduraShipModal({
         className="ship-modal bandura fullscreen-challenge"
         onClick={e => e.stopPropagation()}
         style={{
-          maxWidth: '900px',
-          width: '95%',
-          maxHeight: '90vh',
+          maxWidth: '96vw',
+          width: '96%',
+          maxHeight: '94vh',
           overflow: 'auto'
         }}
       >

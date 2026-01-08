@@ -1093,10 +1093,10 @@ export function BanduraChallenge({
             animate={{ rotate: [0, 10, -10, 0] }}
             transition={{ duration: 3, repeat: Infinity }}
           >
-            🧠
+            🔑
           </motion.span>
           <div>
-            <h3>Bandura-Challenge</h3>
+            <h3>Der goldene Schlüssel</h3>
             <p>Die 4 Quellen der Selbstwirksamkeit</p>
           </div>
         </div>

@@ -300,7 +300,7 @@ def render_learnstrat_altersstufen(color: str):
     # ==========================================
     else:
         # Altersstufe aus User-Profil holen (oben gewählt)
-        age_group = st.session_state.get("current_user_age_group", "unterstufe")
+        age_group = st.session_state.get("current_user_age_group", "grundschule")
 
         # Session State für Theorie-Unterbereich
         if "learnstrat_theorie_section" not in st.session_state:

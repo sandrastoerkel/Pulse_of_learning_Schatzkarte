@@ -64,7 +64,7 @@ def render_matheff_altersstufen(color: str):
     # ==========================================
     if st.session_state.matheff_tab == "theorie":
         # Altersstufe aus User-Profil holen (oben gewählt)
-        age_group = st.session_state.get("current_user_age_group", "unterstufe")
+        age_group = st.session_state.get("current_user_age_group", "grundschule")
 
         # Content basierend auf User-Altersstufe anzeigen
         if age_group == "grundschule":

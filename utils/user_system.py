@@ -308,7 +308,7 @@ def login_user(display_name: str, age_group: str = None, avatar_style: str = Non
     user = get_or_create_user_by_name(display_name, age_group, avatar_style)
     st.session_state.current_user_id = user['user_id']
     st.session_state.current_user_name = user['display_name']
-    st.session_state.current_user_age_group = user.get('age_group', 'unterstufe')
+    st.session_state.current_user_age_group = user.get('age_group', 'grundschule')
     return user
 
 def logout_user():
@@ -568,7 +568,7 @@ def zeige_schatzkarte() -> bool:
     Grundschule und Unterstufe: Schatzkarte (gamifiziert)
     Mittelstufe, Oberstufe, Pädagogen: Klassische Ressourcen-Seite
     """
-    age_group = st.session_state.get("current_user_age_group", "unterstufe")
+    age_group = st.session_state.get("current_user_age_group", "grundschule")
     return age_group in SCHATZKARTE_ALTERSSTUFEN
 
 
@@ -674,7 +674,7 @@ def render_age_switcher_overlay():
     if not is_preview and user_role not in allowed_roles:
         return
 
-    current_age = st.session_state.get("current_user_age_group", "unterstufe")
+    current_age = st.session_state.get("current_user_age_group", "grundschule")
 
     # Mapping für Anzeige
     age_labels = {
@@ -686,86 +686,49 @@ def render_age_switcher_overlay():
     }
     current_short = age_labels.get(current_age, "📚 US")
 
-    # CSS für schwebendes Overlay-Menü
+    # CSS für kompakten Popover-Button (kein weißer Balken)
     st.markdown("""
     <style>
-        /* Schwebendes Overlay-Menü */
-        .age-switcher-overlay {
-            position: fixed;
-            top: 70px;
-            left: 15px;
-            z-index: 99999;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        /* Positioniere den Popover-Button fest (rechts von Sidebar) */
+        [data-testid="stPopoverButton"] {
+            position: fixed !important;
+            top: 60px !important;
+            left: 300px !important;
+            z-index: 99999 !important;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 20px !important;
+            padding: 6px 12px !important;
+            box-shadow: 0 3px 12px rgba(102, 126, 234, 0.4) !important;
+            transition: all 0.2s ease !important;
+            width: auto !important;
+            min-width: unset !important;
         }
 
-        .age-switcher-tab {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 0.85em;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            display: inline-block;
-            transition: all 0.2s ease;
+        [data-testid="stPopoverButton"]:hover {
+            transform: scale(1.05) !important;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.5) !important;
         }
 
-        .age-switcher-tab:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        /* Text im Button weiß machen */
+        [data-testid="stPopoverButton"] p {
+            color: white !important;
+            margin: 0 !important;
+            font-size: 0.85em !important;
         }
 
-        .age-switcher-dropdown {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            margin-top: 5px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
-            padding: 10px;
-            min-width: 200px;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.2s ease;
+        /* Pfeil-Icon weiß */
+        [data-testid="stPopoverButton"] svg {
+            color: white !important;
         }
 
-        .age-switcher-overlay:hover .age-switcher-dropdown {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        .age-switcher-title {
-            font-size: 0.75em;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-            padding-bottom: 5px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .age-switcher-info {
-            font-size: 0.7em;
-            color: #999;
-            margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px solid #eee;
+        /* Popover-Dropdown schön stylen */
+        [data-testid="stPopoverBody"] {
+            border-radius: 12px !important;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2) !important;
         }
     </style>
-
-    <div class="age-switcher-overlay">
-        <div class="age-switcher-tab">
-            👁️ """ + current_short + """
-        </div>
-        <div class="age-switcher-dropdown">
-            <div class="age-switcher-title">Altersstufe wechseln</div>
-            <div class="age-switcher-info">Wähle unten eine Stufe ↓</div>
-        </div>
-    </div>
     """, unsafe_allow_html=True)
 
     # Streamlit-Buttons für Interaktion (in einem Popover)

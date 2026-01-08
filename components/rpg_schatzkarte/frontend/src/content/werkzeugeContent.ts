@@ -85,17 +85,6 @@ Ist sie einfach schlauer? **Nein.** Sie lernt nur ANDERS.
 Die Wissenschaft weiß seit über 100 Jahren, welche Methoden funktionieren. Die Schule hat's dir nur nie erzählt. **Bis jetzt!**`,
     sections: [
       {
-        title: "Effektstärke",
-        content: `Stell dir vor, du misst, wie viel Schüler in einem Jahr lernen. Das ist der Normalfall. Jetzt fragst du: Bringt Methode X mehr oder weniger als dieses eine Jahr?
-
-- **d = 0.40** → Ein Jahr Lernfortschritt (der Durchschnitt)
-- **d > 0.40** → Mehr als ein Jahr!
-- **d < 0.40** → Weniger als ein Jahr
-- **d = 0.80** → Zwei Jahre Fortschritt in einem Jahr!`,
-        type: 'expander',
-        expanded: false
-      },
-      {
         title: "Das wissen sogar die meisten Erwachsenen nicht",
         content: `*"Schreib das auf, dann merkst du's dir!"*
 
@@ -265,7 +254,7 @@ Aber: Etwas wiederzuerkennen ist nicht dasselbe wie es zu WISSEN.
 - Wenn Lernen sich leicht anfühlt, lernst du wahrscheinlich nicht viel.
 - Wenn Lernen sich anstrengend anfühlt, bist du auf dem richtigen Weg.
 
-**Vertrau der Wissenschaft, nicht deinem Gefühl!**`,
+**Vertrau der Wissenschaft!**`,
         type: 'info',
         study: {
           authors: 'Bjork',
@@ -305,17 +294,6 @@ Siehst du das Muster? Die Methoden, die sich GUT anfühlen, funktionieren oft SC
 
 Hier sind die 7 Techniken, die WIRKLICH funktionieren!`,
     sections: [
-      {
-        title: "Effektstärke",
-        content: `Stell dir vor, du misst, wie viel Schüler in einem Jahr lernen. Das ist der Normalfall. Jetzt fragst du: Bringt Methode X mehr oder weniger als dieses eine Jahr?
-
-- **d = 0.40** → Ein Jahr Lernfortschritt (der Durchschnitt)
-- **d > 0.40** → Mehr als ein Jahr!
-- **d < 0.40** → Weniger als ein Jahr
-- **d = 0.80** → Zwei Jahre Fortschritt in einem Jahr!`,
-        type: 'expander',
-        expanded: false
-      },
       {
         title: "Was ist eine 'Effektstärke' (d)?",
         content: `Stell dir vor, du misst, wie viel Schüler in einem Jahr lernen. Das ist der Normalfall.
@@ -511,17 +489,6 @@ Siehst du das Muster? Die Methoden, die sich GUT anfühlen, funktionieren oft SC
 - d = 0.80 → Zwei Jahre Fortschritt in einem Jahr!
 - d < 0.40 → Weniger als der Durchschnitt`,
     sections: [
-      {
-        title: "Effektstärke",
-        content: `Stell dir vor, du misst, wie viel Schüler in einem Jahr lernen. Das ist der Normalfall. Jetzt fragst du: Bringt Methode X mehr oder weniger als dieses eine Jahr?
-
-- **d = 0.40** → Ein Jahr Lernfortschritt (der Durchschnitt)
-- **d > 0.40** → Mehr als ein Jahr!
-- **d < 0.40** → Weniger als ein Jahr
-- **d = 0.80** → Zwei Jahre Fortschritt in einem Jahr!`,
-        type: 'expander',
-        expanded: false
-      },
       {
         title: "Die Effektstärken im Vergleich",
         content: `**High Utility Strategien:**

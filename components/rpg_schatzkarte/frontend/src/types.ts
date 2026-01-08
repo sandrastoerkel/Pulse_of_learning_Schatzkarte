@@ -140,9 +140,18 @@ export interface SchatzkarteProp {
   ageGroup: AgeGroup;
 }
 
+// Superhelden-Tagebuch (nur Grundschule)
+export interface TagebuchEintrag {
+  id: string;
+  datum: string; // ISO date
+  wasGeschafft: string; // z.B. "Das 3er-Einmaleins gelernt"
+  warEsSchwer: 'leicht' | 'mittel' | 'schwer';
+  gefuehl: string; // Emoji: 💪, 😊, 🎉, 😅, 🌟, 🦸
+}
+
 // Aktionen die an Python zurueckgegeben werden
 export interface SchatzkartAction {
-  action: 'quest_completed' | 'treasure_collected' | 'xp_earned' | 'item_received' | 'bandura_entry' | 'hattie_entry' | 'hattie_prediction' | 'hattie_complete';
+  action: 'quest_completed' | 'treasure_collected' | 'xp_earned' | 'item_received' | 'bandura_entry' | 'hattie_entry' | 'hattie_prediction' | 'hattie_complete' | 'tagebuch_entry';
   islandId?: string;
   questType?: QuestType;
   treasureId?: string;
@@ -152,6 +161,8 @@ export interface SchatzkartAction {
   // Bandura-Challenge spezifisch
   banduraSource?: 'mastery' | 'vicarious' | 'persuasion' | 'physiological';
   description?: string;
+  // Tagebuch spezifisch
+  tagebuchEntry?: TagebuchEintrag;
 }
 
 // Bandura-Quellen Konfiguration

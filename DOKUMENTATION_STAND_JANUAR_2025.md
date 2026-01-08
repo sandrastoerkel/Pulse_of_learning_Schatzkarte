@@ -1,5 +1,5 @@
 # Pulse of Learning - Schatzkarte
-## Dokumentation Stand 6. Januar 2025
+## Dokumentation Stand 7. Januar 2025
 
 ---
 
@@ -21,7 +21,62 @@ Danach hast du Zugang zur **👥 Lerngruppen**-Seite.
 
 ---
 
-# HEUTIGE ÄNDERUNGEN (6. Januar 2025)
+# HEUTIGE ÄNDERUNGEN (7. Januar 2025)
+
+## Bandura-Urkunde & Verbesserungen
+
+### 1. Bandura-Urkunde zeigt echte Einträge
+Die Urkunde zeigt jetzt die **tatsächlichen Texte** der Einträge statt nur Zahlen!
+
+**Vorher:** Nur "1", "2", "3" als Anzahl
+**Nachher:** "• schneller gelaufen als 3s...", "• Mathe-Test bestanden..." etc.
+
+Betroffen:
+- `BanduraChallenge.tsx` - React-Komponente (Urkunde im freischwebenden Schiff)
+- `bandura_sources_widget.py` - Python/Streamlit-Komponente (Portfolio-Urkunde)
+
+### 2. Effektstärke-Dropdown bei Werkzeuge-Insel
+Neues Dropdown-Menü unter der Überschrift "Insel der 7 Werkzeuge" mit Erklärung:
+- d = 0.40 → Ein Jahr Lernfortschritt (Durchschnitt)
+- d > 0.40 → Mehr als ein Jahr!
+- d < 0.40 → Weniger als ein Jahr
+- d = 0.80 → Zwei Jahre Fortschritt in einem Jahr!
+
+Für alle 3 Altersstufen (Grundschule, Unterstufe, Mittelstufe) hinzugefügt.
+
+### 3. Festung zeigt vollständige Bandura-Challenge
+Bei der Festung der Stärke wird jetzt **direkt** die vollständige Bandura-Challenge angezeigt (mit Portfolio, Übersicht, Urkunde & WOW-Effekten) - nicht mehr die Kurzversion.
+
+**Änderung:** `showFullBandura` State von `false` auf `true` geändert in QuestModal.tsx
+
+### 4. Text-Korrektur
+"Das Paradox: Warum sich gutes Lernen **falsch** anfühlt" → "....**anstrengend** anfühlt"
+(Grundschule + Unterstufe)
+
+### Neue/Geänderte Dateien (7. Januar):
+
+| Datei | Änderung |
+|-------|----------|
+| `frontend/src/components/BanduraChallenge.tsx` | Urkunde zeigt echte Texte |
+| `frontend/src/components/QuestModal.tsx` | showFullBandura = true |
+| `frontend/src/content/werkzeugeContent.ts` | Effektstärke-Dropdown, Text-Korrektur |
+| `frontend/src/styles/bandura-challenge.css` | Neue CSS-Klassen für Urkunde |
+| `utils/bandura_sources_widget.py` | Urkunde zeigt echte Texte (Python) |
+
+### Neue Komponenten erstellt:
+
+| Datei | Beschreibung |
+|-------|--------------|
+| `BanduraChallenge.tsx` | Vollständige Bandura-Challenge mit Tabs, Portfolio, Urkunde |
+| `HattieChallenge.tsx` | Hattie-Challenge Komponente |
+| `Brainy.tsx` | Brainy Maskottchen-Komponente |
+| `WerkzeugeTutorial.tsx` | Tutorial für Werkzeuge-Insel |
+| `banduraTypes.ts` | TypeScript-Typen für Bandura |
+| `hattieTypes.ts` | TypeScript-Typen für Hattie |
+
+---
+
+# ÄNDERUNGEN VOM 6. Januar 2025
 
 ## Superhelden-Quiz mit Leben-System
 
@@ -203,26 +258,29 @@ Der Starthafen hat jetzt strukturierte Tutorial-Schritte:
 
 ## Was noch TODO ist:
 
-### 1. Urkunden/Zertifikate für Bandura-Challenge
-**Problem:** Nach Abschluss der Bandura-Challenge soll eine Urkunde erstellt werden können.
+### 1. ✅ Urkunden zeigen echte Einträge (ERLEDIGT 7. Januar)
+~~**Problem:** Urkunde zeigte nur Zahlen statt echte Texte~~
+**Gelöst!** Urkunde zeigt jetzt die tatsächlichen Einträge der Kinder.
+
+### 2. PDF-Download für Urkunde
+**Problem:** Urkunde kann nur gedruckt werden (Strg+P), nicht als PDF heruntergeladen.
 
 **Anforderungen:**
 - PDF-Generator für Urkunden
-- Personalisiert mit Name des Schülers
-- Zeigt abgeschlossene Power-Ups
-- Datum und XP-Punkte
-- Druckbar/Downloadbar
+- Download-Button in der Urkunden-Ansicht
+- Personalisiert mit Name, Datum, Einträgen
 
-### 2. Inhalte für weitere Inseln
+### 3. Inhalte für weitere Inseln
 **Problem:** Die Content-Dateien für die anderen Inseln müssen noch mit Quiz-Fragen erweitert werden.
 
 **Bereits fertig:**
 - ✅ Festung der Stärke (festungContent.ts + festungQuizContent.ts)
-- ⏳ Insel der 7 Werkzeuge (werkzeugeContent.ts - Quiz fehlt)
+- ✅ Insel der 7 Werkzeuge (werkzeugeContent.ts mit Effektstärke-Dropdown)
+- ⏳ Insel der 7 Werkzeuge - Quiz fehlt noch
 - ⏳ Insel der Fäden (faedenContent.ts - Quiz fehlt)
 - ⏳ Insel der Brücken (brueckenContent.ts - Quiz fehlt)
 
-### 3. Willkommensvideo
+### 4. Willkommensvideo
 **Problem:** URL ist noch leer in `map_data.py`
 
 **Wo:** `schatzkarte/map_data.py` Zeile 27:
@@ -230,12 +288,12 @@ Der Starthafen hat jetzt strukturierte Tutorial-Schritte:
 "welcome_video_url": "",  # <-- URL einfügen
 ```
 
-### 4. Gruppenchat-Link
+### 5. Gruppenchat-Link
 **Problem:** Platzhalter für Gruppenchat
 
 **Lösung:** Discord/WhatsApp-Link oder eigenes Chat-System
 
-### 5. Quiz-Daten speichern
+### 6. Quiz-Daten speichern
 **Problem:** Quiz-Ergebnisse werden noch nicht in der Datenbank gespeichert.
 
 **Lösung:** Python-Endpoint für Quiz-Ergebnisse erweitern
@@ -331,15 +389,15 @@ Pulse_of_learning_Schatzkarte/
 
 ---
 
-# NÄCHSTE SCHRITTE (7. Januar 2025)
+# NÄCHSTE SCHRITTE (8. Januar 2025)
 
 ## Hohe Priorität
-1. **Urkunden-System für Bandura-Challenge** - PDF-Generator implementieren
+1. **PDF-Download für Urkunde** - PDF-Generator implementieren
    - Vorlage designen (A4 Querformat)
-   - Name, Datum, Power-Ups, XP einfügen
-   - Download-Button nach Challenge-Abschluss
+   - Download-Button in Urkunden-Ansicht
+   - html2pdf oder ähnliche Library
 2. **Quiz für andere Inseln erstellen** - Werkzeuge, Fäden, Brücken
-3. **Testen** - Superhelden-Quiz durchspielen, alle Fragetypen prüfen
+3. **Testen** - Bandura-Urkunde mit echten Einträgen prüfen
 
 ## Mittlere Priorität
 4. **Quiz-Ergebnisse speichern** - Datenbank-Erweiterung
@@ -380,6 +438,11 @@ components/rpg_schatzkarte/frontend/
 
 | Datum | Was | Details |
 |-------|-----|---------|
+| **07.01.2025** | **Bandura-Urkunde** | Zeigt jetzt echte Einträge statt nur Zahlen (React + Python) |
+| 07.01.2025 | Effektstärke-Dropdown | Neues Dropdown bei Werkzeuge-Insel für alle Altersstufen |
+| 07.01.2025 | Vollständige Bandura | Festung zeigt direkt vollständige Challenge (nicht Kurzversion) |
+| 07.01.2025 | Text-Korrektur | "anstrengend anfühlt" statt "falsch anfühlt" |
+| 07.01.2025 | Neue Komponenten | BanduraChallenge.tsx, HattieChallenge.tsx, Brainy.tsx, WerkzeugeTutorial.tsx |
 | **06.01.2025** | **Superhelden-Quiz** | Leben-System (3 Herzen), 4 Fragetypen (single, multi-select, matching, ordering), Game Over Screen |
 | 06.01.2025 | Bandura-Challenge | 4 Quellen mit Tagebuch-Einträgen integriert |
 | 06.01.2025 | Hattie-Challenge | 5-Schritt-Flow komplett implementiert |
@@ -405,16 +468,16 @@ streamlit run Home.py
 ```
 
 ## Was als erstes tun?
-1. **Superhelden-Quiz testen** - Festung der Stärke → Monster besiegen → Quiz starten
-2. **Urkunden-System planen** - Siehe TODO #1
+1. **Bandura-Urkunde testen** - Festung der Stärke → Bandura-Challenge → Einträge machen → Urkunde prüfen
+2. **PDF-Download implementieren** - html2pdf Library einbauen
 3. **Weitere Quiz-Fragen** - Für Werkzeuge, Fäden, Brücken erstellen
 
-## Zum Testen des Superhelden-Quiz:
+## Zum Testen der Bandura-Urkunde:
 1. Schatzkarte öffnen
-2. Festung der Stärke anklicken
-3. "Monster besiegen" wählen
-4. "Quiz starten" klicken
-5. Alle 10 Fragen durchspielen (3 Leben!)
+2. Festung der Stärke anklicken ODER freischwebendes Bandura-Schiff
+3. "Bandura-Challenge" wählen
+4. Einträge in alle 4 Kategorien machen
+5. Tab "Portfolio" → Urkunde prüfen (zeigt jetzt echte Texte!)
 
 ## Bei Problemen
 - **"Component nicht gefunden"?** → `cd components/rpg_schatzkarte/frontend && npm run build`
@@ -436,5 +499,5 @@ streamlit run Home.py
 
 ---
 
-**Letzte Bearbeitung:** 6. Januar 2025
-**Nächster Meilenstein:** Urkunden-System für Bandura-Challenge implementieren
+**Letzte Bearbeitung:** 7. Januar 2025
+**Nächster Meilenstein:** PDF-Download für Bandura-Urkunde implementieren

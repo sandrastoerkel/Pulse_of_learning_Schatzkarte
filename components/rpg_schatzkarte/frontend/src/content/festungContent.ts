@@ -93,13 +93,12 @@ Das ist nicht Angst, das ist **AUFREGUNG**! Dein Körper macht sich bereit!
       },
       {
         title: "📝 Mein Superhelden-Tagebuch",
-        content: `Jeden Tag aufschreiben:
+        content: `Dein **Superhelden-Tagebuch** wartet auf dich!
 
-| Was habe ich heute geschafft? | War es schwer? | Wie habe ich mich gefühlt? |
-|------------------------------|----------------|---------------------------|
-| 3er-Reihe gelernt | Ja! | 💪 Stolz! |
-| Aufsatz geschrieben | Mittel | 😊 Zufrieden |`,
-        type: 'expander'
+Schreibe jeden Tag auf, was du geschafft hast – so sammelst du deine Superkräfte!
+
+🦸 **So findest du es:** Schau auf die Schatzkarte – unten rechts siehst du immer das goldene **📓 Mein Tagebuch** Symbol. Klick drauf und schreib los!`,
+        type: 'success'
       },
       {
         title: "💬 Deine Superhelden-Sätze",
@@ -118,7 +117,7 @@ Das ist nicht Angst, das ist **AUFREGUNG**! Dein Körper macht sich bereit!
         title: "🔬 Was die Forscher herausgefunden haben",
         content: `Ein schlauer Forscher namens **John Hattie** hat sich gefragt: Was hilft Kindern am meisten beim Lernen?
 
-Er hat gaaaaanz viele Studien gelesen (mehr als du Bücher in deiner Schule hast!) und etwas Spannendes entdeckt:
+Er hat gaaaaanz viele wissenschaftliche Texte und Bücher gelesen (mehr als du Bücher in deiner Schule hast!) und etwas Spannendes entdeckt:
 
 **Kinder, die sich selbst Ziele setzen und dann MEHR schaffen als sie dachten – die werden immer besser und selbstbewusster!**
 
@@ -138,6 +137,15 @@ Das ist wie bei einem Videospiel: Wenn du einen Level schaffst, von dem du dacht
 <div class="column-box info">**Wenn NEIN:** 🤔 Kein Problem! Frag dich: *'Was kann ich beim nächsten Mal anders machen?'*</div>
 </div>`,
         type: 'info'
+      },
+      {
+        title: "🚢 Deine Begleiter auf der Lernreise",
+        content: `**Der goldene Schlüssel** und die **Superpower** sind zwei besondere Werkzeuge, die dich auf deiner *gesamten Lernreise* begleiten!
+
+🗺️ Du findest sie als **freischwebende Symbole** auf der Schatzkarte. Klicke jederzeit darauf, um neue Einträge hinzuzufügen und XP zu sammeln.
+
+💡 **Tipp:** Je öfter du die Challenges besuchst, desto stärker wirst du! Du kannst immer wieder neue Einträge hinzufügen.`,
+        type: 'success'
       },
       {
         title: "📊 Selbstcheck: Wie ist deine Selbstwirksamkeit?",
@@ -302,6 +310,15 @@ Aber wenn dein Kumpel, der auch Probleme hatte, es erklärt – das wirkt!
         title: "⚠️ Der Trick",
         content: `Deine Schätzung muss ehrlich sein. Nicht zu niedrig (um sicher zu gehen), nicht zu hoch (um cool zu wirken).`,
         type: 'warning'
+      },
+      {
+        title: "🚢 Deine Begleiter auf der Lernreise",
+        content: `**Der goldene Schlüssel** und die **Superpower** sind zwei mächtige Werkzeuge, die dich auf deiner *gesamten Lernreise* begleiten!
+
+🗺️ Du findest sie als **freischwebende Symbole** auf der Schatzkarte. Klicke jederzeit darauf, um neue Einträge hinzuzufügen und XP zu sammeln.
+
+💡 **Tipp:** Je öfter du die Challenges besuchst, desto stärker wird deine Selbstwirksamkeit! Du kannst immer wieder neue Einträge hinzufügen.`,
+        type: 'success'
       },
       {
         title: "📊 Selbstcheck: Wie ist deine Selbstwirksamkeit?",
@@ -493,6 +510,15 @@ Das ist keine Motivation-Trickserei – das ist, wie dein Selbstbild tatsächlic
 **Der Trick:** Schreibe Erfolg deiner Anstrengung zu – das motiviert dich weiterzumachen.
 Und wenn etwas nicht klappt: Es lag an der Strategie, nicht an dir. Strategien kann man ändern.`,
         type: 'info'
+      },
+      {
+        title: "🚢 Deine Begleiter auf der gesamten Lernreise",
+        content: `**Der goldene Schlüssel** und die **Superpower** sind zwei evidenzbasierte Werkzeuge, die dich auf deiner *gesamten Lernreise* begleiten!
+
+🗺️ Du findest sie als **freischwebende Symbole** auf der Schatzkarte. Klicke jederzeit darauf, um neue Einträge hinzuzufügen und XP zu sammeln.
+
+💡 **Tipp:** Die Forschung zeigt: Regelmäßige Selbstreflexion stärkt nachhaltig deine Selbstwirksamkeit. Je öfter du die Challenges besuchst, desto stärker werden die neuronalen Verbindungen.`,
+        type: 'success'
       },
       {
         title: "📊 Selbstcheck: Wie ist deine Selbstwirksamkeit?",

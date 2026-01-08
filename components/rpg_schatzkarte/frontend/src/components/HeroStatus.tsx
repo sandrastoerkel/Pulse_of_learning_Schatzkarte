@@ -33,11 +33,31 @@ export function HeroStatus({ hero, onInventoryClick }: HeroStatusProps) {
       <div className="hero-avatar-section">
         <div className="hero-avatar">
           <span className="avatar-icon">{AVATAR_ICONS[hero.avatar]}</span>
-          <div className="level-badge">Lv.{hero.level}</div>
         </div>
         <div className="hero-info">
-          <h3 className="hero-name">{hero.name}</h3>
+          <div className="hero-name-row">
+            <h3 className="hero-name">{hero.name}</h3>
+            <span className="level-badge">Lv.{hero.level}</span>
+          </div>
           <span className="hero-class">{AVATAR_NAMES[hero.avatar]}</span>
+        </div>
+        {/* Quick Inventory Preview */}
+        <div className="inventory-preview" onClick={onInventoryClick}>
+          <div className="inventory-label">🎒 Inventar</div>
+          <div className="inventory-items">
+            {hero.items.slice(0, 4).map((item, index) => (
+              <div
+                key={item.id}
+                className={`inventory-slot rarity-${item.rarity}`}
+                title={item.name}
+              >
+                {item.icon}
+              </div>
+            ))}
+            {hero.items.length > 4 && (
+              <div className="inventory-more">+{hero.items.length - 4}</div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -62,25 +82,6 @@ export function HeroStatus({ hero, onInventoryClick }: HeroStatusProps) {
         <span className="gold-icon">🪙</span>
         <span className="gold-amount">{hero.gold}</span>
         <span className="gold-label">Gold</span>
-      </div>
-
-      {/* Quick Inventory Preview */}
-      <div className="inventory-preview" onClick={onInventoryClick}>
-        <div className="inventory-label">🎒 Inventar</div>
-        <div className="inventory-items">
-          {hero.items.slice(0, 4).map((item, index) => (
-            <div
-              key={item.id}
-              className={`inventory-slot rarity-${item.rarity}`}
-              title={item.name}
-            >
-              {item.icon}
-            </div>
-          ))}
-          {hero.items.length > 4 && (
-            <div className="inventory-more">+{hero.items.length - 4}</div>
-          )}
-        </div>
       </div>
 
       {/* Titles/Achievements */}

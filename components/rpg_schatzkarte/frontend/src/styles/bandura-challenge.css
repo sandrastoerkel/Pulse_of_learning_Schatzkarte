@@ -11,7 +11,7 @@
   background: linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%);
   border-radius: 16px;
   overflow: hidden;
-  max-height: 85vh;
+  max-height: 92vh;
   display: flex;
   flex-direction: column;
 }

@@ -292,7 +292,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Altersstufe aus Session-State holen
-age_group = st.session_state.get("current_user_age_group", "unterstufe")
+age_group = st.session_state.get("current_user_age_group", "grundschule")
 
 # React-Komponente aufrufen (Hoehe wird per CSS auf 100vh gesetzt)
 result = rpg_schatzkarte(

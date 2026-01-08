@@ -7,12 +7,10 @@ import { FESTUNG_CONTENT, ContentSection } from '../content/festungContent';
 import { FAEDEN_CONTENT } from '../content/faedenContent';
 import { BRUECKEN_CONTENT } from '../content/brueckenContent';
 import { WERKZEUGE_CONTENT } from '../content/werkzeugeContent';
-import { BANDURA_SOURCES, BANDURA_INFO, BanduraSourceId } from '../content/banduraContent';
-import { HATTIE_CHALLENGE_INFO, HATTIE_SUBJECTS } from '../content/hattieContent';
 import { SUPERHELDEN_QUIZ_QUESTIONS } from '../content/festungQuizContent';
+import { SUPERHELDEN_QUIZ_QUESTIONS as SUPERHELDEN_QUIZ_UNTERSTUFE } from '../content/festungQuizContent_unterstufe';
 import { BattleQuiz } from './BattleQuiz';
-import { BanduraChallenge } from './BanduraChallenge';
-import { BanduraEntry, BanduraStats, DEFAULT_BANDURA_STATS } from '../banduraTypes';
+import { TagebuchStartButton } from './SuperheldenTagebuch';
 
 interface QuestModalProps {
   island: Island & {
@@ -27,23 +25,11 @@ interface QuestModalProps {
   onClose: () => void;
   onQuestComplete: (questType: string, xp: number, gold?: number, itemId?: string) => void;
   onTreasureCollected: (treasureId: string, xp: number) => void;
-  onChallengeEntry?: (challengeType: 'bandura' | 'hattie', data: any, xp: number) => void;
-  // NEU: Bandura-Daten von Python
-  banduraEntries?: BanduraEntry[];
-  banduraStats?: BanduraStats;
-  userName?: string;
-}
-
-// Challenge Types
-type ChallengeSelection = 'select' | 'bandura' | 'hattie';
-type HattieStep = 'subject' | 'task' | 'prediction' | 'result' | 'reflection' | 'complete';
-
-interface HattieEntry {
-  subject: string;
-  task: string;
-  prediction: number;
-  result?: number;
-  reflection?: string;
+  // Superhelden-Tagebuch öffnen (nur Grundschule)
+  onOpenTagebuch?: () => void;
+  // Challenge-Schiffe öffnen (statt eingebetteter Challenges)
+  onOpenBandura?: () => void;
+  onOpenHattie?: () => void;
 }
 
 interface TutorialStep {
@@ -60,6 +46,10 @@ const ISLAND_SUBTITLES: Record<string, { subtitle: string; description: string }
   festung: {
     subtitle: '(Selbstwirksamkeit)',
     description: 'Selbstwirksamkeit ist das Vertrauen, eine bestimmte Aufgabe erfolgreich bewältigen zu können. Nicht allgemeines Selbstvertrauen, sondern aufgabenbezogen: "Ich kann diese Matheaufgabe lösen" oder "Ich kann dieses Referat halten". Kernbotschaft: Du kannst mehr, als du denkst - und jeder Erfolg beweist es dir!'
+  },
+  werkzeuge: {
+    subtitle: '(Effektstärke)',
+    description: 'Effektstärke (d) misst, wie viel eine Lernmethode bringt. d = 0.40 entspricht einem Jahr Lernfortschritt. d > 0.40 bedeutet: Mehr als ein Jahr Fortschritt! d = 0.80 entspricht sogar zwei Jahren in einem! John Hattie hat über 1.800 Meta-Studien mit 300 Millionen Schülern ausgewertet, um herauszufinden, welche Methoden wirklich funktionieren.'
   }
 };
 
@@ -159,10 +149,9 @@ export function QuestModal({
   onClose,
   onQuestComplete,
   onTreasureCollected,
-  onChallengeEntry,
-  banduraEntries,
-  banduraStats,
-  userName
+  onOpenTagebuch,
+  onOpenBandura,
+  onOpenHattie
 }: QuestModalProps) {
   const [activeQuest, setActiveQuest] = useState<QuestType | null>(null);
   const [showReward, setShowReward] = useState(false);
@@ -172,17 +161,6 @@ export function QuestModal({
   const [showHeaderInfo, setShowHeaderInfo] = useState(false);
   const [selfcheckAnswers, setSelfcheckAnswers] = useState<Record<number, number>>({});
   const [showSelfcheckResult, setShowSelfcheckResult] = useState(false);
-
-  // Challenge State
-  const [challengeSelection, setChallengeSelection] = useState<ChallengeSelection>('select');
-  const [selectedBanduraSource, setSelectedBanduraSource] = useState<BanduraSourceId | null>(null);
-  const [banduraDescription, setBanduraDescription] = useState('');
-  const [banduraCompleted, setBanduraCompleted] = useState<BanduraSourceId[]>([]);
-  const [showFullBandura, setShowFullBandura] = useState(true);
-  const [hattieStep, setHattieStep] = useState<HattieStep>('subject');
-  const [hattieEntry, setHattieEntry] = useState<HattieEntry>({ subject: '', task: '', prediction: 0 });
-  const [challengeSuccess, setChallengeSuccess] = useState(false);
-  const [challengeXp, setChallengeXp] = useState(0);
 
   // Quiz/Battle State
   const [quizActive, setQuizActive] = useState(false);
@@ -378,7 +356,7 @@ export function QuestModal({
                     <div
                       key={questType}
                       className={`quest-type-card ${completed ? 'completed' : 'available'}`}
-                      onClick={() => !completed && handleStartQuest(questType)}
+                      onClick={() => handleStartQuest(questType)}
                     >
                       <div className="quest-icon-wrapper">
                         <span className="quest-icon">{quest.icon}</span>
@@ -390,11 +368,9 @@ export function QuestModal({
                         <span className="xp-reward">⭐ {quest.xp} XP</span>
                         <span className="gold-reward">🪙 {quest.gold}</span>
                       </div>
-                      {!completed && (
-                        <button className="quest-action-btn">
-                          {quest.action}
-                        </button>
-                      )}
+                      <button className="quest-action-btn">
+                        {completed ? '🔄 Wiederholen' : quest.action}
+                      </button>
                     </div>
                   );
                 })}
@@ -565,25 +541,43 @@ export function QuestModal({
                               );
                             }
 
+                            const isTagebuchSection = section.title.includes('Superhelden-Tagebuch');
+
                             return (
-                              <div
-                                key={idx}
-                                className={`content-section section-${sectionType} ${isExpander && isExpanded ? 'expanded' : ''}`}
-                              >
-                                <h4 onClick={isExpander ? () => toggleExpander(idx) : undefined}>
-                                  {section.title}
-                                  {isExpander && (
-                                    <span className={`expander-icon ${isExpanded ? 'expanded' : ''}`}>
-                                      ▼
-                                    </span>
-                                  )}
-                                </h4>
+                              <div key={idx}>
                                 <div
-                                  className="section-content"
-                                  dangerouslySetInnerHTML={{
-                                    __html: markdownToHtml(section.content)
-                                  }}
-                                />
+                                  className={`content-section section-${sectionType} ${isExpander && isExpanded ? 'expanded' : ''}`}
+                                >
+                                  <h4 onClick={isExpander ? () => toggleExpander(idx) : undefined}>
+                                    {section.title}
+                                    {isExpander && (
+                                      <span className={`expander-icon ${isExpanded ? 'expanded' : ''}`}>
+                                        ▼
+                                      </span>
+                                    )}
+                                  </h4>
+                                  <div
+                                    className="section-content"
+                                    dangerouslySetInnerHTML={{
+                                      __html: markdownToHtml(section.content)
+                                    }}
+                                  />
+                                </div>
+
+                                {/* Superhelden-Tagebuch Button - direkt nach dem Tagebuch-Abschnitt */}
+                                {isTagebuchSection && island.id === 'festung' && ageGroup === 'grundschule' && onOpenTagebuch && (
+                                  <div className="tagebuch-promo-section">
+                                    <div className="tagebuch-promo-card">
+                                      <span className="promo-emoji">🦸</span>
+                                      <h4>Starte dein Superhelden-Tagebuch!</h4>
+                                      <p>Schreibe jeden Tag auf, was du geschafft hast. So wirst du immer stärker!</p>
+                                      <TagebuchStartButton onClick={() => {
+                                        onOpenTagebuch();
+                                        onClose();
+                                      }} />
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             );
                           })}
@@ -627,7 +621,7 @@ export function QuestModal({
                       <BattleQuiz
                         quiz={{
                           questions: island.id === 'festung'
-                            ? SUPERHELDEN_QUIZ_QUESTIONS
+                            ? (ageGroup === 'unterstufe' ? SUPERHELDEN_QUIZ_UNTERSTUFE : SUPERHELDEN_QUIZ_QUESTIONS)
                             : island.quiz?.questions || []
                         } as ExtendedQuiz}
                         islandName={island.name}
@@ -647,410 +641,84 @@ export function QuestModal({
 
                 {activeQuest === 'challenge' && island.id === 'festung' && (
                   <div className="challenge-content festung-challenges">
-                    {/* Challenge Auswahl */}
-                    {challengeSelection === 'select' && !challengeSuccess && (
-                      <div className="challenge-select">
-                        <h4>🏆 Wähle deine Challenge</h4>
-                        <p style={{ marginBottom: '20px', color: 'var(--text-muted)' }}>
-                          Trainiere deine Selbstwirksamkeit mit einer der beiden Challenges:
+                    {/* Challenge-Links zu den schwimmenden Schiffen */}
+                    <div className="challenge-ships-info">
+                      <div className="ships-info-header">
+                        <span className="ships-icon">🚢</span>
+                        <h4>Deine Begleiter auf der Reise</h4>
+                      </div>
+
+                      <div className="ships-explanation">
+                        <p>
+                          <strong>Der goldene Schlüssel</strong> und die <strong>Superpower</strong> sind
+                          zwei mächtige Werkzeuge, die dich auf deiner <em>gesamten Lernreise</em> begleiten werden!
                         </p>
+                        <p style={{ marginTop: '10px', fontSize: '0.95em', color: 'var(--text-muted)' }}>
+                          💡 Du findest sie als <strong>freischwebende Symbole</strong> auf der Schatzkarte.
+                          Klicke jederzeit darauf, um neue Einträge hinzuzufügen und XP zu sammeln.
+                        </p>
+                      </div>
 
-                        <div className="challenge-cards">
-                          {/* Bandura Challenge */}
-                          <div
-                            className="challenge-card bandura"
-                            onClick={() => setChallengeSelection('bandura')}
-                          >
-                            <div className="challenge-card-icon">🌟</div>
-                            <h5>{BANDURA_INFO.title}</h5>
-                            <p>{BANDURA_INFO.subtitle}</p>
-                            <div className="challenge-card-xp">+10-25 XP</div>
+                      <div className="challenge-ship-cards">
+                        {/* Bandura Ship Link */}
+                        <div
+                          className="challenge-ship-card bandura"
+                          onClick={() => {
+                            if (onOpenBandura) {
+                              onClose();
+                              setTimeout(() => onOpenBandura(), 100);
+                            }
+                          }}
+                        >
+                          <div className="ship-card-icon">🌟</div>
+                          <div className="ship-card-content">
+                            <h5>Der goldene Schlüssel</h5>
+                            <p>Sammle Erfolge aus 4 Quellen der Selbstwirksamkeit</p>
                           </div>
+                          <div className="ship-card-action">
+                            <span>Zum Schiff →</span>
+                            <span className="ship-xp">+10-25 XP pro Eintrag</span>
+                          </div>
+                        </div>
 
-                          {/* Hattie Challenge */}
-                          <div
-                            className="challenge-card hattie"
-                            onClick={() => setChallengeSelection('hattie')}
-                          >
-                            <div className="challenge-card-icon">🎯</div>
-                            <h5>{HATTIE_CHALLENGE_INFO.title}</h5>
-                            <p>{HATTIE_CHALLENGE_INFO.subtitle}</p>
-                            <div className="challenge-card-xp">+15-40 XP</div>
+                        {/* Hattie Ship Link */}
+                        <div
+                          className="challenge-ship-card hattie"
+                          onClick={() => {
+                            if (onOpenHattie) {
+                              onClose();
+                              setTimeout(() => onOpenHattie(), 100);
+                            }
+                          }}
+                        >
+                          <div className="ship-card-icon">🎯</div>
+                          <div className="ship-card-content">
+                            <h5>Superpower</h5>
+                            <p>Trainiere deine Selbsteinschätzung mit Vorhersagen</p>
+                          </div>
+                          <div className="ship-card-action">
+                            <span>Zum Schiff →</span>
+                            <span className="ship-xp">+15-40 XP pro Eintrag</span>
                           </div>
                         </div>
                       </div>
-                    )}
 
-                    {/* Bandura Challenge - ERWEITERT MIT WOW-EFFEKTEN */}
-                    {challengeSelection === 'bandura' && !challengeSuccess && (
-                      <>
-                        {showFullBandura ? (
-                          // Vollständige Bandura-Challenge Komponente mit Animationen
-                          <BanduraChallenge
-                            entries={banduraEntries || []}
-                            stats={banduraStats || DEFAULT_BANDURA_STATS}
-                            userName={userName || 'Lern-Held'}
-                            onNewEntry={(sourceType, description, xp) => {
-                              if (onChallengeEntry) {
-                                onChallengeEntry('bandura', {
-                                  sourceType,
-                                  description,
-                                  xpEarned: xp,
-                                  timestamp: new Date().toISOString()
-                                }, xp);
-                              }
-                            }}
-                            onClose={() => setShowFullBandura(false)}
-                          />
-                        ) : (
-                          // Quick-Entry Ansicht mit Button zur vollständigen Ansicht
-                          <div className="bandura-challenge">
-                            <h4>🌟 {BANDURA_INFO.title}</h4>
-                            <p style={{ marginBottom: '15px' }}>{BANDURA_INFO.description}</p>
-
-                            {/* Button zur vollständigen Ansicht */}
-                            <button
-                              className="full-bandura-btn"
-                              onClick={() => setShowFullBandura(true)}
-                              style={{
-                                width: '100%',
-                                padding: '15px',
-                                marginBottom: '20px',
-                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                border: 'none',
-                                borderRadius: '12px',
-                                color: 'white',
-                                fontWeight: 'bold',
-                                fontSize: '1.1em',
-                                cursor: 'pointer',
-                                boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
-                                transition: 'transform 0.2s, box-shadow 0.2s'
-                              }}
-                              onMouseOver={e => {
-                                e.currentTarget.style.transform = 'scale(1.02)';
-                                e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.5)';
-                              }}
-                              onMouseOut={e => {
-                                e.currentTarget.style.transform = 'scale(1)';
-                                e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
-                              }}
-                            >
-                              🧠 Vollständige Bandura-Challenge öffnen
-                              <span style={{ display: 'block', fontSize: '0.85em', opacity: 0.9, marginTop: '5px' }}>
-                                ✨ Mit Portfolio, Übersicht, Urkunde & WOW-Effekten!
-                              </span>
-                            </button>
-
-                            <div style={{
-                              textAlign: 'center',
-                              color: '#666',
-                              fontSize: '0.9em',
-                              margin: '15px 0'
-                            }}>
-                              — oder Quick-Entry —
-                            </div>
-
-                            {/* Die 4 Quellen (Quick-Entry) */}
-                            <div className="bandura-sources">
-                              {(Object.keys(BANDURA_SOURCES) as BanduraSourceId[]).map(sourceId => {
-                                const source = BANDURA_SOURCES[sourceId];
-                                const isCompleted = banduraCompleted.includes(sourceId);
-                                const isSelected = selectedBanduraSource === sourceId;
-
-                                return (
-                                  <div
-                                    key={sourceId}
-                                    className={`bandura-source-card ${isSelected ? 'selected' : ''} ${isCompleted ? 'completed' : ''}`}
-                                    onClick={() => !isCompleted && setSelectedBanduraSource(sourceId)}
-                                    style={{ borderColor: isSelected ? source.color : undefined }}
-                                  >
-                                    <div className="bandura-source-icon">{source.icon}</div>
-                                    <div className="bandura-source-name">{source.name_de}</div>
-                                    <div className="bandura-source-xp">+{source.xp} XP</div>
-                                    {isCompleted && <div className="check-mark">✓</div>}
-                                  </div>
-                                );
-                              })}
-                            </div>
-
-                            {/* Eingabe-Formular */}
-                            {selectedBanduraSource && (
-                              <div className="entry-form" style={{ marginTop: '20px' }}>
-                                <div className="entry-prompt">
-                                  <span style={{ fontSize: '24px', marginRight: '10px' }}>
-                                    {BANDURA_SOURCES[selectedBanduraSource].icon}
-                                  </span>
-                                  {BANDURA_SOURCES[selectedBanduraSource].prompt}
-                                </div>
-                                <div className="entry-examples">
-                                  Beispiele: {BANDURA_SOURCES[selectedBanduraSource].examples.join(' • ')}
-                                </div>
-                                <textarea
-                                  className="entry-textarea"
-                                  placeholder="Beschreibe deine Erfahrung..."
-                                  value={banduraDescription}
-                                  onChange={e => setBanduraDescription(e.target.value)}
-                                />
-                                <button
-                                  className="submit-entry-btn"
-                                  onClick={() => {
-                                    if (banduraDescription.trim().length >= 10) {
-                                      const source = BANDURA_SOURCES[selectedBanduraSource];
-                                      let xp = source.xp;
-                                      if (banduraDescription.length > 50) xp += 5;
-
-                                      setBanduraCompleted(prev => [...prev, selectedBanduraSource]);
-                                      setChallengeXp(xp);
-                                      setChallengeSuccess(true);
-
-                                      if (onChallengeEntry) {
-                                        onChallengeEntry('bandura', {
-                                          sourceId: selectedBanduraSource,
-                                          description: banduraDescription
-                                        }, xp);
-                                      }
-
-                                      setTimeout(() => {
-                                        setChallengeSuccess(false);
-                                        setSelectedBanduraSource(null);
-                                        setBanduraDescription('');
-                                        setChallengeSelection('select');
-                                        handleCompleteQuest('challenge');
-                                      }, 2500);
-                                    }
-                                  }}
-                                  disabled={banduraDescription.trim().length < 10}
-                                >
-                                  {banduraDescription.trim().length < 10
-                                    ? `Mindestens ${10 - banduraDescription.trim().length} Zeichen...`
-                                    : '✓ Eintrag speichern'
-                                  }
-                                </button>
-                              </div>
-                            )}
-
-                            <button
-                              className="back-btn"
-                              onClick={() => {
-                                setChallengeSelection('select');
-                                setSelectedBanduraSource(null);
-                                setBanduraDescription('');
-                              }}
-                              style={{ marginTop: '15px' }}
-                            >
-                              ← Andere Challenge wählen
-                            </button>
-                          </div>
-                        )}
-                      </>
-                    )}
-
-                    {/* Hattie Challenge */}
-                    {challengeSelection === 'hattie' && !challengeSuccess && (
-                      <div className="hattie-challenge">
-                        <h4>🎯 {HATTIE_CHALLENGE_INFO.title}</h4>
-
-                        {/* Schritt 1: Fach wählen */}
-                        {hattieStep === 'subject' && (
-                          <>
-                            <p style={{ marginBottom: '15px' }}>Wähle ein Fach:</p>
-                            <div className="hattie-subjects">
-                              {HATTIE_SUBJECTS.map(subject => (
-                                <div
-                                  key={subject.id}
-                                  className="hattie-subject-card"
-                                  onClick={() => {
-                                    setHattieEntry({ ...hattieEntry, subject: subject.id });
-                                    setHattieStep('task');
-                                  }}
-                                >
-                                  <span className="subject-icon">{subject.icon}</span>
-                                  <span className="subject-name">{subject.name}</span>
-                                </div>
-                              ))}
-                            </div>
-                            <button
-                              className="back-btn"
-                              onClick={() => setChallengeSelection('select')}
-                              style={{ marginTop: '15px' }}
-                            >
-                              ← Andere Challenge wählen
-                            </button>
-                          </>
-                        )}
-
-                        {/* Schritt 2: Aufgabe beschreiben */}
-                        {hattieStep === 'task' && (
-                          <>
-                            <p style={{ marginBottom: '10px' }}>Beschreibe die Aufgabe:</p>
-                            <textarea
-                              className="entry-textarea"
-                              placeholder="z.B. '10 Mathe-Aufgaben', 'Diktat', 'Vokabeltest'..."
-                              value={hattieEntry.task}
-                              onChange={e => setHattieEntry({ ...hattieEntry, task: e.target.value })}
-                            />
-                            <button
-                              className="submit-entry-btn"
-                              onClick={() => hattieEntry.task.trim().length >= 5 && setHattieStep('prediction')}
-                              disabled={hattieEntry.task.trim().length < 5}
-                            >
-                              Weiter →
-                            </button>
-                            <button className="back-btn" onClick={() => setHattieStep('subject')} style={{ marginTop: '10px' }}>
-                              ← Zurück
-                            </button>
-                          </>
-                        )}
-
-                        {/* Schritt 3: Vorhersage */}
-                        {hattieStep === 'prediction' && (
-                          <>
-                            <p style={{ marginBottom: '10px' }}>
-                              Aufgabe: <strong>{hattieEntry.task}</strong>
-                            </p>
-                            <p style={{ marginBottom: '15px' }}>Wie viele Punkte/Prozent erwartest du? (0-100)</p>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', justifyContent: 'center' }}>
-                              <input
-                                type="range"
-                                min="0"
-                                max="100"
-                                value={hattieEntry.prediction}
-                                onChange={e => setHattieEntry({ ...hattieEntry, prediction: parseInt(e.target.value) })}
-                                style={{ flex: 1 }}
-                              />
-                              <span style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--gold)', minWidth: '60px' }}>
-                                {hattieEntry.prediction}%
-                              </span>
-                            </div>
-                            <button
-                              className="submit-entry-btn"
-                              onClick={() => setHattieStep('result')}
-                              style={{ marginTop: '20px' }}
-                            >
-                              ✓ Schätzung abgeben
-                            </button>
-                            <button className="back-btn" onClick={() => setHattieStep('task')} style={{ marginTop: '10px' }}>
-                              ← Zurück
-                            </button>
-                          </>
-                        )}
-
-                        {/* Schritt 4: Ergebnis */}
-                        {hattieStep === 'result' && (
-                          <>
-                            <p style={{ marginBottom: '10px' }}>
-                              Aufgabe: <strong>{hattieEntry.task}</strong><br />
-                              Deine Schätzung: <strong style={{ color: 'var(--gold)' }}>{hattieEntry.prediction}%</strong>
-                            </p>
-                            <p style={{ marginBottom: '15px' }}>Wie war dein echtes Ergebnis?</p>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', justifyContent: 'center' }}>
-                              <input
-                                type="range"
-                                min="0"
-                                max="100"
-                                value={hattieEntry.result || 0}
-                                onChange={e => setHattieEntry({ ...hattieEntry, result: parseInt(e.target.value) })}
-                                style={{ flex: 1 }}
-                              />
-                              <span style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--xp-green)', minWidth: '60px' }}>
-                                {hattieEntry.result || 0}%
-                              </span>
-                            </div>
-                            <button
-                              className="submit-entry-btn"
-                              onClick={() => setHattieStep('reflection')}
-                              style={{ marginTop: '20px' }}
-                            >
-                              Weiter zur Reflexion →
-                            </button>
-                            <button className="back-btn" onClick={() => setHattieStep('prediction')} style={{ marginTop: '10px' }}>
-                              ← Zurück
-                            </button>
-                          </>
-                        )}
-
-                        {/* Schritt 5: Reflexion */}
-                        {hattieStep === 'reflection' && (
-                          <>
-                            {(() => {
-                              const exceeded = hattieEntry.result && hattieEntry.result > hattieEntry.prediction;
-                              return (
-                                <>
-                                  <div style={{
-                                    background: exceeded ? 'rgba(34, 197, 94, 0.2)' : 'rgba(255, 215, 0, 0.1)',
-                                    border: `2px solid ${exceeded ? 'var(--xp-green)' : 'var(--gold-dark)'}`,
-                                    borderRadius: '15px',
-                                    padding: '15px',
-                                    marginBottom: '15px',
-                                    textAlign: 'center'
-                                  }}>
-                                    <div style={{ fontSize: '30px', marginBottom: '5px' }}>
-                                      {exceeded ? '🎉' : '🤔'}
-                                    </div>
-                                    <div>
-                                      Schätzung: <strong>{hattieEntry.prediction}%</strong>
-                                      {' → '}
-                                      Ergebnis: <strong style={{ color: exceeded ? 'var(--xp-green)' : 'var(--gold)' }}>{hattieEntry.result}%</strong>
-                                    </div>
-                                    <div style={{ marginTop: '5px', fontSize: '0.9em' }}>
-                                      {exceeded
-                                        ? '✨ Besser als erwartet! Dein Gehirn speichert: "Ich kann mehr als ich denke!"'
-                                        : 'Das hilft dir, dich beim nächsten Mal besser einzuschätzen!'
-                                      }
-                                    </div>
-                                  </div>
-                                  <p style={{ marginBottom: '10px' }}>Was nimmst du mit? (optional)</p>
-                                  <textarea
-                                    className="entry-textarea"
-                                    placeholder="Deine Gedanken..."
-                                    value={hattieEntry.reflection || ''}
-                                    onChange={e => setHattieEntry({ ...hattieEntry, reflection: e.target.value })}
-                                  />
-                                  <button
-                                    className="submit-entry-btn"
-                                    onClick={() => {
-                                      let xp = HATTIE_CHALLENGE_INFO.xp.entry;
-                                      if (exceeded) xp += HATTIE_CHALLENGE_INFO.xp.exceeded;
-
-                                      setChallengeXp(xp);
-                                      setChallengeSuccess(true);
-
-                                      if (onChallengeEntry) {
-                                        onChallengeEntry('hattie', hattieEntry, xp);
-                                      }
-
-                                      setTimeout(() => {
-                                        setChallengeSuccess(false);
-                                        setHattieStep('subject');
-                                        setHattieEntry({ subject: '', task: '', prediction: 0 });
-                                        setChallengeSelection('select');
-                                        handleCompleteQuest('challenge');
-                                      }, 2500);
-                                    }}
-                                  >
-                                    ✓ Challenge abschließen
-                                  </button>
-                                </>
-                              );
-                            })()}
-                            <button className="back-btn" onClick={() => setHattieStep('result')} style={{ marginTop: '10px' }}>
-                              ← Zurück
-                            </button>
-                          </>
-                        )}
+                      <div className="ships-tip">
+                        <span className="tip-icon">🗺️</span>
+                        <span>
+                          Tipp: Beide Challenges kannst du immer wieder besuchen.
+                          Je mehr Einträge du machst, desto stärker wirst du!
+                        </span>
                       </div>
-                    )}
 
-                    {/* Success Animation */}
-                    {challengeSuccess && (
-                      <div className="challenge-success">
-                        <div className="success-content">
-                          <div className="success-icon">🎊</div>
-                          <h4>Challenge geschafft!</h4>
-                          <div className="success-xp">+{challengeXp} XP</div>
-                        </div>
-                      </div>
-                    )}
+                      <button
+                        className="complete-btn"
+                        onClick={() => handleCompleteQuest('challenge')}
+                        style={{ marginTop: '20px' }}
+                      >
+                        ✓ Verstanden!
+                      </button>
+                    </div>
                   </div>
                 )}
 

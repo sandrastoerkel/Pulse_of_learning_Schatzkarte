@@ -5,8 +5,8 @@
 
 // Hattie Challenge Erklaerung
 export const HATTIE_CHALLENGE_INFO = {
-  title: "Die Hattie-Challenge",
-  subtitle: "Trainiere deine Selbsteinschaetzung",
+  title: "Superpower",
+  subtitle: "Trainiere deine Selbsteinschätzung",
   description: `John Hattie fand heraus: **Selbst-Einschaetzung** hat eine Effektstaerke von **1.33** -
 das ist einer der staerksten Lernfaktoren ueberhaupt!
 

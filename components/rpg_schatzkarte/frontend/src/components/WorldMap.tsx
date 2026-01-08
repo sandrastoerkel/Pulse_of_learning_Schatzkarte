@@ -2,7 +2,7 @@
 // RPG Schatzkarte - World Map Component
 // ============================================
 import { useState, useMemo } from 'react';
-import { Island, UserProgress, HeroData } from '../types';
+import { Island, UserProgress, HeroData, AgeGroup, TagebuchEintrag } from '../types';
 import { QuestMarker, getQuestStatus } from './QuestCard';
 import { HeroStatus, InventoryModal } from './HeroStatus';
 
@@ -15,6 +15,10 @@ interface WorldMapProps {
   onIslandClick: (islandId: string) => void;
   onBanduraShipClick?: () => void;
   onHattieShipClick?: () => void;
+  // Superhelden-Tagebuch Props
+  ageGroup?: AgeGroup;
+  tagebuchEntries?: TagebuchEintrag[];
+  onTagebuchToggle?: () => void;
 }
 
 // Vordefinierte Positionen für die Inseln auf der Weltkarte
@@ -78,7 +82,10 @@ export function WorldMap({
   currentIsland,
   onIslandClick,
   onBanduraShipClick,
-  onHattieShipClick
+  onHattieShipClick,
+  ageGroup,
+  tagebuchEntries = [],
+  onTagebuchToggle
 }: WorldMapProps) {
   const [showInventory, setShowInventory] = useState(false);
   const [hoveredIsland, setHoveredIsland] = useState<string | null>(null);
@@ -186,26 +193,26 @@ export function WorldMap({
         <div
           className="challenge-ship bandura-ship"
           onClick={onBanduraShipClick}
-          title="Bandura-Challenge: Die 4 Quellen der Selbstwirksamkeit"
+          title="Der goldene Schlüssel: Die 4 Quellen der Selbstwirksamkeit"
         >
           <div className="ship-body">
-            <span className="ship-icon">🧠</span>
+            <span className="ship-icon">🔑</span>
             <span className="ship-flag">✨</span>
           </div>
-          <div className="ship-label">Selbstwirksamkeit</div>
+          <div className="ship-label">Goldener Schlüssel</div>
           <div className="ship-waves">〰️</div>
         </div>
 
         <div
           className="challenge-ship hattie-ship"
           onClick={onHattieShipClick}
-          title="Hattie-Challenge: Trainiere deine Selbsteinschaetzung"
+          title="Superpower: Trainiere deine Selbsteinschätzung"
         >
           <div className="ship-body">
-            <span className="ship-icon">🎯</span>
+            <span className="ship-icon">💪</span>
             <span className="ship-flag">⭐</span>
           </div>
-          <div className="ship-label">Selbsteinschätzung</div>
+          <div className="ship-label">Superpower</div>
           <div className="ship-waves">〰️</div>
         </div>
 
@@ -265,6 +272,17 @@ export function WorldMap({
           <span>Gesperrt</span>
         </div>
       </div>
+
+      {/* Superhelden-Tagebuch Widget - NUR für Grundschule */}
+      {ageGroup === 'grundschule' && onTagebuchToggle && (
+        <div className="floating-tagebuch-widget" onClick={onTagebuchToggle}>
+          <span className="tagebuch-icon">📓</span>
+          {tagebuchEntries.length > 0 && (
+            <span className="tagebuch-badge">{tagebuchEntries.length}</span>
+          )}
+          <span className="tagebuch-label">Mein Tagebuch</span>
+        </div>
+      )}
 
       {/* Inventory Modal */}
       <InventoryModal

@@ -212,14 +212,16 @@ body {
 
 .hero-status {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 8px;
   background: linear-gradient(180deg, var(--dark-wood) 0%, var(--wood-light) 100%);
-  border-radius: 15px;
-  padding: 15px 25px;
-  margin-bottom: 20px;
-  border: 3px solid var(--gold-dark);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  border: 2px solid var(--gold-dark);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  width: fit-content;
+  max-width: 220px;
 }
 
 .hero-avatar {
@@ -240,10 +242,10 @@ body {
 }
 
 .hero-name {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: bold;
   color: var(--gold);
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .hero-level {
@@ -281,15 +283,15 @@ body {
 }
 
 .gold-icon {
-  font-size: 24px;
+  font-size: 14px;
   animation: goldShine 2s ease-in-out infinite;
 }
 
 .gold-amount {
-  font-size: 20px;
+  font-size: 13px;
   font-weight: bold;
   color: var(--gold);
-  text-shadow: 0 0 10px var(--gold);
+  text-shadow: 0 0 5px var(--gold);
 }
 
 @keyframes goldShine {
@@ -443,9 +445,9 @@ body {
 .quest-modal {
   background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-darker) 100%);
   border-radius: 25px;
-  max-width: 600px;
-  width: 90%;
-  max-height: 90vh;
+  max-width: 96vw;
+  width: 96%;
+  max-height: 94vh;
   overflow-y: auto;
   border: 4px solid var(--gold-dark);
   box-shadow: 0 0 50px rgba(255, 215, 0, 0.3);
@@ -922,8 +924,9 @@ body {
   }
 
   .quest-modal {
-    width: 95%;
-    max-height: 95vh;
+    width: 98%;
+    max-width: 98vw;
+    max-height: 96vh;
   }
 }
 
@@ -989,15 +992,18 @@ body {
   font-size: 28px;
 }
 
+.hero-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .level-badge {
-  position: absolute;
-  bottom: -5px;
-  right: -5px;
   background: var(--epic-purple);
   color: white;
-  font-size: 10px;
+  font-size: 11px;
   padding: 2px 6px;
-  border-radius: 10px;
+  border-radius: 8px;
   font-weight: bold;
 }
 
@@ -1015,7 +1021,7 @@ body {
   display: flex;
   justify-content: space-between;
   font-size: 12px;
-  color: var(--text-muted);
+  color: #333;
   margin-bottom: 5px;
 }
 
@@ -1047,35 +1053,34 @@ body {
 .gold-section {
   display: flex;
   align-items: center;
-  gap: 10px;
-  background: rgba(0, 0, 0, 0.3);
-  padding: 10px 15px;
-  border-radius: 15px;
-  border: 2px solid var(--gold-dark);
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 3px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--gold-dark);
 }
 
 .gold-label {
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 /* Inventory Preview */
 .inventory-preview {
   cursor: pointer;
-  background: rgba(0, 0, 0, 0.3);
-  padding: 15px;
-  border-radius: 15px;
+  background: transparent;
+  padding: 0;
   transition: all 0.3s ease;
 }
 
 .inventory-preview:hover {
-  background: rgba(0, 0, 0, 0.5);
+  opacity: 0.8;
 }
 
 .inventory-label {
-  font-size: 14px;
-  margin-bottom: 10px;
-  color: var(--text-light);
+  font-size: 11px;
+  margin-bottom: 0;
+  color: #5D4037;
 }
 
 .inventory-items {
@@ -1565,11 +1570,11 @@ body {
 .map-legend {
   display: flex;
   justify-content: center;
+  flex-wrap: nowrap;
   gap: 20px;
-  padding: 15px;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 15px;
-  margin: 20px;
+  padding: 8px 15px;
+  background: transparent;
+  margin: 10px auto;
 }
 
 .legend-item {
@@ -1595,9 +1600,9 @@ body {
 .inventory-modal {
   background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-darker) 100%);
   border-radius: 25px;
-  max-width: 500px;
-  width: 90%;
-  max-height: 80vh;
+  max-width: 96vw;
+  width: 96%;
+  max-height: 94vh;
   overflow-y: auto;
   border: 4px solid var(--gold-dark);
 }
@@ -1801,8 +1806,14 @@ body {
 }
 
 .quest-type-card.completed {
-  opacity: 0.6;
-  cursor: default;
+  opacity: 0.85;
+  cursor: pointer;
+  border-color: var(--xp-green);
+}
+
+.quest-type-card.completed:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(34, 197, 94, 0.3);
 }
 
 .quest-icon-wrapper {
@@ -3354,6 +3365,8 @@ body {
 /* App Footer */
 .app-footer {
   padding: 15px 20px;
+  padding-bottom: 30px;
+  margin-bottom: 20px;
   text-align: center;
 }
 
@@ -3364,6 +3377,8 @@ body {
   background: rgba(0, 0, 0, 0.3);
   padding: 10px 20px;
   border-radius: 20px;
+  position: relative;
+  bottom: 25px;
 }
 
 .tip-icon {
@@ -3437,6 +3452,18 @@ body {
 .theme-nintendo .hero-name {
   color: #c0392b;
   text-shadow: none;
+}
+
+.theme-nintendo .stat-label {
+  color: #5D4037;
+}
+
+.theme-nintendo .gold-label {
+  color: #5D4037;
+}
+
+.theme-nintendo .app-subtitle {
+  color: #333;
 }
 
 .theme-nintendo .world-map {
@@ -3920,9 +3947,9 @@ body {
 .ship-modal {
   background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-darker) 100%);
   border-radius: 25px;
-  max-width: 550px;
-  width: 95%;
-  max-height: 85vh;
+  max-width: 96vw;
+  width: 96%;
+  max-height: 94vh;
   overflow-y: auto;
   border: 4px solid;
 }
@@ -4621,5 +4648,158 @@ body {
 
   .matching-column:first-child {
     margin-bottom: 15px;
+  }
+}
+
+
+/* ============================================
+   CHALLENGE SHIP CARDS - Links zu Bandura/Hattie Schiffen
+   ============================================ */
+
+.challenge-ships-info {
+  text-align: center;
+  padding: 10px;
+}
+
+.ships-info-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.ships-info-header .ships-icon {
+  font-size: 32px;
+  animation: floatShip 3s ease-in-out infinite;
+}
+
+@keyframes floatShip {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-5px) rotate(3deg); }
+}
+
+.ships-info-header h4 {
+  font-size: 1.3em;
+  color: var(--text-dark);
+  margin: 0;
+}
+
+.ships-explanation {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 15px;
+  padding: 15px 20px;
+  margin-bottom: 20px;
+  text-align: left;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.ships-explanation p {
+  margin: 0;
+  color: var(--text-dark);
+  line-height: 1.6;
+}
+
+.challenge-ship-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.challenge-ship-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px 20px;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+}
+
+.challenge-ship-card.bandura {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.challenge-ship-card.hattie {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.challenge-ship-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+}
+
+.ship-card-icon {
+  font-size: 36px;
+  flex-shrink: 0;
+}
+
+.ship-card-content {
+  flex: 1;
+}
+
+.ship-card-content h5 {
+  font-size: 1.1em;
+  margin: 0 0 5px 0;
+}
+
+.ship-card-content p {
+  font-size: 0.9em;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.ship-card-action {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  font-size: 0.9em;
+}
+
+.ship-card-action span:first-child {
+  font-weight: bold;
+}
+
+.ship-xp {
+  font-size: 0.8em;
+  opacity: 0.8;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 3px 8px;
+  border-radius: 10px;
+}
+
+.ships-tip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 215, 0, 0.15);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 12px;
+  padding: 12px 15px;
+  font-size: 0.9em;
+  color: var(--text-dark);
+}
+
+.ships-tip .tip-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .challenge-ship-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .ship-card-action {
+    align-items: center;
+    margin-top: 10px;
   }
 }

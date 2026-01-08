@@ -10,7 +10,7 @@ export type BanduraSourceId = 'mastery' | 'vicarious' | 'persuasion' | 'physiolo
 
 // Allgemeine Infos ueber die Bandura-Challenge
 export const BANDURA_INFO = {
-  title: "Banduras Kraftquellen",
+  title: "Der goldene Schlüssel",
   subtitle: "Trainiere deine Selbstwirksamkeit!",
   description: "Albert Bandura fand heraus: Es gibt 4 Wege, wie du deinen Glauben an dich selbst staerken kannst. Waehle eine Quelle und beschreibe deine heutige Erfahrung!",
   xp: {

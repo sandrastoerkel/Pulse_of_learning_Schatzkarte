@@ -773,7 +773,7 @@ def _render_explanation_action(island_id: str, user_id: str, is_preview: bool, p
     content_key = ISLAND_CONTENT_MAP.get(island_id)
 
     # Altersstufe des Users holen (Schatzkarte: nur Grundschule/Unterstufe)
-    age_group = st.session_state.get("current_user_age_group", "unterstufe")
+    age_group = st.session_state.get("current_user_age_group", "grundschule")
 
     with st.expander("📖 Erklärung lesen", expanded=False):
         # Fuer MATHEFF (Festung der Staerke): Altersgerechten Content anzeigen

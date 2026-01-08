@@ -1158,10 +1158,10 @@ export function HattieChallenge({
             animate={{ rotate: [0, 10, -10, 0] }}
             transition={{ duration: 3, repeat: Infinity }}
           >
-            🎯
+            💪
           </motion.span>
           <div>
-            <h3>Hattie-Challenge</h3>
+            <h3>Superpower</h3>
             <p>Trainiere deine Selbsteinschätzung</p>
           </div>
         </div>

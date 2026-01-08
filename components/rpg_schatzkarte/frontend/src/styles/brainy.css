@@ -25,6 +25,11 @@
   bottom: 20px;
 }
 
+.brainy-position-top-right {
+  right: 20px;
+  top: 70px;
+}
+
 .brainy-position-center {
   left: 50%;
   bottom: 20px;

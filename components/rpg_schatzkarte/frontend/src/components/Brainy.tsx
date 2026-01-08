@@ -14,7 +14,7 @@ interface BrainyProps {
   mood?: BrainyMood;
   message?: string;
   size?: 'small' | 'medium' | 'large';
-  position?: 'left' | 'right' | 'center';
+  position?: 'left' | 'right' | 'center' | 'top-right';
   onClick?: () => void;
   autoHide?: boolean;
   hideAfter?: number;

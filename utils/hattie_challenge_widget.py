@@ -170,7 +170,7 @@ def render_challenge_phase1(user_id: str, stats: dict, color: str):
     """Phase 1: Neue Challenge erstellen (Vorhersage)."""
 
     # Altersstufe aus Session State holen
-    age_group = st.session_state.get("current_user_age_group", "unterstufe")
+    age_group = st.session_state.get("current_user_age_group", "grundschule")
     is_oberstufe = age_group == "oberstufe"
 
     # Intro und Wissenschafts-Box

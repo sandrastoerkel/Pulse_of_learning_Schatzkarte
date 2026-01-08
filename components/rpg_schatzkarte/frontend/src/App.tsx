@@ -11,6 +11,7 @@ import { WorldMap } from './components/WorldMap';
 import { QuestModal } from './components/QuestModal';
 import { BanduraShipModal } from './components/BanduraShipModal';
 import { HattieShipModal } from './components/HattieShipModal';
+import { SuperheldenTagebuch, TagebuchEintrag } from './components/SuperheldenTagebuch';
 import { BanduraSourceId } from './content/banduraContent';
 import { BanduraEntry, BanduraStats, DEFAULT_BANDURA_STATS } from './banduraTypes';
 import { HattieEntry, HattieStats } from './hattieTypes';
@@ -24,6 +25,7 @@ import {
 import './styles/rpg-theme.css';
 import './styles/bandura-challenge.css';
 import './styles/hattie-challenge.css';
+import './styles/superhelden-tagebuch.css';
 import './styles/brainy.css';
 import { Brainy } from './components/Brainy';
 
@@ -122,6 +124,10 @@ function RPGSchatzkarteContent({
     total_xp: 0,
     level: 1
   });
+
+  // Superhelden-Tagebuch State (nur Grundschule)
+  const [tagebuchEntries, setTagebuchEntries] = useState<TagebuchEintrag[]>([]);
+  const [showTagebuch, setShowTagebuch] = useState(false);
 
   const handleIslandClick = useCallback((islandId: string) => {
     const island = islands.find(i => i.id === islandId);
@@ -343,6 +349,24 @@ function RPGSchatzkarteContent({
     console.log('Hattie entry completed:', { entryId, result, reflection });
   }, [onAction, hattieEntries]);
 
+  // Superhelden-Tagebuch Handler
+  const handleTagebuchEntry = useCallback((entry: TagebuchEintrag) => {
+    setTagebuchEntries(prev => [entry, ...prev]);
+
+    if (onAction) {
+      onAction({
+        action: 'tagebuch_entry',
+        tagebuchEntry: entry,
+        xpEarned: entry.warEsSchwer === 'schwer' ? 20 : entry.warEsSchwer === 'mittel' ? 15 : 10
+      });
+    }
+    console.log('Tagebuch entry:', entry);
+  }, [onAction]);
+
+  const handleTagebuchToggle = useCallback(() => {
+    setShowTagebuch(prev => !prev);
+  }, []);
+
   return (
     <div className="rpg-schatzkarte">
       <header className="app-header">
@@ -365,6 +389,9 @@ function RPGSchatzkarteContent({
         onIslandClick={handleIslandClick}
         onBanduraShipClick={handleBanduraShipClick}
         onHattieShipClick={handleHattieShipClick}
+        ageGroup={ageGroup}
+        tagebuchEntries={tagebuchEntries}
+        onTagebuchToggle={handleTagebuchToggle}
       />
 
       {showQuestModal && selectedIsland && (
@@ -376,6 +403,19 @@ function RPGSchatzkarteContent({
           onClose={handleCloseModal}
           onQuestComplete={handleQuestComplete}
           onTreasureCollected={handleTreasureCollected}
+          onOpenTagebuch={handleTagebuchToggle}
+          onOpenBandura={handleBanduraShipClick}
+          onOpenHattie={handleHattieShipClick}
+        />
+      )}
+
+      {/* Superhelden-Tagebuch Modal (nur Grundschule) */}
+      {ageGroup === 'grundschule' && (
+        <SuperheldenTagebuch
+          isOpen={showTagebuch}
+          entries={tagebuchEntries}
+          onNewEntry={handleTagebuchEntry}
+          onToggle={handleTagebuchToggle}
         />
       )}
 
@@ -401,13 +441,15 @@ function RPGSchatzkarteContent({
         userName={heroData.name}
       />
 
-      {/* Brainy - Das Maskottchen */}
-      <Brainy
-        mood="happy"
-        message={`Hey ${heroData.name}! Klick auf eine Insel!`}
-        size="medium"
-        position="left"
-      />
+      {/* Brainy - Das Maskottchen (nur auf der Kartenansicht, nicht bei offenen Modals) */}
+      {!showQuestModal && !showBanduraModal && !showHattieModal && !showTagebuch && (
+        <Brainy
+          mood="happy"
+          message={`Hey ${heroData.name}! Klick auf eine Insel!`}
+          size="medium"
+          position="top-right"
+        />
+      )}
 
       <footer className="app-footer">
         <div className="tip-of-the-day">
@@ -441,7 +483,7 @@ function loadSavedTheme(): ThemeType {
   } catch (e) {
     // localStorage nicht verfügbar
   }
-  return 'rpg';
+  return 'nintendo';
 }
 
 // Theme in localStorage speichern
@@ -504,7 +546,7 @@ function RPGSchatzkarteStreamlit({ args }: ComponentProps) {
   const heroData: HeroData = args?.heroData || DEFAULT_HERO;
   const unlockedIslands: string[] = args?.unlockedIslands || ['motivation'];
   const currentIsland: string | null = args?.currentIsland || null;
-  const ageGroup: AgeGroup = args?.ageGroup || 'unterstufe';
+  const ageGroup: AgeGroup = args?.ageGroup || 'grundschule';
   const [currentTheme, setCurrentTheme] = useState<ThemeType>(loadSavedTheme);
 
   useEffect(() => {
@@ -537,7 +579,7 @@ function RPGSchatzkarteStreamlit({ args }: ComponentProps) {
 // Development-Modus Komponente (ohne Streamlit)
 function RPGSchatzkarteDev() {
   const [currentTheme, setCurrentTheme] = useState<ThemeType>(loadSavedTheme);
-  const [ageGroup, setAgeGroup] = useState<AgeGroup>('unterstufe');
+  const [ageGroup, setAgeGroup] = useState<AgeGroup>('grundschule');
 
   // Mehr Inseln freigeschaltet für Demo
   const unlockedIslands = ['start', 'festung', 'werkzeuge', 'bruecken', 'faeden', 'spiegel_see', 'vulkan', 'ruhe_oase'];
