@@ -119,7 +119,7 @@ Stell dir vor, du misst, wie viel Schüler in einem Jahr lernen. Das ist der Nor
         type: 'info'
       },
       {
-        title: "Technik 1: Retrieval Practice (Selbsttest)",
+        title: "Technik 1: Retrieval Practice (Selbsttest) – d = 0.58",
         content: `Jedes Mal, wenn du etwas aus deinem Gedächtnis ABRUFST (statt es nur wieder zu lesen), verstärkst du die Verbindung im Gehirn.
 
 Das ist wie ein Trampelpfad: Je öfter du ihn gehst, desto breiter wird er.
@@ -136,7 +136,7 @@ Abrufen ist, ihn tatsächlich zu gehen.
         effectSize: EFFECT_SIZES.retrieval
       },
       {
-        title: "Technik 2: Spaced Repetition (Zeitversetzt wiederholen)",
+        title: "Technik 2: Spaced Repetition (Zeitversetzt wiederholen) – d = 0.60",
         content: `Dein Gehirn vergisst. Schnell. Nach 24 Stunden hast du 70% vergessen!
 
 ABER: Wenn du wiederholst, BEVOR du vergessen hast, wird die Kurve flacher.
@@ -158,7 +158,7 @@ Mit jeder Wiederholung hält das Wissen länger.
         }
       },
       {
-        title: "Technik 3: Feynman-Methode (Erklär's einem 6-Jährigen)",
+        title: "Technik 3: Feynman-Methode (Erklär's einem 6-Jährigen) – d = 0.75",
         content: `Richard Feynman war Nobelpreisträger für Physik und legendär dafür, komplizierte Sachen einfach zu erklären.
 
 Seine Methode: **Wenn du etwas nicht einfach erklären kannst, hast du es nicht verstanden.**
@@ -173,7 +173,7 @@ Seine Methode: **Wenn du etwas nicht einfach erklären kannst, hast du es nicht 
         effectSize: EFFECT_SIZES.feynman
       },
       {
-        title: "Technik 4: Interleaving (Mischen statt Blocken)",
+        title: "Technik 4: Interleaving (Mischen statt Blocken) – d = 0.67",
         content: `Die meisten lernen "geblockt": Erst 20 Mathe-Aufgaben zum Thema A, dann 20 zum Thema B.
 Fühlt sich effektiv an. **IST ES ABER NICHT.**
 
@@ -194,7 +194,7 @@ Das trainiert dein Gehirn, Unterschiede zu erkennen.
         }
       },
       {
-        title: "Technik 5: Loci-Methode (Gedächtnispalast)",
+        title: "Technik 5: Loci-Methode (Gedächtnispalast) – d = 0.65",
         content: `Diese Methode nutzen Gedächtnis-Weltmeister!
 
 Funktioniert so: Du "gehst" im Kopf durch einen bekannten Ort (dein Zimmer, Schulweg) und "platzierst" an jedem Punkt einen Begriff, den du dir merken willst.
@@ -209,7 +209,7 @@ Warum funktioniert das? Das Gehirn ist super darin, sich Orte zu merken – viel
         effectSize: EFFECT_SIZES.loci
       },
       {
-        title: "Technik 6: Pomodoro-Technik (25 + 5)",
+        title: "Technik 6: Pomodoro-Technik (25 + 5) – d = 0.53",
         content: `Das Gehirn kann sich nicht ewig konzentrieren. Nach etwa 25 Minuten lässt die Aufmerksamkeit nach.
 
 Die Pomodoro-Technik nutzt das: 25 Min fokussiert arbeiten, dann 5 Min echte Pause (nicht Handy!). Nach 4 Runden: 15-30 Min längere Pause.
@@ -222,7 +222,7 @@ Die Pomodoro-Technik nutzt das: 25 Min fokussiert arbeiten, dann 5 Min echte Pau
         effectSize: EFFECT_SIZES.pomodoro
       },
       {
-        title: "Technik 7: Lernen durch Lehren",
+        title: "Technik 7: Lernen durch Lehren – d = 0.53",
         content: `*"Wer lehrt, lernt doppelt."*
 
 Das ist nicht nur ein Spruch. Wenn du jemandem etwas erklärst, musst du:

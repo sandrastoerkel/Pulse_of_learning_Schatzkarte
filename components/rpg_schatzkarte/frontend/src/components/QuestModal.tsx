@@ -9,8 +9,10 @@ import { BRUECKEN_CONTENT } from '../content/brueckenContent';
 import { WERKZEUGE_CONTENT } from '../content/werkzeugeContent';
 import { SUPERHELDEN_QUIZ_QUESTIONS } from '../content/festungQuizContent';
 import { SUPERHELDEN_QUIZ_QUESTIONS as SUPERHELDEN_QUIZ_UNTERSTUFE } from '../content/festungQuizContent_unterstufe';
+import { WERKZEUGE_QUIZ_QUESTIONS } from '../content/werkzeugeQuizContent';
 import { BattleQuiz } from './BattleQuiz';
 import { TagebuchStartButton } from './SuperheldenTagebuch';
+import { PowertechnikenChallenge } from './PowertechnikenChallenge';
 
 interface QuestModalProps {
   island: Island & {
@@ -164,6 +166,9 @@ export function QuestModal({
 
   // Quiz/Battle State
   const [quizActive, setQuizActive] = useState(false);
+
+  // Powertechniken Challenge State (für Werkzeuge-Insel)
+  const [powertechnikenActive, setPowertechnikenActive] = useState(false);
 
   // Toggle Expander
   const toggleExpander = (idx: number) => {
@@ -603,10 +608,12 @@ export function QuestModal({
                     {!quizActive ? (
                       <div className="battle-teaser">
                         <div className="monster-preview">
-                          <span className="monster-icon">🦸‍♀️</span>
-                          <p>Superhelden-Quiz wartet!</p>
+                          <span className="monster-icon">{island.id === 'werkzeuge' ? '🧠' : '🦸‍♀️'}</span>
+                          <p>{island.id === 'werkzeuge' ? 'Power-Techniken Quiz wartet!' : 'Superhelden-Quiz wartet!'}</p>
                         </div>
-                        <p>Teste dein Wissen über Banduras Power-Ups und die Hattie-Challenge!</p>
+                        <p>{island.id === 'werkzeuge'
+                          ? 'Teste dein Wissen über die 7 cleveren Lerntechniken!'
+                          : 'Teste dein Wissen über Banduras Power-Ups und die Hattie-Challenge!'}</p>
                         <p style={{ fontSize: '14px', color: 'var(--text-muted)', margin: '10px 0' }}>
                           ❤️❤️❤️ Du hast 3 Leben - nutze sie weise!
                         </p>
@@ -622,6 +629,8 @@ export function QuestModal({
                         quiz={{
                           questions: island.id === 'festung'
                             ? (ageGroup === 'unterstufe' ? SUPERHELDEN_QUIZ_UNTERSTUFE : SUPERHELDEN_QUIZ_QUESTIONS)
+                            : island.id === 'werkzeuge'
+                            ? WERKZEUGE_QUIZ_QUESTIONS
                             : island.quiz?.questions || []
                         } as ExtendedQuiz}
                         islandName={island.name}
@@ -722,8 +731,49 @@ export function QuestModal({
                   </div>
                 )}
 
+                {/* Werkzeuge-Insel: Powertechniken Challenge */}
+                {activeQuest === 'challenge' && island.id === 'werkzeuge' && (
+                  <>
+                    {!powertechnikenActive ? (
+                      <div className="challenge-teaser">
+                        <div className="challenge-preview">
+                          <span className="challenge-icon">🛠️</span>
+                          <h4>Die 7 Powertechniken Challenge!</h4>
+                        </div>
+                        <p>Entdecke 7 wissenschaftlich bewiesene Lerntechniken und probiere sie aus!</p>
+                        <ul style={{ textAlign: 'left', margin: '15px auto', maxWidth: '300px' }}>
+                          <li>🍅 Pomodoro - Konzentrations-Timer</li>
+                          <li>🔄 Active Recall - Erinnerungs-Spiel</li>
+                          <li>👶 Feynman - Teddy-Erklärer</li>
+                          <li>📅 Spaced Repetition - Wissens-Kalender</li>
+                          <li>👥 Lernen durch Lehren</li>
+                          <li>🏰 Loci-Methode - Gedächtnispalast</li>
+                          <li>🔀 Interleaving - Mathe-Mixer</li>
+                        </ul>
+                        <p style={{ fontSize: '14px', color: 'var(--text-muted)', margin: '10px 0' }}>
+                          ⭐ +15 XP pro Technik • 🏆 Zertifikat am Ende!
+                        </p>
+                        <button
+                          className="complete-btn challenge-start"
+                          onClick={() => setPowertechnikenActive(true)}
+                        >
+                          🚀 Challenge starten!
+                        </button>
+                      </div>
+                    ) : (
+                      <PowertechnikenChallenge
+                        onComplete={(xp) => {
+                          setPowertechnikenActive(false);
+                          handleCompleteQuest('challenge');
+                        }}
+                        onClose={() => setPowertechnikenActive(false)}
+                      />
+                    )}
+                  </>
+                )}
+
                 {/* Fallback für andere Inseln */}
-                {activeQuest === 'challenge' && island.id !== 'festung' && (
+                {activeQuest === 'challenge' && island.id !== 'festung' && island.id !== 'werkzeuge' && (
                   <div className="challenge-content">
                     <div className="challenge-icon">🏆</div>
                     <h4>Finale Herausforderung</h4>

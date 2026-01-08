@@ -1,5 +1,5 @@
 # Pulse of Learning - Schatzkarte
-## Dokumentation Stand 7. Januar 2025
+## Dokumentation Stand 8. Januar 2025
 
 ---
 
@@ -21,7 +21,111 @@ Danach hast du Zugang zur **👥 Lerngruppen**-Seite.
 
 ---
 
-# HEUTIGE ÄNDERUNGEN (7. Januar 2025)
+# HEUTIGE ÄNDERUNGEN (8. Januar 2025)
+
+## Insel der 7 Werkzeuge - Grundschule Challenge KOMPLETT! 🎉
+
+Die **7 Powertechniken Challenge** für Grundschüler (8-10 Jahre) wurde vollständig implementiert!
+
+### Neue Komponenten erstellt:
+
+| Datei | Beschreibung |
+|-------|--------------|
+| `PowertechnikenChallenge.tsx` | Hauptchallenge mit 7 interaktiven Übungen |
+| `LerntechnikenUebersicht.tsx` | Persönliche Übersicht aller Techniken |
+| `LerntechnikenZertifikat.tsx` | Urkunde "Lerntechniken-Entdecker" |
+| `powertechnikenTypes.ts` | TypeScript-Typen und Technik-Daten |
+| `powertechniken-challenge.css` | Nintendo-Style CSS (~3000 Zeilen) |
+
+### Die 7 Powertechniken mit interaktiven Übungen:
+
+| # | Technik | Übung |
+|---|---------|-------|
+| 1 | 🍅 Pomodoro | Timer mit Lern-Pause-Zyklen |
+| 2 | 🔄 Active Recall | Memory-Spiel (5 Wörter merken) |
+| 3 | 👶 Feynman-Methode | Teddy-Erklärer Checkbox |
+| 4 | 📅 Spaced Repetition | Wiederholungs-Kalender + Anki-Tipp |
+| 5 | 👥 Lernen durch Lehren | Partner-Checkliste |
+| 6 | 🏰 Loci-Methode | Zimmer-Spaziergang (5 Orte belegen) |
+| 7 | 🔀 Interleaved Practice | Mathe-Mixer (+, -, ×) |
+
+### Verbesserungen an den Übungen:
+
+#### 🍅 Pomodoro - Zyklus-System
+- **Lern-Pause-Wechsel**: Lernen → Pause → Lernen → Pause (beliebig oft)
+- **Zyklus-Zähler**: Zeigt 🍅🍅🍅 für abgeschlossene Pomodoros
+- **Phasen-Anzeige**: Rot = Lernen, Grün = Pause
+- **Buttons**: "☕ Pause starten" / "🍅 Weiter lernen" / "✅ Fertig für heute"
+
+#### 📅 Spaced Repetition - Anki-Hinweis für Eltern
+```
+💡 Tipp für Eltern:
+Die kostenlose App „Anki" macht Spaced Repetition automatisch!
+📱 Kostenlos: apps.ankiweb.net
+```
+
+#### 🏰 Loci-Methode - Grammatik korrigiert
+- ✅ "Was legst du auf **das** Bett?" (war: "auf den Bett")
+- ✅ "Was legst du auf **das** Fenster?"
+- ✅ "Was legst du auf **die** Tür?"
+
+#### 🔀 Interleaving - Verbessert
+- **Erklärungsbox**: "Was ist Interleaving?" mit Prinzip-Erklärung
+- **Schwierigere Aufgaben**: 3.-4. Klasse Niveau (47+28, 72-45, 7×6)
+- **Plus, Minus UND Mal** gemischt (12 Aufgaben)
+- **Hinweis**: "Das geht auch mit: Vokabeln, Sachkunde, Rechtschreibung..."
+- **Breiteres Lösungsfeld**: 70px statt 50px für 2-3 stellige Zahlen
+
+### 🎓 Urkunde "Lerntechniken-Entdecker"
+
+- **Top 3 Auswahl**: Kind wählt seine 3 Lieblingstechniken (🥇🥈🥉)
+- **Alle Techniken mit Anwendungen**: Zeigt was das Kind bei jeder Technik geschrieben hat
+- **Buttons funktionieren jetzt**:
+  - 📥 Als Bild speichern (html2canvas → PNG Download)
+  - 🖨️ Drucken (Browser-Druckdialog)
+
+### 🗺️ WorldMap - Lerntechniken-Widget
+
+Neuer Floating-Button unten rechts auf der Weltkarte:
+- 📋 "Lerntechniken" (Standard-Ansicht)
+- Badge mit Fortschritt (z.B. "3/7")
+- 🎓 "Zertifikat" mit goldenem Glow wenn alle 7 abgeschlossen
+
+### Neue/Geänderte Dateien (8. Januar):
+
+| Datei | Änderung |
+|-------|----------|
+| `PowertechnikenChallenge.tsx` | **NEU** - Hauptchallenge |
+| `LerntechnikenUebersicht.tsx` | **NEU** - Übersicht Modal |
+| `LerntechnikenZertifikat.tsx` | **NEU** - Zertifikat mit Download |
+| `powertechnikenTypes.ts` | **NEU** - Types & Daten |
+| `powertechniken-challenge.css` | **NEU** - ~3000 Zeilen CSS |
+| `QuestModal.tsx` | Challenge-Integration für werkzeuge |
+| `WorldMap.tsx` | Lerntechniken-Widget Props |
+| `App.tsx` | State & Handler für Lerntechniken |
+
+### Dependencies hinzugefügt:
+- `html2canvas` - Für Zertifikat-Download als PNG
+
+---
+
+## TODO für 9. Januar
+
+### 1. Insel der 7 Werkzeuge - UNTERSTUFE
+Die **Insel der 7 Werkzeuge für Unterstufe** muss noch gemacht werden!
+- Gleiche 7 Techniken, aber angepasste Sprache/Übungen für ältere Schüler
+- Komplexere Interleaving-Aufgaben
+- Längere Pomodoro-Zeiten (25 Min statt 15 Min)
+
+### 2. 🐛 BUG: Superhelden-Tagebuch lässt sich nicht schließen
+**Problem:** Das Superhelden-Tagebuch (Grundschule) lässt sich nicht schließen.
+- Vermutlich überdeckt ein Button den Schließen-Button
+- **Komponente:** `SuperheldenTagebuch.tsx`
+- **Zu prüfen:** Z-Index, Button-Positionierung, Click-Handler
+
+---
+
+# ÄNDERUNGEN VOM 7. Januar 2025
 
 ## Bandura-Urkunde & Verbesserungen
 
@@ -275,7 +379,8 @@ Der Starthafen hat jetzt strukturierte Tutorial-Schritte:
 
 **Bereits fertig:**
 - ✅ Festung der Stärke (festungContent.ts + festungQuizContent.ts)
-- ✅ Insel der 7 Werkzeuge (werkzeugeContent.ts mit Effektstärke-Dropdown)
+- ✅ Insel der 7 Werkzeuge - Grundschule KOMPLETT! (PowertechnikenChallenge)
+- ⏳ Insel der 7 Werkzeuge - Unterstufe Challenge fehlt
 - ⏳ Insel der 7 Werkzeuge - Quiz fehlt noch
 - ⏳ Insel der Fäden (faedenContent.ts - Quiz fehlt)
 - ⏳ Insel der Brücken (brueckenContent.ts - Quiz fehlt)
@@ -389,15 +494,17 @@ Pulse_of_learning_Schatzkarte/
 
 ---
 
-# NÄCHSTE SCHRITTE (8. Januar 2025)
+# NÄCHSTE SCHRITTE (9. Januar 2025)
 
 ## Hohe Priorität
-1. **PDF-Download für Urkunde** - PDF-Generator implementieren
-   - Vorlage designen (A4 Querformat)
-   - Download-Button in Urkunden-Ansicht
-   - html2pdf oder ähnliche Library
-2. **Quiz für andere Inseln erstellen** - Werkzeuge, Fäden, Brücken
-3. **Testen** - Bandura-Urkunde mit echten Einträgen prüfen
+1. **Insel der 7 Werkzeuge - UNTERSTUFE** - Challenge für ältere Schüler erstellen
+   - Angepasste Sprache (weniger kindlich)
+   - Komplexere Interleaving-Aufgaben
+   - Längere Pomodoro-Zeiten (25 Min statt 15 Min)
+2. **🐛 BUG FIX: Superhelden-Tagebuch** - Schließen-Button funktioniert nicht
+   - Vermutlich Z-Index oder Button-Überlappung
+   - Komponente: `SuperheldenTagebuch.tsx`
+3. **Quiz für Werkzeuge-Insel** - Quiz-Fragen für alle Altersstufen
 
 ## Mittlere Priorität
 4. **Quiz-Ergebnisse speichern** - Datenbank-Erweiterung
@@ -407,6 +514,10 @@ Pulse_of_learning_Schatzkarte/
 ## Niedrige Priorität
 7. **Gruppenchat** - Lösung finden
 8. **Weitere Selfchecks** - Für andere Altersstufen/Inseln
+
+## ✅ ERLEDIGT (8. Januar)
+- ~~PDF-Download für Urkunde~~ → PNG-Download mit html2canvas implementiert!
+- ~~Challenge für Werkzeuge-Insel Grundschule~~ → 7 Powertechniken komplett!
 
 ---
 
@@ -438,6 +549,13 @@ components/rpg_schatzkarte/frontend/
 
 | Datum | Was | Details |
 |-------|-----|---------|
+| **08.01.2025** | **7 Powertechniken Challenge** | Grundschule komplett: 7 interaktive Übungen, Zertifikat, PNG-Download |
+| 08.01.2025 | Pomodoro Zyklus-System | Lern-Pause-Wechsel beliebig oft, Zyklus-Zähler |
+| 08.01.2025 | Anki-Hinweis | Eltern-Tipp bei Spaced Repetition |
+| 08.01.2025 | Loci Grammatik | Artikel korrigiert (das Bett, die Tür) |
+| 08.01.2025 | Interleaving verbessert | Plus/Minus/Mal, 3.-4. Klasse Niveau, Erklärungsbox |
+| 08.01.2025 | Zertifikat-Download | html2canvas für PNG-Export, Drucken-Button |
+| 08.01.2025 | WorldMap Widget | Floating-Button für Lerntechniken-Übersicht |
 | **07.01.2025** | **Bandura-Urkunde** | Zeigt jetzt echte Einträge statt nur Zahlen (React + Python) |
 | 07.01.2025 | Effektstärke-Dropdown | Neues Dropdown bei Werkzeuge-Insel für alle Altersstufen |
 | 07.01.2025 | Vollständige Bandura | Festung zeigt direkt vollständige Challenge (nicht Kurzversion) |
@@ -468,16 +586,29 @@ streamlit run Home.py
 ```
 
 ## Was als erstes tun?
-1. **Bandura-Urkunde testen** - Festung der Stärke → Bandura-Challenge → Einträge machen → Urkunde prüfen
-2. **PDF-Download implementieren** - html2pdf Library einbauen
-3. **Weitere Quiz-Fragen** - Für Werkzeuge, Fäden, Brücken erstellen
+1. **Powertechniken-Challenge testen** - Insel der 7 Werkzeuge → alle 7 Übungen durchspielen → Zertifikat erstellen
+2. **Unterstufe Challenge** - Gleiche 7 Techniken, aber für ältere Schüler anpassen
+3. **Quiz-Fragen** - Für Werkzeuge-Insel erstellen
 
-## Zum Testen der Bandura-Urkunde:
+## Zum Testen der Powertechniken-Challenge:
+1. Schatzkarte öffnen (als Grundschüler eingeloggt)
+2. Insel der 7 Werkzeuge anklicken
+3. Challenge starten
+4. Alle 7 Techniken durchspielen:
+   - 🍅 Pomodoro-Timer starten (30 Sek Demo)
+   - 🔄 Active Recall Memory-Spiel
+   - 👶 Feynman Teddy-Erklärer
+   - 📅 Spaced Repetition Kalender
+   - 👥 Teaching Partner-Checkliste
+   - 🏰 Loci 5 Orte belegen
+   - 🔀 Interleaving Mathe-Mixer
+5. Zertifikat erstellen → Download als PNG testen
+
+## Zum Testen des WorldMap-Widgets:
 1. Schatzkarte öffnen
-2. Festung der Stärke anklicken ODER freischwebendes Bandura-Schiff
-3. "Bandura-Challenge" wählen
-4. Einträge in alle 4 Kategorien machen
-5. Tab "Portfolio" → Urkunde prüfen (zeigt jetzt echte Texte!)
+2. Unten rechts: Floating-Button "📋 Lerntechniken"
+3. Klicken → Übersicht öffnet sich
+4. Nach 7 Techniken: Goldener Glow + "🎓 Zertifikat"
 
 ## Bei Problemen
 - **"Component nicht gefunden"?** → `cd components/rpg_schatzkarte/frontend && npm run build`
@@ -499,5 +630,5 @@ streamlit run Home.py
 
 ---
 
-**Letzte Bearbeitung:** 7. Januar 2025
-**Nächster Meilenstein:** PDF-Download für Bandura-Urkunde implementieren
+**Letzte Bearbeitung:** 8. Januar 2025
+**Nächster Meilenstein:** Insel der 7 Werkzeuge - Unterstufe Challenge implementieren

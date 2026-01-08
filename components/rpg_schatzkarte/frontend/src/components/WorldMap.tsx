@@ -19,6 +19,10 @@ interface WorldMapProps {
   ageGroup?: AgeGroup;
   tagebuchEntries?: TagebuchEintrag[];
   onTagebuchToggle?: () => void;
+  // Lerntechniken-Übersicht Props
+  onLerntechnikenClick?: () => void;
+  lerntechnikenCompleted?: number;  // Anzahl abgeschlossener Techniken (0-7)
+  hasCertificate?: boolean;  // Hat Zertifikat verdient
 }
 
 // Vordefinierte Positionen für die Inseln auf der Weltkarte
@@ -85,7 +89,10 @@ export function WorldMap({
   onHattieShipClick,
   ageGroup,
   tagebuchEntries = [],
-  onTagebuchToggle
+  onTagebuchToggle,
+  onLerntechnikenClick,
+  lerntechnikenCompleted = 0,
+  hasCertificate = false
 }: WorldMapProps) {
   const [showInventory, setShowInventory] = useState(false);
   const [hoveredIsland, setHoveredIsland] = useState<string | null>(null);
@@ -238,19 +245,6 @@ export function WorldMap({
           );
         })}
 
-        {/* Aktuelle Quest Highlight */}
-        {currentIsland && (
-          <div
-            className="current-quest-indicator"
-            style={{
-              left: `${ISLAND_POSITIONS[currentIsland]?.x || 50}%`,
-              top: `${ISLAND_POSITIONS[currentIsland]?.y || 50}%`
-            }}
-          >
-            <div className="indicator-ping"></div>
-            <div className="indicator-label">Du bist hier!</div>
-          </div>
-        )}
       </div>
 
       {/* Legende */}
@@ -281,6 +275,22 @@ export function WorldMap({
             <span className="tagebuch-badge">{tagebuchEntries.length}</span>
           )}
           <span className="tagebuch-label">Mein Tagebuch</span>
+        </div>
+      )}
+
+      {/* Lerntechniken-Übersicht Widget */}
+      {onLerntechnikenClick && (
+        <div
+          className={`floating-lerntechniken-widget ${hasCertificate ? 'has-certificate' : ''}`}
+          onClick={onLerntechnikenClick}
+        >
+          <span className="lerntechniken-icon">{hasCertificate ? '🎓' : '📋'}</span>
+          {lerntechnikenCompleted > 0 && (
+            <span className="lerntechniken-badge">{lerntechnikenCompleted}/7</span>
+          )}
+          <span className="lerntechniken-label">
+            {hasCertificate ? 'Zertifikat' : 'Lerntechniken'}
+          </span>
         </div>
       )}
 

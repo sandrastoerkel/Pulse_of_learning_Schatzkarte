@@ -12,6 +12,9 @@ import { QuestModal } from './components/QuestModal';
 import { BanduraShipModal } from './components/BanduraShipModal';
 import { HattieShipModal } from './components/HattieShipModal';
 import { SuperheldenTagebuch, TagebuchEintrag } from './components/SuperheldenTagebuch';
+import { UebersichtModal } from './components/LerntechnikenUebersicht';
+import { ZertifikatStandalone } from './components/LerntechnikenZertifikat';
+import { PowertechnikenProgress, TechniqueKey } from './components/powertechnikenTypes';
 import { BanduraSourceId } from './content/banduraContent';
 import { BanduraEntry, BanduraStats, DEFAULT_BANDURA_STATS } from './banduraTypes';
 import { HattieEntry, HattieStats } from './hattieTypes';
@@ -128,6 +131,14 @@ function RPGSchatzkarteContent({
   // Superhelden-Tagebuch State (nur Grundschule)
   const [tagebuchEntries, setTagebuchEntries] = useState<TagebuchEintrag[]>([]);
   const [showTagebuch, setShowTagebuch] = useState(false);
+
+  // Lerntechniken-Übersicht State
+  const [showLerntechnikenModal, setShowLerntechnikenModal] = useState(false);
+  const [showZertifikat, setShowZertifikat] = useState(false);
+  const [powertechnikenProgress, setPowertechnikenProgress] = useState<PowertechnikenProgress>({
+    completedTechniques: [],
+    applications: {} as Record<TechniqueKey, string>
+  });
 
   const handleIslandClick = useCallback((islandId: string) => {
     const island = islands.find(i => i.id === islandId);
@@ -367,6 +378,35 @@ function RPGSchatzkarteContent({
     setShowTagebuch(prev => !prev);
   }, []);
 
+  // Lerntechniken-Übersicht Handler
+  const handleLerntechnikenClick = useCallback(() => {
+    // Wenn alle 7 Techniken abgeschlossen und Zertifikat verdient, zeige Zertifikat
+    if (powertechnikenProgress.completedTechniques.length === 7) {
+      setShowZertifikat(true);
+    } else {
+      setShowLerntechnikenModal(true);
+    }
+  }, [powertechnikenProgress.completedTechniques.length]);
+
+  // Handler für Powertechniken-Fortschritt (wird von QuestModal aufgerufen)
+  const handlePowertechnikenComplete = useCallback((techniqueKey: TechniqueKey, application?: string) => {
+    setPowertechnikenProgress(prev => {
+      const newCompleted = prev.completedTechniques.includes(techniqueKey)
+        ? prev.completedTechniques
+        : [...prev.completedTechniques, techniqueKey];
+
+      const newApplications = application
+        ? { ...prev.applications, [techniqueKey]: application }
+        : prev.applications;
+
+      return {
+        ...prev,
+        completedTechniques: newCompleted,
+        applications: newApplications
+      };
+    });
+  }, []);
+
   return (
     <div className="rpg-schatzkarte">
       <header className="app-header">
@@ -392,6 +432,9 @@ function RPGSchatzkarteContent({
         ageGroup={ageGroup}
         tagebuchEntries={tagebuchEntries}
         onTagebuchToggle={handleTagebuchToggle}
+        onLerntechnikenClick={handleLerntechnikenClick}
+        lerntechnikenCompleted={powertechnikenProgress.completedTechniques.length}
+        hasCertificate={powertechnikenProgress.completedTechniques.length === 7}
       />
 
       {showQuestModal && selectedIsland && (
@@ -441,8 +484,23 @@ function RPGSchatzkarteContent({
         userName={heroData.name}
       />
 
+      {/* Lerntechniken-Übersicht Modal */}
+      <UebersichtModal
+        isOpen={showLerntechnikenModal}
+        progress={powertechnikenProgress}
+        onClose={() => setShowLerntechnikenModal(false)}
+      />
+
+      {/* Zertifikat Modal (nur wenn alle 7 Techniken abgeschlossen) */}
+      {showZertifikat && (
+        <ZertifikatStandalone
+          progress={powertechnikenProgress}
+          onClose={() => setShowZertifikat(false)}
+        />
+      )}
+
       {/* Brainy - Das Maskottchen (nur auf der Kartenansicht, nicht bei offenen Modals) */}
-      {!showQuestModal && !showBanduraModal && !showHattieModal && !showTagebuch && (
+      {!showQuestModal && !showBanduraModal && !showHattieModal && !showTagebuch && !showLerntechnikenModal && !showZertifikat && (
         <Brainy
           mood="happy"
           message={`Hey ${heroData.name}! Klick auf eine Insel!`}

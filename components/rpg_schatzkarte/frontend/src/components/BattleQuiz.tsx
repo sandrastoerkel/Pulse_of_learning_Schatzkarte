@@ -3,7 +3,7 @@
 // Quiz als epischer Monster-Kampf mit Leben-System!
 // Unterstützt: single, multi-select, matching, ordering
 // ============================================
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   Quiz, QuizQuestion, BattleState, AnimationState,
   ExtendedQuizQuestion, MultiSelectQuestion, MatchingQuestion, OrderingQuestion,
@@ -27,11 +27,12 @@ interface MatchingState {
 }
 
 // Monster-Typen basierend auf Schwierigkeit
+// HP wird dynamisch basierend auf Fragenanzahl berechnet
 const MONSTERS = [
-  { name: 'Wissens-Kobold', icon: '👹', hp: 3, xpBonus: 20 },
-  { name: 'Rätsel-Wolf', icon: '🐺', hp: 4, xpBonus: 30 },
-  { name: 'Quiz-Drache', icon: '🐉', hp: 5, xpBonus: 50 },
-  { name: 'Lern-Titan', icon: '🗿', hp: 6, xpBonus: 75 }
+  { name: 'Wissens-Kobold', icon: '👹', baseHp: 3, xpBonus: 20 },
+  { name: 'Rätsel-Wolf', icon: '🐺', baseHp: 5, xpBonus: 30 },
+  { name: 'Quiz-Drache', icon: '🐉', baseHp: 8, xpBonus: 50 },
+  { name: 'Lern-Titan', icon: '🗿', baseHp: 12, xpBonus: 75 }
 ];
 
 // Kampf-Nachrichten
@@ -68,10 +69,18 @@ export function BattleQuiz({
 }: BattleQuizProps) {
   // Wähle Monster basierend auf Fragenanzahl
   const monsterIndex = Math.min(
-    Math.floor(quiz.questions.length / 3),
+    Math.floor(quiz.questions.length / 4),
     MONSTERS.length - 1
   );
-  const monster = MONSTERS[monsterIndex];
+  const baseMonster = MONSTERS[monsterIndex];
+
+  // Dynamische HP: Skaliert mit Fragenanzahl, damit alle Fragen gespielt werden
+  // Bei 15 Fragen mit Combo-Schaden (~1.5 avg) brauchen wir ca. 20 HP
+  const dynamicHp = Math.max(
+    baseMonster.baseHp,
+    Math.ceil(quiz.questions.length * 1.3) // 1.3x Fragen = HP (berücksichtigt Combo-Schaden)
+  );
+  const monster = { ...baseMonster, hp: dynamicHp };
 
   // Battle State mit Spieler-Leben
   const [battleState, setBattleState] = useState<BattleState>({
@@ -106,6 +115,27 @@ export function BattleQuiz({
 
   const currentQuestion = quiz.questions[battleState.currentQuestion] as ExtendedQuizQuestion;
   const questionType = currentQuestion.type || 'single';
+
+  // Shuffle-Funktion für Arrays
+  const shuffleArray = <T,>(array: T[]): T[] => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  };
+
+  // Gemischte Ordering-Items (wird bei Fragenwechsel neu berechnet)
+  const [shuffledOrderingItems, setShuffledOrderingItems] = useState<OrderingQuestion['items']>([]);
+
+  // Shuffle Ordering-Items wenn sich die Frage ändert
+  useEffect(() => {
+    if (questionType === 'ordering') {
+      const items = (currentQuestion as OrderingQuestion).items;
+      setShuffledOrderingItems(shuffleArray(items));
+    }
+  }, [battleState.currentQuestion, questionType]);
 
   // Helper: Punkte für aktuellen Fragetyp
   const getPointsForQuestion = () => {
@@ -672,14 +702,14 @@ export function BattleQuiz({
                 <p>Deine Reihenfolge:</p>
                 {orderingState.map((id, idx) => (
                   <span key={id} className="order-preview-item">
-                    {idx + 1}. {(currentQuestion as OrderingQuestion).items.find(i => i.id === id)?.text.slice(0, 3)}
+                    {idx + 1}. {shuffledOrderingItems.find(i => i.id === id)?.text.slice(0, 3)}
                     {idx < orderingState.length - 1 ? ' → ' : ''}
                   </span>
                 ))}
               </div>
             )}
             <div className="ordering-items">
-              {(currentQuestion as OrderingQuestion).items.map((item) => {
+              {shuffledOrderingItems.map((item) => {
                 const isSelected = orderingState.includes(item.id);
                 const orderNum = orderingState.indexOf(item.id) + 1;
 
@@ -696,11 +726,11 @@ export function BattleQuiz({
                 );
               })}
             </div>
-            {selectedAnswer === null && (
+            {selectedAnswer === null && shuffledOrderingItems.length > 0 && (
               <button
                 className="check-btn"
                 onClick={checkOrdering}
-                disabled={orderingState.length !== (currentQuestion as OrderingQuestion).items.length}
+                disabled={orderingState.length !== shuffledOrderingItems.length}
               >
                 ✓ PRÜFEN
               </button>
