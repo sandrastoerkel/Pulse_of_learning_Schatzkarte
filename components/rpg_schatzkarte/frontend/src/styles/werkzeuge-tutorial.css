@@ -307,6 +307,27 @@
   text-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
+/* Wissenschaftliche Quelle Link */
+.source-link {
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  display: inline-block;
+  margin-left: 0.3rem;
+  pointer-events: auto;
+  position: relative;
+  z-index: 10;
+}
+
+.source-link:hover {
+  transform: scale(1.2);
+  filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.8));
+}
+
+.source-link:active {
+  transform: scale(0.95);
+}
+
 .expander-chevron {
   font-size: 0.875rem;
   opacity: 0.9;

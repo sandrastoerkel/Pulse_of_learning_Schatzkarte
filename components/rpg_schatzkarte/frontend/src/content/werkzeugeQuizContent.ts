@@ -61,7 +61,7 @@ export const WERKZEUGE_QUIZ_QUESTIONS: ExtendedQuizQuestion[] = [
       { id: "b", text: "🧠 Buch zu, aus dem Kopf erzählen – wie ein Quiz!", correct: true },
       { id: "c", text: "🖍️ Alles gelb markieren (sieht nur produktiv aus)", correct: false },
       { id: "d", text: "📅 Clever wiederholen: heute, in 3 Tagen, in 1 Woche", correct: true },
-      { id: "e", text: "🎓 Deinem Teddy erklären – du bist der Lehrer!", correct: true },
+      { id: "e", text: "🎓 Deinem Sofakissen erklären – du bist der Lehrer!", correct: true },
     ],
     correctCount: 3,
     explanation: "Richtig! 🏆 Diese Tricks sind clever: Du bist aktiv dabei, es macht Spaß und du merkst sofort, was du schon kannst!"
@@ -80,7 +80,7 @@ export const WERKZEUGE_QUIZ_QUESTIONS: ExtendedQuizQuestion[] = [
       "Man muss 40 Minuten lernen"
     ],
     correct: 1,
-    explanation: "Genau! 📊 d = 0.40 ist normal. Die Feynman-Methode hat d = 0.75 – fast doppelt so gut! Clever statt viel!"
+    explanation: "Genau! 📊 d = 0.40 ist normal. Loci-Methode (g = 0.65) und Retrieval Practice (d = 0.50–0.74) sind deutlich besser! Clever statt viel!"
   } as QuizQuestion,
 
   // ========== WORLD 2: Power-Techniken (6 Fragen) ==========
@@ -97,7 +97,7 @@ export const WERKZEUGE_QUIZ_QUESTIONS: ExtendedQuizQuestion[] = [
       { id: 3, text: "🔀 Interleaving", correctMatch: 2 },
     ],
     matches: [
-      { id: 0, text: "Spiel Lehrer – erklär's deinem Teddy!" },
+      { id: 0, text: "Spiel Lehrer – erklär's deinem Sofakissen!" },
       { id: 1, text: "Mach ein Quiz mit dir selbst!" },
       { id: 2, text: "Abwechslung: Plus, Minus, Plus, Minus!" },
       { id: 3, text: "Clever timen: heute, in 3 Tagen, in 1 Woche" },
@@ -126,7 +126,7 @@ export const WERKZEUGE_QUIZ_QUESTIONS: ExtendedQuizQuestion[] = [
     level: "2-3",
     type: "single",
     title: "Die Feynman-Methode",
-    question: "Die Feynman-Methode hat die HÖCHSTE Effektstärke (d = 0.75)! Was ist das Geheimnis?",
+    question: "Die Feynman-Methode (d = 0.54) ist eine der effektivsten Techniken! Was ist das Geheimnis?",
     options: [
       "Man liest besonders langsam",
       "Man schreibt alles 10 Mal ab",
@@ -211,7 +211,7 @@ export const WERKZEUGE_QUIZ_QUESTIONS: ExtendedQuizQuestion[] = [
     options: [
       { id: "a", text: "🔀 Misch verschiedene Aufgaben – wie ein Überraschungs-Paket!", correct: true },
       { id: "b", text: "📚 Mach alle gleichen Aufgaben nacheinander (langweilig...)", correct: false },
-      { id: "c", text: "🎓 Spiel Lehrer: Erkläre die Lösung deinem Teddy!", correct: true },
+      { id: "c", text: "🎓 Spiel Lehrer: Erkläre die Lösung deinem Sofakissen!", correct: true },
       { id: "d", text: "👀 Lies die Lösung einfach mehrmals durch", correct: false },
       { id: "e", text: "🧠 Quiz-Zeit: Teste dich selbst, bevor du die Lösung anschaust!", correct: true },
     ],
@@ -232,7 +232,7 @@ export const WERKZEUGE_QUIZ_QUESTIONS: ExtendedQuizQuestion[] = [
       { id: 3, text: "🤔 Ich vergesse alles so schnell", correctMatch: 3 },
     ],
     matches: [
-      { id: 0, text: "🎓 Feynman: Spiel Lehrer – erklär's deinem Teddy!" },
+      { id: 0, text: "🎓 Feynman: Spiel Lehrer – erklär's deinem Sofakissen!" },
       { id: 1, text: "🍅 Pomodoro: 25 Min Flow, dann echte Pause!" },
       { id: 2, text: "🏰 Loci: Bau einen verrückten Gedächtnispalast!" },
       { id: 3, text: "📅 Spaced: Clever timen – heute, morgen, in 3 Tagen!" },
@@ -248,12 +248,12 @@ export const WERKZEUGE_QUIZ_QUESTIONS: ExtendedQuizQuestion[] = [
     title: "Boss-Challenge: Effektstärken-Ranking",
     question: "Ordne die Techniken nach ihrer Effektstärke – von der HÖCHSTEN zur niedrigsten!",
     items: [
-      { id: "a", text: "🎓 Feynman-Methode (d = 0.75)", order: 1 },
+      { id: "a", text: "🏰 Loci-Methode (g = 0.65)", order: 1 },
       { id: "b", text: "🖍️ Markieren (d = 0.36)", order: 4 },
-      { id: "c", text: "🔀 Interleaving (d = 0.67)", order: 2 },
-      { id: "d", text: "📅 Spaced Repetition (d = 0.60)", order: 3 },
+      { id: "c", text: "📅 Spaced Repetition (d = 0.60)", order: 2 },
+      { id: "d", text: "🎓 Feynman-Methode (d = 0.54)", order: 3 },
     ],
-    explanation: "Wissenschafts-Experte! 🔬 Die Feynman-Methode ist der Champion! Und Markieren? Fast am Ende... Clever lernen schlägt viel lernen!"
+    explanation: "Wissenschafts-Experte! 🔬 Die Loci-Methode ist der Champion! Und Markieren? Fast am Ende... Clever lernen schlägt viel lernen!"
   } as OrderingQuestion,
 
   {

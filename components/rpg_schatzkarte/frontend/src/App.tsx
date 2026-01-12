@@ -378,15 +378,16 @@ function RPGSchatzkarteContent({
     setShowTagebuch(prev => !prev);
   }, []);
 
-  // Lerntechniken-Übersicht Handler
+  // Lerntechniken-Übersicht Handler - Direkt zur Insel der 7 Werkzeuge
   const handleLerntechnikenClick = useCallback(() => {
     // Wenn alle 7 Techniken abgeschlossen und Zertifikat verdient, zeige Zertifikat
     if (powertechnikenProgress.completedTechniques.length === 7) {
       setShowZertifikat(true);
     } else {
-      setShowLerntechnikenModal(true);
+      // Direkt zur Insel der 7 Werkzeuge navigieren
+      handleIslandClick('werkzeuge');
     }
-  }, [powertechnikenProgress.completedTechniques.length]);
+  }, [powertechnikenProgress.completedTechniques.length, handleIslandClick]);
 
   // Handler für Powertechniken-Fortschritt (wird von QuestModal aufgerufen)
   const handlePowertechnikenComplete = useCallback((techniqueKey: TechniqueKey, application?: string) => {
@@ -489,6 +490,7 @@ function RPGSchatzkarteContent({
         isOpen={showLerntechnikenModal}
         progress={powertechnikenProgress}
         onClose={() => setShowLerntechnikenModal(false)}
+        onGoToChallenge={() => handleIslandClick('werkzeuge')}
       />
 
       {/* Zertifikat Modal (nur wenn alle 7 Techniken abgeschlossen) */}
@@ -507,6 +509,26 @@ function RPGSchatzkarteContent({
           size="medium"
           position="top-right"
         />
+      )}
+
+      {/* Zurück zur Schatzkarte Button - erscheint wenn ein Modal offen ist */}
+      {(showQuestModal || showBanduraModal || showHattieModal || showTagebuch || showLerntechnikenModal || showZertifikat) && (
+        <button
+          className="back-to-map-button"
+          onClick={() => {
+            // Alle Modals schließen
+            setShowQuestModal(false);
+            setSelectedIsland(null);
+            setShowBanduraModal(false);
+            setShowHattieModal(false);
+            setShowTagebuch(false);
+            setShowLerntechnikenModal(false);
+            setShowZertifikat(false);
+          }}
+        >
+          <span className="back-icon">🗺️</span>
+          <span className="back-text">Zurück zur Schatzkarte</span>
+        </button>
       )}
 
       <footer className="app-footer">

@@ -686,83 +686,88 @@ def render_age_switcher_overlay():
     }
     current_short = age_labels.get(current_age, "📚 US")
 
-    # CSS für kompakten Popover-Button (kein weißer Balken)
+    # CSS für kompakte Selectbox (verschiebt sich wenn Sidebar offen)
     st.markdown("""
     <style>
-        /* Positioniere den Popover-Button fest (rechts von Sidebar) */
-        [data-testid="stPopoverButton"] {
+        /* Altersstufen-Selectbox kompakt stylen */
+        [data-testid="stSelectbox"] {
             position: fixed !important;
-            top: 60px !important;
-            left: 300px !important;
+            top: 70px !important;
+            left: 70px !important;
             z-index: 99999 !important;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-            color: white !important;
-            border: none !important;
-            border-radius: 20px !important;
-            padding: 6px 12px !important;
-            box-shadow: 0 3px 12px rgba(102, 126, 234, 0.4) !important;
-            transition: all 0.2s ease !important;
-            width: auto !important;
-            min-width: unset !important;
+            width: 200px !important;
+            transition: left 0.3s ease !important;
         }
 
-        [data-testid="stPopoverButton"]:hover {
-            transform: scale(1.05) !important;
+        /* Wenn Sidebar offen ist: nach rechts verschieben */
+        [data-testid="stSidebar"][aria-expanded="true"] ~ section [data-testid="stSelectbox"],
+        body:has([data-testid="stSidebar"][aria-expanded="true"]) [data-testid="stSelectbox"] {
+            left: 320px !important;
+        }
+
+        [data-testid="stSelectbox"] > div > div {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            border: none !important;
+            border-radius: 20px !important;
+            padding: 2px 10px !important;
+            box-shadow: 0 3px 12px rgba(102, 126, 234, 0.4) !important;
+        }
+
+        [data-testid="stSelectbox"] > div > div:hover {
             box-shadow: 0 5px 20px rgba(102, 126, 234, 0.5) !important;
         }
 
-        /* Text im Button weiß machen */
-        [data-testid="stPopoverButton"] p {
+        /* Text weiß */
+        [data-testid="stSelectbox"] span {
             color: white !important;
-            margin: 0 !important;
-            font-size: 0.85em !important;
+            font-size: 0.9em !important;
         }
 
-        /* Pfeil-Icon weiß */
-        [data-testid="stPopoverButton"] svg {
+        /* Pfeil weiß */
+        [data-testid="stSelectbox"] svg {
             color: white !important;
-        }
-
-        /* Popover-Dropdown schön stylen */
-        [data-testid="stPopoverBody"] {
-            border-radius: 12px !important;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.2) !important;
         }
     </style>
     """, unsafe_allow_html=True)
 
-    # Streamlit-Buttons für Interaktion (in einem Popover)
-    with st.popover("🎚️ Altersstufe", use_container_width=False):
-        st.markdown("**Wähle eine Altersstufe:**")
+    # Altersstufen-Optionen
+    age_options = {
+        "grundschule": "🎒 Grundschule",
+        "unterstufe": "📚 Unterstufe",
+        "mittelstufe": "🎯 Mittelstufe",
+        "oberstufe": "🎓 Oberstufe",
+        "paedagogen": "👩‍🏫 Pädagogen",
+    }
 
-        age_options = [
-            ("grundschule", "🎒 Grundschule"),
-            ("unterstufe", "📚 Unterstufe"),
-            ("mittelstufe", "🎯 Mittelstufe"),
-            ("oberstufe", "🎓 Oberstufe"),
-            ("paedagogen", "👩‍🏫 Pädagogen"),
-        ]
+    # Selectbox für Altersstufe (schließt automatisch nach Auswahl)
+    age_keys = list(age_options.keys())
+    current_index = age_keys.index(current_age) if current_age in age_keys else 0
 
-        for age_key, age_label in age_options:
-            is_selected = current_age == age_key
-            btn_type = "primary" if is_selected else "secondary"
-            if st.button(age_label, key=f"age_switch_{age_key}", use_container_width=True, type=btn_type):
-                change_preview_age_group(age_key)
+    selected_age = st.selectbox(
+        "Auswahl Altersstufe",
+        options=age_keys,
+        format_func=lambda x: age_options[x],
+        index=current_index,
+        key="age_switcher_select",
+        label_visibility="collapsed"
+    )
+
+    # Bei Änderung: Altersstufe wechseln
+    if selected_age != current_age:
+        change_preview_age_group(selected_age)
+        st.rerun()
+
+    # Reset und Beenden nur im Preview-Modus (in Sidebar)
+    if is_preview:
+        with st.sidebar:
+            st.divider()
+            st.markdown("**Preview-Optionen:**")
+            if st.button("🗑️ Daten zurücksetzen", key="preview_reset", use_container_width=True):
+                reset_preview_data()
                 st.rerun()
-
-        st.divider()
-
-        # Reset und Beenden nur im Preview-Modus
-        if is_preview:
-            col1, col2 = st.columns(2)
-            with col1:
-                if st.button("🗑️ Reset", key="preview_reset", use_container_width=True):
-                    reset_preview_data()
-                    st.rerun()
-            with col2:
-                if st.button("🚪 Ende", key="preview_end", use_container_width=True):
-                    end_preview_mode()
-                    st.rerun()
+            if st.button("🚪 Preview beenden", key="preview_end", use_container_width=True):
+                end_preview_mode()
+                st.rerun()
 
 
 # ============================================

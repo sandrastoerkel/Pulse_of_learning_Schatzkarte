@@ -1,0 +1,1120 @@
+/* ============================================
+   Festung Island Experience - Styles
+   Gleiche Qualität wie TransferChallenge
+   ============================================ */
+
+/* ============================================
+   CSS VARIABLES
+   ============================================ */
+
+.festung-island {
+  --primary: #8e44ad;
+  --secondary: #3498db;
+  --success: #27ae60;
+  --warning: #f39c12;
+  --danger: #e74c3c;
+  --dark: #2c3e50;
+  --light: #f8f9fa;
+  --white: #ffffff;
+
+  --gradient-primary: linear-gradient(135deg, #8e44ad 0%, #3498db 100%);
+  --gradient-success: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  --gradient-warm: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --gradient-cool: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --gradient-festung: linear-gradient(135deg, #8e44ad 0%, #e74c3c 50%, #f39c12 100%);
+
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.15);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.2);
+  --shadow-glow: 0 0 20px rgba(142, 68, 173, 0.3);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 30px;
+
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+  min-height: 100%;
+  padding: 1rem;
+  color: var(--dark);
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
+
+.festung-island .island-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.festung-island .island-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--dark);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.festung-island .title-icon {
+  font-size: 1.5rem;
+}
+
+.festung-island .back-btn {
+  background: var(--light);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.festung-island .back-btn:hover {
+  background: var(--white);
+  box-shadow: var(--shadow-sm);
+}
+
+.festung-island .xp-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--gradient-warm);
+  color: var(--white);
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-xl);
+  font-weight: 600;
+  font-size: 0.9rem;
+  box-shadow: var(--shadow-md);
+}
+
+.festung-island .xp-icon {
+  font-size: 1rem;
+}
+
+/* ============================================
+   SUBTITLE BAR
+   ============================================ */
+
+.festung-island .island-subtitle-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.5rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.festung-island .subtitle-text {
+  font-size: 0.9rem;
+  color: var(--dark);
+  opacity: 0.8;
+}
+
+.festung-island .effect-badge {
+  background: var(--gradient-success);
+  color: var(--white);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-xl);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* ============================================
+   PROGRESS BAR
+   ============================================ */
+
+.festung-island .progress-container {
+  margin-bottom: 1.5rem;
+}
+
+.festung-island .progress-bar {
+  height: 8px;
+  background: var(--light);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  margin-bottom: 0.4rem;
+}
+
+.festung-island .progress-fill {
+  height: 100%;
+  background: var(--gradient-festung);
+  border-radius: var(--radius-xl);
+}
+
+.festung-island .progress-text {
+  font-size: 0.8rem;
+  color: var(--dark);
+  opacity: 0.7;
+  text-align: center;
+  display: block;
+}
+
+/* ============================================
+   XP REWARD POPUP
+   ============================================ */
+
+.festung-island .xp-reward-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  background: var(--gradient-warm);
+  color: var(--white);
+  padding: 1.5rem 2.5rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+}
+
+.festung-island .xp-reward-amount {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.festung-island .xp-reward-stars {
+  font-size: 1.5rem;
+}
+
+/* ============================================
+   QUESTS GRID
+   ============================================ */
+
+.festung-island .quest-overview {
+  padding: 0 0.5rem;
+}
+
+.festung-island .overview-intro {
+  text-align: center;
+  font-size: 1rem;
+  color: var(--dark);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.festung-island .quests-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.festung-island .quest-card {
+  position: relative;
+  background: var(--white);
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1rem;
+  cursor: pointer;
+  text-align: center;
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s;
+  overflow: hidden;
+}
+
+.festung-island .quest-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--quest-color);
+}
+
+.festung-island .quest-card .card-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-lg);
+  opacity: 0;
+  transition: opacity 0.3s;
+  box-shadow: inset 0 0 20px var(--quest-color);
+  pointer-events: none;
+}
+
+.festung-island .quest-card:hover .card-glow {
+  opacity: 0.15;
+}
+
+.festung-island .quest-card.completed {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e8f5e9 100%);
+}
+
+.festung-island .quest-icon {
+  display: block;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.festung-island .quest-name {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 0.25rem;
+}
+
+.festung-island .quest-description {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--dark);
+  opacity: 0.7;
+  margin-bottom: 0.75rem;
+  line-height: 1.3;
+}
+
+.festung-island .completed-badge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: var(--success);
+  color: var(--white);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.festung-island .xp-preview {
+  background: var(--light);
+  padding: 0.3rem 0.6rem;
+  border-radius: var(--radius-xl);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+/* ============================================
+   TAGEBUCH PROMO
+   ============================================ */
+
+.festung-island .tagebuch-promo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: var(--white);
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+  margin-top: 1.5rem;
+  box-shadow: var(--shadow-md);
+}
+
+.festung-island .promo-icon {
+  font-size: 2rem;
+}
+
+.festung-island .promo-content {
+  flex: 1;
+}
+
+.festung-island .promo-content h4 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+}
+
+.festung-island .promo-content p {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.festung-island .inline-tagebuch-promo {
+  margin: 0.75rem 0;
+  padding: 0.75rem;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+/* ============================================
+   ALL COMPLETE BANNER
+   ============================================ */
+
+.festung-island .all-complete-banner {
+  margin-top: 1.5rem;
+  background: var(--gradient-success);
+  color: var(--white);
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+  text-align: center;
+  box-shadow: var(--shadow-md);
+}
+
+.festung-island .banner-icon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.festung-island .banner-text {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+/* ============================================
+   PHASE CONTAINER & HEADER
+   ============================================ */
+
+.festung-island .phase-container {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.festung-island .phase-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  color: var(--white);
+}
+
+.festung-island .phase-back-btn {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: var(--white);
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.festung-island .phase-back-btn:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+.festung-island .phase-header-icon {
+  font-size: 1.5rem;
+}
+
+.festung-island .phase-header-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.festung-island .phase-content {
+  padding: 1.25rem;
+}
+
+/* ============================================
+   VIDEO PHASE
+   ============================================ */
+
+.festung-island .video-container {
+  margin-bottom: 1.5rem;
+}
+
+.festung-island .video-placeholder {
+  background: var(--gradient-cool);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  text-align: center;
+  color: var(--white);
+}
+
+.festung-island .play-icon-wrapper {
+  width: 80px;
+  height: 80px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem auto;
+}
+
+.festung-island .play-icon {
+  font-size: 2.5rem;
+}
+
+.festung-island .video-placeholder h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+}
+
+.festung-island .video-placeholder p {
+  margin: 0;
+  opacity: 0.9;
+}
+
+.festung-island .video-embed {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.festung-island .video-embed iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ============================================
+   SCROLL PHASE
+   ============================================ */
+
+.festung-island .scroll-container {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.festung-island .scroll-title {
+  text-align: center;
+  font-size: 1.2rem;
+  color: var(--primary);
+  margin: 0 0 1rem 0;
+}
+
+.festung-island .scroll-intro {
+  background: var(--light);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.festung-island .scroll-intro strong {
+  color: var(--primary);
+}
+
+/* Two columns layout */
+.festung-island .scroll-intro .two-columns {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.festung-island .scroll-intro .column-box {
+  padding: 0.75rem;
+  border-radius: var(--radius-sm);
+  text-align: center;
+}
+
+.festung-island .scroll-intro .column-box.error {
+  background: rgba(231, 76, 60, 0.15);
+  border: 1px solid var(--danger);
+}
+
+.festung-island .scroll-intro .column-box.success {
+  background: rgba(39, 174, 96, 0.15);
+  border: 1px solid var(--success);
+}
+
+.festung-island .scroll-intro .column-box.info {
+  background: rgba(52, 152, 219, 0.15);
+  border: 1px solid var(--secondary);
+}
+
+.festung-island .scroll-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.festung-island .scroll-section {
+  background: var(--white);
+  border: 2px solid var(--light);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border-left: 4px solid var(--section-color);
+}
+
+.festung-island .section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--light);
+}
+
+.festung-island .section-header.clickable {
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.festung-island .section-header.clickable:hover {
+  background: #e9ecef;
+}
+
+.festung-island .section-icon {
+  font-size: 1.2rem;
+}
+
+.festung-island .section-header h4 {
+  flex: 1;
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--dark);
+}
+
+.festung-island .expander-arrow {
+  font-size: 0.8rem;
+  color: var(--dark);
+  opacity: 0.5;
+}
+
+.festung-island .section-content {
+  padding: 1rem;
+  line-height: 1.6;
+  overflow: hidden;
+}
+
+.festung-island .section-content strong {
+  color: var(--primary);
+}
+
+.festung-island .section-content ul {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.festung-island .section-content li {
+  margin-bottom: 0.25rem;
+}
+
+.festung-island .section-content blockquote {
+  margin: 0.5rem 0;
+  padding: 0.5rem 1rem;
+  background: var(--light);
+  border-left: 3px solid var(--primary);
+  border-radius: var(--radius-sm);
+  font-style: italic;
+}
+
+.festung-island .section-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+
+.festung-island .section-content th,
+.festung-island .section-content td {
+  padding: 0.5rem;
+  text-align: left;
+  border: 1px solid var(--light);
+}
+
+.festung-island .section-content th {
+  background: var(--light);
+  font-weight: 600;
+}
+
+/* Two columns in section content */
+.festung-island .section-content .two-columns {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.festung-island .section-content .column-box {
+  padding: 0.75rem;
+  border-radius: var(--radius-sm);
+}
+
+.festung-island .section-content .column-box.success {
+  background: rgba(39, 174, 96, 0.15);
+}
+
+.festung-island .section-content .column-box.info {
+  background: rgba(52, 152, 219, 0.15);
+}
+
+.festung-island .scroll-summary {
+  background: var(--gradient-primary);
+  color: var(--white);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  margin-top: 1.5rem;
+  line-height: 1.5;
+}
+
+.festung-island .scroll-summary strong {
+  color: var(--white);
+}
+
+/* ============================================
+   SELFCHECK SECTION
+   ============================================ */
+
+.festung-island .section-selfcheck {
+  border-left-color: var(--secondary);
+}
+
+.festung-island .selfcheck-intro {
+  margin: 0 0 1rem 0;
+  color: var(--dark);
+}
+
+.festung-island .selfcheck-statements {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.festung-island .selfcheck-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.festung-island .statement-text {
+  font-size: 0.9rem;
+  color: var(--dark);
+}
+
+.festung-island .rating-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.festung-island .rating-btn {
+  width: 36px;
+  height: 36px;
+  border: 2px solid var(--light);
+  border-radius: 50%;
+  background: var(--white);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.festung-island .rating-btn:hover {
+  border-color: var(--primary);
+  background: rgba(142, 68, 173, 0.1);
+}
+
+.festung-island .rating-btn.selected {
+  background: var(--primary);
+  color: var(--white);
+  border-color: var(--primary);
+}
+
+.festung-island .selfcheck-submit {
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.festung-island .selfcheck-submit.ready {
+  background: var(--gradient-primary);
+  color: var(--white);
+}
+
+.festung-island .selfcheck-submit.disabled {
+  background: var(--light);
+  color: var(--dark);
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.festung-island .selfcheck-result {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: var(--light);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.festung-island .result-score {
+  margin-bottom: 1rem;
+}
+
+.festung-island .score-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.festung-island .score-max {
+  font-size: 1rem;
+  color: var(--dark);
+  opacity: 0.7;
+}
+
+.festung-island .result-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 1rem;
+}
+
+.festung-island .result-message.excellent {
+  background: rgba(39, 174, 96, 0.2);
+}
+
+.festung-island .result-message.good {
+  background: rgba(52, 152, 219, 0.2);
+}
+
+.festung-island .result-message.starter {
+  background: rgba(243, 156, 18, 0.2);
+}
+
+.festung-island .result-emoji {
+  font-size: 1.5rem;
+}
+
+.festung-island .result-text {
+  font-weight: 600;
+}
+
+.festung-island .result-conclusion {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--dark);
+  font-style: italic;
+}
+
+/* ============================================
+   QUIZ PHASE
+   ============================================ */
+
+.festung-island .quiz-intro {
+  text-align: center;
+}
+
+.festung-island .quiz-monster {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.festung-island .quiz-intro h3 {
+  font-size: 1.3rem;
+  color: var(--dark);
+  margin: 0 0 0.5rem 0;
+}
+
+.festung-island .quiz-intro > p {
+  color: var(--dark);
+  opacity: 0.8;
+  margin: 0 0 1.5rem 0;
+}
+
+.festung-island .quiz-info {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.festung-island .info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  color: var(--dark);
+}
+
+.festung-island .info-icon {
+  font-size: 1.2rem;
+}
+
+.festung-island .start-quiz-btn {
+  background: var(--gradient-warm);
+  color: var(--white);
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: var(--radius-xl);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: all 0.2s;
+}
+
+.festung-island .start-quiz-btn:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+/* ============================================
+   CHALLENGE PHASE - SHIPS
+   ============================================ */
+
+.festung-island .ships-intro {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.festung-island .ships-intro .ships-icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.festung-island .ships-intro h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+  color: var(--dark);
+}
+
+.festung-island .ships-intro p {
+  margin: 0;
+  color: var(--dark);
+  opacity: 0.8;
+  line-height: 1.5;
+}
+
+.festung-island .ship-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.festung-island .ship-card {
+  background: var(--white);
+  border: 2px solid var(--light);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: var(--shadow-sm);
+}
+
+.festung-island .ship-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.festung-island .ship-card.bandura {
+  border-color: #f39c12;
+  border-left-width: 4px;
+}
+
+.festung-island .ship-card.hattie {
+  border-color: #3498db;
+  border-left-width: 4px;
+}
+
+.festung-island .ship-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.festung-island .ship-card-header .ship-icon {
+  font-size: 2rem;
+}
+
+.festung-island .ship-card-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--dark);
+}
+
+.festung-island .ship-card > p {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.9rem;
+  color: var(--dark);
+  opacity: 0.8;
+}
+
+.festung-island .ship-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.festung-island .ship-action {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.festung-island .ship-xp {
+  font-size: 0.8rem;
+  color: var(--success);
+  font-weight: 600;
+}
+
+.festung-island .ships-tip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(243, 156, 18, 0.1);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 1.5rem;
+}
+
+.festung-island .tip-icon {
+  font-size: 1.2rem;
+}
+
+.festung-island .ships-tip span:last-child {
+  font-size: 0.9rem;
+  color: var(--dark);
+}
+
+/* ============================================
+   COMPLETE BUTTON
+   ============================================ */
+
+.festung-island .complete-btn {
+  display: block;
+  width: 100%;
+  background: var(--gradient-success);
+  color: var(--white);
+  border: none;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: all 0.2s;
+  margin-top: 1rem;
+}
+
+.festung-island .complete-btn:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+/* ============================================
+   KONFETTI
+   ============================================ */
+
+.festung-island .confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 999;
+  overflow: hidden;
+}
+
+.festung-island .confetti-piece {
+  position: absolute;
+  top: 0;
+  border-radius: 2px;
+}
+
+/* ============================================
+   RESPONSIVE - TABLET
+   ============================================ */
+
+@media (min-width: 600px) {
+  .festung-island {
+    padding: 1.5rem;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .festung-island .island-title {
+    font-size: 1.4rem;
+  }
+
+  .festung-island .quests-grid {
+    gap: 1.25rem;
+  }
+
+  .festung-island .quest-card {
+    padding: 1.5rem;
+  }
+
+  .festung-island .quest-icon {
+    font-size: 3rem;
+  }
+
+  .festung-island .quest-name {
+    font-size: 1rem;
+  }
+
+  .festung-island .scroll-container {
+    max-height: 65vh;
+  }
+
+  .festung-island .selfcheck-row {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .festung-island .ship-cards {
+    flex-direction: row;
+  }
+
+  .festung-island .ship-card {
+    flex: 1;
+  }
+}
+
+/* ============================================
+   RESPONSIVE - DESKTOP
+   ============================================ */
+
+@media (min-width: 900px) {
+  .festung-island {
+    max-width: 900px;
+  }
+
+  .festung-island .quests-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .festung-island *,
+  .festung-island *::before,
+  .festung-island *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus styles */
+.festung-island button:focus-visible,
+.festung-island .quest-card:focus-visible,
+.festung-island .ship-card:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Touch-friendly sizing */
+@media (pointer: coarse) {
+  .festung-island .quest-card,
+  .festung-island .section-header.clickable,
+  .festung-island .ship-card {
+    min-height: 48px;
+  }
+}

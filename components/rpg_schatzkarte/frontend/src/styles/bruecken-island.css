@@ -1,0 +1,744 @@
+/* ============================================
+   Brücken Island Experience - Styles
+   Gleiche Qualität wie TransferChallenge
+   ============================================ */
+
+/* ============================================
+   CSS VARIABLES
+   ============================================ */
+
+.bruecken-island {
+  --primary: #9b59b6;
+  --secondary: #3498db;
+  --success: #27ae60;
+  --warning: #f39c12;
+  --danger: #e74c3c;
+  --dark: #2c3e50;
+  --light: #f8f9fa;
+  --white: #ffffff;
+
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-success: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  --gradient-warm: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --gradient-cool: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --gradient-bridge: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f39c12 100%);
+
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.15);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.2);
+  --shadow-glow: 0 0 20px rgba(155, 89, 182, 0.3);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 30px;
+
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+  min-height: 100%;
+  padding: 1rem;
+  color: var(--dark);
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
+
+.bruecken-island .island-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.bruecken-island .island-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--dark);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.bruecken-island .title-icon {
+  font-size: 1.5rem;
+}
+
+.bruecken-island .back-btn {
+  background: var(--light);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.bruecken-island .back-btn:hover {
+  background: var(--white);
+  box-shadow: var(--shadow-sm);
+}
+
+.bruecken-island .xp-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--gradient-warm);
+  color: var(--white);
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-xl);
+  font-weight: 600;
+  font-size: 0.9rem;
+  box-shadow: var(--shadow-md);
+}
+
+.bruecken-island .xp-icon {
+  font-size: 1rem;
+}
+
+/* ============================================
+   SUBTITLE BAR
+   ============================================ */
+
+.bruecken-island .island-subtitle-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.5rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.bruecken-island .subtitle-text {
+  font-size: 0.9rem;
+  color: var(--dark);
+  opacity: 0.8;
+}
+
+.bruecken-island .effect-badge {
+  background: var(--gradient-success);
+  color: var(--white);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-xl);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* ============================================
+   PROGRESS BAR
+   ============================================ */
+
+.bruecken-island .progress-container {
+  margin-bottom: 1.5rem;
+}
+
+.bruecken-island .progress-bar {
+  height: 8px;
+  background: var(--light);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  margin-bottom: 0.4rem;
+}
+
+.bruecken-island .progress-fill {
+  height: 100%;
+  background: var(--gradient-bridge);
+  border-radius: var(--radius-xl);
+}
+
+.bruecken-island .progress-text {
+  font-size: 0.8rem;
+  color: var(--dark);
+  opacity: 0.7;
+  text-align: center;
+  display: block;
+}
+
+/* ============================================
+   XP REWARD POPUP
+   ============================================ */
+
+.bruecken-island .xp-reward-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  background: var(--gradient-warm);
+  color: var(--white);
+  padding: 1.5rem 2.5rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+}
+
+.bruecken-island .xp-reward-amount {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.bruecken-island .xp-reward-stars {
+  font-size: 1.5rem;
+}
+
+/* ============================================
+   QUESTS GRID
+   ============================================ */
+
+.bruecken-island .quest-overview {
+  padding: 0 0.5rem;
+}
+
+.bruecken-island .overview-intro {
+  text-align: center;
+  font-size: 1rem;
+  color: var(--dark);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.bruecken-island .quests-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.bruecken-island .quest-card {
+  position: relative;
+  background: var(--white);
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1rem;
+  cursor: pointer;
+  text-align: center;
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s;
+  overflow: hidden;
+}
+
+.bruecken-island .quest-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--quest-color);
+}
+
+.bruecken-island .quest-card .card-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-lg);
+  opacity: 0;
+  transition: opacity 0.3s;
+  box-shadow: inset 0 0 20px var(--quest-color);
+  pointer-events: none;
+}
+
+.bruecken-island .quest-card:hover .card-glow {
+  opacity: 0.15;
+}
+
+.bruecken-island .quest-card.completed {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e8f5e9 100%);
+}
+
+.bruecken-island .quest-icon {
+  display: block;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.bruecken-island .quest-name {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 0.25rem;
+}
+
+.bruecken-island .quest-description {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--dark);
+  opacity: 0.7;
+  margin-bottom: 0.75rem;
+  line-height: 1.3;
+}
+
+.bruecken-island .completed-badge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: var(--success);
+  color: var(--white);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.bruecken-island .xp-preview {
+  background: var(--light);
+  padding: 0.3rem 0.6rem;
+  border-radius: var(--radius-xl);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+/* ============================================
+   ALL COMPLETE BANNER
+   ============================================ */
+
+.bruecken-island .all-complete-banner {
+  margin-top: 1.5rem;
+  background: var(--gradient-success);
+  color: var(--white);
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+  text-align: center;
+  box-shadow: var(--shadow-md);
+}
+
+.bruecken-island .banner-icon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.bruecken-island .banner-text {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+/* ============================================
+   PHASE CONTAINER & HEADER
+   ============================================ */
+
+.bruecken-island .phase-container {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.bruecken-island .phase-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  color: var(--white);
+}
+
+.bruecken-island .phase-back-btn {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: var(--white);
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.bruecken-island .phase-back-btn:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+.bruecken-island .phase-header-icon {
+  font-size: 1.5rem;
+}
+
+.bruecken-island .phase-header-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.bruecken-island .phase-content {
+  padding: 1.25rem;
+}
+
+/* ============================================
+   VIDEO PHASE
+   ============================================ */
+
+.bruecken-island .video-container {
+  margin-bottom: 1.5rem;
+}
+
+.bruecken-island .video-placeholder {
+  background: var(--gradient-cool);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  text-align: center;
+  color: var(--white);
+}
+
+.bruecken-island .play-icon-wrapper {
+  width: 80px;
+  height: 80px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem auto;
+}
+
+.bruecken-island .play-icon {
+  font-size: 2.5rem;
+}
+
+.bruecken-island .video-placeholder h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+}
+
+.bruecken-island .video-placeholder p {
+  margin: 0;
+  opacity: 0.9;
+}
+
+.bruecken-island .placeholder-hint {
+  margin-top: 1rem !important;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.bruecken-island .video-embed {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.bruecken-island .video-embed iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ============================================
+   SCROLL PHASE
+   ============================================ */
+
+.bruecken-island .scroll-container {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.bruecken-island .scroll-title {
+  text-align: center;
+  font-size: 1.2rem;
+  color: var(--primary);
+  margin: 0 0 1rem 0;
+}
+
+.bruecken-island .scroll-intro {
+  background: var(--light);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.bruecken-island .scroll-intro strong {
+  color: var(--primary);
+}
+
+.bruecken-island .scroll-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.bruecken-island .scroll-section {
+  background: var(--white);
+  border: 2px solid var(--light);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border-left: 4px solid var(--section-color);
+}
+
+.bruecken-island .section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--light);
+}
+
+.bruecken-island .section-header.clickable {
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.bruecken-island .section-header.clickable:hover {
+  background: #e9ecef;
+}
+
+.bruecken-island .section-icon {
+  font-size: 1.2rem;
+}
+
+.bruecken-island .section-header h4 {
+  flex: 1;
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--dark);
+}
+
+.bruecken-island .expander-arrow {
+  font-size: 0.8rem;
+  color: var(--dark);
+  opacity: 0.5;
+}
+
+.bruecken-island .section-content {
+  padding: 1rem;
+  line-height: 1.6;
+  overflow: hidden;
+}
+
+.bruecken-island .section-content strong {
+  color: var(--primary);
+}
+
+.bruecken-island .section-content ul {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.bruecken-island .section-content li {
+  margin-bottom: 0.25rem;
+}
+
+.bruecken-island .section-content blockquote {
+  margin: 0.5rem 0;
+  padding: 0.5rem 1rem;
+  background: var(--light);
+  border-left: 3px solid var(--primary);
+  border-radius: var(--radius-sm);
+}
+
+.bruecken-island .scroll-summary {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: var(--gradient-primary);
+  color: var(--white);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  margin-top: 1.5rem;
+}
+
+.bruecken-island .summary-icon {
+  font-size: 1.5rem;
+}
+
+.bruecken-island .scroll-summary p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* ============================================
+   QUIZ PHASE
+   ============================================ */
+
+.bruecken-island .quiz-intro {
+  text-align: center;
+}
+
+.bruecken-island .quiz-monster {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.bruecken-island .quiz-intro h3 {
+  font-size: 1.3rem;
+  color: var(--dark);
+  margin: 0 0 0.5rem 0;
+}
+
+.bruecken-island .quiz-intro > p {
+  color: var(--dark);
+  opacity: 0.8;
+  margin: 0 0 1.5rem 0;
+}
+
+.bruecken-island .quiz-info {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.bruecken-island .info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  color: var(--dark);
+}
+
+.bruecken-island .info-icon {
+  font-size: 1.2rem;
+}
+
+.bruecken-island .start-quiz-btn {
+  background: var(--gradient-warm);
+  color: var(--white);
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: var(--radius-xl);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: all 0.2s;
+}
+
+.bruecken-island .start-quiz-btn:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+/* ============================================
+   COMPLETE BUTTON
+   ============================================ */
+
+.bruecken-island .complete-btn {
+  display: block;
+  width: 100%;
+  background: var(--gradient-success);
+  color: var(--white);
+  border: none;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: all 0.2s;
+  margin-top: 1rem;
+}
+
+.bruecken-island .complete-btn:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+/* ============================================
+   KONFETTI
+   ============================================ */
+
+.bruecken-island .confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 999;
+  overflow: hidden;
+}
+
+.bruecken-island .confetti-piece {
+  position: absolute;
+  top: 0;
+  border-radius: 2px;
+}
+
+/* ============================================
+   RESPONSIVE - TABLET
+   ============================================ */
+
+@media (min-width: 600px) {
+  .bruecken-island {
+    padding: 1.5rem;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .bruecken-island .island-title {
+    font-size: 1.4rem;
+  }
+
+  .bruecken-island .quests-grid {
+    gap: 1.25rem;
+  }
+
+  .bruecken-island .quest-card {
+    padding: 1.5rem;
+  }
+
+  .bruecken-island .quest-icon {
+    font-size: 3rem;
+  }
+
+  .bruecken-island .quest-name {
+    font-size: 1rem;
+  }
+
+  .bruecken-island .scroll-container {
+    max-height: 65vh;
+  }
+}
+
+/* ============================================
+   RESPONSIVE - DESKTOP
+   ============================================ */
+
+@media (min-width: 900px) {
+  .bruecken-island {
+    max-width: 900px;
+  }
+
+  .bruecken-island .quests-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .bruecken-island *,
+  .bruecken-island *::before,
+  .bruecken-island *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus styles */
+.bruecken-island button:focus-visible,
+.bruecken-island .quest-card:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Touch-friendly sizing */
+@media (pointer: coarse) {
+  .bruecken-island .quest-card,
+  .bruecken-island .section-header.clickable {
+    min-height: 48px;
+  }
+}

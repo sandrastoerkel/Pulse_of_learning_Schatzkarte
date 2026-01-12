@@ -10,9 +10,15 @@ import { WERKZEUGE_CONTENT } from '../content/werkzeugeContent';
 import { SUPERHELDEN_QUIZ_QUESTIONS } from '../content/festungQuizContent';
 import { SUPERHELDEN_QUIZ_QUESTIONS as SUPERHELDEN_QUIZ_UNTERSTUFE } from '../content/festungQuizContent_unterstufe';
 import { WERKZEUGE_QUIZ_QUESTIONS } from '../content/werkzeugeQuizContent';
+import { BRUECKEN_QUIZ_QUESTIONS } from '../content/brueckenQuizContent';
+import { BRUECKEN_QUIZ_QUESTIONS_UNTERSTUFE } from '../content/brueckenQuizContent_unterstufe';
+import { BRUECKEN_QUIZ_QUESTIONS_MITTELSTUFE } from '../content/brueckenQuizContent_mittelstufe';
 import { BattleQuiz } from './BattleQuiz';
 import { TagebuchStartButton } from './SuperheldenTagebuch';
 import { PowertechnikenChallenge } from './PowertechnikenChallenge';
+import { TransferChallenge } from './TransferChallenge';
+import { BrueckenIslandExperience } from './BrueckenIslandExperience';
+import { FestungIslandExperience } from './FestungIslandExperience';
 
 interface QuestModalProps {
   island: Island & {
@@ -170,6 +176,9 @@ export function QuestModal({
   // Powertechniken Challenge State (für Werkzeuge-Insel)
   const [powertechnikenActive, setPowertechnikenActive] = useState(false);
 
+  // Transfer Challenge State (für Brücken-Insel)
+  const [transferChallengeActive, setTransferChallengeActive] = useState(false);
+
   // Toggle Expander
   const toggleExpander = (idx: number) => {
     setExpandedSections(prev => {
@@ -296,8 +305,25 @@ export function QuestModal({
 
         {/* Quest Liste oder aktive Quest */}
         <div className="modal-body">
-          {/* Tutorial-Insel (Starthafen) */}
-          {island.type === 'tutorial' && !activeQuest ? (
+          {/* Brücken-Insel: Vollständige animierte Experience */}
+          {island.id === 'bruecken' ? (
+            <BrueckenIslandExperience
+              ageGroup={ageGroup}
+              onClose={onClose}
+              onQuestComplete={onQuestComplete}
+            />
+          ) : /* Festung der Stärke: Vollständige animierte Experience */
+          island.id === 'festung' ? (
+            <FestungIslandExperience
+              ageGroup={ageGroup}
+              onClose={onClose}
+              onQuestComplete={onQuestComplete}
+              onOpenTagebuch={onOpenTagebuch}
+              onOpenBandura={onOpenBandura}
+              onOpenHattie={onOpenHattie}
+            />
+          ) : /* Tutorial-Insel (Starthafen) */
+          island.type === 'tutorial' && !activeQuest ? (
             <div className="tutorial-content">
               {island.tutorial_steps?.map((step, index) => (
                 <div key={step.id} className={`tutorial-step ${step.placeholder ? 'placeholder' : ''}`}>
@@ -631,6 +657,8 @@ export function QuestModal({
                             ? (ageGroup === 'unterstufe' ? SUPERHELDEN_QUIZ_UNTERSTUFE : SUPERHELDEN_QUIZ_QUESTIONS)
                             : island.id === 'werkzeuge'
                             ? WERKZEUGE_QUIZ_QUESTIONS
+                            : island.id === 'bruecken'
+                            ? (ageGroup === 'grundschule' ? BRUECKEN_QUIZ_QUESTIONS : ageGroup === 'unterstufe' ? BRUECKEN_QUIZ_QUESTIONS_UNTERSTUFE : BRUECKEN_QUIZ_QUESTIONS_MITTELSTUFE)
                             : island.quiz?.questions || []
                         } as ExtendedQuiz}
                         islandName={island.name}
@@ -772,8 +800,46 @@ export function QuestModal({
                   </>
                 )}
 
+                {/* Brücken-Insel: Transfer Challenge */}
+                {activeQuest === 'challenge' && island.id === 'bruecken' && (
+                  <>
+                    {!transferChallengeActive ? (
+                      <div className="challenge-teaser">
+                        <div className="challenge-preview">
+                          <span className="challenge-icon">🌉</span>
+                          <h4>Das Geheimnis der Überflieger!</h4>
+                        </div>
+                        <p>Entdecke den mächtigsten Lerntrick: Transfer - Wissen übertragen!</p>
+                        <ul style={{ textAlign: 'left', margin: '15px auto', maxWidth: '320px' }}>
+                          <li>🔮 Das Transfer-Geheimnis entdecken</li>
+                          <li>🎯 Near Transfer - Ähnliches verbinden</li>
+                          <li>🚀 Far Transfer - Kreative Brücken bauen</li>
+                          <li>🌟 Deinen eigenen Transfer-Trick finden</li>
+                        </ul>
+                        <p style={{ fontSize: '14px', color: 'var(--text-muted)', margin: '10px 0' }}>
+                          ⭐ +150 XP möglich • 🏆 Transfer-Zertifikat!
+                        </p>
+                        <button
+                          className="complete-btn challenge-start"
+                          onClick={() => setTransferChallengeActive(true)}
+                        >
+                          🚀 Challenge starten!
+                        </button>
+                      </div>
+                    ) : (
+                      <TransferChallenge
+                        onComplete={(xp) => {
+                          setTransferChallengeActive(false);
+                          handleCompleteQuest('challenge');
+                        }}
+                        onClose={() => setTransferChallengeActive(false)}
+                      />
+                    )}
+                  </>
+                )}
+
                 {/* Fallback für andere Inseln */}
-                {activeQuest === 'challenge' && island.id !== 'festung' && island.id !== 'werkzeuge' && (
+                {activeQuest === 'challenge' && island.id !== 'festung' && island.id !== 'werkzeuge' && island.id !== 'bruecken' && (
                   <div className="challenge-content">
                     <div className="challenge-icon">🏆</div>
                     <h4>Finale Herausforderung</h4>

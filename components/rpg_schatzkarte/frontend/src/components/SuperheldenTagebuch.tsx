@@ -3,7 +3,7 @@
 // 🦸 Für kleine Helden in der Grundschule!
 // Using: framer-motion + react-confetti
 // ============================================
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Confetti from 'react-confetti';
 
@@ -123,6 +123,11 @@ export function SuperheldenTagebuch({
   const [showConfetti, setShowConfetti] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
+  // Sync internal state with external isOpen prop
+  useEffect(() => {
+    setModalOpen(isOpen);
+  }, [isOpen]);
+
   const handleToggle = useCallback(() => {
     setModalOpen(prev => !prev);
     onToggle?.();
@@ -167,43 +172,7 @@ export function SuperheldenTagebuch({
   return (
     <>
       {/* ============================================
-          SCHWEBENDES WIDGET
-          ============================================ */}
-      <motion.div
-        className="tagebuch-widget"
-        variants={widgetVariants}
-        initial="initial"
-        animate="animate"
-        whileHover="hover"
-        whileTap="tap"
-        onClick={handleToggle}
-      >
-        <span className="widget-icon">📓</span>
-        {entries.length > 0 && (
-          <motion.span 
-            className="widget-badge"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 500 }}
-          >
-            {entries.length}
-          </motion.span>
-        )}
-        <motion.div 
-          className="widget-glow"
-          animate={{ 
-            boxShadow: [
-              '0 0 10px rgba(255, 215, 0, 0.3)',
-              '0 0 20px rgba(255, 215, 0, 0.6)',
-              '0 0 10px rgba(255, 215, 0, 0.3)'
-            ]
-          }}
-          transition={{ duration: 2, repeat: Infinity }}
-        />
-      </motion.div>
-
-      {/* ============================================
-          MODAL
+          MODAL (Widget wird in WorldMap.tsx gerendert)
           ============================================ */}
       <AnimatePresence>
         {modalOpen && (

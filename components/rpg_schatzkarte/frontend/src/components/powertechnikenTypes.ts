@@ -54,6 +54,7 @@ export interface LerntechnikenUebersichtProps {
   techniques: TechniqueData[];
   onClose: () => void;
   onExport?: () => void;
+  onGoToChallenge?: () => void;
 }
 
 // Props für Zertifikat

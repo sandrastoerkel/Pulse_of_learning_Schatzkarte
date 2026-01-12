@@ -23,7 +23,7 @@ export function LerntechnikenUebersicht({
   progress,
   techniques = TECHNIQUES_DATA,
   onClose,
-  onExport,
+  onGoToChallenge,
 }: LerntechnikenUebersichtProps) {
   const [activeTab, setActiveTab] = useState<'overview' | 'details'>('overview');
   const [selectedTechnique, setSelectedTechnique] = useState<TechniqueKey | null>(null);
@@ -32,11 +32,10 @@ export function LerntechnikenUebersicht({
   const completedCount = progress.completedTechniques.length;
   const progressPercent = (completedCount / 7) * 100;
 
-  // Export als Bild (vereinfacht)
-  const handleExport = () => {
-    onExport?.();
-    // In der Praxis würde hier html2canvas o.ä. verwendet
-    alert('📥 Übersicht wird gespeichert...');
+  // Zur Challenge navigieren
+  const handleGoToChallenge = () => {
+    onGoToChallenge?.();
+    onClose();
   };
 
   return (
@@ -202,11 +201,11 @@ export function LerntechnikenUebersicht({
         </AnimatePresence>
       </div>
 
-      {/* Export Button */}
+      {/* Zur Challenge Button */}
       <div className="uebersicht-actions">
-        <button className="export-btn" onClick={handleExport}>
-          <span className="btn-icon">📥</span>
-          <span className="btn-text">Übersicht speichern</span>
+        <button className="challenge-link-btn" onClick={handleGoToChallenge}>
+          <span className="btn-icon">🏝️</span>
+          <span className="btn-text">Zur Insel der 7 Werkzeuge</span>
         </button>
       </div>
     </div>
@@ -356,6 +355,7 @@ interface UebersichtModalProps {
   isOpen: boolean;
   progress: PowertechnikenProgress;
   onClose: () => void;
+  onGoToChallenge?: () => void;
   activeTab?: 'uebersicht' | 'zertifikat';
 }
 
@@ -363,6 +363,7 @@ export function UebersichtModal({
   isOpen,
   progress,
   onClose,
+  onGoToChallenge,
   activeTab = 'uebersicht',
 }: UebersichtModalProps) {
   if (!isOpen) return null;
@@ -387,6 +388,7 @@ export function UebersichtModal({
             progress={progress}
             techniques={TECHNIQUES_DATA}
             onClose={onClose}
+            onGoToChallenge={onGoToChallenge}
           />
         </motion.div>
       </motion.div>

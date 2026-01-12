@@ -269,12 +269,11 @@ export function WorldMap({
 
       {/* Superhelden-Tagebuch Widget - NUR für Grundschule */}
       {ageGroup === 'grundschule' && onTagebuchToggle && (
-        <div className="floating-tagebuch-widget" onClick={onTagebuchToggle}>
-          <span className="tagebuch-icon">📓</span>
+        <div className="tagebuch-widget" onClick={onTagebuchToggle}>
+          <span className="widget-icon">📓</span>
           {tagebuchEntries.length > 0 && (
-            <span className="tagebuch-badge">{tagebuchEntries.length}</span>
+            <span className="widget-badge">{tagebuchEntries.length}</span>
           )}
-          <span className="tagebuch-label">Mein Tagebuch</span>
         </div>
       )}
 

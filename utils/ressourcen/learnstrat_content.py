@@ -438,9 +438,12 @@ Stell dir vor, du misst, wie viel Schüler in einem Jahr lernen. Das ist der Nor
 
 | Technik | Effektstärke | Bewertung |
 |---------|--------------|-----------|
-| Selbsttest (Retrieval) | d = 0.58 | ⭐⭐⭐ High Utility |
+| Loci-Methode | g = 0.65 | ⭐⭐⭐ High Utility |
+| Retrieval Practice | d = 0.50–0.74 | ⭐⭐⭐ High Utility |
 | Verteiltes Lernen | d = 0.60 | ⭐⭐⭐ High Utility |
-| Feynman-Methode | d = 0.75 | ⭐⭐⭐ Sehr hoch! |
+| Feynman-Methode | d = 0.54* | ⭐⭐⭐ High Utility |
+| Interleaving | d = 0.52 | ⭐⭐ Moderat |
+| Lernen durch Lehren | d = 0.53 | ⭐⭐ Moderat |
 | Markieren | d = 0.36 | ❌ Low Utility |
 | Wiederlesen | d = 0.36 | ❌ Low Utility |
                     """)
@@ -457,7 +460,7 @@ Stell dir vor, du misst, wie viel Schüler in einem Jahr lernen. Das ist der Nor
 
             # ----- TECHNIK 1: Retrieval Practice -----
             if show_section in ["alle", "techniken"]:
-                with st.expander("⚡ **Technik 1: Retrieval Practice (Selbsttest)** – Effektstärke: d = 0.58"):
+                with st.expander("⚡ **Technik 1: Retrieval Practice (Selbsttest)** – Effektstärke: d = 0.50–0.74 [📚](static/effektstaerken_wissenschaftlich.docx)"):
                     st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
@@ -475,7 +478,7 @@ Jedes Mal, wenn du etwas aus deinem Gedächtnis ABRUFST (statt es nur wieder zu 
 
             # ----- TECHNIK 2: Spaced Repetition -----
             if show_section in ["alle", "techniken"]:
-                with st.expander("📅 **Technik 2: Spaced Repetition (Zeitversetzt wiederholen)** – Effektstärke: d = 0.60"):
+                with st.expander("📅 **Technik 2: Spaced Repetition (Zeitversetzt wiederholen)** – Effektstärke: d = 0.60 [📚](static/effektstaerken_wissenschaftlich.docx)"):
                     st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
@@ -495,7 +498,7 @@ Dein Gehirn vergisst. Schnell. Die Vergessenskurve (Ebbinghaus, 1885 – ja, das
 
             # ----- TECHNIK 3: Feynman-Methode -----
             if show_section in ["alle", "techniken"]:
-                with st.expander("👶 **Technik 3: Feynman-Methode (Erklär's einem 10-Jährigen)** – Effektstärke: d = 0.75"):
+                with st.expander("👶 **Technik 3: Feynman-Methode (Erklär's einem 10-Jährigen)** – Effektstärke: d = 0.54* [📚](static/effektstaerken_wissenschaftlich.docx)"):
                     st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
@@ -514,7 +517,7 @@ Richard Feynman war Nobelpreisträger für Physik und legendär dafür, komplizi
 
             # ----- TECHNIK 4: Interleaving -----
             if show_section in ["alle", "techniken"]:
-                with st.expander("🔀 **Technik 4: Interleaving (Mischen statt Blocken)** – Effektstärke: d = 0.67"):
+                with st.expander("🔀 **Technik 4: Interleaving (Mischen statt Blocken)** – Effektstärke: d = 0.52 [📚](static/effektstaerken_wissenschaftlich.docx)"):
                     st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
@@ -535,7 +538,7 @@ Interleaving heißt: Aufgaben mischen! A, B, C, A, B, C... Warum? Weil du bei je
 
             # ----- TECHNIK 5: Loci-Methode -----
             if show_section in ["alle", "techniken"]:
-                with st.expander("🏰 **Technik 5: Loci-Methode (Gedächtnispalast)** – Effektstärke: d = 0.65"):
+                with st.expander("🏰 **Technik 5: Loci-Methode (Gedächtnispalast)** – Effektstärke: g = 0.65 [📚](static/effektstaerken_wissenschaftlich.docx)"):
                     st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
@@ -552,7 +555,7 @@ Diese Methode nutzen Gedächtnis-Weltmeister! Funktioniert so: Du "gehst" im Kop
 
             # ----- TECHNIK 6: Pomodoro -----
             if show_section in ["alle", "techniken"]:
-                with st.expander("🍅 **Technik 6: Pomodoro-Technik (25 + 5)** – Effektstärke: d = 0.53"):
+                with st.expander("🍅 **Technik 6: Pomodoro-Technik (25 + 5)** – Keine Meta-Analyse verfügbar"):
                     st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
@@ -568,7 +571,7 @@ Das Gehirn kann sich nicht ewig konzentrieren. Nach etwa 25 Minuten lässt die A
 
             # ----- TECHNIK 7: Lernen durch Lehren -----
             if show_section in ["alle", "techniken"]:
-                with st.expander("👥 **Technik 7: Lernen durch Lehren** – Effektstärke: d = 0.53"):
+                with st.expander("👥 **Technik 7: Lernen durch Lehren** – Effektstärke: d = 0.53 [📚](static/effektstaerken_wissenschaftlich.docx)"):
                     st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
@@ -790,9 +793,12 @@ Stell dir vor, du misst, wie viel Schüler in einem Jahr lernen. Das ist der Nor
 
 | Technik | Effektstärke | Bewertung |
 |---------|--------------|-----------|
-| Selbsttest (Retrieval) | d = 0.58 | ⭐⭐⭐ High Utility |
+| Loci-Methode | g = 0.65 | ⭐⭐⭐ High Utility |
+| Retrieval Practice | d = 0.50–0.74 | ⭐⭐⭐ High Utility |
 | Verteiltes Lernen | d = 0.60 | ⭐⭐⭐ High Utility |
-| Feynman-Methode | d = 0.75 | ⭐⭐⭐ Sehr hoch! |
+| Feynman-Methode | d = 0.54* | ⭐⭐⭐ High Utility |
+| Interleaving | d = 0.52 | ⭐⭐ Moderat |
+| Lernen durch Lehren | d = 0.53 | ⭐⭐ Moderat |
 | Markieren | d = 0.36 | ❌ Low Utility |
 | Wiederlesen | d = 0.36 | ❌ Low Utility |
                 """)
@@ -809,7 +815,7 @@ Stell dir vor, du misst, wie viel Schüler in einem Jahr lernen. Das ist der Nor
 
             # ----- TECHNIK 1: Retrieval Practice -----
             if show_section in ["alle", "techniken"]:
-                with st.expander("⚡ **Technik 1: Retrieval Practice (Selbsttest)** – Effektstärke: d = 0.58"):
+                with st.expander("⚡ **Technik 1: Retrieval Practice (Selbsttest)** – Effektstärke: d = 0.50–0.74 [📚](static/effektstaerken_wissenschaftlich.docx)"):
                     st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
@@ -827,7 +833,7 @@ Jedes Mal, wenn du etwas aus deinem Gedächtnis ABRUFST (statt es nur wieder zu 
 
             # ----- TECHNIK 2: Spaced Repetition -----
             if show_section in ["alle", "techniken"]:
-                with st.expander("📅 **Technik 2: Spaced Repetition (Zeitversetzt wiederholen)** – Effektstärke: d = 0.60"):
+                with st.expander("📅 **Technik 2: Spaced Repetition (Zeitversetzt wiederholen)** – Effektstärke: d = 0.60 [📚](static/effektstaerken_wissenschaftlich.docx)"):
                     st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
@@ -845,7 +851,7 @@ Dein Gehirn vergisst. Schnell. Die Vergessenskurve (Ebbinghaus, 1885 – ja, das
 
             # ----- TECHNIK 3: Feynman-Methode -----
             if show_section in ["alle", "techniken"]:
-                with st.expander("👶 **Technik 3: Feynman-Methode (Erklär's einem 10-Jährigen)** – Effektstärke: d = 0.75"):
+                with st.expander("👶 **Technik 3: Feynman-Methode (Erklär's einem 10-Jährigen)** – Effektstärke: d = 0.54* [📚](static/effektstaerken_wissenschaftlich.docx)"):
                     st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
@@ -864,7 +870,7 @@ Richard Feynman war Nobelpreisträger für Physik und legendär dafür, komplizi
 
             # ----- TECHNIK 4: Interleaving -----
             if show_section in ["alle", "techniken"]:
-                with st.expander("🔀 **Technik 4: Interleaving (Mischen statt Blocken)** – Effektstärke: d = 0.67"):
+                with st.expander("🔀 **Technik 4: Interleaving (Mischen statt Blocken)** – Effektstärke: d = 0.52 [📚](static/effektstaerken_wissenschaftlich.docx)"):
                     st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
@@ -884,7 +890,7 @@ Interleaving heißt: Aufgaben mischen! A, B, C, A, B, C... Warum? Weil du bei je
 
             # ----- TECHNIK 5: Loci-Methode -----
             if show_section in ["alle", "techniken"]:
-                with st.expander("🏰 **Technik 5: Loci-Methode (Gedächtnispalast)** – Effektstärke: d = 0.65"):
+                with st.expander("🏰 **Technik 5: Loci-Methode (Gedächtnispalast)** – Effektstärke: g = 0.65 [📚](static/effektstaerken_wissenschaftlich.docx)"):
                     st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
@@ -900,7 +906,7 @@ Diese Methode nutzen Gedächtnis-Weltmeister! Funktioniert so: Du "gehst" im Kop
 
             # ----- TECHNIK 6: Pomodoro -----
             if show_section in ["alle", "techniken"]:
-                with st.expander("🍅 **Technik 6: Pomodoro-Technik (25 + 5)** – Effektstärke: d = 0.53"):
+                with st.expander("🍅 **Technik 6: Pomodoro-Technik (25 + 5)** – Keine Meta-Analyse verfügbar"):
                     st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
@@ -918,7 +924,7 @@ Das Gehirn kann sich nicht ewig konzentrieren. Nach etwa 25 Minuten lässt die A
 
             # ----- TECHNIK 7: Lernen durch Lehren -----
             if show_section in ["alle", "techniken"]:
-                with st.expander("👥 **Technik 7: Lernen durch Lehren** – Effektstärke: d = 0.53"):
+                with st.expander("👥 **Technik 7: Lernen durch Lehren** – Effektstärke: d = 0.53 [📚](static/effektstaerken_wissenschaftlich.docx)"):
                     st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
@@ -1139,9 +1145,12 @@ Stell dir vor, du misst, wie viel Schüler in einem Jahr lernen. Das ist der Nor
 
 | Technik | Effektstärke | Bewertung |
 |---------|--------------|-----------|
-| Selbsttest (Retrieval) | d = 0.58 | ⭐⭐⭐ High Utility |
+| Loci-Methode | g = 0.65 | ⭐⭐⭐ High Utility |
+| Retrieval Practice | d = 0.50–0.74 | ⭐⭐⭐ High Utility |
 | Verteiltes Lernen | d = 0.60 | ⭐⭐⭐ High Utility |
-| Feynman-Methode | d = 0.75 | ⭐⭐⭐ Sehr hoch! |
+| Feynman-Methode | d = 0.54* | ⭐⭐⭐ High Utility |
+| Interleaving | d = 0.52 | ⭐⭐ Moderat |
+| Lernen durch Lehren | d = 0.53 | ⭐⭐ Moderat |
 | Markieren | d = 0.36 | ❌ Low Utility |
 | Wiederlesen | d = 0.36 | ❌ Low Utility |
                 """)
@@ -1156,7 +1165,7 @@ Stell dir vor, du misst, wie viel Schüler in einem Jahr lernen. Das ist der Nor
             """)
 
             # ----- TECHNIK 1: Retrieval Practice -----
-            with st.expander("⚡ **Technik 1: Retrieval Practice (Selbsttest)** – Effektstärke: d = 0.58"):
+            with st.expander("⚡ **Technik 1: Retrieval Practice (Selbsttest)** – Effektstärke: d = 0.50–0.74 [📚](static/effektstaerken_wissenschaftlich.docx)"):
                 st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
@@ -1172,7 +1181,7 @@ Jedes Mal, wenn du etwas aus deinem Gedächtnis ABRUFST (statt es nur wieder zu 
 
             # ----- TECHNIK 2: Spaced Repetition -----
             if show_section in ["alle", "techniken"]:
-                with st.expander("📅 **Technik 2: Spaced Repetition (Zeitversetzt wiederholen)** – Effektstärke: d = 0.60"):
+                with st.expander("📅 **Technik 2: Spaced Repetition (Zeitversetzt wiederholen)** – Effektstärke: d = 0.60 [📚](static/effektstaerken_wissenschaftlich.docx)"):
                     st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
@@ -1190,7 +1199,7 @@ Dein Gehirn vergisst. Schnell. Die Vergessenskurve (Ebbinghaus, 1885 – ja, das
 
             # ----- TECHNIK 3: Feynman-Methode -----
             if show_section in ["alle", "techniken"]:
-                with st.expander("👶 **Technik 3: Feynman-Methode (Erklär's einem 10-Jährigen)** – Effektstärke: d = 0.75"):
+                with st.expander("👶 **Technik 3: Feynman-Methode (Erklär's einem 10-Jährigen)** – Effektstärke: d = 0.54* [📚](static/effektstaerken_wissenschaftlich.docx)"):
                     st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
@@ -1213,7 +1222,7 @@ Richard Feynman war Nobelpreisträger für Physik und legendär dafür, komplizi
 
             # ----- TECHNIK 4: Interleaving -----
             if show_section in ["alle", "techniken"]:
-                with st.expander("🔀 **Technik 4: Interleaving (Mischen statt Blocken)** – Effektstärke: d = 0.67"):
+                with st.expander("🔀 **Technik 4: Interleaving (Mischen statt Blocken)** – Effektstärke: d = 0.52 [📚](static/effektstaerken_wissenschaftlich.docx)"):
                     st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
@@ -1233,7 +1242,7 @@ Interleaving heißt: Aufgaben mischen! A, B, C, A, B, C... Warum? Weil du bei je
 
             # ----- TECHNIK 5: Loci-Methode -----
             if show_section in ["alle", "techniken"]:
-                with st.expander("🏰 **Technik 5: Loci-Methode (Gedächtnispalast)** – Effektstärke: d = 0.65"):
+                with st.expander("🏰 **Technik 5: Loci-Methode (Gedächtnispalast)** – Effektstärke: g = 0.65 [📚](static/effektstaerken_wissenschaftlich.docx)"):
                     st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
@@ -1249,7 +1258,7 @@ Diese Methode nutzen Gedächtnis-Weltmeister! Funktioniert so: Du "gehst" im Kop
 
             # ----- TECHNIK 6: Pomodoro -----
             if show_section in ["alle", "techniken"]:
-                with st.expander("🍅 **Technik 6: Pomodoro-Technik (25 + 5)** – Effektstärke: d = 0.53"):
+                with st.expander("🍅 **Technik 6: Pomodoro-Technik (25 + 5)** – Keine Meta-Analyse verfügbar"):
                     st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
@@ -1265,7 +1274,7 @@ Das Gehirn kann sich nicht ewig konzentrieren. Nach etwa 25 Minuten lässt die A
 
             # ----- TECHNIK 7: Lernen durch Lehren -----
             if show_section in ["alle", "techniken"]:
-                with st.expander("👥 **Technik 7: Lernen durch Lehren** – Effektstärke: d = 0.53"):
+                with st.expander("👥 **Technik 7: Lernen durch Lehren** – Effektstärke: d = 0.53 [📚](static/effektstaerken_wissenschaftlich.docx)"):
                     st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
@@ -1485,9 +1494,12 @@ Stell dir vor, du misst, wie viel Schüler in einem Jahr lernen. Das ist der Nor
 
 | Technik | Effektstärke | Bewertung |
 |---------|--------------|-----------|
-| Selbsttest (Retrieval) | d = 0.58 | ⭐⭐⭐ High Utility |
+| Loci-Methode | g = 0.65 | ⭐⭐⭐ High Utility |
+| Retrieval Practice | d = 0.50–0.74 | ⭐⭐⭐ High Utility |
 | Verteiltes Lernen | d = 0.60 | ⭐⭐⭐ High Utility |
-| Feynman-Methode | d = 0.75 | ⭐⭐⭐ Sehr hoch! |
+| Feynman-Methode | d = 0.54* | ⭐⭐⭐ High Utility |
+| Interleaving | d = 0.52 | ⭐⭐ Moderat |
+| Lernen durch Lehren | d = 0.53 | ⭐⭐ Moderat |
 | Markieren | d = 0.36 | ❌ Low Utility |
 | Wiederlesen | d = 0.36 | ❌ Low Utility |
                 """)
@@ -1502,7 +1514,7 @@ Stell dir vor, du misst, wie viel Schüler in einem Jahr lernen. Das ist der Nor
             """)
 
             # ----- TECHNIK 1: Retrieval Practice -----
-            with st.expander("⚡ **Technik 1: Retrieval Practice (Selbsttest)** – Effektstärke: d = 0.58"):
+            with st.expander("⚡ **Technik 1: Retrieval Practice (Selbsttest)** – Effektstärke: d = 0.50–0.74 [📚](static/effektstaerken_wissenschaftlich.docx)"):
                 st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
@@ -1518,7 +1530,7 @@ Jedes Mal, wenn du etwas aus deinem Gedächtnis ABRUFST (statt es nur wieder zu 
 
             # ----- TECHNIK 2: Spaced Repetition -----
             if show_section in ["alle", "techniken"]:
-                with st.expander("📅 **Technik 2: Spaced Repetition (Zeitversetzt wiederholen)** – Effektstärke: d = 0.60"):
+                with st.expander("📅 **Technik 2: Spaced Repetition (Zeitversetzt wiederholen)** – Effektstärke: d = 0.60 [📚](static/effektstaerken_wissenschaftlich.docx)"):
                     st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
@@ -1536,7 +1548,7 @@ Dein Gehirn vergisst. Schnell. Die Vergessenskurve (Ebbinghaus, 1885 – ja, das
 
             # ----- TECHNIK 3: Feynman-Methode -----
             if show_section in ["alle", "techniken"]:
-                with st.expander("👶 **Technik 3: Feynman-Methode (Erklär's einem 10-Jährigen)** – Effektstärke: d = 0.75"):
+                with st.expander("👶 **Technik 3: Feynman-Methode (Erklär's einem 10-Jährigen)** – Effektstärke: d = 0.54* [📚](static/effektstaerken_wissenschaftlich.docx)"):
                     st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
@@ -1554,7 +1566,7 @@ Richard Feynman war Nobelpreisträger für Physik und legendär dafür, komplizi
 
             # ----- TECHNIK 4: Interleaving -----
             if show_section in ["alle", "techniken"]:
-                with st.expander("🔀 **Technik 4: Interleaving (Mischen statt Blocken)** – Effektstärke: d = 0.67"):
+                with st.expander("🔀 **Technik 4: Interleaving (Mischen statt Blocken)** – Effektstärke: d = 0.52 [📚](static/effektstaerken_wissenschaftlich.docx)"):
                     st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
@@ -1574,7 +1586,7 @@ Interleaving heißt: Aufgaben mischen! A, B, C, A, B, C... Warum? Weil du bei je
 
             # ----- TECHNIK 5: Loci-Methode -----
             if show_section in ["alle", "techniken"]:
-                with st.expander("🏰 **Technik 5: Loci-Methode (Gedächtnispalast)** – Effektstärke: d = 0.65"):
+                with st.expander("🏰 **Technik 5: Loci-Methode (Gedächtnispalast)** – Effektstärke: g = 0.65 [📚](static/effektstaerken_wissenschaftlich.docx)"):
                     st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
@@ -1590,7 +1602,7 @@ Diese Methode nutzen Gedächtnis-Weltmeister! Funktioniert so: Du "gehst" im Kop
 
             # ----- TECHNIK 6: Pomodoro -----
             if show_section in ["alle", "techniken"]:
-                with st.expander("🍅 **Technik 6: Pomodoro-Technik (25 + 5)** – Effektstärke: d = 0.53"):
+                with st.expander("🍅 **Technik 6: Pomodoro-Technik (25 + 5)** – Keine Meta-Analyse verfügbar"):
                     st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
@@ -1606,7 +1618,7 @@ Das Gehirn kann sich nicht ewig konzentrieren. Nach etwa 25 Minuten lässt die A
 
             # ----- TECHNIK 7: Lernen durch Lehren -----
             if show_section in ["alle", "techniken"]:
-                with st.expander("👥 **Technik 7: Lernen durch Lehren** – Effektstärke: d = 0.53"):
+                with st.expander("👥 **Technik 7: Lernen durch Lehren** – Effektstärke: d = 0.53 [📚](static/effektstaerken_wissenschaftlich.docx)"):
                     st.markdown("""
 **🧪 Die Wissenschaft dahinter:**
 
@@ -1793,7 +1805,7 @@ Diese Meta-Analyse vereinte beide Forschungsstränge und analysierte 242 Studien
 
 **Praktische Umsetzung:** Lernstoff auf mehrere Tage/Wochen verteilen. Wiederholungsintervalle systematisch erweitern (1 Tag → 3 Tage → 1 Woche → 2 Wochen). Digitale Tools wie Anki oder Quizlet nutzen, die Spaced Repetition Algorithmen implementieren.
 
-*2.1.2 Retrieval Practice / Practice Testing (Abrufübung) – Effektstärke: d = 0.58 (Dunlosky: "High Utility")*
+*2.1.2 Retrieval Practice / Practice Testing (Abrufübung) – Effektstärke: d = 0.50–0.74 (Rowland 2014; Adesope et al. 2017)*
 
 **Definition:** Aktives Abrufen von Information aus dem Gedächtnis, statt passives Wiederlesen oder Betrachten.
 
@@ -1803,7 +1815,7 @@ Diese Meta-Analyse vereinte beide Forschungsstränge und analysierte 242 Studien
 
 **Praktische Umsetzung:** Karteikarten (physisch oder digital), selbst erstellte Quizfragen, "Blatt-Papier-Methode" (Buch schließen, aufschreiben was man erinnert), Fragen am Kapitelende beantworten BEVOR man die Antworten nachschlägt.
 
-*2.1.3 Elaboration / Elaborative Interrogation (Ausarbeitung) – Effektstärke: d = 0.75 (Feynman-Methode), d = 0.42 (Elaborative Interrogation)*
+*2.1.3 Elaboration / Self-Explanation (Feynman-Methode) – Effektstärke: d = 0.54* (Donoghue & Hattie 2021)*
 
 **Definition:** Elaboration bedeutet, neue Information mit bestehendem Wissen zu verknüpfen, indem man sie erklärt, hinterfragt oder in eigene Worte fasst.
 
@@ -1815,7 +1827,7 @@ Diese Meta-Analyse vereinte beide Forschungsstränge und analysierte 242 Studien
 
 **Praktische Umsetzung:** "Warum?"-Fragen zu jedem neuen Fakt stellen, Konzepte laut erklären (der Wand, dem Haustier, einem imaginären Schüler), Analogien und Beispiele aus dem eigenen Leben finden, Zusammenhänge zu anderen Fächern herstellen.
 
-*2.1.4 Interleaved Practice (Vermischtes Üben) – Effektstärke: d = 0.67 (für visuelle Kategorien), variabel für andere Bereiche*
+*2.1.4 Interleaved Practice (Vermischtes Üben) – Effektstärke: d = 0.52 (Donoghue & Hattie 2021)*
 
 **Definition:** Abwechselndes Üben verschiedener Problemtypen oder Themen innerhalb einer Lernsitzung, im Gegensatz zu "Blocked Practice" (ein Thema nach dem anderen).
 
@@ -2031,13 +2043,13 @@ Umgekehrt stärkt erfolgreiches Lernen die Selbstwirksamkeit – ein positiver K
 
 Nach aktueller Forschungslage (Donoghue & Hattie, 2021) sind die wirksamsten Lernstrategien:
 
-1. Transfer Strategien (d = 0.86) – Anwendung in neuen Kontexten üben
-2. Elaboration / Feynman-Methode (d = 0.75) – Verknüpfung mit Vorwissen
-3. Interleaved Practice (d = 0.67) – Unterschiede zwischen Konzepten erkennen
-4. Spaced Practice (d = 0.60) – Vergessenskurve durch Wiederholung unterbrechen
-5. Retrieval Practice (d = 0.58) – Aktiver Abruf statt passivem Wiederlesen
-6. Self-Explanation (d = 0.55) – Integration in bestehende Wissensstrukturen
-7. Dual Coding (d = 0.54) – Nutzung mehrerer Gedächtnissysteme
+1. Retrieval Practice (d = 0.50–0.74) – Aktiver Abruf statt passivem Wiederlesen
+2. Loci-Methode (g = 0.65) – Räumliche Merkstrategien
+3. Spaced Practice (d = 0.60) – Vergessenskurve durch Wiederholung unterbrechen
+4. Feynman-Methode / Self-Explanation (d = 0.54*) – Verknüpfung mit Vorwissen
+5. Lernen durch Lehren (d = 0.53) – Tiefe Elaboration durch Erklären
+6. Interleaved Practice (d = 0.52) – Unterschiede zwischen Konzepten erkennen
+*(Quellen: Rowland 2014, Adesope 2017, Dunlosky 2013, Donoghue & Hattie 2021, Twomey & Kroneisen 2021)*
 
 **9.2 Die Meta-Prinzipien**
 

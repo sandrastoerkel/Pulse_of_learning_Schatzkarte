@@ -4803,3 +4803,90 @@ body {
     margin-top: 10px;
   }
 }
+
+
+/* ============================================
+   ZURÜCK ZUR SCHATZKARTE BUTTON
+   ============================================ */
+
+.back-to-map-button {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99999;
+  
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  
+  padding: 16px 32px;
+  
+  background: linear-gradient(135deg, #4fc3f7 0%, #29b6f6 50%, #03a9f4 100%);
+  border: 4px solid #fff;
+  border-radius: 50px;
+  box-shadow: 
+    0 6px 20px rgba(3, 169, 244, 0.5),
+    0 0 0 3px rgba(3, 169, 244, 0.3),
+    inset 0 2px 0 rgba(255, 255, 255, 0.3);
+  
+  cursor: pointer;
+  
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  
+  animation: backButtonPulse 2s ease-in-out infinite;
+  transition: all 0.3s ease;
+}
+
+.back-to-map-button:hover {
+  transform: translateX(-50%) scale(1.08);
+  box-shadow: 
+    0 8px 30px rgba(3, 169, 244, 0.6),
+    0 0 0 5px rgba(3, 169, 244, 0.4),
+    inset 0 2px 0 rgba(255, 255, 255, 0.3);
+}
+
+.back-to-map-button:active {
+  transform: translateX(-50%) scale(0.98);
+}
+
+.back-to-map-button .back-icon {
+  font-size: 28px;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
+}
+
+.back-to-map-button .back-text {
+  letter-spacing: 0.5px;
+}
+
+@keyframes backButtonPulse {
+  0%, 100% {
+    box-shadow: 
+      0 6px 20px rgba(3, 169, 244, 0.5),
+      0 0 0 3px rgba(3, 169, 244, 0.3),
+      inset 0 2px 0 rgba(255, 255, 255, 0.3);
+  }
+  50% {
+    box-shadow: 
+      0 6px 25px rgba(3, 169, 244, 0.7),
+      0 0 0 6px rgba(3, 169, 244, 0.2),
+      inset 0 2px 0 rgba(255, 255, 255, 0.3);
+  }
+}
+
+/* Responsive für kleinere Bildschirme */
+@media (max-width: 500px) {
+  .back-to-map-button {
+    padding: 14px 24px;
+    font-size: 16px;
+    bottom: 15px;
+  }
+  
+  .back-to-map-button .back-icon {
+    font-size: 24px;
+  }
+}

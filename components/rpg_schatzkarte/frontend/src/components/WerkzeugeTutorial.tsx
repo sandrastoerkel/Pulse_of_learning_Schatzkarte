@@ -33,6 +33,48 @@ const TECHNIQUE_GRADIENTS = [
 // Icons für die Techniken
 const TECHNIQUE_ICONS = ['🧠', '📅', '👨‍🏫', '🔀', '🏛️', '🍅', '👥'];
 
+// Link zum wissenschaftlichen Dokument (Streamlit static folder)
+const EFFECT_SIZE_DOC = 'app/static/effektstaerken_wissenschaftlich.docx';
+
+// Helper: Rendert Titel mit klickbarem 📚-Link
+const renderTitleWithSourceLink = (title: string): React.ReactNode => {
+  if (!title.includes('📚')) {
+    return title;
+  }
+  const parts = title.split('📚');
+
+  const handleClick = (e: React.MouseEvent) => {
+    // Alle Event-Propagation stoppen
+    e.stopPropagation();
+    e.preventDefault();
+    e.nativeEvent.stopImmediatePropagation();
+    // Öffne das Dokument im übergeordneten Fenster (aus dem iframe heraus)
+    window.open(EFFECT_SIZE_DOC, '_blank');
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    // Auch mouseDown stoppen, da motion.button darauf reagieren könnte
+    e.stopPropagation();
+  };
+
+  return (
+    <>
+      {parts[0]}
+      <span
+        onClick={handleClick}
+        onMouseDown={handleMouseDown}
+        className="source-link"
+        title="Wissenschaftliche Quellen anzeigen"
+        role="button"
+        tabIndex={0}
+      >
+        📚
+      </span>
+      {parts[1] || ''}
+    </>
+  );
+};
+
 // ============================================
 // Sub-Components
 // ============================================
@@ -202,7 +244,7 @@ const AnimatedExpander: React.FC<{
         style={{ background: gradient }}
       >
         <span className="expander-icon">{icon}</span>
-        <span className="expander-title">{title}</span>
+        <span className="expander-title">{renderTitleWithSourceLink(title)}</span>
         <motion.span
           className="expander-chevron"
           animate={{ rotate: isExpanded ? 180 : 0 }}
@@ -334,7 +376,7 @@ const ContentBox: React.FC<{
     >
       <div className="content-box-header">
         <span className="content-box-icon">{style.icon}</span>
-        <h3>{section.title}</h3>
+        <h3>{renderTitleWithSourceLink(section.title)}</h3>
       </div>
       <div className="content-box-body">
         {renderContent(section.content)}

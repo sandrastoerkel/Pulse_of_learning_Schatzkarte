@@ -1,5 +1,5 @@
 # Pulse of Learning - Schatzkarte
-## Dokumentation Stand 8. Januar 2025
+## Dokumentation Stand 12. Januar 2025
 
 ---
 
@@ -21,7 +21,317 @@ Danach hast du Zugang zur **👥 Lerngruppen**-Seite.
 
 ---
 
-# HEUTIGE ÄNDERUNGEN (8. Januar 2025)
+# HEUTIGE ÄNDERUNGEN (12. Januar 2025)
+
+## Neues Insel-Design-System - Festung & Brücken komplett neu! 🎨
+
+Die **Festung der Stärke** und **Insel der Brücken** wurden komplett mit einem neuen, animierten Design-System überarbeitet. Dieses Design soll morgen auf **alle anderen Inseln** angewendet werden!
+
+### Neue Dateien erstellt:
+
+| Datei | Beschreibung |
+|-------|--------------|
+| `FestungIslandExperience.tsx` | **NEU** - Animierte Festung-Insel |
+| `BrueckenIslandExperience.tsx` | **NEU** - Animierte Brücken-Insel |
+| `festung-island.css` | **NEU** - CSS für Festung (~400 Zeilen) |
+| `bruecken-island.css` | **NEU** - CSS für Brücken (~400 Zeilen) |
+| `TransferChallenge.tsx` | **ÜBERARBEITET** - Kreative 4-Phasen Challenge |
+| `transferChallengeTypes.ts` | **ÜBERARBEITET** - Neue Inhalte |
+
+### Bug-Fix: SuperheldenTagebuch öffnet sich jetzt!
+
+**Problem:** Das Tagebuch ließ sich nicht öffnen (egal ob Widget, Button oder Schriftrolle).
+
+**Ursache:** Der interne `modalOpen` State wurde nur einmal initialisiert, aber nicht mit dem `isOpen` Prop synchronisiert.
+
+**Lösung:** `useEffect` hinzugefügt in `SuperheldenTagebuch.tsx`:
+```tsx
+useEffect(() => {
+  setModalOpen(isOpen);
+}, [isOpen]);
+```
+
+### Quiz für Brücken-Insel - Alle 3 Altersstufen!
+
+Neue Quiz-Dateien erstellt:
+- `brueckenQuizContent.ts` - Grundschule (existierte)
+- `brueckenQuizContent_unterstufe.ts` - **NEU**
+- `brueckenQuizContent_mittelstufe.ts` - **NEU**
+
+---
+
+# 🎨 DESIGN-SYSTEM FÜR INSELN (Template für morgen!)
+
+## So wendest du das Design auf eine neue Insel an:
+
+### Schritt 1: Neue Dateien erstellen
+
+```
+frontend/src/components/[Insel]IslandExperience.tsx
+frontend/src/styles/[insel]-island.css
+```
+
+### Schritt 2: Component-Struktur kopieren
+
+Kopiere `FestungIslandExperience.tsx` als Template. Die Struktur ist:
+
+```tsx
+// ============================================
+// [Insel] Island Experience
+// ============================================
+
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { AgeGroup } from '../types';
+import '../styles/[insel]-island.css';
+
+// QUEST INFO - Anpassen pro Insel!
+const QUEST_INFO: Record<QuestKey, {...}> = {
+  video: { name: "...", icon: "📜", color: "#9b59b6", xp: 25 },
+  scroll: { name: "...", icon: "📖", color: "#3498db", xp: 20 },
+  quiz: { name: "...", icon: "⚔️", color: "#e74c3c", xp: 50 },
+  challenge: { name: "...", icon: "🏆", color: "#f39c12", xp: 40 },
+};
+
+// HAUPT-KOMPONENTE
+export function [Insel]IslandExperience({
+  ageGroup,
+  onClose,
+  onQuestComplete,
+}: Props) {
+  const [currentView, setCurrentView] = useState<'overview' | QuestKey>('overview');
+  const [progress, setProgress] = useState<Progress>({...});
+
+  return (
+    <div className="[insel]-island">
+      {/* Header mit Titel + XP */}
+      {/* Progress-Bar */}
+      {/* AnimatePresence für View-Wechsel */}
+      {/* QuestCards Grid */}
+      {/* Phasen: VideoPhase, ScrollPhase, QuizPhase, ChallengePhase */}
+    </div>
+  );
+}
+```
+
+### Schritt 3: Die 4 Phasen implementieren
+
+#### VideoPhase
+```tsx
+function VideoPhase({ content, onComplete, onBack }) {
+  return (
+    <div className="phase-container video-phase">
+      <PhaseHeader icon="📜" title="..." color="#9b59b6" onBack={onBack} />
+      <div className="video-container">
+        {/* YouTube iframe oder Placeholder */}
+      </div>
+      <motion.button className="complete-btn" onClick={onComplete}>
+        Video abgeschlossen ✓
+      </motion.button>
+    </div>
+  );
+}
+```
+
+#### ScrollPhase
+```tsx
+function ScrollPhase({ content, ageGroup, onComplete, onBack }) {
+  return (
+    <div className="phase-container scroll-phase">
+      <PhaseHeader icon="📖" title="..." color="#3498db" onBack={onBack} />
+      <div className="scroll-container">
+        {/* Titel, Intro, Sections mit Expandern */}
+      </div>
+      <motion.button className="complete-btn" onClick={onComplete}>
+        Gelesen ✓
+      </motion.button>
+    </div>
+  );
+}
+```
+
+#### QuizPhase
+```tsx
+function QuizPhase({ ageGroup, onComplete, onBack }) {
+  const [quizStarted, setQuizStarted] = useState(false);
+
+  if (quizStarted) {
+    return <BattleQuiz quiz={...} onComplete={onComplete} onClose={onBack} />;
+  }
+
+  return (
+    <div className="phase-container quiz-phase">
+      <PhaseHeader icon="⚔️" title="..." color="#e74c3c" onBack={onBack} />
+      {/* Quiz-Intro mit Start-Button */}
+    </div>
+  );
+}
+```
+
+#### ChallengePhase
+```tsx
+function ChallengePhase({ onComplete, onBack, ...props }) {
+  return (
+    <div className="phase-container challenge-phase">
+      <PhaseHeader icon="🏆" title="..." color="#f39c12" onBack={onBack} />
+      {/* Insel-spezifische Challenge */}
+    </div>
+  );
+}
+```
+
+### Schritt 4: CSS-Datei erstellen
+
+Kopiere `festung-island.css` und passe die Variablen an:
+
+```css
+/* ============================================
+   [INSEL] ISLAND EXPERIENCE
+   ============================================ */
+
+.[insel]-island {
+  /* FARB-VARIABLEN - Pro Insel anpassen! */
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-header: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+  --color-primary: #667eea;
+  --color-secondary: #764ba2;
+
+  /* STANDARD-VARIABLEN (gleich für alle) */
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.1);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.15);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.2);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+
+  /* Layout */
+  padding: 20px;
+  min-height: 100%;
+  background: var(--gradient-primary);
+}
+
+/* Header */
+.[insel]-island .island-header { ... }
+
+/* Quest Cards Grid */
+.[insel]-island .quests-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .[insel]-island .quests-grid {
+    grid-template-columns: 1fr;
+  }
+}
+```
+
+### Schritt 5: In QuestModal.tsx einbinden
+
+```tsx
+// Import hinzufügen
+import { [Insel]IslandExperience } from './[Insel]IslandExperience';
+
+// Im JSX (nach den anderen Inseln)
+{island.id === '[insel]' ? (
+  <[Insel]IslandExperience
+    ageGroup={ageGroup}
+    onClose={onClose}
+    onQuestComplete={onQuestComplete}
+    // + weitere Props falls nötig
+  />
+) : /* nächste Insel */ }
+```
+
+---
+
+## Framer Motion Animationen (Copy-Paste!)
+
+### QuestCard Animation
+```tsx
+<motion.button
+  className="quest-card"
+  initial={{ opacity: 0, y: 30 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ delay: index * 0.1, type: "spring", bounce: 0.4 }}
+  whileHover={{ scale: 1.05, rotate: [-1, 1, -1, 0] }}
+  whileTap={{ scale: 0.95 }}
+>
+```
+
+### Phase-Wechsel Animation
+```tsx
+<AnimatePresence mode="wait">
+  {currentView === 'overview' && (
+    <motion.div
+      key="overview"
+      initial={{ opacity: 0, x: -50 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 50 }}
+    >
+      {/* Content */}
+    </motion.div>
+  )}
+</AnimatePresence>
+```
+
+### XP-Reward Popup
+```tsx
+<AnimatePresence>
+  {showXPReward && (
+    <motion.div
+      className="xp-reward-popup"
+      initial={{ scale: 0, y: 50, opacity: 0 }}
+      animate={{ scale: 1, y: 0, opacity: 1 }}
+      exit={{ scale: 0, y: -50, opacity: 0 }}
+    >
+      +{xp} XP!
+    </motion.div>
+  )}
+</AnimatePresence>
+```
+
+### Icon-Animationen
+```tsx
+// Pulsieren
+<motion.span
+  animate={{ scale: [1, 1.2, 1] }}
+  transition={{ repeat: Infinity, duration: 2 }}
+>
+  ⭐
+</motion.span>
+
+// Wackeln
+<motion.span
+  animate={{ rotate: [0, -10, 10, -10, 0] }}
+  transition={{ repeat: Infinity, duration: 3 }}
+>
+  🏆
+</motion.span>
+```
+
+---
+
+## Checkliste: Welche Inseln fehlen noch?
+
+| Insel | Experience | CSS | Quiz GS | Quiz US | Quiz MS | Challenge |
+|-------|------------|-----|---------|---------|---------|-----------|
+| Festung der Stärke | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ (Schiffe) |
+| Insel der Brücken | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ (Transfer) |
+| Insel der 7 Werkzeuge | ❌ | ❌ | ✅ | ❌ | ❌ | ✅ (Powertechniken) |
+| Insel der Fäden | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Spiegel-See | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Vulkan der Motivation | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Ruhe-Oase | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| ... (weitere) | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+
+**Legende:** GS = Grundschule, US = Unterstufe, MS = Mittelstufe
+
+---
+
+# ÄNDERUNGEN VOM 8. Januar 2025
 
 ## Insel der 7 Werkzeuge - Grundschule Challenge KOMPLETT! 🎉
 
@@ -109,19 +419,20 @@ Neuer Floating-Button unten rechts auf der Weltkarte:
 
 ---
 
-## TODO für 9. Januar
+## TODO für 13. Januar
 
-### 1. Insel der 7 Werkzeuge - UNTERSTUFE
-Die **Insel der 7 Werkzeuge für Unterstufe** muss noch gemacht werden!
-- Gleiche 7 Techniken, aber angepasste Sprache/Übungen für ältere Schüler
-- Komplexere Interleaving-Aufgaben
-- Längere Pomodoro-Zeiten (25 Min statt 15 Min)
+### 1. 🎨 Design auf alle Inseln anwenden (HAUPTAUFGABE!)
+Das neue animierte Design von Festung & Brücken auf alle anderen Inseln übertragen.
+- **Siehe oben:** "DESIGN-SYSTEM FÜR INSELN (Template für morgen!)"
+- Priorität: Insel der 7 Werkzeuge → Insel der Fäden → Rest
 
-### 2. 🐛 BUG: Superhelden-Tagebuch lässt sich nicht schließen
-**Problem:** Das Superhelden-Tagebuch (Grundschule) lässt sich nicht schließen.
-- Vermutlich überdeckt ein Button den Schließen-Button
-- **Komponente:** `SuperheldenTagebuch.tsx`
-- **Zu prüfen:** Z-Index, Button-Positionierung, Click-Handler
+### 2. ✅ ~~BUG: Superhelden-Tagebuch~~ (ERLEDIGT 12. Januar)
+~~**Problem:** Das Superhelden-Tagebuch öffnete sich nicht.~~
+**Gelöst!** useEffect für State-Sync hinzugefügt.
+
+### 3. Quiz für Festung - Mittelstufe
+**Problem:** Festung hat noch kein Quiz für Mittelstufe (fällt auf Grundschule zurück).
+- Datei erstellen: `festungQuizContent_mittelstufe.ts`
 
 ---
 
@@ -494,26 +805,30 @@ Pulse_of_learning_Schatzkarte/
 
 ---
 
-# NÄCHSTE SCHRITTE (9. Januar 2025)
+# NÄCHSTE SCHRITTE (13. Januar 2025)
 
 ## Hohe Priorität
-1. **Insel der 7 Werkzeuge - UNTERSTUFE** - Challenge für ältere Schüler erstellen
-   - Angepasste Sprache (weniger kindlich)
-   - Komplexere Interleaving-Aufgaben
-   - Längere Pomodoro-Zeiten (25 Min statt 15 Min)
-2. **🐛 BUG FIX: Superhelden-Tagebuch** - Schließen-Button funktioniert nicht
-   - Vermutlich Z-Index oder Button-Überlappung
-   - Komponente: `SuperheldenTagebuch.tsx`
-3. **Quiz für Werkzeuge-Insel** - Quiz-Fragen für alle Altersstufen
+1. **🎨 Design auf alle Inseln anwenden** (HAUPTAUFGABE!)
+   - Nutze das Template aus "DESIGN-SYSTEM FÜR INSELN"
+   - Reihenfolge: Werkzeuge → Fäden → Spiegel-See → Rest
+   - Pro Insel: ~30 Min (Experience.tsx + CSS kopieren & anpassen)
+2. **Quiz für Festung - Mittelstufe** - `festungQuizContent_mittelstufe.ts` erstellen
+3. **Insel der 7 Werkzeuge - UNTERSTUFE** - Challenge für ältere Schüler erstellen
 
 ## Mittlere Priorität
 4. **Quiz-Ergebnisse speichern** - Datenbank-Erweiterung
 5. **Willkommensvideo** - YouTube-URL produzieren
-6. **Design-Feinschliff** - CSS anpassen nach Feedback
+6. **Quiz für weitere Inseln** - Fäden, Spiegel-See etc.
 
 ## Niedrige Priorität
 7. **Gruppenchat** - Lösung finden
 8. **Weitere Selfchecks** - Für andere Altersstufen/Inseln
+
+## ✅ ERLEDIGT (12. Januar)
+- ~~Superhelden-Tagebuch Bug~~ → useEffect für State-Sync hinzugefügt!
+- ~~Design für Festung der Stärke~~ → FestungIslandExperience komplett!
+- ~~Design für Insel der Brücken~~ → BrueckenIslandExperience komplett!
+- ~~Quiz für Brücken Unterstufe/Mittelstufe~~ → Alle 3 Altersstufen fertig!
 
 ## ✅ ERLEDIGT (8. Januar)
 - ~~PDF-Download für Urkunde~~ → PNG-Download mit html2canvas implementiert!
@@ -549,6 +864,11 @@ components/rpg_schatzkarte/frontend/
 
 | Datum | Was | Details |
 |-------|-----|---------|
+| **12.01.2025** | **🎨 Neues Insel-Design-System** | FestungIslandExperience + BrueckenIslandExperience mit Framer Motion Animationen |
+| 12.01.2025 | TransferChallenge Redesign | 4 kreative Phasen: Verbindungen, Mein Trick, Mission, Tagebuch |
+| 12.01.2025 | Bug-Fix SuperheldenTagebuch | useEffect für isOpen State-Sync hinzugefügt |
+| 12.01.2025 | Brücken Quiz komplett | Quiz für alle 3 Altersstufen (GS, US, MS) |
+| 12.01.2025 | Design-Dokumentation | Template + Anleitung für weitere Inseln |
 | **08.01.2025** | **7 Powertechniken Challenge** | Grundschule komplett: 7 interaktive Übungen, Zertifikat, PNG-Download |
 | 08.01.2025 | Pomodoro Zyklus-System | Lern-Pause-Wechsel beliebig oft, Zyklus-Zähler |
 | 08.01.2025 | Anki-Hinweis | Eltern-Tipp bei Spaced Repetition |
@@ -585,36 +905,72 @@ cd /Users/sandra/Documents/Pulse_of_learning/Pulse_of_learning_Schatzkarte
 streamlit run Home.py
 ```
 
-## Was als erstes tun?
-1. **Powertechniken-Challenge testen** - Insel der 7 Werkzeuge → alle 7 Übungen durchspielen → Zertifikat erstellen
-2. **Unterstufe Challenge** - Gleiche 7 Techniken, aber für ältere Schüler anpassen
-3. **Quiz-Fragen** - Für Werkzeuge-Insel erstellen
+## 🎨 HAUPTAUFGABE: Design auf alle Inseln anwenden
 
-## Zum Testen der Powertechniken-Challenge:
-1. Schatzkarte öffnen (als Grundschüler eingeloggt)
-2. Insel der 7 Werkzeuge anklicken
-3. Challenge starten
-4. Alle 7 Techniken durchspielen:
-   - 🍅 Pomodoro-Timer starten (30 Sek Demo)
-   - 🔄 Active Recall Memory-Spiel
-   - 👶 Feynman Teddy-Erklärer
-   - 📅 Spaced Repetition Kalender
-   - 👥 Teaching Partner-Checkliste
-   - 🏰 Loci 5 Orte belegen
-   - 🔀 Interleaving Mathe-Mixer
-5. Zertifikat erstellen → Download als PNG testen
+### Schritt-für-Schritt Anleitung:
 
-## Zum Testen des WorldMap-Widgets:
+**1. Wähle die nächste Insel** (z.B. `werkzeuge`)
+
+**2. Erstelle die Experience-Komponente:**
+```bash
+# Kopiere als Template
+cp frontend/src/components/FestungIslandExperience.tsx \
+   frontend/src/components/WerkzeugeIslandExperience.tsx
+```
+
+**3. Erstelle die CSS-Datei:**
+```bash
+cp frontend/src/styles/festung-island.css \
+   frontend/src/styles/werkzeuge-island.css
+```
+
+**4. Passe an:**
+- Suchen & Ersetzen: `festung` → `werkzeuge`, `Festung` → `Werkzeuge`
+- CSS-Variablen anpassen (Farben passend zur Insel)
+- Content importieren: `WERKZEUGE_CONTENT` statt `FESTUNG_CONTENT`
+- Quiz importieren: `WERKZEUGE_QUIZ_QUESTIONS`
+- Challenge anpassen (Powertechniken statt Schiffe)
+
+**5. In QuestModal.tsx einbinden:**
+```tsx
+import { WerkzeugeIslandExperience } from './WerkzeugeIslandExperience';
+
+// Im JSX:
+island.id === 'werkzeuge' ? (
+  <WerkzeugeIslandExperience ... />
+) :
+```
+
+**6. Build & Test:**
+```bash
+npm run build
+# App neu laden, Insel testen
+```
+
+### Farb-Vorschläge pro Insel:
+
+| Insel | Primär | Sekundär | Gradient |
+|-------|--------|----------|----------|
+| Werkzeuge | #81c784 | #4caf50 | Grün |
+| Fäden | #ba68c8 | #9c27b0 | Lila |
+| Spiegel-See | #90caf9 | #2196f3 | Blau |
+| Vulkan | #ef5350 | #f44336 | Rot/Orange |
+| Ruhe-Oase | #80deea | #26c6da | Türkis |
+
+## Zum Testen des neuen Designs:
+
 1. Schatzkarte öffnen
-2. Unten rechts: Floating-Button "📋 Lerntechniken"
-3. Klicken → Übersicht öffnet sich
-4. Nach 7 Techniken: Goldener Glow + "🎓 Zertifikat"
+2. **Festung der Stärke** anklicken → Neues animiertes Design!
+3. **Insel der Brücken** anklicken → Gleiches Design!
+4. Alle 4 Quest-Karten durchklicken (Video, Scroll, Quiz, Challenge)
+5. XP-Popup prüfen, Animationen prüfen
 
 ## Bei Problemen
 - **"Component nicht gefunden"?** → `cd components/rpg_schatzkarte/frontend && npm run build`
 - **Fehler in React?** → Console im Browser prüfen (F12)
 - **Import-Fehler?** → Prüfe ob `components/__init__.py` existiert
 - **DB-Fehler?** → `rm data/hattie_gamification.db` und neu starten
+- **CSS lädt nicht?** → Import in Experience.tsx prüfen
 
 ---
 
@@ -630,5 +986,5 @@ streamlit run Home.py
 
 ---
 
-**Letzte Bearbeitung:** 8. Januar 2025
-**Nächster Meilenstein:** Insel der 7 Werkzeuge - Unterstufe Challenge implementieren
+**Letzte Bearbeitung:** 12. Januar 2025
+**Nächster Meilenstein:** Design auf alle Inseln anwenden (Werkzeuge → Fäden → Rest)
