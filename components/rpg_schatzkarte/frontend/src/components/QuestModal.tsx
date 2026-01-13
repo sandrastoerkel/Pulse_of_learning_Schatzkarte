@@ -19,6 +19,19 @@ import { PowertechnikenChallenge } from './PowertechnikenChallenge';
 import { TransferChallenge } from './TransferChallenge';
 import { BrueckenIslandExperience } from './BrueckenIslandExperience';
 import { FestungIslandExperience } from './FestungIslandExperience';
+import { WerkzeugeIslandExperience } from './WerkzeugeIslandExperience';
+import { StarthafenIslandExperience } from './StarthafenIslandExperience';
+import { FaedenIslandExperience } from './FaedenIslandExperience';
+import { SpiegelSeeIslandExperience } from './SpiegelSeeIslandExperience';
+import { VulkanIslandExperience } from './VulkanIslandExperience';
+import { RuheOaseIslandExperience } from './RuheOaseIslandExperience';
+import { AusdauerGipfelIslandExperience } from './AusdauerGipfelIslandExperience';
+import { FokusLeuchtturmIslandExperience } from './FokusLeuchtturmIslandExperience';
+import { WachstumGartenIslandExperience } from './WachstumGartenIslandExperience';
+import { LehrerTurmIslandExperience } from './LehrerTurmIslandExperience';
+import { WohlfuehlDorfIslandExperience } from './WohlfuehlDorfIslandExperience';
+import { SchutzBurgIslandExperience } from './SchutzBurgIslandExperience';
+import { MeisterBergIslandExperience } from './MeisterBergIslandExperience';
 
 interface QuestModalProps {
   island: Island & {
@@ -38,6 +51,8 @@ interface QuestModalProps {
   // Challenge-Schiffe öffnen (statt eingebetteter Challenges)
   onOpenBandura?: () => void;
   onOpenHattie?: () => void;
+  // Direkt zur Challenge der 7 Werkzeuge springen (wenn von Lerntechniken-Widget geöffnet)
+  startWerkzeugeWithChallenge?: boolean;
 }
 
 interface TutorialStep {
@@ -159,7 +174,8 @@ export function QuestModal({
   onTreasureCollected,
   onOpenTagebuch,
   onOpenBandura,
-  onOpenHattie
+  onOpenHattie,
+  startWerkzeugeWithChallenge = false
 }: QuestModalProps) {
   const [activeQuest, setActiveQuest] = useState<QuestType | null>(null);
   const [showReward, setShowReward] = useState(false);
@@ -322,54 +338,98 @@ export function QuestModal({
               onOpenBandura={onOpenBandura}
               onOpenHattie={onOpenHattie}
             />
-          ) : /* Tutorial-Insel (Starthafen) */
-          island.type === 'tutorial' && !activeQuest ? (
-            <div className="tutorial-content">
-              {island.tutorial_steps?.map((step, index) => (
-                <div key={step.id} className={`tutorial-step ${step.placeholder ? 'placeholder' : ''}`}>
-                  <div className="step-number">{index + 1}</div>
-                  <div className="step-content">
-                    <h4>{step.title}</h4>
-                    {step.description && <p className="step-description">{step.description}</p>}
-                    {step.content && (
-                      <div className="step-detail" dangerouslySetInnerHTML={{
-                        __html: step.content
-                          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                          .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                          .replace(/---/g, '<hr/>')
-                          .replace(/\n/g, '<br/>')
-                      }} />
-                    )}
-                    {step.placeholder && (
-                      <div className="placeholder-badge">
-                        🚧 Kommt bald!
-                      </div>
-                    )}
-                    {step.type === 'video' && !step.placeholder && (
-                      <button
-                        className="tutorial-action-btn"
-                        onClick={() => handleCompleteQuest('wisdom')}
-                      >
-                        ▶️ Video ansehen
-                      </button>
-                    )}
-                    {step.type === 'explanation' && (
-                      <button
-                        className="tutorial-action-btn read"
-                        onClick={() => handleCompleteQuest('scroll')}
-                      >
-                        ✓ Verstanden!
-                      </button>
-                    )}
-                    {step.type === 'link' && !step.placeholder && (
-                      <button className="tutorial-action-btn link">
-                        👥 Zur Gruppe
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
+          ) : /* Insel der 7 Werkzeuge: Vollständige animierte Experience */
+          island.id === 'werkzeuge' ? (
+            <WerkzeugeIslandExperience
+              ageGroup={ageGroup}
+              onClose={onClose}
+              onQuestComplete={onQuestComplete}
+              startWithChallenge={startWerkzeugeWithChallenge}
+            />
+          ) : /* Starthafen: Tutorial & Einführung */
+          island.id === 'start' ? (
+            <StarthafenIslandExperience
+              ageGroup={ageGroup}
+              onClose={onClose}
+              onQuestComplete={onQuestComplete}
+            />
+          ) : /* Insel der Fäden: Birkenbihl's Faden-Prinzip */
+          island.id === 'faeden' ? (
+            <FaedenIslandExperience
+              ageGroup={ageGroup}
+              onClose={onClose}
+              onQuestComplete={onQuestComplete}
+            />
+          ) : /* Spiegel-See: Metakognition */
+          island.id === 'spiegel_see' ? (
+            <SpiegelSeeIslandExperience
+              ageGroup={ageGroup}
+              onClose={onClose}
+              onQuestComplete={onQuestComplete}
+            />
+          ) : /* Vulkan der Motivation */
+          island.id === 'vulkan' ? (
+            <VulkanIslandExperience
+              ageGroup={ageGroup}
+              onClose={onClose}
+              onQuestComplete={onQuestComplete}
+            />
+          ) : /* Ruhe-Oase */
+          island.id === 'ruhe_oase' ? (
+            <RuheOaseIslandExperience
+              ageGroup={ageGroup}
+              onClose={onClose}
+              onQuestComplete={onQuestComplete}
+            />
+          ) : /* Ausdauer-Gipfel */
+          island.id === 'ausdauer_gipfel' ? (
+            <AusdauerGipfelIslandExperience
+              ageGroup={ageGroup}
+              onClose={onClose}
+              onQuestComplete={onQuestComplete}
+            />
+          ) : /* Fokus-Leuchtturm */
+          island.id === 'fokus_leuchtturm' ? (
+            <FokusLeuchtturmIslandExperience
+              ageGroup={ageGroup}
+              onClose={onClose}
+              onQuestComplete={onQuestComplete}
+            />
+          ) : /* Wachstums-Garten */
+          island.id === 'wachstum_garten' ? (
+            <WachstumGartenIslandExperience
+              ageGroup={ageGroup}
+              onClose={onClose}
+              onQuestComplete={onQuestComplete}
+            />
+          ) : /* Lehrer-Turm */
+          island.id === 'lehrer_turm' ? (
+            <LehrerTurmIslandExperience
+              ageGroup={ageGroup}
+              onClose={onClose}
+              onQuestComplete={onQuestComplete}
+            />
+          ) : /* Wohlfühl-Dorf */
+          island.id === 'wohlfuehl_dorf' ? (
+            <WohlfuehlDorfIslandExperience
+              ageGroup={ageGroup}
+              onClose={onClose}
+              onQuestComplete={onQuestComplete}
+            />
+          ) : /* Schutz-Burg */
+          island.id === 'schutz_burg' ? (
+            <SchutzBurgIslandExperience
+              ageGroup={ageGroup}
+              onClose={onClose}
+              onQuestComplete={onQuestComplete}
+            />
+          ) : /* Berg der Meisterschaft - Finale */
+          island.id === 'meister_berg' ? (
+            <MeisterBergIslandExperience
+              ageGroup={ageGroup}
+              onClose={onClose}
+              onQuestComplete={onQuestComplete}
+            />
           ) : !activeQuest ? (
             <>
               {/* Standard Quest-Karten */}

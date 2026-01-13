@@ -1,0 +1,72 @@
+/* ============================================
+   Vulkan der Motivation Island - Styles
+   Motivation Theme (Rot/Orange)
+   ============================================ */
+
+.vulkan-island {
+  --primary: #ef5350;
+  --secondary: #ff7043;
+  --accent: #ffab91;
+  --success: #27ae60;
+  --dark: #2c3e50;
+  --light: #f8f9fa;
+  --white: #ffffff;
+  --gradient-primary: linear-gradient(135deg, #ef5350 0%, #ff7043 100%);
+  --gradient-island: linear-gradient(135deg, #bf360c 0%, #e64a19 50%, #ff7043 100%);
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.15);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.2);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 30px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(180deg, #ffebee 0%, #ffcdd2 100%);
+  min-height: 100%;
+  padding: 1rem;
+  color: var(--dark);
+}
+
+.vulkan-island .island-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; }
+.vulkan-island .island-title { font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; margin: 0; }
+.vulkan-island .title-icon { font-size: 1.5rem; }
+.vulkan-island .back-btn { background: var(--light); border: none; padding: 0.5rem 1rem; border-radius: var(--radius-md); font-size: 0.9rem; cursor: pointer; }
+.vulkan-island .back-btn:hover { background: var(--white); box-shadow: var(--shadow-sm); }
+.vulkan-island .xp-badge { display: flex; align-items: center; gap: 0.4rem; background: var(--gradient-primary); color: var(--white); padding: 0.4rem 0.8rem; border-radius: var(--radius-xl); font-weight: 600; font-size: 0.9rem; }
+.vulkan-island .island-subtitle-bar { display: flex; align-items: center; justify-content: center; padding: 0.5rem; margin-bottom: 0.75rem; }
+.vulkan-island .subtitle-text { font-size: 0.9rem; color: var(--dark); opacity: 0.8; }
+.vulkan-island .progress-container { margin-bottom: 1.5rem; }
+.vulkan-island .progress-bar { height: 8px; background: var(--light); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: 0.4rem; }
+.vulkan-island .progress-fill { height: 100%; background: var(--gradient-island); border-radius: var(--radius-xl); }
+.vulkan-island .progress-text { font-size: 0.8rem; color: var(--dark); opacity: 0.7; text-align: center; display: block; }
+.vulkan-island .xp-reward-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--gradient-island); color: var(--white); padding: 1.5rem 2.5rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); z-index: 1000; text-align: center; }
+.vulkan-island .xp-reward-amount { font-size: 2rem; font-weight: 700; }
+.vulkan-island .coming-soon-banner { background: linear-gradient(135deg, rgba(239, 83, 80, 0.1) 0%, rgba(255, 112, 67, 0.1) 100%); border: 2px dashed var(--secondary); border-radius: var(--radius-lg); padding: 1.5rem; text-align: center; margin-bottom: 1.5rem; }
+.vulkan-island .coming-soon-icon { font-size: 2.5rem; display: block; margin-bottom: 0.5rem; }
+.vulkan-island .coming-soon-banner h3 { margin: 0.5rem 0; color: var(--primary); }
+.vulkan-island .coming-soon-banner p { margin: 0; color: var(--dark); opacity: 0.7; }
+.vulkan-island .quest-overview { padding: 1rem 0; }
+.vulkan-island .quests-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+.vulkan-island .quest-card { position: relative; background: var(--white); border: none; border-radius: var(--radius-lg); padding: 1.2rem 1rem; cursor: pointer; text-align: center; box-shadow: var(--shadow-md); overflow: hidden; }
+.vulkan-island .quest-card .card-glow { position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--quest-color, var(--primary)); }
+.vulkan-island .quest-card .quest-icon { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
+.vulkan-island .quest-card .quest-name { font-size: 0.95rem; font-weight: 600; display: block; margin-bottom: 0.3rem; }
+.vulkan-island .quest-card .quest-description { font-size: 0.8rem; opacity: 0.7; display: block; }
+.vulkan-island .quest-card .xp-preview { margin-top: 0.8rem; font-size: 0.75rem; color: var(--quest-color, var(--primary)); font-weight: 600; }
+.vulkan-island .quest-card.completed { background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); }
+.vulkan-island .quest-card .completed-badge { position: absolute; top: 0.5rem; right: 0.5rem; background: var(--success); color: var(--white); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+.vulkan-island .quest-card.disabled { opacity: 0.7; cursor: not-allowed; }
+.vulkan-island .quest-card .disabled-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, 0.5); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+.vulkan-island .all-complete-banner { background: var(--gradient-island); color: var(--white); padding: 1rem; border-radius: var(--radius-lg); text-align: center; }
+.vulkan-island .phase-container { background: var(--white); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-md); }
+.vulkan-island .phase-header { display: flex; align-items: center; gap: 1rem; padding: 1rem; color: var(--white); }
+.vulkan-island .phase-back-btn { background: rgba(255, 255, 255, 0.2); border: none; color: var(--white); padding: 0.4rem 0.8rem; border-radius: var(--radius-md); cursor: pointer; font-size: 0.85rem; }
+.vulkan-island .phase-header-icon { font-size: 1.5rem; }
+.vulkan-island .phase-header-title { margin: 0; font-size: 1.1rem; font-weight: 600; }
+.vulkan-island .phase-content { padding: 1.5rem; }
+.vulkan-island .placeholder-message { text-align: center; padding: 2rem; }
+.vulkan-island .placeholder-icon { font-size: 3rem; display: block; margin-bottom: 1rem; }
+.vulkan-island .placeholder-message h3 { margin: 0.5rem 0; color: var(--primary); }
+.vulkan-island .placeholder-message p { color: var(--dark); opacity: 0.7; }
+.vulkan-island .back-btn-large { display: block; width: 100%; max-width: 300px; margin: 1rem auto 0; padding: 0.8rem 1.5rem; background: var(--gradient-primary); color: var(--white); border: none; border-radius: var(--radius-md); font-size: 1rem; font-weight: 600; cursor: pointer; }
+@media (max-width: 480px) { .vulkan-island .quests-grid { grid-template-columns: 1fr; } .vulkan-island .island-title { font-size: 1rem; } }

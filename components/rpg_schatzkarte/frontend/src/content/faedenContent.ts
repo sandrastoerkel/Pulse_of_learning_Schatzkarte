@@ -36,17 +36,17 @@ const GRUNDSCHULE_CONTENT: IslandContent = {
     placeholder: true
   },
   explanation: {
-    intro: `**Stell dir dein Gehirn wie ein Spinnennetz vor!** 🕸️
+    intro: `**Stell dir dein Gehirn vor wie ein Freundschaftsband, das du knüpfst!** 🧶
 
-Jedes Mal wenn du etwas lernst, ist das wie ein neuer Faden im Netz.
+Jedes Mal wenn du etwas lernst, ist das wie ein neuer Faden, den du einwebst.
 
 Wenn jemand dir etwas Neues erzählt und du hast schon einen Faden dazu –
-dann kannst du das Neue einfach dranhängen! Easy! ✨
+dann kannst du das Neue einfach dranknüpfen! Easy! ✨
 
 Aber wenn du KEINEN Faden hast?
-Dann ist es wie wenn eine Fliege am Netz vorbeifliegt – sie bleibt nicht hängen! 🪰
+Dann ist es wie ein loses Stück Wolle – es fällt einfach runter! 🧵
 
-**Das Geheimnis:** Du musst erst einen Faden haben, dann bleibt alles hängen!`,
+**Das Geheimnis:** Du musst erst einen Faden haben, dann hält alles zusammen!`,
     sections: [
       {
         title: "Die Geschichte vom Zauberwort ✨",
@@ -82,43 +82,30 @@ Warum? Weil DEIN Gedanke der Faden ist, an dem das Neue hängt!`,
         type: 'success'
       },
       {
-        title: "Das Faden-Experiment! 🔬",
-        content: `Vera Birkenbihl hat dieses Experiment mit tausenden Menschen gemacht!
+        title: "Dein Wissen ist wie ein Freundschaftsband! 🧶",
+        content: `Hast du schon mal ein **Freundschaftsband** geknüpft?
+Oder kennst du das **Straßennetz** in deiner Stadt?
 
-**So geht's:**
-1. Ich sage dir gleich 5 Wörter
-2. Du darfst sie NICHT aufschreiben!
-3. Du darfst sie dir NICHT merken wollen!
-4. Du schreibst nur auf: "Was fällt MIR dazu ein?"
+**🧶 Wie ein Freundschaftsband:**
+Jeder neue Faden, den du dazuknüpfst, macht das Band stärker!
+Am Anfang hast du nur einen dünnen Faden – aber je mehr du knüpfst, desto bunter und stabiler wird es!
 
-**Beispiel:** Ich sage "Drache" 🐉
-Du schreibst: "Feuer, fliegen, Minecraft, cool"
-(NICHT das Wort "Drache"!)
+Genauso ist es mit deinem Wissen: Jede neue Sache, die du lernst, ist ein neuer Faden, den du an die anderen knüpfst!
 
-**Probier es mit diesen Wörtern:**
-🍦 Eiscreme - Was fällt dir ein? Sommer? Lieblingssorte?
-🛹 Skateboard - Tricks? Park? YouTube-Videos?
-🌈 Regenbogen - Farben? Nach dem Regen? Einhorn?
-🚀 Rakete - Weltraum? Silvester? SpaceX?
-🦖 Dinosaurier - T-Rex? Jurassic Park? Ausgestorben?`,
-        type: 'expander',
-        expanded: true
-      },
-      {
-        title: "Dein Gehirn ist ein Spinnennetz! 🕷️",
-        content: `Stell dir vor: Jedes Mal wenn du etwas lernst,
-kommt ein neuer Faden in dein Netz.
+**🛣️ Wie ein Straßennetz:**
+Stell dir eine Stadt vor. Die Straßen verbinden alle Orte miteinander.
+Wenn du von der Schule zum Spielplatz willst, nimmst du eine Straße.
+Wenn eine Straße fehlt? Dann kommst du nicht hin!
 
-Je MEHR Fäden du hast, desto mehr neue Sachen bleiben hängen!
+Dein Gehirn funktioniert genauso: Je mehr "Straßen" du baust, desto schneller findest du alles!
 
 **Das Problem:**
-Manche Kinder haben zu einem Thema NULL Fäden.
-Dann ist es wie ein Netz mit riesigen Löchern – alles fällt durch!
+Manche Kinder haben zu einem Thema NULL Fäden – wie ein Armband ohne Knoten oder eine Stadt ohne Straßen. Dann fällt alles auseinander!
 
 **Die Lösung:**
-Erst Fäden bauen! Dann lernen!
+Erst Fäden knüpfen! Erst Straßen bauen! DANN lernen!
 
-Wie baut man Fäden? Indem man SELBER Erfahrungen macht!`,
+Wie? Indem du SELBER nachdenkst: "Was kenne ich schon dazu?"`,
         type: 'expander'
       },
       {
@@ -145,7 +132,7 @@ Wie baut man Fäden? Indem man SELBER Erfahrungen macht!`,
         title: "Fun Fact 🧠",
         content: `Vera Birkenbihl sagte: "Ob etwas leicht oder schwer ist, hat nur damit zu tun, ob du einen Faden hast – nicht wie schlau du bist!"
 
-Das größte Spinnennetz der Welt ist 25 Meter breit! Dein Wissensnetz kann noch viel größer werden! 🕸️`,
+Wusstest du? Das längste Freundschaftsband der Welt ist über 2 Kilometer lang! 🧶 Und das größte Straßennetz (in den USA) hat über 6 Millionen Kilometer! 🛣️ Dein Wissensnetz kann noch viel größer werden!`,
         type: 'info'
       }
     ]
@@ -214,36 +201,12 @@ Was sagt Birkenbihl? **"Das ist der größte Lernfehler!"**
 **Was sollst du stattdessen tun?**
 Schreib auf, was DU DENKST, während du zuhörst!
 
-**Beispiel Meeting (Birkenbihl):**
-Chef redet über Dienstwagen.
-Dir fällt ein: "Dietrich hat damals einen Dienstwagen ergattert!"
-→ Du schreibst: "Dietrich"
-→ An "Dietrich" hängt ALLES was du brauchst!`,
+**Beispiel aus dem Unterricht:**
+Der Lehrer erklärt die Römer und sagt: "Die Römer haben Straßen gebaut."
+Dir fällt ein: "Assassin's Creed! Da laufe ich immer durch Rom!"
+→ Du schreibst: "AC Rom"
+→ An "AC Rom" hängt ALLES was du über römische Straßen brauchst!`,
         type: 'success'
-      },
-      {
-        title: "Das Birkenbihl-Experiment! 🔬",
-        content: `Das Original-Experiment aus Birkenbihl's Seminar!
-
-**Die Regeln:**
-1. Ich nenne dir 5 Begriffe
-2. Du darfst sie NICHT aufschreiben
-3. Du darfst sie dir NICHT merken wollen!
-4. Du schreibst NUR auf: Was fällt DIR dazu ein?
-
-**Wichtig:** Beobachte dein eigenes Denken!
-Was für Bilder tauchen auf? Welche Erinnerungen?
-
-**Probier es mit diesen Wörtern:**
-😀 Emoji - Welches benutzt du am meisten?
-🚁 Drohne - Videos? Fliegen? Teuer?
-🎧 Bluetooth - Kopfhörer? Verbinden?
-📺 Streaming - Netflix? YouTube? Serien?
-🤖 Algorithmus - TikTok? Vorgeschlagen?
-
-**Fun Fact:** Birkenbihl hat über 30.000 Menschen mit diesem Experiment getestet – und ALLE haben besser erinnert, wenn sie eigene Gedanken notierten! 📊`,
-        type: 'expander',
-        expanded: true
       },
       {
         title: "Das Wissensnetz-Prinzip",
@@ -265,30 +228,6 @@ Wenn jemand etwas über Fußball erzählt, bleibt ALLES hängen!
 Null Fäden? Dann geht es rein und direkt wieder raus!
 
 **Die Lösung:** Erst Fäden bauen, dann lernen!`,
-        type: 'expander'
-      },
-      {
-        title: "Die 30-Tage-Birkenbihl-Challenge! 🏆",
-        content: `Trainiere 30 Tage lang – und werde zum Faden-Meister!
-
-**Woche 1: Nachrichten-Training**
-- 5 Min/Tag Nachrichten schauen
-- Eigene Gedanken notieren
-- Danach: Was ist hängengeblieben?
-
-**Woche 2: Schul-Training**
-- In EINER Stunde: Nur eigene Gedanken notieren
-- Vergleiche: Wie viel weißt du?
-
-**Woche 3: Lese-Training**
-- Bei jedem Text: Gedanken-Spalte!
-- Links: Stichworte | Rechts: Eigene Gedanken
-
-**Woche 4: Meister-Level**
-- Kombiniere alles!
-- Erkläre es einem Freund!
-
-**Nach 30 Tagen wird die Faden-Methode automatisch – dein Gehirn macht es ohne nachzudenken!** 🧠`,
         type: 'expander'
       },
       {
@@ -382,29 +321,6 @@ Je tiefer die Verarbeitung, desto besser die Erinnerung.
         type: 'success'
       },
       {
-        title: "Das wissenschaftliche Experiment 🔬",
-        content: `Birkenbihl's Original-Experiment (30.000+ Teilnehmer!)
-
-**Ablauf:**
-1. Du hörst 5 Fachbegriffe
-2. Du schreibst NICHT die Begriffe auf!
-3. Du notierst NUR: Was fällt MIR dazu ein?
-4. Danach prüfen wir: Wie viel erinnerst du?
-
-**Die Erkenntnis:**
-Wer seine eigenen Gedanken notiert, erinnert MEHR
-als wer versucht, die Wörter auswendig zu lernen!
-
-**Probier es:**
-😀 Emoji - Assoziationen notieren!
-🚁 Drohne - Deine Bilder, Erinnerungen!
-🎧 Bluetooth - Was verbindest DU damit?
-📺 Streaming - Persönliche Assoziationen!
-🤖 Algorithmus - Egal wie wenig – notiere es!`,
-        type: 'expander',
-        expanded: true
-      },
-      {
         title: "Assoziative Netzwerke und Spreading Activation",
         content: `Vera Birkenbihl nutzte das Modell der assoziativen Netzwerke:
 
@@ -432,25 +348,6 @@ Beispiel: "Bank"
 → Geld, Sitzen, Park, Sparkasse, Räuber, Tresor, Holz, Fluss...
 
 Siehst du? Von "Bank" (Sitzen) zu "Fluss" (Flussufer) – alles verbunden!`,
-        type: 'expander'
-      },
-      {
-        title: "Das Birkenbihl-Tagebuch 📓",
-        content: `Führe ein "Faden-Tagebuch" für 2 Wochen:
-
-**Täglich notieren:**
-1. Situation (Unterricht/Video/Gespräch)
-2. Thema
-3. Meine Fäden (was fiel mir ein?)
-4. Ergebnis (wie viel behalten?)
-5. Reflexion (was hat funktioniert?)
-
-**Wöchentliche Auswertung:**
-- Bei welchen Themen hatte ich viele Fäden?
-- Wo fehlten Fäden?
-- Wie kann ich Fäden aufbauen?
-
-**Tipp:** Birkenbihl empfahl: "Üben Sie bei den Nachrichten!" – Perfektes tägliches Training! 📺`,
         type: 'expander'
       },
       {

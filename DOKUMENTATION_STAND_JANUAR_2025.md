@@ -1,5 +1,5 @@
 # Pulse of Learning - Schatzkarte
-## Dokumentation Stand 12. Januar 2025
+## Dokumentation Stand 13. Januar 2025
 
 ---
 
@@ -21,20 +21,40 @@ Danach hast du Zugang zur **👥 Lerngruppen**-Seite.
 
 ---
 
-# HEUTIGE ÄNDERUNGEN (12. Januar 2025)
+# HEUTIGE ÄNDERUNGEN (13. Januar 2025)
 
-## Neues Insel-Design-System - Festung & Brücken komplett neu! 🎨
+## Neues Insel-Design-System - Alle 14 Inseln komplett! 🎨
 
-Die **Festung der Stärke** und **Insel der Brücken** wurden komplett mit einem neuen, animierten Design-System überarbeitet. Dieses Design soll morgen auf **alle anderen Inseln** angewendet werden!
+**ERLEDIGT!** Das animierte Design-System wurde auf **alle 14 Inseln** angewendet! Jede Insel hat jetzt:
+- Eine eigene Experience-Komponente mit Framer Motion Animationen
+- Eine eigene CSS-Datei mit insel-spezifischen Farben
+- Quest-Karten für Video, Scroll, Quiz und Challenge
+- "Coming Soon"-Placeholder für Inseln ohne Inhalt
 
-### Neue Dateien erstellt:
+### Neue Dateien erstellt (13. Januar):
 
 | Datei | Beschreibung |
 |-------|--------------|
-| `FestungIslandExperience.tsx` | **NEU** - Animierte Festung-Insel |
-| `BrueckenIslandExperience.tsx` | **NEU** - Animierte Brücken-Insel |
-| `festung-island.css` | **NEU** - CSS für Festung (~400 Zeilen) |
-| `bruecken-island.css` | **NEU** - CSS für Brücken (~400 Zeilen) |
+| `SpiegelSeeIslandExperience.tsx` | Spiegel-See Experience (Blau) |
+| `VulkanIslandExperience.tsx` | Vulkan Experience (Rot) |
+| `RuheOaseIslandExperience.tsx` | Ruhe-Oase Experience (Türkis) |
+| `AusdauerGipfelIslandExperience.tsx` | Ausdauer-Gipfel Experience (Orange) |
+| `FokusLeuchtturmIslandExperience.tsx` | Fokus-Leuchtturm Experience (Hellorange) |
+| `WachstumGartenIslandExperience.tsx` | Wachstums-Garten Experience (Grün) |
+| `LehrerTurmIslandExperience.tsx` | Lehrer-Turm Experience (Lila) |
+| `WohlfuehlDorfIslandExperience.tsx` | Wohlfühl-Dorf Experience (Sanftgrün) |
+| `SchutzBurgIslandExperience.tsx` | Schutz-Burg Experience (Pink) |
+| `MeisterBergIslandExperience.tsx` | Berg der Meisterschaft Experience (Gold) |
+| 10 CSS-Dateien | Entsprechende Styles für jede Insel |
+
+### Neue Dateien erstellt (12. Januar):
+
+| Datei | Beschreibung |
+|-------|--------------|
+| `FestungIslandExperience.tsx` | Animierte Festung-Insel |
+| `BrueckenIslandExperience.tsx` | Animierte Brücken-Insel |
+| `festung-island.css` | CSS für Festung (~400 Zeilen) |
+| `bruecken-island.css` | CSS für Brücken (~400 Zeilen) |
 | `TransferChallenge.tsx` | **ÜBERARBEITET** - Kreative 4-Phasen Challenge |
 | `transferChallengeTypes.ts` | **ÜBERARBEITET** - Neue Inhalte |
 
@@ -314,20 +334,31 @@ import { [Insel]IslandExperience } from './[Insel]IslandExperience';
 
 ---
 
-## Checkliste: Welche Inseln fehlen noch?
+## Checkliste: Design-Status aller Inseln
 
-| Insel | Experience | CSS | Quiz GS | Quiz US | Quiz MS | Challenge |
-|-------|------------|-----|---------|---------|---------|-----------|
-| Festung der Stärke | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ (Schiffe) |
-| Insel der Brücken | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ (Transfer) |
-| Insel der 7 Werkzeuge | ❌ | ❌ | ✅ | ❌ | ❌ | ✅ (Powertechniken) |
-| Insel der Fäden | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Spiegel-See | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Vulkan der Motivation | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Ruhe-Oase | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| ... (weitere) | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| # | Insel | Experience | CSS | Quiz GS | Quiz US | Quiz MS | Challenge |
+|:-:|-------|:----------:|:---:|:-------:|:-------:|:-------:|:---------:|
+| 1 | 🏰 Festung der Stärke | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ (Schiffe) |
+| 2 | 🔧 Insel der 7 Werkzeuge | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ (Powertechniken) |
+| 3 | 🌉 Insel der Brücken | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ (Transfer) |
+| 4 | 🧵 Insel der Fäden | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ (Fäden) |
+| 5 | 🧠 Spiegel-See | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| 6 | 🔥 Vulkan der Motivation | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| 7 | 😌 Ruhe-Oase | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| 8 | 🏆 Ausdauer-Gipfel | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| 9 | 🎯 Fokus-Leuchtturm | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| 10 | 🌱 Wachstums-Garten | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| 11 | 🏫 Lehrer-Turm | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| 12 | 🏠 Wohlfühl-Dorf | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| 13 | 🛡️ Schutz-Burg | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| 14 | ⛰️ Berg der Meisterschaft | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
 
 **Legende:** GS = Grundschule, US = Unterstufe, MS = Mittelstufe
+
+### Zusammenfassung:
+- **Design (Experience + CSS):** ✅ Alle 14 Inseln fertig!
+- **Quiz fehlt noch:** Werkzeuge (US/MS), Fäden (alle), Inseln 5-14 (alle)
+- **Challenge fehlt noch:** Inseln 5-14
 
 ---
 
@@ -419,12 +450,11 @@ Neuer Floating-Button unten rechts auf der Weltkarte:
 
 ---
 
-## TODO für 13. Januar
+## TODO für 14. Januar
 
-### 1. 🎨 Design auf alle Inseln anwenden (HAUPTAUFGABE!)
-Das neue animierte Design von Festung & Brücken auf alle anderen Inseln übertragen.
-- **Siehe oben:** "DESIGN-SYSTEM FÜR INSELN (Template für morgen!)"
-- Priorität: Insel der 7 Werkzeuge → Insel der Fäden → Rest
+### 1. ✅ ~~🎨 Design auf alle Inseln anwenden~~ (ERLEDIGT 13. Januar!)
+~~Das neue animierte Design von Festung & Brücken auf alle anderen Inseln übertragen.~~
+**Gelöst!** Alle 14 Inseln haben jetzt das Design-System (Experience + CSS).
 
 ### 2. ✅ ~~BUG: Superhelden-Tagebuch~~ (ERLEDIGT 12. Januar)
 ~~**Problem:** Das Superhelden-Tagebuch öffnete sich nicht.~~
@@ -433,6 +463,17 @@ Das neue animierte Design von Festung & Brücken auf alle anderen Inseln übertr
 ### 3. Quiz für Festung - Mittelstufe
 **Problem:** Festung hat noch kein Quiz für Mittelstufe (fällt auf Grundschule zurück).
 - Datei erstellen: `festungQuizContent_mittelstufe.ts`
+
+### 4. Quiz für alle Stufen - Fäden-Insel
+**Problem:** Fäden-Insel hat noch kein Quiz für alle Altersstufen.
+- Datei erstellen: `faedenQuizContent.ts` (Grundschule)
+- Datei erstellen: `faedenQuizContent_unterstufe.ts`
+- Datei erstellen: `faedenQuizContent_mittelstufe.ts`
+
+### 5. Quiz für Werkzeuge - Unterstufe & Mittelstufe
+**Problem:** Werkzeuge-Insel hat nur Quiz für Grundschule.
+- Datei erstellen: `werkzeugeQuizContent_unterstufe.ts`
+- Datei erstellen: `werkzeugeQuizContent_mittelstufe.ts`
 
 ---
 
@@ -805,24 +846,37 @@ Pulse_of_learning_Schatzkarte/
 
 ---
 
-# NÄCHSTE SCHRITTE (13. Januar 2025)
+# NÄCHSTE SCHRITTE (14. Januar 2025)
 
 ## Hohe Priorität
-1. **🎨 Design auf alle Inseln anwenden** (HAUPTAUFGABE!)
-   - Nutze das Template aus "DESIGN-SYSTEM FÜR INSELN"
-   - Reihenfolge: Werkzeuge → Fäden → Spiegel-See → Rest
-   - Pro Insel: ~30 Min (Experience.tsx + CSS kopieren & anpassen)
-2. **Quiz für Festung - Mittelstufe** - `festungQuizContent_mittelstufe.ts` erstellen
-3. **Insel der 7 Werkzeuge - UNTERSTUFE** - Challenge für ältere Schüler erstellen
+1. **Quiz für Festung - Mittelstufe** - `festungQuizContent_mittelstufe.ts` erstellen
+2. **Quiz für Werkzeuge - Unterstufe** - `werkzeugeQuizContent_unterstufe.ts` erstellen
+3. **Quiz für Werkzeuge - Mittelstufe** - `werkzeugeQuizContent_mittelstufe.ts` erstellen
+4. **Quiz für Fäden - Alle Stufen** - `faedenQuizContent.ts` + US + MS erstellen
 
 ## Mittlere Priorität
-4. **Quiz-Ergebnisse speichern** - Datenbank-Erweiterung
-5. **Willkommensvideo** - YouTube-URL produzieren
-6. **Quiz für weitere Inseln** - Fäden, Spiegel-See etc.
+5. **Video URLs eintragen** - Werkzeuge, Brücken, Fäden haben Placeholder-Videos
+6. **Inhalt für Spiegel-See** - Als nächste leere Insel mit Inhalt befüllen
+7. **Quiz-Ergebnisse speichern** - Datenbank-Erweiterung
 
 ## Niedrige Priorität
-7. **Gruppenchat** - Lösung finden
-8. **Weitere Selfchecks** - Für andere Altersstufen/Inseln
+8. **Inhalt für restliche Inseln** - Vulkan, Ruhe-Oase, Ausdauer-Gipfel, etc.
+9. **Willkommensvideo** - YouTube-URL produzieren
+10. **Gruppenchat** - Lösung finden
+
+## ✅ ERLEDIGT (13. Januar)
+- ~~🎨 Design auf alle Inseln anwenden~~ → **Alle 14 Inseln haben jetzt das Design-System!**
+  - SpiegelSeeIslandExperience.tsx + spiegel-see-island.css (Blau)
+  - VulkanIslandExperience.tsx + vulkan-island.css (Rot)
+  - RuheOaseIslandExperience.tsx + ruhe-oase-island.css (Türkis)
+  - AusdauerGipfelIslandExperience.tsx + ausdauer-gipfel-island.css (Orange)
+  - FokusLeuchtturmIslandExperience.tsx + fokus-leuchtturm-island.css (Hellorange)
+  - WachstumGartenIslandExperience.tsx + wachstum-garten-island.css (Grün)
+  - LehrerTurmIslandExperience.tsx + lehrer-turm-island.css (Lila)
+  - WohlfuehlDorfIslandExperience.tsx + wohlfuehl-dorf-island.css (Sanftgrün)
+  - SchutzBurgIslandExperience.tsx + schutz-burg-island.css (Pink)
+  - MeisterBergIslandExperience.tsx + meister-berg-island.css (Gold)
+- QuestModal.tsx aktualisiert mit allen neuen Imports und Routing
 
 ## ✅ ERLEDIGT (12. Januar)
 - ~~Superhelden-Tagebuch Bug~~ → useEffect für State-Sync hinzugefügt!
@@ -864,6 +918,9 @@ components/rpg_schatzkarte/frontend/
 
 | Datum | Was | Details |
 |-------|-----|---------|
+| **13.01.2025** | **🎨 Design auf ALLE 14 Inseln** | 10 neue Experience-Komponenten + 10 CSS-Dateien erstellt! |
+| 13.01.2025 | Neue Experience-Komponenten | SpiegelSee, Vulkan, RuheOase, AusdauerGipfel, FokusLeuchtturm, WachstumGarten, LehrerTurm, WohlfuehlDorf, SchutzBurg, MeisterBerg |
+| 13.01.2025 | Dokumentation aktualisiert | SCHATZKARTE_STATUS_UEBERSICHT.md komplett überarbeitet |
 | **12.01.2025** | **🎨 Neues Insel-Design-System** | FestungIslandExperience + BrueckenIslandExperience mit Framer Motion Animationen |
 | 12.01.2025 | TransferChallenge Redesign | 4 kreative Phasen: Verbindungen, Mein Trick, Mission, Tagebuch |
 | 12.01.2025 | Bug-Fix SuperheldenTagebuch | useEffect für isOpen State-Sync hinzugefügt |
@@ -895,7 +952,7 @@ components/rpg_schatzkarte/frontend/
 
 ---
 
-# WENN DU MORGEN WEITERARBEITEST
+# WENN DU WEITERARBEITEST
 
 ## Schnellstart
 ```bash
@@ -905,65 +962,52 @@ cd /Users/sandra/Documents/Pulse_of_learning/Pulse_of_learning_Schatzkarte
 streamlit run Home.py
 ```
 
-## 🎨 HAUPTAUFGABE: Design auf alle Inseln anwenden
+## 🎨 Design-System ist FERTIG!
 
-### Schritt-für-Schritt Anleitung:
+Alle 14 Inseln haben jetzt das animierte Design-System. Die nächsten Aufgaben sind:
 
-**1. Wähle die nächste Insel** (z.B. `werkzeuge`)
+### HAUPTAUFGABE: Quiz-Content erstellen
 
-**2. Erstelle die Experience-Komponente:**
-```bash
-# Kopiere als Template
-cp frontend/src/components/FestungIslandExperience.tsx \
-   frontend/src/components/WerkzeugeIslandExperience.tsx
-```
+**Priorität 1: Festung Mittelstufe**
+- Erstelle: `festungQuizContent_mittelstufe.ts`
+- Template: Kopiere von `festungQuizContent_unterstufe.ts`
+- Passe Fragen für 15-18 Jahre an
 
-**3. Erstelle die CSS-Datei:**
-```bash
-cp frontend/src/styles/festung-island.css \
-   frontend/src/styles/werkzeuge-island.css
-```
+**Priorität 2: Werkzeuge Unterstufe/Mittelstufe**
+- Erstelle: `werkzeugeQuizContent_unterstufe.ts`
+- Erstelle: `werkzeugeQuizContent_mittelstufe.ts`
+- Template: Kopiere von `werkzeugeQuizContent.ts`
 
-**4. Passe an:**
-- Suchen & Ersetzen: `festung` → `werkzeuge`, `Festung` → `Werkzeuge`
-- CSS-Variablen anpassen (Farben passend zur Insel)
-- Content importieren: `WERKZEUGE_CONTENT` statt `FESTUNG_CONTENT`
-- Quiz importieren: `WERKZEUGE_QUIZ_QUESTIONS`
-- Challenge anpassen (Powertechniken statt Schiffe)
-
-**5. In QuestModal.tsx einbinden:**
-```tsx
-import { WerkzeugeIslandExperience } from './WerkzeugeIslandExperience';
-
-// Im JSX:
-island.id === 'werkzeuge' ? (
-  <WerkzeugeIslandExperience ... />
-) :
-```
-
-**6. Build & Test:**
-```bash
-npm run build
-# App neu laden, Insel testen
-```
-
-### Farb-Vorschläge pro Insel:
-
-| Insel | Primär | Sekundär | Gradient |
-|-------|--------|----------|----------|
-| Werkzeuge | #81c784 | #4caf50 | Grün |
-| Fäden | #ba68c8 | #9c27b0 | Lila |
-| Spiegel-See | #90caf9 | #2196f3 | Blau |
-| Vulkan | #ef5350 | #f44336 | Rot/Orange |
-| Ruhe-Oase | #80deea | #26c6da | Türkis |
+**Priorität 3: Fäden alle Stufen**
+- Erstelle: `faedenQuizContent.ts` (Grundschule)
+- Erstelle: `faedenQuizContent_unterstufe.ts`
+- Erstelle: `faedenQuizContent_mittelstufe.ts`
 
 ## Zum Testen des neuen Designs:
 
 1. Schatzkarte öffnen
-2. **Festung der Stärke** anklicken → Neues animiertes Design!
-3. **Insel der Brücken** anklicken → Gleiches Design!
-4. Alle 4 Quest-Karten durchklicken (Video, Scroll, Quiz, Challenge)
-5. XP-Popup prüfen, Animationen prüfen
+2. **Jede Insel** anklicken → Alle haben jetzt animiertes Design!
+3. Quest-Karten zeigen "Coming Soon" für leere Inseln
+4. XP-Popup und Animationen prüfen
+
+## Farb-Schema aller Inseln:
+
+| Insel | Farbe | CSS-Datei |
+|-------|-------|-----------|
+| 🏰 Festung | Lila/Pink | festung-island.css |
+| 🔧 Werkzeuge | Grün | werkzeuge-island.css |
+| 🌉 Brücken | Türkis | bruecken-island.css |
+| 🧵 Fäden | Lila | faeden-island.css |
+| 🧠 Spiegel-See | Blau | spiegel-see-island.css |
+| 🔥 Vulkan | Rot | vulkan-island.css |
+| 😌 Ruhe-Oase | Türkis | ruhe-oase-island.css |
+| 🏆 Ausdauer-Gipfel | Orange | ausdauer-gipfel-island.css |
+| 🎯 Fokus-Leuchtturm | Hellorange | fokus-leuchtturm-island.css |
+| 🌱 Wachstums-Garten | Grün | wachstum-garten-island.css |
+| 🏫 Lehrer-Turm | Lila | lehrer-turm-island.css |
+| 🏠 Wohlfühl-Dorf | Sanftgrün | wohlfuehl-dorf-island.css |
+| 🛡️ Schutz-Burg | Pink | schutz-burg-island.css |
+| ⛰️ Berg der Meisterschaft | Gold | meister-berg-island.css |
 
 ## Bei Problemen
 - **"Component nicht gefunden"?** → `cd components/rpg_schatzkarte/frontend && npm run build`
@@ -986,5 +1030,5 @@ npm run build
 
 ---
 
-**Letzte Bearbeitung:** 12. Januar 2025
-**Nächster Meilenstein:** Design auf alle Inseln anwenden (Werkzeuge → Fäden → Rest)
+**Letzte Bearbeitung:** 13. Januar 2025
+**Nächster Meilenstein:** Quiz-Content für fehlende Stufen erstellen (Festung MS, Werkzeuge US/MS, Fäden alle)

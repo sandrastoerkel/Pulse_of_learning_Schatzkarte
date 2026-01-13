@@ -1,0 +1,64 @@
+/* Fokus-Leuchtturm Island - Styles (Light Orange Theme) */
+
+.fokus-leuchtturm-island {
+  --primary: #ff7043;
+  --secondary: #ffab91;
+  --accent: #ffccbc;
+  --success: #27ae60;
+  --dark: #2c3e50;
+  --light: #f8f9fa;
+  --white: #ffffff;
+  --gradient-primary: linear-gradient(135deg, #ff7043 0%, #ffab91 100%);
+  --gradient-island: linear-gradient(135deg, #e64a19 0%, #ff5722 50%, #ffab91 100%);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.15);
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 30px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(180deg, #fbe9e7 0%, #ffccbc 100%);
+  min-height: 100%;
+  padding: 1rem;
+  color: var(--dark);
+}
+
+.fokus-leuchtturm-island .island-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; }
+.fokus-leuchtturm-island .island-title { font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; margin: 0; }
+.fokus-leuchtturm-island .title-icon { font-size: 1.5rem; }
+.fokus-leuchtturm-island .back-btn { background: var(--light); border: none; padding: 0.5rem 1rem; border-radius: var(--radius-md); cursor: pointer; }
+.fokus-leuchtturm-island .xp-badge { display: flex; align-items: center; gap: 0.4rem; background: var(--gradient-primary); color: var(--white); padding: 0.4rem 0.8rem; border-radius: var(--radius-xl); font-weight: 600; }
+.fokus-leuchtturm-island .island-subtitle-bar { display: flex; justify-content: center; padding: 0.5rem; margin-bottom: 0.75rem; }
+.fokus-leuchtturm-island .subtitle-text { font-size: 0.9rem; opacity: 0.8; }
+.fokus-leuchtturm-island .progress-container { margin-bottom: 1.5rem; }
+.fokus-leuchtturm-island .progress-bar { height: 8px; background: var(--light); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: 0.4rem; }
+.fokus-leuchtturm-island .progress-fill { height: 100%; background: var(--gradient-island); border-radius: var(--radius-xl); }
+.fokus-leuchtturm-island .progress-text { font-size: 0.8rem; opacity: 0.7; text-align: center; display: block; }
+.fokus-leuchtturm-island .xp-reward-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--gradient-island); color: var(--white); padding: 1.5rem 2.5rem; border-radius: var(--radius-lg); z-index: 1000; text-align: center; }
+.fokus-leuchtturm-island .xp-reward-amount { font-size: 2rem; font-weight: 700; }
+.fokus-leuchtturm-island .coming-soon-banner { background: linear-gradient(135deg, rgba(255, 112, 67, 0.1) 0%, rgba(255, 171, 145, 0.1) 100%); border: 2px dashed var(--secondary); border-radius: var(--radius-lg); padding: 1.5rem; text-align: center; margin-bottom: 1.5rem; }
+.fokus-leuchtturm-island .coming-soon-icon { font-size: 2.5rem; display: block; margin-bottom: 0.5rem; }
+.fokus-leuchtturm-island .coming-soon-banner h3 { margin: 0.5rem 0; color: var(--primary); }
+.fokus-leuchtturm-island .coming-soon-banner p { margin: 0; opacity: 0.7; }
+.fokus-leuchtturm-island .quest-overview { padding: 1rem 0; }
+.fokus-leuchtturm-island .quests-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+.fokus-leuchtturm-island .quest-card { position: relative; background: var(--white); border: none; border-radius: var(--radius-lg); padding: 1.2rem 1rem; cursor: pointer; text-align: center; box-shadow: var(--shadow-md); overflow: hidden; }
+.fokus-leuchtturm-island .quest-card .card-glow { position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--quest-color, var(--primary)); }
+.fokus-leuchtturm-island .quest-card .quest-icon { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
+.fokus-leuchtturm-island .quest-card .quest-name { font-size: 0.95rem; font-weight: 600; display: block; margin-bottom: 0.3rem; }
+.fokus-leuchtturm-island .quest-card .quest-description { font-size: 0.8rem; opacity: 0.7; display: block; }
+.fokus-leuchtturm-island .quest-card .xp-preview { margin-top: 0.8rem; font-size: 0.75rem; color: var(--quest-color, var(--primary)); font-weight: 600; }
+.fokus-leuchtturm-island .quest-card.completed { background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); }
+.fokus-leuchtturm-island .quest-card .completed-badge { position: absolute; top: 0.5rem; right: 0.5rem; background: var(--success); color: var(--white); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.fokus-leuchtturm-island .quest-card.disabled { opacity: 0.7; cursor: not-allowed; }
+.fokus-leuchtturm-island .quest-card .disabled-overlay { position: absolute; inset: 0; background: rgba(255, 255, 255, 0.5); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+.fokus-leuchtturm-island .phase-container { background: var(--white); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-md); }
+.fokus-leuchtturm-island .phase-header { display: flex; align-items: center; gap: 1rem; padding: 1rem; color: var(--white); }
+.fokus-leuchtturm-island .phase-back-btn { background: rgba(255, 255, 255, 0.2); border: none; color: var(--white); padding: 0.4rem 0.8rem; border-radius: var(--radius-md); cursor: pointer; }
+.fokus-leuchtturm-island .phase-header-icon { font-size: 1.5rem; }
+.fokus-leuchtturm-island .phase-header-title { margin: 0; font-size: 1.1rem; font-weight: 600; }
+.fokus-leuchtturm-island .phase-content { padding: 1.5rem; }
+.fokus-leuchtturm-island .placeholder-message { text-align: center; padding: 2rem; }
+.fokus-leuchtturm-island .placeholder-icon { font-size: 3rem; display: block; margin-bottom: 1rem; }
+.fokus-leuchtturm-island .placeholder-message h3 { margin: 0.5rem 0; color: var(--primary); }
+.fokus-leuchtturm-island .placeholder-message p { opacity: 0.7; }
+.fokus-leuchtturm-island .back-btn-large { display: block; width: 100%; max-width: 300px; margin: 1rem auto 0; padding: 0.8rem 1.5rem; background: var(--gradient-primary); color: var(--white); border: none; border-radius: var(--radius-md); font-size: 1rem; font-weight: 600; cursor: pointer; }
+@media (max-width: 480px) { .fokus-leuchtturm-island .quests-grid { grid-template-columns: 1fr; } .fokus-leuchtturm-island .island-title { font-size: 1rem; } }

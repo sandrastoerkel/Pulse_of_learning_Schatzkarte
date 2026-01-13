@@ -139,6 +139,8 @@ function RPGSchatzkarteContent({
     completedTechniques: [],
     applications: {} as Record<TechniqueKey, string>
   });
+  // Direkt zur Challenge springen wenn über Lerntechniken-Widget geöffnet
+  const [startWerkzeugeWithChallenge, setStartWerkzeugeWithChallenge] = useState(false);
 
   const handleIslandClick = useCallback((islandId: string) => {
     const island = islands.find(i => i.id === islandId);
@@ -186,6 +188,7 @@ function RPGSchatzkarteContent({
   const handleCloseModal = useCallback(() => {
     setShowQuestModal(false);
     setSelectedIsland(null);
+    setStartWerkzeugeWithChallenge(false); // Reset Challenge-Start-Flag
   }, []);
 
   // Bandura Ship Modal handlers
@@ -378,13 +381,14 @@ function RPGSchatzkarteContent({
     setShowTagebuch(prev => !prev);
   }, []);
 
-  // Lerntechniken-Übersicht Handler - Direkt zur Insel der 7 Werkzeuge
+  // Lerntechniken-Übersicht Handler - Direkt zur Challenge der 7 Werkzeuge
   const handleLerntechnikenClick = useCallback(() => {
     // Wenn alle 7 Techniken abgeschlossen und Zertifikat verdient, zeige Zertifikat
     if (powertechnikenProgress.completedTechniques.length === 7) {
       setShowZertifikat(true);
     } else {
-      // Direkt zur Insel der 7 Werkzeuge navigieren
+      // Direkt zur Challenge der Insel der 7 Werkzeuge navigieren
+      setStartWerkzeugeWithChallenge(true);
       handleIslandClick('werkzeuge');
     }
   }, [powertechnikenProgress.completedTechniques.length, handleIslandClick]);
@@ -450,6 +454,7 @@ function RPGSchatzkarteContent({
           onOpenTagebuch={handleTagebuchToggle}
           onOpenBandura={handleBanduraShipClick}
           onOpenHattie={handleHattieShipClick}
+          startWerkzeugeWithChallenge={startWerkzeugeWithChallenge}
         />
       )}
 
