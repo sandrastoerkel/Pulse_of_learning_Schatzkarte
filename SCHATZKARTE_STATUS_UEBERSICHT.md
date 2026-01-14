@@ -1,5 +1,40 @@
 # Schatzkarte - Status Übersicht
-## Stand: 13. Januar 2025
+## Stand: 14. Januar 2025
+
+---
+
+# Änderungen vom 14. Januar 2025
+
+## Karten-Anpassungen
+- Hintergrundbild auf 115% Breite gestreckt (keine blauen Ränder mehr)
+- Alle 15 Inseln gleichmäßig auf der Landmasse verteilt (y: 12-85)
+
+## Video-Chat Integration (NEU!)
+Neues Feature für Lerngruppen:
+
+| Komponente | Beschreibung |
+|------------|--------------|
+| `VideoChat/` | Neue Komponenten für Jitsi Meet |
+| `ScreenShareHelper.jsx` | Kindgerechte Screen-Sharing-Anleitung |
+| `SchatzkarteMeetingWithScreenShare.jsx` | Meeting-Komponente |
+| `useMeeting.ts` | React Hook für Meeting-Zugriff |
+| `lerngruppen_db.py` | Meeting-Tabellen + Funktionen |
+| `7_👥_Lerngruppen.py` | Neuer Tab "📹 Video-Treffen" |
+
+### So funktioniert's:
+1. **👥 Lerngruppen** → Tab **📹 Video-Treffen**
+2. Lerngruppe auswählen
+3. Treffen planen (Tag, Uhrzeit, Dauer)
+4. **🚀 Jetzt beitreten** klicken
+5. Mit Google anmelden (nur Coach als Moderator)
+
+### Wichtig:
+- **Coach:** Muss sich mit Google anmelden (Moderator-Rechte)
+- **Kinder:** Keine Anmeldung nötig, warten im Warteraum
+
+### Bug-Fixes:
+- Migration für `status`-Spalte in `group_members`
+- Korrektur `jitsi_room_name` Feldname
 
 ---
 
@@ -130,6 +165,7 @@ Diese Inseln haben das neue Design-System, aber noch keinen Inhalt:
 | 🧠 Brainy | ✅ | Maskottchen mit Hilfe-Tipps |
 | ⚔️ BattleQuiz | ✅ | Quiz mit Leben-System |
 | 🎓 Lerntechniken-Zertifikat | ✅ | PNG-Download für Werkzeuge-Insel |
+| 📹 Video-Chat | ✅ | Jitsi Meet für Lerngruppen (Coach plant, Kinder treten bei) |
 
 ---
 
@@ -203,6 +239,19 @@ frontend/src/styles/
 └── ✅ meister-berg-island.css
 ```
 
+## VideoChat-Dateien (NEU 14.01.2025)
+
+```
+frontend/src/components/VideoChat/
+├── ✅ ScreenShareHelper.jsx
+├── ✅ SchatzkarteMeetingWithScreenShare.jsx
+├── ✅ screen-share-helper.css
+└── ✅ video-chat.css
+
+frontend/src/hooks/
+└── ✅ useMeeting.ts
+```
+
 ## Content-Dateien
 
 ```
@@ -231,4 +280,4 @@ frontend/src/content/
 
 ---
 
-**Letzte Aktualisierung:** 13. Januar 2025
+**Letzte Aktualisierung:** 14. Januar 2025

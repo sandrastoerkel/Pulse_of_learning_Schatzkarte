@@ -97,6 +97,12 @@ def init_lerngruppen_tables():
             FOREIGN KEY (group_id) REFERENCES learning_groups(group_id)
         )
     ''')
+
+    # Migration: status-Spalte zu group_members hinzufügen falls nicht vorhanden
+    try:
+        c.execute("ALTER TABLE group_members ADD COLUMN status TEXT DEFAULT 'active'")
+    except sqlite3.OperationalError:
+        pass  # Spalte existiert bereits
     
     # Indizes
     c.execute('CREATE INDEX IF NOT EXISTS idx_members_group ON group_members(group_id)')
@@ -611,8 +617,383 @@ def get_group_progress(group_id: str) -> Dict[str, Any]:
     }
 
 # ============================================
+# VIDEO-MEETING VERWALTUNG
+# ============================================
+
+def init_meeting_tables():
+    """Initialisiert die Meeting-Tabellen."""
+    conn = sqlite3.connect(get_db_path())
+    c = conn.cursor()
+
+    # Scheduled Meetings Tabelle
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS scheduled_meetings (
+            id TEXT PRIMARY KEY,
+            group_id TEXT NOT NULL,
+            title TEXT NOT NULL,
+            scheduled_start TIMESTAMP NOT NULL,
+            scheduled_end TIMESTAMP NOT NULL,
+            recurrence_type TEXT DEFAULT 'weekly',
+            day_of_week INTEGER,
+            time_of_day TEXT,
+            duration_minutes INTEGER DEFAULT 45,
+            status TEXT DEFAULT 'scheduled',
+            jitsi_room_name TEXT UNIQUE,
+            created_by TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (group_id) REFERENCES learning_groups(group_id),
+            FOREIGN KEY (created_by) REFERENCES users(user_id)
+        )
+    ''')
+
+    # Meeting Participants Tabelle
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS meeting_participants (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            meeting_id TEXT NOT NULL,
+            user_id TEXT NOT NULL,
+            display_name TEXT,
+            role TEXT DEFAULT 'kind',
+            joined_at TIMESTAMP,
+            left_at TIMESTAMP,
+            FOREIGN KEY (meeting_id) REFERENCES scheduled_meetings(id),
+            FOREIGN KEY (user_id) REFERENCES users(user_id)
+        )
+    ''')
+
+    # Indizes
+    c.execute('CREATE INDEX IF NOT EXISTS idx_meetings_group ON scheduled_meetings(group_id)')
+    c.execute('CREATE INDEX IF NOT EXISTS idx_meetings_status ON scheduled_meetings(status)')
+    c.execute('CREATE INDEX IF NOT EXISTS idx_participants_meeting ON meeting_participants(meeting_id)')
+
+    conn.commit()
+    conn.close()
+
+
+def generate_secure_room_name(group_id: str, scheduled_start: str) -> str:
+    """Generiert einen sicheren, nicht erratbaren Raumnamen."""
+    date_str = scheduled_start.split('T')[0] if 'T' in scheduled_start else scheduled_start.split(' ')[0]
+    room_secret = "schatzkarte-secret-2024"  # In Produktion: aus Umgebungsvariable
+    hash_input = f"{group_id}-{date_str}-{room_secret}"
+    hash_value = hashlib.sha256(hash_input.encode()).hexdigest()[:12]
+    return f"schatzkarte-{hash_value}"
+
+
+def schedule_meeting(
+    group_id: str,
+    coach_id: str,
+    day_of_week: int,
+    time_of_day: str,
+    duration_minutes: int = 45,
+    recurrence: str = 'weekly',
+    title: str = None
+) -> Optional[Dict]:
+    """
+    Plant ein neues Meeting für eine Lerngruppe.
+
+    Args:
+        group_id: ID der Lerngruppe
+        coach_id: ID des Coaches
+        day_of_week: 0=Sonntag, 1=Montag, ..., 6=Samstag
+        time_of_day: Uhrzeit im Format "HH:MM"
+        duration_minutes: Dauer in Minuten
+        recurrence: 'weekly', 'biweekly', 'none'
+        title: Titel des Meetings (optional)
+
+    Returns:
+        Meeting-Dict oder None bei Fehler
+    """
+    init_meeting_tables()
+    conn = sqlite3.connect(get_db_path())
+    c = conn.cursor()
+
+    # Berechne nächsten Termin
+    next_date = calculate_next_meeting_date(day_of_week, time_of_day)
+    end_date = next_date + timedelta(minutes=duration_minutes)
+
+    # Generiere eindeutige Meeting-ID und Raumnamen
+    meeting_id = hashlib.md5(f"{group_id}{next_date.isoformat()}{datetime.now().isoformat()}".encode()).hexdigest()[:16]
+    room_name = generate_secure_room_name(group_id, next_date.isoformat())
+
+    # Hole Gruppenname für Titel
+    group = get_group(group_id)
+    meeting_title = title or f"Schatzkarten-Treffen: {group['name'] if group else 'Lerngruppe'}"
+
+    try:
+        c.execute('''
+            INSERT INTO scheduled_meetings
+            (id, group_id, title, scheduled_start, scheduled_end, recurrence_type,
+             day_of_week, time_of_day, duration_minutes, status, jitsi_room_name, created_by)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'scheduled', ?, ?)
+        ''', (
+            meeting_id, group_id, meeting_title,
+            next_date.isoformat(), end_date.isoformat(),
+            recurrence, day_of_week, time_of_day, duration_minutes,
+            room_name, coach_id
+        ))
+        conn.commit()
+
+        return {
+            "id": meeting_id,
+            "group_id": group_id,
+            "title": meeting_title,
+            "scheduled_start": next_date.isoformat(),
+            "scheduled_end": end_date.isoformat(),
+            "jitsi_room_name": room_name,
+            "recurrence_type": recurrence
+        }
+    except Exception as e:
+        print(f"Error scheduling meeting: {e}")
+        return None
+    finally:
+        conn.close()
+
+
+def calculate_next_meeting_date(day_of_week: int, time_of_day: str) -> datetime:
+    """Berechnet das nächste Datum für einen bestimmten Wochentag und Uhrzeit."""
+    now = datetime.now()
+    hour, minute = map(int, time_of_day.split(':'))
+
+    # Finde den nächsten passenden Wochentag
+    days_ahead = day_of_week - now.weekday()
+    if days_ahead < 0:  # Ziel-Tag ist schon vorbei diese Woche
+        days_ahead += 7
+    elif days_ahead == 0:  # Heute ist der Tag
+        # Prüfe ob die Uhrzeit schon vorbei ist
+        target_time = now.replace(hour=hour, minute=minute, second=0, microsecond=0)
+        if now >= target_time:
+            days_ahead = 7  # Nächste Woche
+
+    next_date = now + timedelta(days=days_ahead)
+    return next_date.replace(hour=hour, minute=minute, second=0, microsecond=0)
+
+
+def get_next_meeting(group_id: str) -> Optional[Dict]:
+    """Holt das nächste geplante Meeting einer Gruppe."""
+    init_meeting_tables()
+    conn = sqlite3.connect(get_db_path())
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    now = datetime.now().isoformat()
+
+    c.execute('''
+        SELECT * FROM scheduled_meetings
+        WHERE group_id = ? AND scheduled_end > ? AND status != 'cancelled'
+        ORDER BY scheduled_start ASC
+        LIMIT 1
+    ''', (group_id, now))
+
+    row = c.fetchone()
+    conn.close()
+
+    return dict(row) if row else None
+
+
+def get_group_meetings(group_id: str, include_past: bool = False) -> List[Dict]:
+    """Holt alle Meetings einer Gruppe."""
+    init_meeting_tables()
+    conn = sqlite3.connect(get_db_path())
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    if include_past:
+        c.execute('''
+            SELECT * FROM scheduled_meetings
+            WHERE group_id = ?
+            ORDER BY scheduled_start DESC
+        ''', (group_id,))
+    else:
+        now = datetime.now().isoformat()
+        c.execute('''
+            SELECT * FROM scheduled_meetings
+            WHERE group_id = ? AND scheduled_end > ?
+            ORDER BY scheduled_start ASC
+        ''', (group_id, now))
+
+    meetings = [dict(row) for row in c.fetchall()]
+    conn.close()
+    return meetings
+
+
+def get_meeting_access(group_id: str, user_id: str, user_role: str = 'kind') -> Dict[str, Any]:
+    """
+    Generiert Zugangs-Informationen für ein Meeting.
+
+    Returns:
+        {
+            "canJoin": bool,
+            "timeStatus": {...},
+            "roomName": str,
+            "meeting": {...},
+            "config": {...}
+        }
+    """
+    meeting = get_next_meeting(group_id)
+
+    if not meeting:
+        return {
+            "canJoin": False,
+            "timeStatus": {"reason": "no_meeting", "message": "Kein Meeting geplant"},
+            "roomName": None,
+            "meeting": None
+        }
+
+    now = datetime.now()
+    start = datetime.fromisoformat(meeting['scheduled_start'])
+    end = datetime.fromisoformat(meeting['scheduled_end'])
+
+    # 5 Minuten Puffer vor Start
+    access_start = start - timedelta(minutes=5)
+
+    # Zeit-Status prüfen
+    if now < access_start:
+        minutes_until = int((access_start - now).total_seconds() / 60)
+        time_status = {
+            "canJoin": False,
+            "reason": "too_early",
+            "message": f"Das Treffen beginnt in {minutes_until} Minuten",
+            "minutesUntilStart": minutes_until
+        }
+    elif now > end:
+        time_status = {
+            "canJoin": False,
+            "reason": "ended",
+            "message": "Das Treffen ist bereits beendet"
+        }
+    else:
+        minutes_remaining = int((end - now).total_seconds() / 60)
+        time_status = {
+            "canJoin": True,
+            "reason": "active",
+            "message": "Treffen ist aktiv",
+            "minutesRemaining": minutes_remaining
+        }
+
+    # Jitsi-Konfiguration
+    config = get_jitsi_config(user_role)
+    interface_config = get_jitsi_interface_config()
+
+    return {
+        "canJoin": time_status.get("canJoin", False),
+        "timeStatus": time_status,
+        "roomName": meeting['jitsi_room_name'],
+        "meeting": meeting,
+        "config": config,
+        "interfaceConfig": interface_config,
+        "userRole": user_role
+    }
+
+
+def get_jitsi_config(role: str) -> Dict:
+    """Jitsi-Konfiguration basierend auf Benutzerrolle."""
+    base_buttons = [
+        'microphone', 'camera', 'desktop', 'hangup',
+        'chat', 'raisehand', 'tileview'
+    ]
+
+    coach_buttons = base_buttons + [
+        'mute-everyone', 'participants-pane', 'settings'
+    ]
+
+    return {
+        "startWithAudioMuted": True,
+        "startWithVideoMuted": False,
+        "disableDeepLinking": True,
+        "prejoinPageEnabled": False,
+        "enableClosePage": False,
+        "disableInviteFunctions": True,
+        "hideConferenceSubject": False,
+        "subject": "🗺️ Schatzkarten-Treffen",
+        "desktopSharingEnabled": True,
+        "disableRemoteMute": role != 'coach',
+        "remoteVideoMenu": {
+            "disableKick": role != 'coach',
+            "disableGrantModerator": True
+        },
+        "toolbarButtons": coach_buttons if role == 'coach' else base_buttons,
+        "fileRecordingsEnabled": False,
+        "liveStreamingEnabled": False,
+        "defaultLanguage": "de"
+    }
+
+
+def get_jitsi_interface_config() -> Dict:
+    """Interface-Konfiguration für Jitsi (kindgerecht)."""
+    return {
+        "DISABLE_JOIN_LEAVE_NOTIFICATIONS": False,
+        "SHOW_JITSI_WATERMARK": False,
+        "SHOW_BRAND_WATERMARK": False,
+        "SHOW_POWERED_BY": False,
+        "SHOW_PROMOTIONAL_CLOSE_PAGE": False,
+        "MOBILE_APP_PROMO": False,
+        "HIDE_INVITE_MORE_HEADER": True,
+        "TOOLBAR_ALWAYS_VISIBLE": True,
+        "INITIAL_TOOLBAR_TIMEOUT": 0
+    }
+
+
+def record_meeting_join(meeting_id: str, user_id: str, display_name: str, role: str = 'kind') -> bool:
+    """Registriert den Beitritt eines Teilnehmers."""
+    conn = sqlite3.connect(get_db_path())
+    c = conn.cursor()
+
+    try:
+        c.execute('''
+            INSERT INTO meeting_participants (meeting_id, user_id, display_name, role, joined_at)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (meeting_id, user_id, display_name, role, datetime.now().isoformat()))
+        conn.commit()
+        return True
+    except Exception as e:
+        print(f"Error recording join: {e}")
+        return False
+    finally:
+        conn.close()
+
+
+def record_meeting_leave(meeting_id: str, user_id: str) -> bool:
+    """Registriert das Verlassen eines Teilnehmers."""
+    conn = sqlite3.connect(get_db_path())
+    c = conn.cursor()
+
+    try:
+        c.execute('''
+            UPDATE meeting_participants
+            SET left_at = ?
+            WHERE meeting_id = ? AND user_id = ? AND left_at IS NULL
+        ''', (datetime.now().isoformat(), meeting_id, user_id))
+        conn.commit()
+        return True
+    except Exception as e:
+        print(f"Error recording leave: {e}")
+        return False
+    finally:
+        conn.close()
+
+
+def cancel_meeting(meeting_id: str) -> bool:
+    """Storniert ein Meeting."""
+    conn = sqlite3.connect(get_db_path())
+    c = conn.cursor()
+
+    try:
+        c.execute('''
+            UPDATE scheduled_meetings SET status = 'cancelled' WHERE id = ?
+        ''', (meeting_id,))
+        conn.commit()
+        return c.rowcount > 0
+    except Exception as e:
+        print(f"Error cancelling meeting: {e}")
+        return False
+    finally:
+        conn.close()
+
+
+# ============================================
 # INITIALISIERUNG
 # ============================================
 
 # Tabellen beim Import erstellen
 init_lerngruppen_tables()
+init_meeting_tables()

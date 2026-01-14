@@ -1,5 +1,100 @@
 # Pulse of Learning - Schatzkarte
-## Dokumentation Stand 13. Januar 2025
+## Dokumentation Stand 14. Januar 2025
+
+---
+
+# HEUTIGE ÄNDERUNGEN (14. Januar 2025)
+
+## 1. Karten-Anpassungen
+
+### Hintergrundbild verbreitert
+Die Schatzkarte wurde angepasst, um blaue Ränder innerhalb des goldenen Rahmens zu eliminieren:
+- **Datei:** `illustrated-map.css`
+- **Änderung:** `.map-image` auf 115% Breite mit -7.5% margin-left
+- Schiffe bleiben aufrecht (keine Rotation)
+
+### Inseln neu positioniert
+Alle 15 Inseln wurden gleichmäßig auf der Landmasse verteilt:
+- **Datei:** `WorldMapIllustrated.tsx`
+- **Änderung:** Vertikale Verteilung von y: 12 bis y: 85
+- Alle Inseln sind jetzt auf der Landmasse (nicht im Wasser)
+
+---
+
+## 2. Video-Chat Integration (NEU!)
+
+### Neues Feature: Jitsi Meet Video-Treffen für Lerngruppen
+
+Coaches können jetzt Video-Treffen für ihre Lerngruppen planen. Kinder sehen einen Countdown und können zur geplanten Zeit beitreten.
+
+### Neue Dateien erstellt:
+
+| Datei | Beschreibung |
+|-------|--------------|
+| `VideoChat/ScreenShareHelper.jsx` | Kindgerechte Screen-Sharing-Anleitung (Schritt für Schritt) |
+| `VideoChat/SchatzkarteMeetingWithScreenShare.jsx` | Jitsi Meeting-Komponente mit Sidebar |
+| `VideoChat/screen-share-helper.css` | Nintendo-inspirierte Styles |
+| `VideoChat/video-chat.css` | Meeting-Container, Warteraum, Scheduler Styles |
+| `hooks/useMeeting.ts` | React Hook für Meeting-Zugriff |
+
+### Backend-Erweiterungen:
+
+**lerngruppen_db.py** - Neue Meeting-Tabellen und Funktionen:
+- `scheduled_meetings` Tabelle (Treffen planen)
+- `meeting_participants` Tabelle (Teilnahme tracken)
+- `init_meeting_tables()` - Tabellen initialisieren
+- `schedule_meeting()` - Treffen planen
+- `get_next_meeting()` - Nächstes Treffen abrufen
+- `get_group_meetings()` - Alle Treffen einer Gruppe
+- `get_meeting_access()` - Zugriffsrechte prüfen
+- `get_jitsi_config()` - Rollen-basierte Jitsi-Konfiguration
+- `record_meeting_join()` / `record_meeting_leave()` - Teilnahme erfassen
+- `cancel_meeting()` - Treffen absagen
+
+### Streamlit UI:
+
+**pages/7_👥_Lerngruppen.py** - Neuer Tab "📹 Video-Treffen":
+- Gruppen-Auswahl Dropdown
+- "📅 Nächstes Treffen" - Zeigt geplante Treffen mit Details
+- "➕ Neues Treffen planen" - Formular mit Tag, Uhrzeit, Dauer, Wiederholung
+- Treffen absagen mit Bestätigung
+
+### Dependencies:
+
+- `@jitsi/react-sdk` (v1.4.4) zu npm hinzugefügt
+
+### Features:
+- Coach plant wöchentliche/einmalige Meetings
+- Sichere, nicht-erratbare Raum-Namen (Hash-basiert)
+- Kindgerechte Screen-Sharing-Anleitung
+- Warteraum mit Countdown für Kinder
+- Rollen-basierte Jitsi-Konfiguration (Coach vs Kind)
+- Mikro/Kamera standardmäßig aus für Kinder
+- **🚀 Jetzt beitreten** Button öffnet Jitsi direkt im Browser
+
+### Bug-Fixes (14. Januar):
+- `status`-Spalte Migration für `group_members` Tabelle hinzugefügt
+- `jitsi_room_name` Feldname korrigiert (war: `room_name`)
+- Alte Datenbank-Tabellen gelöscht und neu erstellt
+
+### Jitsi Meet Hinweise:
+
+**Für Coaches (Moderatoren):**
+- Der Coach muss sich mit **Google anmelden** um Moderator zu sein
+- Nach der Anmeldung kann er Teilnehmer einlassen und die Konferenz steuern
+
+**Für Kinder (Teilnehmer):**
+- Kinder müssen sich **NICHT** anmelden
+- Sie warten im Warteraum bis der Coach sie reinlässt
+
+### So startest du ein Video-Treffen:
+
+1. Gehe zu **👥 Lerngruppen** → Tab **📹 Video-Treffen**
+2. Wähle deine Lerngruppe im Dropdown
+3. Falls kein Treffen existiert: Tab "➕ Neues Treffen planen" → Treffen erstellen
+4. Klicke auf **🚀 Jetzt beitreten** (grüner Button)
+5. Melde dich mit Google an (nur einmalig als Moderator)
+6. Warte auf Teilnehmer und lasse sie rein
 
 ---
 
@@ -918,6 +1013,10 @@ components/rpg_schatzkarte/frontend/
 
 | Datum | Was | Details |
 |-------|-----|---------|
+| **14.01.2025** | **📹 Video-Chat Integration** | Jitsi Meet für Lerngruppen: Coach plant Treffen, Kinder sehen Countdown |
+| 14.01.2025 | Karten-Anpassung | Hintergrundbild 115% breit, Inseln neu auf Landmasse verteilt |
+| 14.01.2025 | Neue Komponenten | VideoChat/, useMeeting Hook, Meeting-Tabellen in DB |
+| 14.01.2025 | Lerngruppen UI | Neuer Tab "📹 Video-Treffen" für Coaches |
 | **13.01.2025** | **🎨 Design auf ALLE 14 Inseln** | 10 neue Experience-Komponenten + 10 CSS-Dateien erstellt! |
 | 13.01.2025 | Neue Experience-Komponenten | SpiegelSee, Vulkan, RuheOase, AusdauerGipfel, FokusLeuchtturm, WachstumGarten, LehrerTurm, WohlfuehlDorf, SchutzBurg, MeisterBerg |
 | 13.01.2025 | Dokumentation aktualisiert | SCHATZKARTE_STATUS_UEBERSICHT.md komplett überarbeitet |
@@ -1030,5 +1129,5 @@ Alle 14 Inseln haben jetzt das animierte Design-System. Die nächsten Aufgaben s
 
 ---
 
-**Letzte Bearbeitung:** 13. Januar 2025
+**Letzte Bearbeitung:** 14. Januar 2025
 **Nächster Meilenstein:** Quiz-Content für fehlende Stufen erstellen (Festung MS, Werkzeuge US/MS, Fäden alle)

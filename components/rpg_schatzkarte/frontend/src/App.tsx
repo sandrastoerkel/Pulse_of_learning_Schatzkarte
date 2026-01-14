@@ -7,7 +7,7 @@ import {
   withStreamlitConnection,
   ComponentProps
 } from 'streamlit-component-lib';
-import { WorldMap } from './components/WorldMap';
+import { WorldMapIllustrated } from './components/WorldMapIllustrated';
 import { QuestModal } from './components/QuestModal';
 import { BanduraShipModal } from './components/BanduraShipModal';
 import { HattieShipModal } from './components/HattieShipModal';
@@ -425,7 +425,7 @@ function RPGSchatzkarteContent({
         </p>
       </header>
 
-      <WorldMap
+      <WorldMapIllustrated
         islands={islands}
         userProgress={userProgress}
         heroData={heroData}

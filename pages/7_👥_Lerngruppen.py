@@ -27,7 +27,10 @@ try:
         create_invitation, get_invitation, use_invitation, get_group_invitations,
         activate_weekly_island, get_activated_islands, get_available_islands,
         get_current_island, get_group_week, get_group_progress,
-        FLEXIBLE_ISLANDS
+        FLEXIBLE_ISLANDS,
+        # Meeting-Funktionen
+        init_meeting_tables, schedule_meeting, get_next_meeting, get_group_meetings,
+        get_meeting_access, cancel_meeting, record_meeting_join, record_meeting_leave
     )
     from schatzkarte.map_data import ISLANDS
 except ImportError as e:
@@ -80,16 +83,22 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     
+    # Meeting-Tabellen initialisieren
+    init_meeting_tables()
+
     # Tabs für verschiedene Bereiche
-    tab1, tab2, tab3 = st.tabs(["📋 Meine Gruppen", "➕ Neue Gruppe", "🔗 Einladung prüfen"])
-    
+    tab1, tab2, tab3, tab4 = st.tabs(["📋 Meine Gruppen", "➕ Neue Gruppe", "📹 Video-Treffen", "🔗 Einladung prüfen"])
+
     with tab1:
         render_my_groups(user_id)
-    
+
     with tab2:
         render_create_group(user_id)
-    
+
     with tab3:
+        render_video_meetings(user_id)
+
+    with tab4:
         render_check_invitation()
 
 # ============================================
@@ -441,7 +450,212 @@ def render_create_group(coach_id: str):
                     st.error("Fehler beim Erstellen der Gruppe.")
 
 # ============================================
-# TAB 3: EINLADUNG PRÜFEN
+# TAB 3: VIDEO-TREFFEN
+# ============================================
+
+DAYS_OF_WEEK = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"]
+
+def render_video_meetings(coach_id: str):
+    """Video-Treffen für Lerngruppen planen und verwalten."""
+
+    st.markdown("### 📹 Video-Treffen planen")
+
+    # Gruppen des Coaches laden
+    groups = get_coach_groups(coach_id)
+
+    if not groups:
+        st.info("📭 Du hast noch keine Lerngruppen. Erstelle zuerst eine Gruppe!")
+        return
+
+    # Gruppen-Auswahl
+    group_options = {f"{g['name']}": g['group_id'] for g in groups}
+    selected_group_name = st.selectbox(
+        "Lerngruppe auswählen:",
+        options=list(group_options.keys()),
+        key="meeting_group_select"
+    )
+    selected_group_id = group_options[selected_group_name]
+
+    # Tabs für Treffen-Verwaltung
+    meeting_tab1, meeting_tab2 = st.tabs(["📅 Nächstes Treffen", "➕ Neues Treffen planen"])
+
+    with meeting_tab1:
+        render_next_meeting(selected_group_id, coach_id)
+
+    with meeting_tab2:
+        render_schedule_meeting(selected_group_id, coach_id)
+
+
+def render_next_meeting(group_id: str, coach_id: str):
+    """Zeigt das nächste geplante Treffen an."""
+
+    next_meeting = get_next_meeting(group_id)
+
+    if not next_meeting:
+        st.info("📭 Kein Treffen geplant. Plane ein neues Treffen im Tab 'Neues Treffen planen'!")
+        return
+
+    # Meeting-Karte
+    meeting = next_meeting
+    day_name = DAYS_OF_WEEK[meeting['day_of_week']]
+
+    st.markdown(f"""
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white; padding: 20px; border-radius: 15px; margin-bottom: 20px;">
+        <h3 style="margin: 0 0 10px 0;">📹 {meeting.get('title', 'Lerngruppen-Treffen')}</h3>
+        <div style="font-size: 1.5em; font-weight: bold;">{day_name}, {meeting['time_of_day']} Uhr</div>
+        <div style="opacity: 0.9; margin-top: 5px;">⏱️ {meeting['duration_minutes']} Minuten</div>
+        <div style="margin-top: 10px;">
+            <span style="background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px;">
+                {'🔄 Wöchentlich' if meeting.get('recurrence') == 'woechentlich' else '📅 Einmalig'}
+            </span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Jitsi Room Name
+    room_name = meeting.get('jitsi_room_name', '')
+    jitsi_url = f"https://meet.jit.si/{room_name}" if room_name else None
+
+    # Beitreten-Button
+    if jitsi_url:
+        st.markdown(f"""
+        <a href="{jitsi_url}" target="_blank" style="
+            display: inline-block;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 1.2em;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+            margin: 10px 0;
+        ">🚀 Jetzt beitreten</a>
+        """, unsafe_allow_html=True)
+    else:
+        st.warning("⚠️ Raum-Name fehlt. Bitte Treffen neu erstellen.")
+
+    # Raum-Info (nur für Coach)
+    with st.expander("🔑 Raum-Details (nur für Coach sichtbar)"):
+        st.markdown(f"**Raum-Name:** `{room_name or 'N/A'}`")
+        if jitsi_url:
+            st.markdown(f"**URL:** `{jitsi_url}`")
+        st.caption("Der sichere Raum-Name wird automatisch generiert.")
+
+    # Treffen absagen
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("🗑️ Treffen absagen", key=f"cancel_meeting_{meeting['id']}", type="secondary"):
+            st.session_state[f"confirm_cancel_{meeting['id']}"] = True
+
+    # Bestätigung fürs Absagen
+    if st.session_state.get(f"confirm_cancel_{meeting['id']}", False):
+        st.warning("⚠️ Möchtest du dieses Treffen wirklich absagen?")
+        col_yes, col_no = st.columns(2)
+        with col_yes:
+            if st.button("✅ Ja, absagen", key=f"yes_cancel_{meeting['id']}", type="primary"):
+                if cancel_meeting(meeting['id']):
+                    st.success("Treffen wurde abgesagt!")
+                    st.session_state[f"confirm_cancel_{meeting['id']}"] = False
+                    st.rerun()
+                else:
+                    st.error("Fehler beim Absagen.")
+        with col_no:
+            if st.button("❌ Nein", key=f"no_cancel_{meeting['id']}"):
+                st.session_state[f"confirm_cancel_{meeting['id']}"] = False
+                st.rerun()
+
+    # Alle Treffen anzeigen
+    st.markdown("---")
+    st.markdown("### 📋 Alle geplanten Treffen")
+
+    all_meetings = get_group_meetings(group_id, include_past=False)
+
+    if all_meetings:
+        for m in all_meetings:
+            day = DAYS_OF_WEEK[m['day_of_week']]
+            status_icon = "🟢" if m['status'] == 'geplant' else "⚪"
+            st.markdown(f"{status_icon} **{day}**, {m['time_of_day']} Uhr - {m.get('title', 'Treffen')} ({m['duration_minutes']} Min.)")
+    else:
+        st.caption("Keine weiteren Treffen geplant.")
+
+
+def render_schedule_meeting(group_id: str, coach_id: str):
+    """Formular zum Planen eines neuen Treffens."""
+
+    st.markdown("### ➕ Neues Treffen planen")
+
+    with st.form("schedule_meeting_form"):
+        title = st.text_input(
+            "Titel (optional):",
+            placeholder="z.B. Wöchentliches Lerngruppen-Treffen",
+            help="Ein kurzer Titel für das Treffen"
+        )
+
+        # Tag und Uhrzeit
+        col1, col2 = st.columns(2)
+
+        with col1:
+            day = st.selectbox(
+                "📅 Wochentag:",
+                options=DAYS_OF_WEEK,
+                index=0,  # Montag
+                help="An welchem Tag findet das Treffen statt?"
+            )
+            day_index = DAYS_OF_WEEK.index(day)
+
+        with col2:
+            time = st.time_input(
+                "⏰ Uhrzeit:",
+                value=None,
+                help="Zu welcher Uhrzeit beginnt das Treffen?"
+            )
+
+        # Dauer
+        duration = st.select_slider(
+            "⏱️ Dauer:",
+            options=[15, 30, 45, 60, 90],
+            value=30,
+            format_func=lambda x: f"{x} Minuten"
+        )
+
+        # Wiederholung
+        recurrence = st.radio(
+            "🔄 Wiederholung:",
+            options=["einmalig", "woechentlich"],
+            format_func=lambda x: "Einmalig" if x == "einmalig" else "Wöchentlich",
+            horizontal=True
+        )
+
+        st.markdown("---")
+
+        submitted = st.form_submit_button("📹 Treffen planen", type="primary", use_container_width=True)
+
+        if submitted:
+            if not time:
+                st.error("Bitte wähle eine Uhrzeit aus.")
+            else:
+                time_str = time.strftime("%H:%M")
+                meeting_id = schedule_meeting(
+                    group_id=group_id,
+                    coach_id=coach_id,
+                    day_of_week=day_index,
+                    time_of_day=time_str,
+                    duration_minutes=duration,
+                    recurrence=recurrence,
+                    title=title or "Lerngruppen-Treffen"
+                )
+
+                if meeting_id:
+                    st.success(f"🎉 Treffen für {day} um {time_str} Uhr geplant!")
+                    st.balloons()
+                else:
+                    st.error("Fehler beim Planen des Treffens.")
+
+
+# ============================================
+# TAB 4: EINLADUNG PRÜFEN
 # ============================================
 
 def render_check_invitation():
