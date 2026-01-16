@@ -16,6 +16,7 @@ interface StarthafenIslandProps {
   ageGroup: AgeGroup;
   onClose: () => void;
   onQuestComplete: (questType: string, xp: number, gold?: number) => void;
+  onPolarsternClick?: () => void;  // NEU: Polarstern-Widget öffnen
 }
 
 interface FeatureCard {
@@ -69,37 +70,38 @@ const FEATURE_CARDS: FeatureCard[] = [
     ]
   },
   {
-    id: 'treasures',
-    icon: '💎',
-    title: 'Schätze',
-    description: 'Sammle wertvolle Belohnungen',
-    color: '#4fc3f7',
+    id: 'polarstern',
+    icon: '⭐',
+    title: 'Der Polarstern',
+    description: 'Dein Kompass der Reise',
+    color: '#FFD700',
     details: [
-      '💎 Jede Insel hat versteckte Schätze',
-      '🧭 Der Kompass der Reise wartet hier auf dich!'
+      '⭐ Setze deine persönlichen Ziele',
+      '🎯 Verfolge deinen Fortschritt',
+      '🏆 Feiere deine Erfolge!'
     ]
   }
 ];
 
 const WELCOME_MESSAGES: Record<AgeGroup, { title: string; intro: string }> = {
   grundschule: {
-    title: 'Willkommen, junger Abenteurer!',
+    title: 'Willkommen!',
     intro: 'Du stehst am Anfang einer aufregenden Lernreise! Hier im Starthafen erfährst du, wie alles funktioniert. Bist du bereit, die Welt des Wissens zu entdecken?'
   },
   unterstufe: {
-    title: 'Willkommen an Bord!',
+    title: 'Willkommen!',
     intro: 'Der Starthafen ist dein Tor zu einer Reise durch die Welt des effektiven Lernens. Hier lernst du die wichtigsten Werkzeuge und Strategien kennen, die dich zum Lern-Meister machen.'
   },
   mittelstufe: {
-    title: 'Willkommen, angehender Lern-Meister!',
+    title: 'Willkommen!',
     intro: 'Diese Schatzkarte führt dich durch evidenzbasierte Lernstrategien. Jede Insel repräsentiert ein wissenschaftlich fundiertes Konzept, das dein Lernen revolutionieren wird.'
   },
   oberstufe: {
-    title: 'Willkommen zur Lernreise!',
+    title: 'Willkommen!',
     intro: 'Hier findest du die effektivsten Lernstrategien, basierend auf aktueller Forschung. Navigiere durch die Inseln und entdecke, wie du dein volles Potenzial entfalten kannst.'
   },
   paedagoge: {
-    title: 'Willkommen, Lern-Experte!',
+    title: 'Willkommen!',
     intro: 'Diese Plattform vermittelt evidenzbasierte Lernstrategien auf spielerische Weise. Entdecken Sie die didaktischen Konzepte hinter jeder Insel.'
   }
 };
@@ -112,6 +114,7 @@ export function StarthafenIslandExperience({
   ageGroup,
   onClose,
   onQuestComplete,
+  onPolarsternClick,
 }: StarthafenIslandProps) {
   const [currentPhase, setCurrentPhase] = useState<'welcome' | 'features' | 'ready'>('welcome');
   const [expandedFeature, setExpandedFeature] = useState<string | null>(null);
@@ -132,6 +135,13 @@ export function StarthafenIslandExperience({
     setTotalXP(prev => prev + 15);
     onQuestComplete('wisdom', 15, 3);
     setCurrentPhase('ready');
+  };
+
+  const openPolarstern = () => {
+    // Öffne das Polarstern-Widget für die erste Zielformulierung
+    if (onPolarsternClick) {
+      onPolarsternClick();
+    }
   };
 
   const collectTreasure = () => {
@@ -384,16 +394,88 @@ export function StarthafenIslandExperience({
             <h2 className="ready-title">Du bist bereit!</h2>
 
             <p className="ready-text">
-              Du hast den Starthafen erkundet. Bevor du in See stichst,
-              sammle deinen ersten Schatz!
+              Du hast den Starthafen erkundet. Jetzt kommt deine <strong>erste wichtige Aufgabe</strong>:
             </p>
 
-            {/* Schatz */}
+            {/* Polarstern - Kompass der Reise */}
+            <motion.div
+              className="polarstern-intro-card"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              onClick={openPolarstern}
+              whileHover={{ scale: 1.05, boxShadow: '0 8px 32px rgba(255, 215, 0, 0.5)' }}
+              whileTap={{ scale: 0.95 }}
+              style={{
+                background: 'linear-gradient(135deg, #1a237e 0%, #4a148c 100%)',
+                border: '3px solid #FFD700',
+                borderRadius: '20px',
+                padding: '1.5rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem',
+                marginBottom: '1rem',
+                boxShadow: '0 4px 20px rgba(26, 35, 126, 0.4)',
+              }}
+            >
+              <motion.span
+                style={{ fontSize: '3rem' }}
+                animate={{
+                  y: [0, -8, 0],
+                  rotate: [0, 10, -10, 0],
+                  scale: [1, 1.1, 1]
+                }}
+                transition={{ repeat: Infinity, duration: 2.5 }}
+              >
+                ⭐
+              </motion.span>
+              <div style={{ flex: 1 }}>
+                <h3 style={{
+                  color: '#FFD700',
+                  margin: '0 0 0.3rem 0',
+                  fontSize: '1.3rem',
+                  fontWeight: 700
+                }}>
+                  🧭 Polarstern - Kompass der Reise
+                </h3>
+                <p style={{
+                  color: 'rgba(255,255,255,0.9)',
+                  margin: 0,
+                  fontSize: '1rem'
+                }}>
+                  Setze dein <strong>erstes Ziel</strong> - egal welches!
+                </p>
+                <p style={{
+                  color: 'rgba(255,255,255,0.7)',
+                  margin: '0.3rem 0 0 0',
+                  fontSize: '0.85rem'
+                }}>
+                  Wohin soll deine Lernreise führen?
+                </p>
+              </div>
+              <motion.span
+                style={{
+                  fontSize: '1.5rem',
+                  background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '30px',
+                  color: '#1a237e',
+                  fontWeight: 700
+                }}
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ repeat: Infinity, duration: 1.5 }}
+              >
+                Öffnen →
+              </motion.span>
+            </motion.div>
+
+            {/* Schatz - wird nach dem Polarstern freigeschaltet */}
             <motion.div
               className={`treasure-card ${treasureCollected ? 'collected' : ''}`}
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.5 }}
               onClick={collectTreasure}
               whileHover={!treasureCollected ? { scale: 1.05, rotate: [0, -2, 2, 0] } : {}}
               whileTap={!treasureCollected ? { scale: 0.95 } : {}}
@@ -406,11 +488,11 @@ export function StarthafenIslandExperience({
                 } : {}}
                 transition={{ repeat: Infinity, duration: 2 }}
               >
-                {treasureCollected ? '✨' : '🧭'}
+                {treasureCollected ? '✨' : '💎'}
               </motion.span>
               <div className="treasure-info">
-                <h3>Kompass der Reise</h3>
-                <p>{treasureCollected ? 'Gesammelt!' : 'Klicke um zu sammeln'}</p>
+                <h3>Bonus-Schatz</h3>
+                <p>{treasureCollected ? 'Gesammelt!' : 'Extra-Belohnung sammeln'}</p>
                 <span className="treasure-xp">+20 XP</span>
               </div>
               {treasureCollected && (
@@ -433,7 +515,8 @@ export function StarthafenIslandExperience({
             >
               <h4>🗺️ Tipps für deine Reise</h4>
               <ul>
-                <li>Beginne mit der <strong>Festung der Stärke</strong> (Woche 1)</li>
+                <li>Öffne den <strong>⭐ Polarstern</strong> und setze dein erstes Ziel!</li>
+                <li>Beginne mit der <strong>Mental stark</strong> (Woche 1)</li>
                 <li>Schließe alle Quests einer Insel ab für Bonus-XP</li>
                 <li>Besuche regelmäßig die Schiffe für Extra-Punkte</li>
               </ul>

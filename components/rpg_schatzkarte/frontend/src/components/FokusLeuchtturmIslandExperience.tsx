@@ -1,5 +1,5 @@
 // ============================================
-// Fokus-Leuchtturm Island Experience
+// Fokus halten Island Experience
 // Schöne Animationen wie die anderen Inseln
 // ============================================
 
@@ -49,7 +49,7 @@ export function FokusLeuchtturmIslandExperience({ ageGroup, onClose, onQuestComp
         <button className="back-btn" onClick={onClose}>← Zurück</button>
         <h1 className="island-title">
           <motion.span className="title-icon" animate={{ opacity: [1, 0.5, 1] }} transition={{ repeat: Infinity, duration: 2 }}>🎯</motion.span>
-          Fokus-Leuchtturm
+          Fokus halten
         </h1>
         <div className="xp-badge">
           <motion.span className="xp-icon" animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 2 }}>⭐</motion.span>

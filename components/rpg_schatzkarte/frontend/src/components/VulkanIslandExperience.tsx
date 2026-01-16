@@ -1,5 +1,5 @@
 // ============================================
-// Vulkan der Motivation Island Experience
+// Was dich antreibt Island Experience
 // Schöne Animationen wie die anderen Inseln
 // ============================================
 
@@ -110,7 +110,7 @@ export function VulkanIslandExperience({
           >
             🔥
           </motion.span>
-          Vulkan der Motivation
+          Was dich antreibt
         </h1>
         <div className="xp-badge">
           <motion.span className="xp-icon" animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 2 }}>⭐</motion.span>

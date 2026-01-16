@@ -135,7 +135,7 @@ export function FestungIslandExperience({
           >
             🏰
           </motion.span>
-          Festung der Stärke
+          Mental stark
         </h1>
         <div className="xp-badge">
           <motion.span
@@ -850,7 +850,7 @@ function QuizPhase({ ageGroup, onComplete, onBack }: QuizPhaseProps) {
     return (
       <BattleQuiz
         quiz={{ questions: getQuizQuestions() } as ExtendedQuiz}
-        islandName="Festung der Stärke"
+        islandName="Mental stark"
         enableLives={true}
         maxLives={3}
         onComplete={(victory, score, streak) => {

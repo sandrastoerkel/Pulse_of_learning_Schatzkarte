@@ -54,6 +54,7 @@ def rpg_schatzkarte(
     unlocked_islands: list = None,
     current_island: str = None,
     age_group: str = "grundschule",
+    is_admin: bool = False,
     height: int = 700,
     key: str = None
 ) -> dict:
@@ -107,6 +108,7 @@ def rpg_schatzkarte(
         unlockedIslands=unlocked_islands,
         currentIsland=current_island,
         ageGroup=age_group,
+        isAdmin=is_admin,
         key=key,
         default=None,
     )

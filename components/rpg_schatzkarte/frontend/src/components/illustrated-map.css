@@ -63,12 +63,23 @@
   width: 100%;
   aspect-ratio: 21 / 9;
   border-radius: 12px;
-  overflow: hidden;
+  overflow: visible;
   border: 4px solid var(--map-gold);
   box-shadow:
     0 0 0 2px var(--map-brown),
     var(--map-shadow);
   background: #1a2a3a;
+}
+
+/* Pfade innerhalb der Karte clippen, aber Tooltips nicht */
+.connections-layer {
+  clip-path: inset(0);
+}
+
+/* Hintergrund mit abgerundeten Ecken */
+.map-background {
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 /* Dekorative Ecken */
@@ -127,6 +138,104 @@
   gap: 12px;
 }
 
+/* ========================================
+   PLAYER AVATAR CARD - Oben im Panel
+   ======================================== */
+.player-avatar-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--panel-bg);
+  border-radius: 12px;
+  border: 2px solid var(--map-gold);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.player-avatar-card:hover {
+  border-color: var(--map-gold-light);
+  box-shadow: 0 0 15px rgba(201, 162, 39, 0.3);
+}
+
+.player-avatar-frame {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(135deg, #4a3728, #2a1d0f);
+  border: 3px solid var(--map-gold);
+  flex-shrink: 0;
+}
+
+.player-avatar-frame svg {
+  width: 100%;
+  height: 100%;
+}
+
+.player-avatar-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.player-avatar-name {
+  color: var(--text-light);
+  font-size: 16px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.player-avatar-edit {
+  color: var(--map-gold);
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.player-avatar-card:hover .player-avatar-edit {
+  opacity: 1;
+}
+
+/* ========================================
+   PLAYER STATS ROW - XP und Gold
+   ======================================== */
+.player-stats-row {
+  display: flex;
+  gap: 8px;
+}
+
+.player-stats-row .stat-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px;
+  background: var(--panel-bg);
+  border-radius: 8px;
+  border: 2px solid var(--panel-border);
+}
+
+.player-stats-row .stat-icon {
+  font-size: 16px;
+}
+
+.player-stats-row .stat-value {
+  color: var(--text-light);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.player-stats-row .xp-stat {
+  border-color: #fbbf24;
+}
+
+.player-stats-row .gold-stat {
+  border-color: #c9a227;
+}
+
 .total-progress-illustrated {
   background: var(--panel-bg);
   border-radius: 10px;
@@ -172,6 +281,9 @@
   inset: 0;
   z-index: 5;
   pointer-events: none;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
 }
 
 /* ========================================
@@ -185,7 +297,33 @@
 }
 
 .quest-marker-illustrated:hover {
-  z-index: 15;
+  z-index: 500;
+}
+
+/* CSS-only Tooltip als Fallback */
+.quest-marker-illustrated::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(26, 35, 126, 0.98);
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 2px solid #FFD700;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 215, 0, 0.3);
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.quest-marker-illustrated:hover::before {
+  opacity: 1;
 }
 
 /* Pulsierender Ring */
@@ -219,6 +357,40 @@
 .marker-icon {
   font-size: 28px;
   line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* ========================================
+   SVG ICON CONTAINER - Ohne Hintergrundkreis
+   ======================================== */
+.svg-icon-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 60px;
+  min-height: 60px;
+}
+
+.svg-icon-container svg {
+  filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.7))
+          drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.quest-marker-illustrated:hover .svg-icon-container svg {
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.9))
+          drop-shadow(0 6px 12px rgba(0, 0, 0, 0.6))
+          brightness(1.1);
+}
+
+/* Completion Star für SVG Icons */
+.svg-icon-container .svg-completion-star {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  font-size: 22px;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
@@ -279,16 +451,18 @@
   bottom: calc(100% + 16px);
   left: 50%;
   transform: translateX(-50%);
-  background: var(--tooltip-bg);
+  background: rgba(26, 35, 126, 0.98);
   color: #fff;
   padding: 12px 16px;
   border-radius: 12px;
-  border: 3px solid;
+  border: 3px solid #FFD700;
   white-space: nowrap;
   font-size: 14px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-  z-index: 100;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), 0 0 20px rgba(255, 215, 0, 0.3);
+  z-index: 9999;
   pointer-events: none;
+  min-width: 150px;
+  text-align: center;
 }
 
 .marker-tooltip::after {
@@ -298,7 +472,7 @@
   left: 50%;
   transform: translateX(-50%);
   border: 8px solid transparent;
-  border-top-color: var(--tooltip-bg);
+  border-top-color: rgba(26, 35, 126, 0.98);
 }
 
 .tooltip-title {
@@ -335,14 +509,78 @@
   filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
 }
 
+/* Ship Icon Container - für SVG Icons */
+.ship-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ship-icon-container svg {
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+}
+
 .bandura-ship {
   left: 25%;
   top: 88%;
 }
 
+/* Goldener Schlüssel Body */
+.bandura-key-body {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bandura-key-body svg {
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+}
+
 .hattie-ship {
   left: 48%;
   top: 90%;
+}
+
+/* Polarstern Schiff - OBEN MITTE */
+.polarstern-ship {
+  left: 50%;
+  top: 3%;
+  transform: translateX(-50%);
+}
+
+.polarstern-ship .ship-icon-container svg {
+  filter: drop-shadow(0 0 15px rgba(0, 212, 255, 0.8));
+}
+
+.polarstern-ship:hover .ship-icon-container svg {
+  filter: drop-shadow(0 0 30px rgba(0, 212, 255, 1)) brightness(1.2);
+}
+
+.polarstern-ship .ship-badge {
+  top: 5px;
+  right: 5px;
+}
+
+/* Badge für Anzahl aktiver Ziele */
+.ship-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #FFD700;
+  color: #1a237e;
+  font-size: 11px;
+  font-weight: bold;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #1a237e;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }
 
 .ship-body {
@@ -424,12 +662,11 @@
   font-size: 13px;
 }
 
-.legend-dot {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.8);
+.legend-icon {
+  font-size: 16px;
   flex-shrink: 0;
+  width: 20px;
+  text-align: center;
 }
 
 /* ========================================
@@ -454,32 +691,35 @@
 
 /* ========================================
    WIDGETS (Tagebuch & Lerntechniken)
+   Gestaltet wie die Schiffe - transparent mit Label darunter
    ======================================== */
+
+/* Tagebuch Widget */
 .tagebuch-widget-illustrated {
   position: absolute;
   bottom: 16px;
-  right: 80px;
-  width: 56px;
-  height: 56px;
-  background: linear-gradient(145deg, #9b59b6, #8e44ad);
-  border-radius: 50%;
+  right: 180px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
   cursor: pointer;
-  border: 3px solid #fff;
-  box-shadow: 0 4px 16px rgba(155, 89, 182, 0.5);
   z-index: 20;
+  transition: filter 0.3s ease;
+}
+
+.tagebuch-widget-illustrated:hover {
+  filter: drop-shadow(0 0 20px rgba(155, 89, 182, 0.8));
 }
 
 .tagebuch-widget-illustrated .widget-icon {
-  font-size: 28px;
+  font-size: 48px;
+  filter: drop-shadow(0 0 8px rgba(155, 89, 182, 0.6));
 }
 
 .tagebuch-widget-illustrated .widget-badge {
   position: absolute;
   top: -4px;
-  right: -4px;
+  right: 10px;
   background: #e74c3c;
   color: white;
   font-size: 12px;
@@ -493,45 +733,124 @@
   border: 2px solid #fff;
 }
 
+.tagebuch-widget-illustrated .widget-label {
+  background: rgba(0, 0, 0, 0.8);
+  color: #ce93d8;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 10px;
+  margin-top: 4px;
+  border: 1px solid var(--map-border-color);
+}
+
+/* Lerntechniken Widget - wie Schiffe gestaltet */
 .lerntechniken-widget-illustrated {
   position: absolute;
   bottom: 16px;
   right: 16px;
-  background: linear-gradient(145deg, #3498db, #2980b9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  z-index: 20;
+  transition: filter 0.3s ease;
+}
+
+.lerntechniken-widget-illustrated:hover {
+  filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+}
+
+.lerntechniken-widget-illustrated.has-certificate:hover {
+  filter: drop-shadow(0 0 20px rgba(241, 196, 15, 0.8));
+}
+
+.lerntechniken-widget-illustrated .lerntechniken-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lerntechniken-widget-illustrated .lerntechniken-icon-container svg {
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+}
+
+.lerntechniken-widget-illustrated .lerntechniken-emoji {
+  font-size: 48px;
+  filter: drop-shadow(0 0 8px rgba(241, 196, 15, 0.6));
+}
+
+.lerntechniken-widget-illustrated .lerntechniken-badge {
+  position: absolute;
+  top: -4px;
+  right: 10px;
+  background: #27ae60;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 2px solid #fff;
+}
+
+.lerntechniken-widget-illustrated .lerntechniken-label {
+  background: rgba(0, 0, 0, 0.8);
+  color: #f4d03f;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 10px;
+  margin-top: 4px;
+  border: 1px solid var(--map-border-color);
+}
+
+/* ========================================
+   COMPANION WIDGET (Lernbegleiter)
+   ======================================== */
+.companion-widget-illustrated {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: linear-gradient(145deg, #9b59b6, #8e44ad);
   border-radius: 28px;
   padding: 10px 16px;
   display: flex;
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  border: 3px solid #fff;
-  box-shadow: 0 4px 16px rgba(52, 152, 219, 0.5);
+  border: 3px solid #FFD700;
+  box-shadow: 0 4px 16px rgba(155, 89, 182, 0.5), 0 0 20px rgba(255, 215, 0, 0.3);
   z-index: 20;
   transition: all 0.3s ease;
+  animation: companion-glow 2s infinite;
 }
 
-.lerntechniken-widget-illustrated.has-certificate {
-  background: linear-gradient(145deg, #f1c40f, #f39c12);
-  box-shadow: 0 0 20px rgba(241, 196, 15, 0.6);
+@keyframes companion-glow {
+  0%, 100% {
+    box-shadow: 0 4px 16px rgba(155, 89, 182, 0.5), 0 0 20px rgba(255, 215, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(155, 89, 182, 0.7), 0 0 30px rgba(255, 215, 0, 0.6);
+  }
 }
 
-.lerntechniken-widget-illustrated .lerntechniken-icon {
-  font-size: 24px;
+.companion-widget-illustrated .companion-widget-icon {
+  font-size: 28px;
 }
 
-.lerntechniken-widget-illustrated .lerntechniken-badge {
-  background: rgba(255, 255, 255, 0.3);
+.companion-widget-illustrated .companion-widget-img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  border-radius: 50%;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.companion-widget-illustrated .companion-widget-label {
   color: white;
-  font-size: 11px;
-  font-weight: bold;
-  padding: 2px 8px;
-  border-radius: 10px;
-}
-
-.lerntechniken-widget-illustrated .lerntechniken-label {
-  color: white;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 /* ========================================
@@ -607,9 +926,8 @@
     gap: 6px;
   }
 
-  .legend-dot {
-    width: 10px;
-    height: 10px;
+  .legend-icon {
+    font-size: 14px;
   }
 
   .floating-ship {
@@ -624,6 +942,11 @@
   .hattie-ship {
     left: 40%;
     top: 88%;
+  }
+
+  .polarstern-ship {
+    left: 50%;
+    top: 6%;
   }
 
   .tagebuch-widget-illustrated,
@@ -673,14 +996,17 @@
   }
 
   .tagebuch-widget-illustrated {
-    width: 44px;
-    height: 44px;
-    right: 50px;
+    transform: scale(0.7);
+    right: 120px;
     bottom: 8px;
   }
 
+  .tagebuch-widget-illustrated .widget-label {
+    display: none;
+  }
+
   .lerntechniken-widget-illustrated {
-    padding: 6px 10px;
+    transform: scale(0.7);
     bottom: 8px;
     right: 8px;
   }

@@ -1,5 +1,5 @@
 // ============================================
-// Spiegel-See Island Experience - Metakognition
+// Über dein Lernen nachdenken Island Experience - Metakognition
 // Schöne Animationen wie die anderen Inseln
 // ============================================
 
@@ -115,7 +115,7 @@ export function SpiegelSeeIslandExperience({
           >
             🧠
           </motion.span>
-          Spiegel-See
+          Über dein Lernen nachdenken
         </h1>
         <div className="xp-badge">
           <motion.span

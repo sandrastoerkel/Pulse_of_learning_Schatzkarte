@@ -1,7 +1,7 @@
 // ============================================
 // RPG Schatzkarte - Main App Component
 // ============================================
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Streamlit,
   withStreamlitConnection,
@@ -23,14 +23,28 @@ import {
   UserProgress,
   HeroData,
   SchatzkartAction,
-  AgeGroup
+  AgeGroup,
+  CompanionType
 } from './types';
+import { CompanionSelector } from './components/CompanionSelector';
+import { Lernbegleiter, LernkonText } from './components/Lernbegleiter';
+import { AvatarCreator } from './components/AvatarCreator';
+import { AvatarDisplay } from './components/AvatarDisplay';
+import { AvatarShop } from './components/AvatarShop';
+import { CustomAvatar, ShopItem, ItemSlot } from './types';
+import { DEFAULT_AVATAR_VISUALS } from './components/AvatarParts';
 import './styles/rpg-theme.css';
+import './styles/avatar.css';
 import './styles/bandura-challenge.css';
 import './styles/hattie-challenge.css';
 import './styles/superhelden-tagebuch.css';
 import './styles/brainy.css';
 import { Brainy } from './components/Brainy';
+import { MemoryGame, RewardModal, MiniGameSelector } from './components/MiniGames';
+import { RunnerGame } from './components/MiniGames/Runner/RunnerGame';
+import { TestPanel } from './components/TestPanel';
+import type { GameResult } from './types/games';
+import type { GameResult as RunnerGameResult } from './components/MiniGames/Runner/RunnerEngine';
 
 // Standard-Held für Preview/Development
 const DEFAULT_HERO: HeroData = {
@@ -52,20 +66,20 @@ const DEFAULT_ISLANDS: Island[] = [
   // Starthafen
   { id: 'start', name: 'Starthafen', icon: '🚢', color: '#4fc3f7', week: 0, treasures: [{ name: 'Kompass der Reise', icon: '🧭', xp: 20 }] },
   // Feste Inseln (Woche 1-4)
-  { id: 'festung', name: 'Festung der Stärke', icon: '💪', color: '#ffb74d', week: 1, treasures: [{ name: 'Kleine Siege', icon: '💎', xp: 50 }, { name: 'Vorbilder', icon: '💎', xp: 50 }] },
-  { id: 'werkzeuge', name: 'Insel der 7 Werkzeuge', icon: '🔧', color: '#81c784', week: 2, treasures: [{ name: 'Magische Tomate', icon: '🍅', xp: 50 }, { name: 'Erinnerungs-Spiegel', icon: '🔄', xp: 50 }] },
-  { id: 'bruecken', name: 'Insel der Brücken', icon: '🌉', color: '#fff176', week: 3, treasures: [{ name: 'Teil weg = Minus', icon: '🌉', xp: 60 }] },
+  { id: 'festung', name: 'Mental stark', icon: '💪', color: '#ffb74d', week: 1, treasures: [{ name: 'Kleine Siege', icon: '💎', xp: 50 }, { name: 'Vorbilder', icon: '💎', xp: 50 }] },
+  { id: 'werkzeuge', name: 'Cleverer lernen', icon: '📚', color: '#81c784', week: 2, treasures: [{ name: 'Magische Tomate', icon: '🍅', xp: 50 }, { name: 'Erinnerungs-Spiegel', icon: '🔄', xp: 50 }] },
+  { id: 'bruecken', name: 'Transferlernen', icon: '🌉', color: '#fff176', week: 3, treasures: [{ name: 'Teil weg = Minus', icon: '🌉', xp: 60 }] },
   { id: 'faeden', name: 'Insel der Fäden', icon: '🧵', color: '#ba68c8', week: 4, treasures: [{ name: 'Faden-Spule', icon: '🧵', xp: 50 }, { name: 'Netz-Karte', icon: '🕸', xp: 60 }] },
   // Flexible Inseln (Woche 5-13)
-  { id: 'spiegel_see', name: 'Spiegel-See', icon: '🧠', color: '#90caf9', week: 5, treasures: [{ name: 'Spiegel der Erkenntnis', icon: '🪞', xp: 50 }] },
-  { id: 'vulkan', name: 'Vulkan der Motivation', icon: '🔥', color: '#ef5350', week: 6, treasures: [{ name: 'Freiheits-Flamme', icon: '🔥', xp: 50 }] },
-  { id: 'ruhe_oase', name: 'Ruhe-Oase', icon: '😌', color: '#80deea', week: 7, treasures: [{ name: 'Atem-Brunnen', icon: '🌬', xp: 50 }] },
-  { id: 'ausdauer_gipfel', name: 'Ausdauer-Gipfel', icon: '🏆', color: '#ffcc80', week: 8, treasures: [{ name: 'Kletter-Seil', icon: '🧗', xp: 50 }] },
-  { id: 'fokus_leuchtturm', name: 'Fokus-Leuchtturm', icon: '🎯', color: '#ffab91', week: 9, treasures: [{ name: 'Fokus-Licht', icon: '💡', xp: 50 }] },
-  { id: 'wachstum_garten', name: 'Wachstums-Garten', icon: '🌱', color: '#c5e1a5', week: 10, treasures: [{ name: 'Das Wort NOCH', icon: '🌱', xp: 50 }] },
-  { id: 'lehrer_turm', name: 'Lehrer-Turm', icon: '🏫', color: '#b39ddb', week: 11, treasures: [{ name: 'Frage-Schlüssel', icon: '❓', xp: 50 }] },
-  { id: 'wohlfuehl_dorf', name: 'Wohlfühl-Dorf', icon: '🏠', color: '#a5d6a7', week: 12, treasures: [{ name: 'Mein Platz', icon: '🏡', xp: 50 }] },
-  { id: 'schutz_burg', name: 'Schutz-Burg', icon: '🛡', color: '#f48fb1', week: 13, treasures: [{ name: 'Grenzen-Schild', icon: '🛡', xp: 50 }] },
+  { id: 'spiegel_see', name: 'Über dein Lernen nachdenken', icon: '🧠', color: '#90caf9', week: 5, treasures: [{ name: 'Spiegel der Erkenntnis', icon: '🪞', xp: 50 }] },
+  { id: 'vulkan', name: 'Was dich antreibt', icon: '🔥', color: '#ef5350', week: 6, treasures: [{ name: 'Freiheits-Flamme', icon: '🔥', xp: 50 }] },
+  { id: 'ruhe_oase', name: 'Weniger Stress beim Lernen', icon: '😌', color: '#80deea', week: 7, treasures: [{ name: 'Atem-Brunnen', icon: '🌬', xp: 50 }] },
+  { id: 'ausdauer_gipfel', name: 'Länger dranbleiben können', icon: '🏆', color: '#ffcc80', week: 8, treasures: [{ name: 'Kletter-Seil', icon: '🧗', xp: 50 }] },
+  { id: 'fokus_leuchtturm', name: 'Fokus halten', icon: '🎯', color: '#ffab91', week: 9, treasures: [{ name: 'Fokus-Licht', icon: '💡', xp: 50 }] },
+  { id: 'wachstum_garten', name: 'Glauben, dass du wachsen kannst', icon: '🌱', color: '#c5e1a5', week: 10, treasures: [{ name: 'Das Wort NOCH', icon: '🌱', xp: 50 }] },
+  { id: 'lehrer_turm', name: 'Besser mit Lehrern klarkommen', icon: '🏫', color: '#b39ddb', week: 11, treasures: [{ name: 'Frage-Schlüssel', icon: '❓', xp: 50 }] },
+  { id: 'wohlfuehl_dorf', name: 'Dich in der Schule wohlfühlen', icon: '🏠', color: '#a5d6a7', week: 12, treasures: [{ name: 'Mein Platz', icon: '🏡', xp: 50 }] },
+  { id: 'schutz_burg', name: 'Wenn andere dich fertig machen', icon: '🛡', color: '#f48fb1', week: 13, treasures: [{ name: 'Grenzen-Schild', icon: '🛡', xp: 50 }] },
   // Finale
   { id: 'meister_berg', name: 'Berg der Meisterschaft', icon: '⛰️', color: '#ffd700', week: 14, treasures: [{ name: 'Meister-Krone', icon: '👑', xp: 500 }] }
 ];
@@ -81,15 +95,21 @@ const DEFAULT_PROGRESS: UserProgress = {
 // Prüfe ob wir im Development-Modus sind (nicht in Streamlit)
 const isDevelopment = !window.frameElement;
 
+// Reward Types für TestPanel
+type RewardType = 'game_won' | 'game_lost' | 'achievement' | 'level_up' | 'island_complete';
+
 // Die eigentliche Komponenten-Logik
 function RPGSchatzkarteContent({
   islands,
-  userProgress,
+  userProgress: initialProgress,
   heroData,
-  unlockedIslands,
+  unlockedIslands: initialUnlockedIslands,
   currentIsland,
-  ageGroup,
-  onAction
+  ageGroup: initialAgeGroup,
+  isAdmin = false,
+  onAction,
+  onProgressChange,
+  onUnlockedIslandsChange
 }: {
   islands: Island[];
   userProgress: UserProgress;
@@ -97,8 +117,16 @@ function RPGSchatzkarteContent({
   unlockedIslands: string[];
   currentIsland: string | null;
   ageGroup: AgeGroup;
+  isAdmin?: boolean;
   onAction?: (action: SchatzkartAction) => void;
+  onProgressChange?: (progress: UserProgress) => void;
+  onUnlockedIslandsChange?: (islands: string[]) => void;
 }) {
+  // Lokaler State für TestPanel-Manipulationen
+  const [userProgress, setUserProgress] = useState<UserProgress>(initialProgress);
+  const [unlockedIslands, setUnlockedIslands] = useState<string[]>(initialUnlockedIslands);
+  const [ageGroup, setAgeGroup] = useState<AgeGroup>(initialAgeGroup);
+  const [playerLevel, setPlayerLevel] = useState(heroData.level);
   const [selectedIsland, setSelectedIsland] = useState<Island | null>(null);
   const [showQuestModal, setShowQuestModal] = useState(false);
   const [showBanduraModal, setShowBanduraModal] = useState(false);
@@ -135,6 +163,86 @@ function RPGSchatzkarteContent({
   // Lerntechniken-Übersicht State
   const [showLerntechnikenModal, setShowLerntechnikenModal] = useState(false);
   const [showZertifikat, setShowZertifikat] = useState(false);
+
+  // Polarstern Modal State
+  const [showPolarsternModal, setShowPolarsternModal] = useState(false);
+
+  // Companion Selector State
+  const [showCompanionSelector, setShowCompanionSelector] = useState(false);
+  const [selectedCompanion, setSelectedCompanion] = useState<CompanionType | undefined>(heroData.companion);
+  const [companionMinimized, setCompanionMinimized] = useState(false);
+
+  // Avatar Creator State
+  const [showAvatarCreator, setShowAvatarCreator] = useState(false);
+  const [customAvatar, setCustomAvatar] = useState<CustomAvatar | null>(() => {
+    // Lade gespeicherten Avatar aus localStorage
+    try {
+      const saved = localStorage.getItem('schatzkarte_custom_avatar');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [heroNameFromAvatar, setHeroNameFromAvatar] = useState<string>(() => {
+    try {
+      return localStorage.getItem('schatzkarte_hero_name') || '';
+    } catch {
+      return '';
+    }
+  });
+
+  // Memory Game State
+  const [showMemoryGame, setShowMemoryGame] = useState(false);
+  // Runner Game State
+  const [showRunnerGame, setShowRunnerGame] = useState(false);
+  const [playerXP, setPlayerXP] = useState(heroData.xp);
+  const [playerGold, setPlayerGold] = useState(heroData.gold);
+
+  // RewardModal State
+  const [showRewardModal, setShowRewardModal] = useState(false);
+  const [rewardType, setRewardType] = useState<RewardType>('game_won');
+  const [currentGameResult, setCurrentGameResult] = useState<GameResult | null>(null);
+
+  // MiniGameSelector State
+  const [showMiniGameSelector, setShowMiniGameSelector] = useState(false);
+
+  // Avatar Shop State
+  const [showAvatarShop, setShowAvatarShop] = useState(false);
+  const [ownedItems, setOwnedItems] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('schatzkarte_owned_items');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  // Zeige Avatar Creator automatisch beim ersten Besuch (kein Avatar vorhanden)
+  useEffect(() => {
+    // Prüfe ob Avatar existiert
+    const hasAvatar = customAvatar !== null;
+    console.log('Avatar Check:', { hasAvatar, customAvatar, showAvatarCreator });
+
+    if (!hasAvatar && !showAvatarCreator) {
+      // Kleiner Delay für bessere UX
+      const timer = setTimeout(() => {
+        console.log('Opening Avatar Creator automatically...');
+        setShowAvatarCreator(true);
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [customAvatar, showAvatarCreator]);
+
+  // Kontext für Lernbegleiter-Tipps ermitteln
+  const currentLernkontext: LernkonText = useMemo(() => {
+    if (showBanduraModal) return 'bandura';
+    if (showHattieModal) return 'hattie';
+    if (showTagebuch) return 'success';
+    if (selectedIsland) {
+      return `island_${selectedIsland.id}` as LernkonText;
+    }
+    return 'map';
+  }, [showBanduraModal, showHattieModal, showTagebuch, selectedIsland]);
   const [powertechnikenProgress, setPowertechnikenProgress] = useState<PowertechnikenProgress>({
     completedTechniques: [],
     applications: {} as Record<TechniqueKey, string>
@@ -158,6 +266,14 @@ function RPGSchatzkarteContent({
   ) => {
     if (!selectedIsland) return;
 
+    // XP und Gold lokal aktualisieren
+    if (xpEarned > 0) {
+      setPlayerXP(prev => prev + xpEarned);
+    }
+    if (goldEarned && goldEarned > 0) {
+      setPlayerGold(prev => prev + goldEarned);
+    }
+
     const action: SchatzkartAction = {
       action: 'quest_completed',
       islandId: selectedIsland.id,
@@ -173,6 +289,11 @@ function RPGSchatzkarteContent({
 
   const handleTreasureCollected = useCallback((treasureId: string, xp: number) => {
     if (!selectedIsland) return;
+
+    // XP lokal aktualisieren
+    if (xp > 0) {
+      setPlayerXP(prev => prev + xp);
+    }
 
     const action: SchatzkartAction = {
       action: 'treasure_collected',
@@ -246,6 +367,20 @@ function RPGSchatzkarteContent({
   const handleHattieShipClick = useCallback(() => {
     setShowHattieModal(true);
   }, []);
+
+  // Polarstern Click Handler - sendet Action an Streamlit
+  const handlePolarsternClick = useCallback(() => {
+    if (onAction) {
+      onAction({
+        action: 'polarstern_clicked',
+        islandId: 'polarstern'
+      });
+    } else {
+      // Dev-Modus ohne Streamlit: Placeholder anzeigen
+      setShowPolarsternModal(true);
+    }
+    console.log('Polarstern clicked');
+  }, [onAction]);
 
   // Neue Vorhersage anlegen (pending)
   const handleNewPrediction = useCallback((
@@ -387,11 +522,164 @@ function RPGSchatzkarteContent({
     if (powertechnikenProgress.completedTechniques.length === 7) {
       setShowZertifikat(true);
     } else {
-      // Direkt zur Challenge der Insel der 7 Werkzeuge navigieren
+      // Direkt zur Challenge "Cleverer lernen" navigieren
       setStartWerkzeugeWithChallenge(true);
       handleIslandClick('werkzeuge');
     }
   }, [powertechnikenProgress.completedTechniques.length, handleIslandClick]);
+
+  // Companion Selection Handler
+  const handleCompanionSelect = useCallback((companionId: CompanionType) => {
+    setSelectedCompanion(companionId);
+    if (onAction) {
+      onAction({
+        action: 'companion_selected',
+        companionId
+      });
+    }
+    console.log('Companion selected:', companionId);
+  }, [onAction]);
+
+  // Avatar Creator Handler
+  const handleAvatarSave = useCallback((avatar: CustomAvatar, name: string) => {
+    setCustomAvatar(avatar);
+    setHeroNameFromAvatar(name);
+    setShowAvatarCreator(false);
+
+    // Speichere in localStorage
+    try {
+      localStorage.setItem('schatzkarte_custom_avatar', JSON.stringify(avatar));
+      localStorage.setItem('schatzkarte_hero_name', name);
+    } catch (e) {
+      console.warn('Could not save avatar to localStorage:', e);
+    }
+
+    console.log('Avatar saved:', { avatar, name });
+  }, []);
+
+  // Memory Game Handler
+  const handleMemoryGameEnd = useCallback((result: GameResult) => {
+    console.log('Memory Game Result:', result);
+
+    // XP aktualisieren
+    setPlayerXP(prev => Math.max(0, prev + result.xpWon));
+
+    // Gold aktualisieren (bei Perfekt-Bonus)
+    if (result.goldWon > 0) {
+      setPlayerGold(prev => prev + result.goldWon);
+    }
+
+    // Schließe das Spiel
+    setShowMemoryGame(false);
+
+    // Optional: Action an Streamlit senden
+    if (onAction) {
+      onAction({
+        action: 'minigame_completed',
+        islandId: 'memory_game',
+        xpEarned: result.xpWon,
+        goldEarned: result.goldWon,
+        description: result.won
+          ? `Memory gewonnen! +${result.xpWon} XP`
+          : `Memory verloren. -${result.xpBet} XP`
+      });
+    }
+  }, [onAction]);
+
+  // Runner Game Handler
+  const handleRunnerGameEnd = useCallback((result: RunnerGameResult) => {
+    console.log('Runner Game Result:', result);
+
+    // XP aktualisieren
+    setPlayerXP(prev => Math.max(0, prev + result.xpWon));
+
+    // Gold aktualisieren
+    if (result.goldWon > 0) {
+      setPlayerGold(prev => prev + result.goldWon);
+    }
+
+    // Schließe das Spiel
+    setShowRunnerGame(false);
+
+    // Optional: Action an Streamlit senden
+    if (onAction) {
+      onAction({
+        action: 'minigame_completed',
+        islandId: 'runner_game',
+        xpEarned: result.xpWon,
+        goldEarned: result.goldWon,
+        description: result.won
+          ? `Runner gewonnen! +${result.xpWon} XP, ${result.distance}m gelaufen`
+          : `Runner verloren. -${result.xpBet} XP`
+      });
+    }
+  }, [onAction]);
+
+  // Avatar Shop Handlers
+  const handleShopPurchase = useCallback((item: ShopItem) => {
+    if (playerGold < item.price) return;
+
+    setPlayerGold(prev => prev - item.price);
+    setOwnedItems(prev => {
+      const newOwned = [...prev, item.id];
+      // Speichere in localStorage
+      try {
+        localStorage.setItem('schatzkarte_owned_items', JSON.stringify(newOwned));
+      } catch (e) {
+        console.warn('Could not save owned items to localStorage:', e);
+      }
+      return newOwned;
+    });
+    console.log('Item purchased:', item);
+  }, [playerGold]);
+
+  const handleShopEquip = useCallback((itemId: string, slot: ItemSlot) => {
+    if (!customAvatar) return;
+
+    setCustomAvatar(prev => {
+      if (!prev) return prev;
+      const updated: CustomAvatar = {
+        ...prev,
+        equipped: {
+          ...prev.equipped,
+          [slot]: itemId
+        },
+        updatedAt: new Date().toISOString()
+      };
+      // Speichere in localStorage
+      try {
+        localStorage.setItem('schatzkarte_custom_avatar', JSON.stringify(updated));
+      } catch (e) {
+        console.warn('Could not save avatar to localStorage:', e);
+      }
+      return updated;
+    });
+    console.log('Item equipped:', itemId, slot);
+  }, [customAvatar]);
+
+  const handleShopUnequip = useCallback((slot: ItemSlot) => {
+    if (!customAvatar) return;
+
+    setCustomAvatar(prev => {
+      if (!prev) return prev;
+      const updated: CustomAvatar = {
+        ...prev,
+        equipped: {
+          ...prev.equipped,
+          [slot]: null
+        },
+        updatedAt: new Date().toISOString()
+      };
+      // Speichere in localStorage
+      try {
+        localStorage.setItem('schatzkarte_custom_avatar', JSON.stringify(updated));
+      } catch (e) {
+        console.warn('Could not save avatar to localStorage:', e);
+      }
+      return updated;
+    });
+    console.log('Item unequipped:', slot);
+  }, [customAvatar]);
 
   // Handler für Powertechniken-Fortschritt (wird von QuestModal aufgerufen)
   const handlePowertechnikenComplete = useCallback((techniqueKey: TechniqueKey, application?: string) => {
@@ -412,6 +700,141 @@ function RPGSchatzkarteContent({
     });
   }, []);
 
+  // ═══════════════════════════════════════
+  // TEST PANEL HANDLERS
+  // ═══════════════════════════════════════
+
+  // Insel freischalten
+  const handleIslandUnlock = useCallback((islandId: string) => {
+    setUnlockedIslands(prev => {
+      if (prev.includes(islandId)) return prev;
+      const newUnlocked = [...prev, islandId];
+      onUnlockedIslandsChange?.(newUnlocked);
+      return newUnlocked;
+    });
+  }, [onUnlockedIslandsChange]);
+
+  // Insel als abgeschlossen markieren
+  const handleIslandComplete = useCallback((islandId: string) => {
+    // Erst freischalten falls noch nicht
+    handleIslandUnlock(islandId);
+
+    // Progress setzen
+    setUserProgress(prev => {
+      const newProgress = {
+        ...prev,
+        [islandId]: {
+          video_watched: true,
+          explanation_read: true,
+          quiz_passed: true,
+          challenge_completed: true,
+          treasures_collected: islands.find(i => i.id === islandId)?.treasures.map(t => t.name) || []
+        }
+      };
+      onProgressChange?.(newProgress);
+      return newProgress;
+    });
+
+    // Nächste Insel freischalten (basierend auf week)
+    const currentIsland = islands.find(i => i.id === islandId);
+    if (currentIsland) {
+      const nextIsland = islands.find(i => i.week === currentIsland.week + 1);
+      if (nextIsland) {
+        handleIslandUnlock(nextIsland.id);
+      }
+    }
+  }, [islands, handleIslandUnlock, onProgressChange]);
+
+  // Insel zurücksetzen
+  const handleIslandReset = useCallback((islandId: string) => {
+    // Aus freigeschalteten entfernen (außer Start)
+    if (islandId !== 'start') {
+      setUnlockedIslands(prev => {
+        const newUnlocked = prev.filter(id => id !== islandId);
+        onUnlockedIslandsChange?.(newUnlocked);
+        return newUnlocked;
+      });
+    }
+
+    // Progress zurücksetzen
+    setUserProgress(prev => {
+      const newProgress = {
+        ...prev,
+        [islandId]: {
+          video_watched: false,
+          explanation_read: false,
+          quiz_passed: false,
+          challenge_completed: false,
+          treasures_collected: []
+        }
+      };
+      onProgressChange?.(newProgress);
+      return newProgress;
+    });
+  }, [onProgressChange, onUnlockedIslandsChange]);
+
+  // Alle Inseln freischalten
+  const handleUnlockAllIslands = useCallback(() => {
+    const allIds = islands.map(i => i.id);
+    setUnlockedIslands(allIds);
+    onUnlockedIslandsChange?.(allIds);
+  }, [islands, onUnlockedIslandsChange]);
+
+  // Alle Inseln zurücksetzen
+  const handleResetAllIslands = useCallback(() => {
+    // Nur Start freigeschaltet
+    setUnlockedIslands(['start']);
+    onUnlockedIslandsChange?.(['start']);
+
+    // Alle Progress zurücksetzen
+    const emptyProgress: UserProgress = {};
+    islands.forEach(island => {
+      emptyProgress[island.id] = {
+        video_watched: false,
+        explanation_read: false,
+        quiz_passed: false,
+        challenge_completed: false,
+        treasures_collected: []
+      };
+    });
+    setUserProgress(emptyProgress);
+    onProgressChange?.(emptyProgress);
+  }, [islands, onProgressChange, onUnlockedIslandsChange]);
+
+  // Reward-Modal triggern
+  const handleTriggerReward = useCallback((type: RewardType) => {
+    setRewardType(type);
+
+    // Demo-Daten für verschiedene Reward-Typen
+    if (type === 'game_won') {
+      setCurrentGameResult({
+        game: 'memory',
+        won: true,
+        xpBet: 50,
+        xpWon: 150,
+        goldWon: 25,
+        stats: {
+          moves: 12,
+          timeUsed: 45
+        }
+      });
+    } else if (type === 'game_lost') {
+      setCurrentGameResult({
+        game: 'memory',
+        won: false,
+        xpBet: 50,
+        xpWon: -50,
+        goldWon: 0,
+        stats: {
+          moves: 20,
+          timeUsed: 60
+        }
+      });
+    }
+
+    setShowRewardModal(true);
+  }, []);
+
   return (
     <div className="rpg-schatzkarte">
       <header className="app-header">
@@ -428,18 +851,26 @@ function RPGSchatzkarteContent({
       <WorldMapIllustrated
         islands={islands}
         userProgress={userProgress}
-        heroData={heroData}
+        heroData={{ ...heroData, companion: selectedCompanion }}
         unlockedIslands={unlockedIslands}
         currentIsland={currentIsland}
         onIslandClick={handleIslandClick}
         onBanduraShipClick={handleBanduraShipClick}
         onHattieShipClick={handleHattieShipClick}
+        onPolarsternClick={handlePolarsternClick}
+        polarsternGoals={0}
         ageGroup={ageGroup}
         tagebuchEntries={tagebuchEntries}
         onTagebuchToggle={handleTagebuchToggle}
         onLerntechnikenClick={handleLerntechnikenClick}
         lerntechnikenCompleted={powertechnikenProgress.completedTechniques.length}
         hasCertificate={powertechnikenProgress.completedTechniques.length === 7}
+        onCompanionClick={() => setShowCompanionSelector(true)}
+        customAvatar={customAvatar}
+        heroName={heroNameFromAvatar}
+        onAvatarEdit={() => setShowAvatarCreator(true)}
+        playerGold={playerGold}
+        playerXP={playerXP}
       />
 
       {showQuestModal && selectedIsland && (
@@ -455,6 +886,7 @@ function RPGSchatzkarteContent({
           onOpenBandura={handleBanduraShipClick}
           onOpenHattie={handleHattieShipClick}
           startWerkzeugeWithChallenge={startWerkzeugeWithChallenge}
+          onPolarsternClick={handlePolarsternClick}
         />
       )}
 
@@ -506,18 +938,185 @@ function RPGSchatzkarteContent({
         />
       )}
 
-      {/* Brainy - Das Maskottchen (nur auf der Kartenansicht, nicht bei offenen Modals) */}
-      {!showQuestModal && !showBanduraModal && !showHattieModal && !showTagebuch && !showLerntechnikenModal && !showZertifikat && (
-        <Brainy
-          mood="happy"
-          message={`Hey ${heroData.name}! Klick auf eine Insel!`}
-          size="medium"
-          position="top-right"
+      {/* Polarstern Modal - Ziele setzen */}
+      {showPolarsternModal && (
+        <div className="modal-overlay" onClick={() => setShowPolarsternModal(false)}>
+          <div className="polarstern-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close-btn" onClick={() => setShowPolarsternModal(false)}>×</button>
+            <div className="polarstern-modal__header">
+              <span className="polarstern-modal__icon">⭐</span>
+              <h2>Dein Polarstern</h2>
+            </div>
+            <div className="polarstern-modal__content">
+              <p className="polarstern-intro">
+                Der Polarstern zeigt dir den Weg! Setze hier deine Lernziele und Träume.
+              </p>
+              <div className="polarstern-coming-soon">
+                <span className="coming-soon-icon">🚧</span>
+                <h3>Bald verfügbar!</h3>
+                <p>
+                  Hier kannst du bald deine persönlichen Lernziele setzen und verfolgen.
+                  Der Polarstern hilft dir, deinen Weg nicht aus den Augen zu verlieren!
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Companion Selector Modal */}
+      <CompanionSelector
+        currentCompanion={selectedCompanion}
+        onSelect={handleCompanionSelect}
+        isOpen={showCompanionSelector}
+        onClose={() => setShowCompanionSelector(false)}
+      />
+
+      {/* Avatar Creator Modal */}
+      {showAvatarCreator && (
+        <div className="avatar-creator-modal">
+          <AvatarCreator
+            initialAvatar={customAvatar || undefined}
+            initialName={heroNameFromAvatar}
+            onSave={handleAvatarSave}
+            onCancel={customAvatar ? () => setShowAvatarCreator(false) : undefined}
+          />
+        </div>
+      )}
+
+      {/* Memory Game Modal */}
+      {showMemoryGame && (
+        <div className="memory-game-modal">
+          <MemoryGame
+            playerXP={playerXP}
+            playerGold={playerGold}
+            playerAvatar={customAvatar || undefined}
+            onGameEnd={handleMemoryGameEnd}
+            onClose={() => setShowMemoryGame(false)}
+          />
+        </div>
+      )}
+
+      {/* Runner Game Modal */}
+      {showRunnerGame && customAvatar && (
+        <div className="runner-game-modal">
+          <RunnerGame
+            playerXP={playerXP}
+            playerGold={playerGold}
+            playerAvatar={customAvatar}
+            playerAgeGroup={ageGroup === 'oberstufe' || ageGroup === 'paedagoge' ? 'mittelstufe' : ageGroup}
+            onGameEnd={handleRunnerGameEnd}
+            onClose={() => setShowRunnerGame(false)}
+          />
+        </div>
+      )}
+
+      {/* Avatar Shop Modal */}
+      {showAvatarShop && customAvatar && (
+        <div className="avatar-shop-modal">
+          <AvatarShop
+            playerGold={playerGold}
+            playerAvatar={customAvatar}
+            ownedItems={ownedItems}
+            onPurchase={handleShopPurchase}
+            onEquip={handleShopEquip}
+            onUnequip={handleShopUnequip}
+            onClose={() => setShowAvatarShop(false)}
+          />
+        </div>
+      )}
+
+      {/* RewardModal - Belohnungs-Anzeige */}
+      <RewardModal
+        isOpen={showRewardModal}
+        type={rewardType}
+        gameResult={currentGameResult || undefined}
+        achievement={rewardType === 'achievement' ? {
+          id: 'demo-achievement',
+          name: 'Erster Erfolg!',
+          description: 'Du hast dein erstes Achievement freigeschaltet!',
+          icon: '🏆',
+          bonusXP: 50
+        } : undefined}
+        levelUp={rewardType === 'level_up' ? {
+          oldLevel: playerLevel,
+          newLevel: playerLevel + 1,
+          newTitle: 'Wissens-Entdecker',
+          goldBonus: 100
+        } : undefined}
+        islandReward={rewardType === 'island_complete' ? {
+          islandName: 'Demo-Insel',
+          xpEarned: 200,
+          goldEarned: 50
+        } : undefined}
+        onPlayAgain={() => {
+          setShowRewardModal(false);
+          setShowMemoryGame(true);
+        }}
+        onClose={() => setShowRewardModal(false)}
+      />
+
+      {/* MiniGameSelector - Spiel-Auswahl nach Erfolgen */}
+      <MiniGameSelector
+        isOpen={showMiniGameSelector}
+        trigger="bandura_complete"
+        availableGames={['memory', 'runner']}
+        bonusMultiplier={1.5}
+        onSelectGame={(game) => {
+          setShowMiniGameSelector(false);
+          if (game === 'memory') {
+            setShowMemoryGame(true);
+          } else {
+            setShowRunnerGame(true);
+          }
+        }}
+        onSelectShop={() => {
+          setShowMiniGameSelector(false);
+          setShowAvatarShop(true);
+        }}
+        onClose={() => setShowMiniGameSelector(false)}
+      />
+
+      {/* Admin Test-Panel - nur für Admins sichtbar */}
+      {isAdmin && (
+        <TestPanel
+          playerXP={playerXP}
+          playerGold={playerGold}
+          playerLevel={playerLevel}
+          islands={islands}
+          userProgress={userProgress}
+          unlockedIslands={unlockedIslands}
+          onXPChange={setPlayerXP}
+          onGoldChange={setPlayerGold}
+          onLevelChange={setPlayerLevel}
+          onIslandUnlock={handleIslandUnlock}
+          onIslandComplete={handleIslandComplete}
+          onIslandReset={handleIslandReset}
+          onUnlockAllIslands={handleUnlockAllIslands}
+          onResetAllIslands={handleResetAllIslands}
+          onTriggerReward={handleTriggerReward}
+          onOpenMiniGameSelector={() => setShowMiniGameSelector(true)}
+          onOpenMemory={() => setShowMemoryGame(true)}
+          onOpenRunner={() => setShowRunnerGame(true)}
+          onOpenAvatarShop={() => setShowAvatarShop(true)}
+          ageGroup={ageGroup}
+          onAgeGroupChange={setAgeGroup}
+        />
+      )}
+
+      {/* Lernbegleiter - erscheint wenn ein Begleiter ausgewählt wurde */}
+      {selectedCompanion && !showCompanionSelector && (
+        <Lernbegleiter
+          companion={selectedCompanion}
+          context={currentLernkontext}
+          userName={heroData.name}
+          minimized={companionMinimized}
+          onToggleMinimize={() => setCompanionMinimized(!companionMinimized)}
         />
       )}
 
       {/* Zurück zur Schatzkarte Button - erscheint wenn ein Modal offen ist */}
-      {(showQuestModal || showBanduraModal || showHattieModal || showTagebuch || showLerntechnikenModal || showZertifikat) && (
+      {(showQuestModal || showBanduraModal || showHattieModal || showTagebuch || showLerntechnikenModal || showZertifikat || showCompanionSelector || showAvatarCreator || showMemoryGame || showRunnerGame || showAvatarShop || showPolarsternModal) && (
         <button
           className="back-to-map-button"
           onClick={() => {
@@ -529,10 +1128,63 @@ function RPGSchatzkarteContent({
             setShowTagebuch(false);
             setShowLerntechnikenModal(false);
             setShowZertifikat(false);
+            setShowCompanionSelector(false);
+            setShowAvatarCreator(false);
+            setShowMemoryGame(false);
+            setShowRunnerGame(false);
+            setShowAvatarShop(false);
+            setShowPolarsternModal(false);
           }}
         >
           <span className="back-icon">🗺️</span>
           <span className="back-text">Zurück zur Schatzkarte</span>
+        </button>
+      )}
+
+      {/* Avatar Edit Widget - jetzt im linken Panel integriert */}
+
+      {/* Memory Game Button - erscheint wenn kein Modal offen */}
+      {!showQuestModal && !showBanduraModal && !showHattieModal && !showMemoryGame && !showRunnerGame && !showAvatarShop && !showAvatarCreator && (
+        <button
+          className="memory-game-widget"
+          onClick={() => setShowMemoryGame(true)}
+          title="Memory spielen"
+        >
+          <span className="memory-game-widget__icon">🧠</span>
+          <div className="memory-game-widget__info">
+            <span className="memory-game-widget__title">Memory</span>
+            <span className="memory-game-widget__xp">{playerXP} XP</span>
+          </div>
+        </button>
+      )}
+
+      {/* Runner Game Button - erscheint wenn kein Modal offen UND Avatar vorhanden */}
+      {customAvatar && !showQuestModal && !showBanduraModal && !showHattieModal && !showMemoryGame && !showRunnerGame && !showAvatarShop && !showAvatarCreator && (
+        <button
+          className="runner-game-widget"
+          onClick={() => setShowRunnerGame(true)}
+          title="Runner spielen"
+        >
+          <span className="runner-game-widget__icon">🏃</span>
+          <div className="runner-game-widget__info">
+            <span className="runner-game-widget__title">Runner</span>
+            <span className="runner-game-widget__xp">{playerXP} XP</span>
+          </div>
+        </button>
+      )}
+
+      {/* Avatar Shop Button - erscheint wenn kein Modal offen UND Avatar vorhanden */}
+      {customAvatar && !showQuestModal && !showBanduraModal && !showHattieModal && !showMemoryGame && !showRunnerGame && !showAvatarShop && !showAvatarCreator && (
+        <button
+          className="avatar-shop-widget"
+          onClick={() => setShowAvatarShop(true)}
+          title="Avatar Shop öffnen"
+        >
+          <span className="avatar-shop-widget__icon">🛒</span>
+          <div className="avatar-shop-widget__info">
+            <span className="avatar-shop-widget__title">Shop</span>
+            <span className="avatar-shop-widget__gold">{playerGold} 💰</span>
+          </div>
         </button>
       )}
 
@@ -632,6 +1284,8 @@ function RPGSchatzkarteStreamlit({ args }: ComponentProps) {
   const unlockedIslands: string[] = args?.unlockedIslands || ['motivation'];
   const currentIsland: string | null = args?.currentIsland || null;
   const ageGroup: AgeGroup = args?.ageGroup || 'grundschule';
+  // Admin-Modus: wird von Streamlit übergeben (z.B. für Pädagogen/Admins)
+  const isAdmin: boolean = args?.isAdmin || args?.ageGroup === 'paedagoge' || false;
   const [currentTheme, setCurrentTheme] = useState<ThemeType>(loadSavedTheme);
 
   useEffect(() => {
@@ -655,6 +1309,7 @@ function RPGSchatzkarteStreamlit({ args }: ComponentProps) {
         unlockedIslands={unlockedIslands}
         currentIsland={currentIsland}
         ageGroup={ageGroup}
+        isAdmin={isAdmin}
         onAction={handleAction}
       />
     </div>
@@ -676,15 +1331,7 @@ function RPGSchatzkarteDev() {
         onThemeChange={setCurrentTheme}
       />
 
-      {/* Altersstufen-Auswahl für Dev */}
-      <div className="dev-age-selector">
-        <label>Altersstufe: </label>
-        <select value={ageGroup} onChange={(e) => setAgeGroup(e.target.value as AgeGroup)}>
-          <option value="grundschule">Grundschule</option>
-          <option value="unterstufe">Unterstufe</option>
-          <option value="mittelstufe">Mittelstufe</option>
-        </select>
-      </div>
+      {/* Altersstufen-Auswahl für Dev - jetzt im TestPanel integriert */}
 
       <RPGSchatzkarteContent
         islands={DEFAULT_ISLANDS}
@@ -693,6 +1340,7 @@ function RPGSchatzkarteDev() {
         unlockedIslands={unlockedIslands}
         currentIsland="werkzeuge"
         ageGroup={ageGroup}
+        isAdmin={true}  // Im Dev-Modus immer Admin
       />
     </div>
   );

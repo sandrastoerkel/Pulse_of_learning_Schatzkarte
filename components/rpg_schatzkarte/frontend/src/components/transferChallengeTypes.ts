@@ -1,6 +1,6 @@
 // ============================================
 // Transfer Challenge - TypeScript Types & Daten
-// Insel der Brücken - Für Grundschule (8-10 Jahre)
+// Transferlernen - Für Grundschule (8-10 Jahre)
 // NEUE VERSION: Kreative, interaktive Übungen
 // Wissenschaftlich fundiert: Effektstärke d=0.86 (Hattie)
 // ============================================

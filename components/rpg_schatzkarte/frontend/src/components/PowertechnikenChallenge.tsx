@@ -173,7 +173,7 @@ export function PowertechnikenChallenge({
         </button>
         <h1 className="challenge-title">
           <span className="title-icon">🛠️</span>
-          Insel der 7 Werkzeuge
+          Cleverer lernen
         </h1>
         <div className="progress-badge">
           <span className="xp-icon">⭐</span>

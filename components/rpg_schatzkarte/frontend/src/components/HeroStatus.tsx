@@ -1,11 +1,13 @@
 // ============================================
 // RPG Schatzkarte - Hero Status Component
 // ============================================
-import { HeroData, Item } from '../types';
+import { HeroData, Item, CompanionType } from '../types';
+import { getCompanionImage } from './CompanionSelector';
 
 interface HeroStatusProps {
   hero: HeroData;
   onInventoryClick?: () => void;
+  onCompanionClick?: () => void;
 }
 
 // Avatar Icons
@@ -24,16 +26,44 @@ const AVATAR_NAMES: Record<string, string> = {
   healer: 'Heiler'
 };
 
-export function HeroStatus({ hero, onInventoryClick }: HeroStatusProps) {
+export function HeroStatus({ hero, onInventoryClick, onCompanionClick }: HeroStatusProps) {
   const xpPercent = (hero.xp / hero.xp_to_next_level) * 100;
+  const hasCompanion = hero.companion !== undefined;
 
   return (
     <div className="hero-status">
       {/* Avatar & Level */}
       <div className="hero-avatar-section">
-        <div className="hero-avatar">
-          <span className="avatar-icon">{AVATAR_ICONS[hero.avatar]}</span>
+        <div
+          className={`hero-avatar ${hasCompanion ? 'has-companion' : ''}`}
+          onClick={onCompanionClick}
+          style={{ cursor: onCompanionClick ? 'pointer' : 'default', position: 'relative' }}
+          title="Klicke um deinen Lernbegleiter zu wechseln"
+        >
+          {hasCompanion ? (
+            <img
+              src={getCompanionImage(hero.companion)}
+              alt="Lernbegleiter"
+              className="companion-avatar-img"
+            />
+          ) : (
+            <span className="avatar-icon">{AVATAR_ICONS[hero.avatar]}</span>
+          )}
+          {onCompanionClick && (
+            <button className="companion-change-btn" title="Begleiter wechseln">
+              ✏️
+            </button>
+          )}
         </div>
+        {/* Button zum Begleiter wählen - erscheint wenn noch keiner ausgewählt */}
+        {onCompanionClick && !hasCompanion && (
+          <button
+            className="choose-companion-btn"
+            onClick={onCompanionClick}
+          >
+            🐉 Wähle Begleiter
+          </button>
+        )}
         <div className="hero-info">
           <div className="hero-name-row">
             <h3 className="hero-name">{hero.name}</h3>

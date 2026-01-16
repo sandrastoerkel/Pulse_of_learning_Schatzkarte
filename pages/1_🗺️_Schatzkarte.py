@@ -13,6 +13,7 @@ from schatzkarte.map_db import (
     save_treasure_collected
 )
 from schatzkarte.map_progress import get_unlocked_islands
+from schatzkarte.map_ships import check_and_render_modals, get_ships_css, render_polarstern_ship_html, get_polarstern_data
 from utils.gamification_db import get_user_stats, calculate_level
 from utils.user_system import (
     is_logged_in,
@@ -294,7 +295,54 @@ st.markdown("""
 # Altersstufe aus Session-State holen
 age_group = st.session_state.get("current_user_age_group", "grundschule")
 
+# ===============================================================
+# POLARSTERN & MODALS (vor React-Komponente prüfen)
+# ===============================================================
+
+# Prüfen ob ein Modal offen ist - wenn ja, nur Modal zeigen
+if check_and_render_modals(user_id, age_group):
+    st.stop()  # Nur Modal zeigen, Rest nicht rendern
+
+# CSS für pulsierenden Polarstern-Button
+st.markdown(get_ships_css(), unsafe_allow_html=True)
+
+# Pulsierender Polarstern-Button oben rechts (als Floating-Element)
+polarstern_data = get_polarstern_data(user_id)
+active_goals = polarstern_data.get('active', 0)
+badge_html = f'<span style="background:#FFD700;color:#1a237e;border-radius:10px;padding:2px 8px;font-size:0.75em;margin-left:5px;">{active_goals}</span>' if active_goals > 0 else ''
+
+st.markdown(f"""
+<style>
+.polarstern-floating-btn {{
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 99999;
+    background: linear-gradient(135deg, #1a237e 0%, #0d1b3e 100%);
+    border: 2px solid #FFD700;
+    border-radius: 50px;
+    padding: 12px 20px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    animation: polarstern-glow 2s ease-in-out infinite, float 3s ease-in-out infinite;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}}
+.polarstern-floating-btn:hover {{
+    transform: scale(1.05);
+}}
+.polarstern-star {{
+    font-size: 1.5em;
+    animation: star-twinkle 2s ease-in-out infinite;
+}}
+</style>
+""", unsafe_allow_html=True)
+
 # React-Komponente aufrufen (Hoehe wird per CSS auf 100vh gesetzt)
+# Der Polarstern ist jetzt direkt auf der Karte (in der React-Komponente)
 result = rpg_schatzkarte(
     islands=islands,
     user_progress=user_data.get("progress", {}),
@@ -302,6 +350,7 @@ result = rpg_schatzkarte(
     unlocked_islands=unlocked_islands,
     current_island=current_island,
     age_group=age_group,
+    is_admin=True,  # Admin-TestPanel aktivieren
     height=900,  # Basis-Hoehe, wird per CSS auf calc(100vh - 60px) ueberschrieben
     key="rpg_schatzkarte"
 )
@@ -313,6 +362,11 @@ result = rpg_schatzkarte(
 if result:
     action = result.get("action")
     island_id = result.get("islandId")
+
+    # Polarstern-Klick SOFORT verarbeiten (kein Duplikat-Schutz nötig)
+    if action == "polarstern_clicked":
+        st.session_state.show_polarstern_modal = True
+        st.rerun()
 
     # Duplikat-Schutz: gleiche Aktion nicht doppelt verarbeiten
     action_key = f"{action}_{island_id}_{result.get('questType', '')}_{result.get('treasureId', '')}"

@@ -1,9 +1,221 @@
 # Pulse of Learning - Schatzkarte
-## Dokumentation Stand 14. Januar 2025
+## Dokumentation Stand 16. Januar 2025
 
 ---
 
-# HEUTIGE ÄNDERUNGEN (14. Januar 2025)
+# HEUTIGE ÄNDERUNGEN (16. Januar 2025)
+
+## 1. Alle 15 Custom SVG Insel-Icons integriert
+
+### Vollständiges Icon-System für die Weltkarte
+Alle 15 Inseln haben jetzt individuelle, handgezeichnete SVG-Icons mit Animationen:
+
+**Datei:** `frontend/src/components/icons/`
+
+| Insel | Icon-Datei | Beschreibung |
+|-------|------------|--------------|
+| 🏠 Starthafen | StartHafenIcon.tsx | Hafen mit Leuchtturm und Anker |
+| 🏰 Festung | FestungIcon.tsx | Burg mit wehenden Fahnen |
+| 🔧 Werkzeuge | WerkzeugeIcon.tsx | Werkzeugkasten mit Zahnrädern |
+| 🌋 Vulkan | VulkanIcon.tsx | Aktiver Vulkan mit Lava |
+| ⛰️ Meisterberg | MeisterBergIcon.tsx | Goldener Gipfel mit Krone |
+| 🌉 Brücken | BrueckenIcon.tsx | Regenbogenbrücke |
+| 🧵 Fäden | FaedenIcon.tsx | Vernetztes Spinnenetz |
+| 🪞 Spiegel-See | SpiegelSeeIcon.tsx | Mystischer See mit Reflexion |
+| 🌴 Ruhe-Oase | RuheOaseIcon.tsx | Palmen und Wasserfall |
+| 🏔️ Ausdauer-Gipfel | AusdauerGipfelIcon.tsx | Schneebedeckter Berg |
+| 🗼 Fokus-Leuchtturm | FokusLeuchtturmIcon.tsx | Strahlender Leuchtturm |
+| 🌱 Wachstums-Garten | WachstumGartenIcon.tsx | Blühender Garten mit Schmetterlingen |
+| 🏫 Lehrer-Turm | LehrerTurmIcon.tsx | Weiser Turm mit Sternen |
+| 🏘️ Wohlfühl-Dorf | WohlfuehlDorfIcon.tsx | Gemütliches Dorf mit Herzen |
+| 🏯 Schutz-Burg | SchutzBurgIcon.tsx | Burg mit leuchtendem Schutzschild |
+
+**Features aller Icons:**
+- Animierte Elemente (Shimmer, Funkeln, Bewegung)
+- Gradient-Füllungen für 3D-Effekt
+- Props: `size`, `animated`, `glowing`
+- Einzigartige IDs pro Instanz (keine Konflikte)
+- Glow-Ringe entfernt für sauberes Design
+
+## 2. Schiff-Icons komplett
+
+Alle 3 Schiffe haben jetzt SVG-Icons:
+
+| Schiff | Icon-Datei | Beschreibung |
+|--------|------------|--------------|
+| 🔑 Goldener Schlüssel | GoldenKeyIcon.tsx | Goldener Schlüssel mit Glitzer |
+| ⚖️ Hattie-Waage | HattieWaageIcon.tsx | Waage für Selbsteinschätzung |
+| ⭐ Polarstern | PolarsternIcon.tsx | Leuchtender Nordstern |
+
+## 3. Lerntechniken-Widget Icon
+
+**Datei:** `frontend/src/components/icons/LerntechnikenIcon.tsx`
+
+Neues Magic-Book-Icon für das Lerntechniken-Widget:
+- Aufgeschlagenes Zauberbuch
+- Schwebende Symbole (Glühbirne, Zahnrad, Stern)
+- Animierte Partikel
+
+## 4. Widget-Styling wie Schiffe
+
+**Dateien:**
+- `frontend/src/components/WorldMapIllustrated.tsx`
+- `frontend/src/styles/illustrated-map.css`
+
+Widgets (Lerntechniken & Tagebuch) sind jetzt wie die Schiffe gestaltet:
+- Transparenter Hintergrund (keine farbige Box)
+- Icon schwebt frei
+- Label darunter (wie bei Schiffen)
+- Hover-Glow-Effekt
+
+## 5. Legende aktualisiert
+
+**Änderung:** Farbige Punkte durch Emojis ersetzt
+
+| Alt | Neu |
+|-----|-----|
+| 🟢 Grüner Punkt | ⭐ Abgeschlossen |
+| 🔴 Roter Punkt | 🔒 Gesperrt |
+
+## 6. Avatar vergrößert
+
+**Änderung:** Avatar-Größe von 80px auf 110px erhöht
+- `.player-avatar-frame`: 70px → 100px
+- Bessere Sichtbarkeit auf der Karte
+
+## 7. Text-Lesbarkeit in PowertechnikenChallenge
+
+**Datei:** `frontend/src/styles/powertechniken-challenge.css`
+
+Umfassende Verbesserung der Textlesbarkeit:
+- CSS-Variable `--pt-text-light`: #f5f5f5 → #ffffff
+- CSS-Variable `--pt-text-muted`: #9ca3af → #d1d5db
+- `.progress-text`: Weiß mit Text-Shadow
+- `.overview-intro`: Weiß mit stärkerem Hintergrund
+- `.back-btn`: Besserer Kontrast
+
+## 8. Admin TestPanel im Streamlit-Modus
+
+**Dateien:**
+- `components/rpg_schatzkarte/__init__.py`
+- `pages/1_🗺️_Schatzkarte.py`
+
+Neuer Parameter `is_admin` ermöglicht Zugriff auf das TestPanel:
+
+```python
+result = rpg_schatzkarte(
+    islands=islands,
+    user_progress=user_data.get("progress", {}),
+    hero_data=hero_data,
+    unlocked_islands=unlocked_islands,
+    current_island=current_island,
+    age_group=age_group,
+    is_admin=True,  # TestPanel aktivieren
+    height=900,
+    key="rpg_schatzkarte"
+)
+```
+
+---
+
+# ÄNDERUNGEN (15. Januar 2025)
+
+## 1. Avatar-Qualität verbessert
+
+### Detailreicherer & realistischerer Avatar
+Die Avatar-Darstellung wurde deutlich verbessert mit Premium-SVG-Rendering:
+
+**Datei:** `frontend/src/components/AvatarDisplay.tsx`
+
+**Verbesserungen:**
+- **Multi-Stop Hautfarben-Gradienten** - Natürlichere Übergänge statt flacher Farben
+- **Verbesserte Augen** - Mehrere Glanzlichter, Iris-Details, dezente Schatten
+- **Haar-Glanz-Overlays** - Realistische Lichtreflexe auf den Haaren
+- **Nasenlöcher-Andeutung** - Subtile Details für mehr Tiefe
+- **Lippen-Gradienten** - Natürlichere Mund-Darstellung
+- **Kleidungs-Details** - Falten, Schatten, Highlights für mehr Tiefe
+- **Einzigartige Gradient-IDs** - Jede Avatar-Instanz hat eigene IDs zur Vermeidung von Konflikten
+
+## 2. Memory-Spiel integriert (NEU!)
+
+### Vollständiges Memory-Spiel mit XP-Wettsystem
+
+Ein neues Mini-Spiel wurde zur Schatzkarte hinzugefügt, bei dem Spieler XP riskieren können.
+
+### Neue Dateien erstellt:
+
+| Datei | Beschreibung |
+|-------|--------------|
+| `MiniGames/Memory/MemoryGame.tsx` | Haupt-Spiellogik mit Timer, Leben, Karten |
+| `MiniGames/Memory/MemoryCard.tsx` | 3D-Flip-Karten mit Framer Motion |
+| `MiniGames/Memory/BettingPhase.tsx` | XP-Wett-UI mit Schwierigkeitsauswahl |
+| `MiniGames/Memory/memory-game.css` | Komplettes Styling (~850 Zeilen) |
+| `MiniGames/Memory/index.ts` | Modul-Exports |
+| `MiniGames/index.ts` | Haupt-Exports für alle MiniGames |
+| `types/games.ts` | TypeScript-Typen für Spiele |
+
+### Features:
+
+**Wett-Phase:**
+- Einsatz wählen: 25, 50, 100 XP oder "All-In"
+- 3 Schwierigkeitsgrade: Leicht (×1.5), Mittel (×2.0), Schwer (×3.0)
+- Anzeige von Leben, Zeit und Paaren pro Schwierigkeit
+
+**Spiel-Phase:**
+- 3D-Kartenflip-Animationen
+- Leben-System (3-5 Herzen je nach Schwierigkeit)
+- Timer mit Warn-Farben (grün → orange → rot)
+- Züge-Zähler und Paare-Anzeige
+- Shake-Animation bei falschem Paar
+- Sparkle-Effekte bei richtigem Paar
+
+**Ergebnis-Phase:**
+- Gewinn: Konfetti-Animation, XP-Gewinn, optionaler Gold-Bonus bei perfektem Spiel
+- Verlust: XP-Verlust, Tipp für nächstes Mal
+- "Nochmal" oder "Fertig" Buttons
+
+### Integration in App.tsx:
+
+```tsx
+// Neue Imports
+import { MemoryGame } from './components/MiniGames';
+import type { GameResult } from './types/games';
+
+// Neue States
+const [showMemoryGame, setShowMemoryGame] = useState(false);
+const [playerXP, setPlayerXP] = useState(heroData.xp);
+const [playerGold, setPlayerGold] = useState(heroData.gold);
+
+// Handler für Spielende
+const handleMemoryGameEnd = useCallback((result: GameResult) => {
+  setPlayerXP(prev => Math.max(0, prev + result.xpWon));
+  if (result.goldWon > 0) {
+    setPlayerGold(prev => prev + result.goldWon);
+  }
+  setShowMemoryGame(false);
+}, []);
+```
+
+### CSS-Styles hinzugefügt (rpg-theme.css):
+
+- `.memory-game-modal` - Vollbild-Overlay für das Spiel
+- `.memory-game-widget` - Schwebendes Widget unten rechts
+- Animiertes Gehirn-Icon mit Puls-Effekt
+- XP-Anzeige im Widget
+
+### So spielst du Memory:
+
+1. Klicke auf das 🧠 Memory-Widget unten rechts auf der Karte
+2. Wähle deinen XP-Einsatz (25, 50, 100 oder All-In)
+3. Wähle die Schwierigkeit (Leicht/Mittel/Schwer)
+4. Klicke "🎮 Spiel starten"
+5. Finde alle Paare bevor Zeit oder Leben aufgebraucht sind!
+6. Bei Gewinn: XP × Multiplikator als Belohnung
+7. Bei Verlust: Einsatz wird abgezogen
+
+---
+
+# ÄNDERUNGEN (14. Januar 2025)
 
 ## 1. Karten-Anpassungen
 
@@ -941,7 +1153,7 @@ Pulse_of_learning_Schatzkarte/
 
 ---
 
-# NÄCHSTE SCHRITTE (14. Januar 2025)
+# NÄCHSTE SCHRITTE (15. Januar 2025)
 
 ## Hohe Priorität
 1. **Quiz für Festung - Mittelstufe** - `festungQuizContent_mittelstufe.ts` erstellen
@@ -953,11 +1165,22 @@ Pulse_of_learning_Schatzkarte/
 5. **Video URLs eintragen** - Werkzeuge, Brücken, Fäden haben Placeholder-Videos
 6. **Inhalt für Spiegel-See** - Als nächste leere Insel mit Inhalt befüllen
 7. **Quiz-Ergebnisse speichern** - Datenbank-Erweiterung
+8. **Weitere Mini-Spiele** - Runner-Spiel als nächstes MiniGame hinzufügen
 
 ## Niedrige Priorität
-8. **Inhalt für restliche Inseln** - Vulkan, Ruhe-Oase, Ausdauer-Gipfel, etc.
-9. **Willkommensvideo** - YouTube-URL produzieren
-10. **Gruppenchat** - Lösung finden
+9. **Inhalt für restliche Inseln** - Vulkan, Ruhe-Oase, Ausdauer-Gipfel, etc.
+10. **Willkommensvideo** - YouTube-URL produzieren
+11. **Gruppenchat** - Lösung finden
+
+## ✅ ERLEDIGT (15. Januar)
+- **🧠 Memory-Spiel integriert** → Vollständiges XP-Wett-Spiel mit 3 Schwierigkeitsgraden!
+  - MemoryGame.tsx, MemoryCard.tsx, BettingPhase.tsx
+  - memory-game.css (~850 Zeilen)
+  - types/games.ts für Spiel-Typen
+  - Widget-Button auf der Schatzkarte
+- **🎨 Avatar-Qualität verbessert** → Premium-SVG-Rendering mit Gradienten und Details
+  - Multi-Stop Hautfarben, verbesserte Augen, Haar-Glanz
+  - Lippen-Gradienten, Kleidungs-Details
 
 ## ✅ ERLEDIGT (13. Januar)
 - ~~🎨 Design auf alle Inseln anwenden~~ → **Alle 14 Inseln haben jetzt das Design-System!**
@@ -1013,6 +1236,15 @@ components/rpg_schatzkarte/frontend/
 
 | Datum | Was | Details |
 |-------|-----|---------|
+| **16.01.2025** | **🎨 15 Custom SVG Icons** | Alle 15 Insel-Icons + 3 Schiff-Icons + Lerntechniken-Icon komplett |
+| 16.01.2025 | Widget-Redesign | Lerntechniken & Tagebuch wie Schiffe gestaltet (transparent, Label unten) |
+| 16.01.2025 | Legende aktualisiert | Farbige Punkte → Emoji-Indikatoren (⭐/🔒) |
+| 16.01.2025 | Avatar vergrößert | 80px → 110px für bessere Sichtbarkeit |
+| 16.01.2025 | Text-Lesbarkeit | PowertechnikenChallenge mit weißem Text + Shadows |
+| 16.01.2025 | Admin TestPanel | is_admin Parameter für Streamlit hinzugefügt |
+| **15.01.2025** | **🧠 Memory-Spiel** | Vollständiges Mini-Spiel mit XP-Wettsystem, 3 Schwierigkeiten, Timer, Leben |
+| 15.01.2025 | Avatar verbessert | Premium-SVG mit Multi-Stop Gradienten, Haar-Glanz, Augen-Details |
+| 15.01.2025 | MiniGames-System | Neue Ordnerstruktur für Mini-Spiele, types/games.ts |
 | **14.01.2025** | **📹 Video-Chat Integration** | Jitsi Meet für Lerngruppen: Coach plant Treffen, Kinder sehen Countdown |
 | 14.01.2025 | Karten-Anpassung | Hintergrundbild 115% breit, Inseln neu auf Landmasse verteilt |
 | 14.01.2025 | Neue Komponenten | VideoChat/, useMeeting Hook, Meeting-Tabellen in DB |
@@ -1129,5 +1361,5 @@ Alle 14 Inseln haben jetzt das animierte Design-System. Die nächsten Aufgaben s
 
 ---
 
-**Letzte Bearbeitung:** 14. Januar 2025
+**Letzte Bearbeitung:** 16. Januar 2025
 **Nächster Meilenstein:** Quiz-Content für fehlende Stufen erstellen (Festung MS, Werkzeuge US/MS, Fäden alle)

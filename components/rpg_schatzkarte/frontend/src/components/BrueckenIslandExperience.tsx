@@ -130,7 +130,7 @@ export function BrueckenIslandExperience({
           >
             🌉
           </motion.span>
-          Insel der Brücken
+          Transferlernen
         </h1>
         <div className="xp-badge">
           <motion.span
@@ -678,7 +678,7 @@ function QuizPhase({ ageGroup, onComplete, onBack }: QuizPhaseProps) {
     return (
       <BattleQuiz
         quiz={{ questions: getQuizQuestions() } as ExtendedQuiz}
-        islandName="Insel der Brücken"
+        islandName="Transferlernen"
         enableLives={true}
         maxLives={3}
         onComplete={(victory, score, streak) => {

@@ -1,5 +1,5 @@
 // ============================================
-// Wachstums-Garten Island Experience
+// Glauben, dass du wachsen kannst Island Experience
 // Schöne Animationen wie die anderen Inseln
 // ============================================
 
@@ -49,7 +49,7 @@ export function WachstumGartenIslandExperience({ ageGroup, onClose, onQuestCompl
         <button className="back-btn" onClick={onClose}>← Zurück</button>
         <h1 className="island-title">
           <motion.span className="title-icon" animate={{ scale: [1, 1.15, 1], rotate: [0, 5, -5, 0] }} transition={{ repeat: Infinity, duration: 3 }}>🌱</motion.span>
-          Wachstums-Garten
+          Glauben, dass du wachsen kannst
         </h1>
         <div className="xp-badge">
           <motion.span className="xp-icon" animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 2 }}>⭐</motion.span>

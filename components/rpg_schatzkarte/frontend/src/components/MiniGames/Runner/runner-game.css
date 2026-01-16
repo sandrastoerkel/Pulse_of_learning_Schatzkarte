@@ -1,0 +1,1043 @@
+/* ============================================
+   RUNNER GAME STYLES
+   Alle Styles für das Runner-Spiel
+   ============================================ */
+
+/* === CSS VARIABLEN === */
+
+.runner-game-container {
+  --gold-primary: #FFD700;
+  --gold-secondary: #FFA500;
+  --purple-primary: #9b59b6;
+  --purple-secondary: #8e44ad;
+  --bg-dark: #1a1a2e;
+  --bg-darker: #16213e;
+  --bg-darkest: #0f0f23;
+  --success: #4ade80;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --text-light: #ffffff;
+  --text-muted: #e0e0e0;
+  --text-dim: #aaaaaa;
+  --rarity-common: #aaaaaa;
+  --rarity-rare: #3498db;
+  --rarity-epic: #9b59b6;
+  --rarity-legendary: #FFD700;
+}
+
+/* === CONTAINER === */
+
+.runner-game-container {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, var(--bg-darkest) 0%, var(--bg-darker) 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  overflow: hidden;
+}
+
+/* === BETTING PHASE === */
+
+.runner-betting-phase {
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
+  border-radius: 20px;
+  border: 2px solid var(--gold-primary);
+  padding: 24px;
+  box-shadow: 
+    0 0 30px rgba(255, 215, 0, 0.2),
+    0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.betting-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.close-button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: var(--text-muted);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.close-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--text-light);
+}
+
+.game-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.game-icon {
+  font-size: 32px;
+  animation: bounce 1s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.game-title h2 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--gold-primary), var(--gold-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.difficulty-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(155, 89, 182, 0.2);
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--purple-primary);
+}
+
+.age-icon {
+  font-size: 18px;
+}
+
+.age-label {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* XP Display */
+
+.xp-display {
+  text-align: center;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 165, 0, 0.05) 100%);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  margin-bottom: 24px;
+}
+
+.xp-label {
+  display: block;
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.xp-value {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--gold-primary);
+}
+
+.xp-icon {
+  font-size: 28px;
+}
+
+/* Betting Section */
+
+.betting-section {
+  margin-bottom: 24px;
+}
+
+.betting-section h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  color: var(--text-light);
+}
+
+.betting-hint {
+  margin: 0 0 16px 0;
+  font-size: 14px;
+  color: var(--text-dim);
+}
+
+.bet-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  position: relative;
+  z-index: 10;
+}
+
+.bet-option {
+  position: relative;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--bg-darker) 0%, var(--bg-darkest) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: var(--text-light);
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  z-index: 11;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.bet-option:hover:not(.disabled) {
+  border-color: var(--gold-primary);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+}
+
+.bet-option.selected {
+  border-color: var(--gold-primary);
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 165, 0, 0.1) 100%);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+}
+
+.bet-option.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.bet-amount {
+  font-size: 20px;
+}
+
+.allin-badge {
+  font-size: 12px;
+  color: var(--danger);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.not-enough {
+  font-size: 11px;
+  color: var(--danger);
+}
+
+/* Milestones Section */
+
+.milestones-section {
+  margin-bottom: 24px;
+}
+
+.milestones-section h3 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+  color: var(--text-light);
+}
+
+.milestones-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.milestone-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.milestone-item.legendary {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 165, 0, 0.05) 100%);
+  border-color: rgba(255, 215, 0, 0.3);
+}
+
+.milestone-distance {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 80px;
+}
+
+.distance-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-light);
+}
+
+.star-badge {
+  font-size: 14px;
+}
+
+.milestone-multiplier {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--success);
+  min-width: 50px;
+}
+
+.potential-win {
+  margin-left: auto;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gold-primary);
+  background: rgba(255, 215, 0, 0.1);
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.milestone-hint {
+  margin: 12px 0 0 0;
+  font-size: 13px;
+  color: var(--text-dim);
+  text-align: center;
+}
+
+/* Game Info Section */
+
+.game-info-section {
+  margin-bottom: 24px;
+}
+
+.game-info-section h3 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+  color: var(--text-light);
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.info-icon {
+  font-size: 18px;
+}
+
+/* Start Button */
+
+.start-button {
+  width: 100%;
+  padding: 18px 24px;
+  background: linear-gradient(135deg, var(--gold-primary) 0%, var(--gold-secondary) 100%);
+  border: none;
+  border-radius: 12px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--bg-darkest);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+}
+
+.start-button:hover:not(.disabled) {
+  box-shadow: 0 6px 25px rgba(255, 215, 0, 0.5);
+}
+
+.start-button.disabled {
+  background: linear-gradient(135deg, #555 0%, #444 100%);
+  color: var(--text-dim);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.button-icon {
+  font-size: 24px;
+}
+
+/* Low XP Warning */
+
+.low-xp-warning {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 10px;
+  font-size: 13px;
+  color: var(--danger);
+}
+
+.warning-icon {
+  font-size: 18px;
+}
+
+/* === GAME PHASE === */
+
+.runner-game-wrapper {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Game Header */
+
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.game-stats {
+  display: flex;
+  gap: 24px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stat-icon {
+  font-size: 20px;
+}
+
+.stat-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-light);
+}
+
+.stat-value.distance {
+  color: var(--gold-primary);
+  min-width: 60px;
+}
+
+.game-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.control-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: var(--text-light);
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.control-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.control-button.muted {
+  color: var(--danger);
+}
+
+/* Lives Display */
+
+.lives-display {
+  display: flex;
+  gap: 4px;
+}
+
+.heart {
+  font-size: 24px;
+  transition: all 0.2s;
+}
+
+.heart.empty {
+  opacity: 0.3;
+  filter: grayscale(1);
+}
+
+.heart.lost {
+  animation: heartLost 0.3s ease-out;
+}
+
+@keyframes heartLost {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); opacity: 0.5; }
+  100% { transform: scale(0); opacity: 0; }
+}
+
+/* Canvas Container */
+
+.canvas-container {
+  position: relative;
+  border-radius: 15px;
+  overflow: hidden;
+  border: 3px solid var(--gold-primary);
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+}
+
+.runner-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: var(--bg-darkest);
+}
+
+/* Countdown Overlay */
+
+.countdown-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 10;
+}
+
+.countdown-number {
+  font-size: 120px;
+  font-weight: 900;
+  color: var(--gold-primary);
+  text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+}
+
+.countdown-go {
+  font-size: 80px;
+  font-weight: 900;
+  color: var(--success);
+  text-transform: uppercase;
+  text-shadow: 0 0 30px rgba(74, 222, 128, 0.5);
+}
+
+/* Pause Overlay */
+
+.pause-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 10;
+}
+
+.pause-title {
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pause-buttons {
+  display: flex;
+  gap: 16px;
+}
+
+.pause-button {
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.pause-button.resume {
+  background: linear-gradient(135deg, var(--success) 0%, #22c55e 100%);
+  color: white;
+}
+
+.pause-button.quit {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-light);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.pause-button:hover {
+  transform: scale(1.05);
+}
+
+/* Help Overlay */
+
+.help-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 15;
+}
+
+.help-content {
+  background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
+  border-radius: 16px;
+  border: 2px solid var(--gold-primary);
+  padding: 20px 24px;
+  max-width: 380px;
+  width: 90%;
+  text-align: center;
+}
+
+.help-content h3 {
+  margin: 0 0 16px 0;
+  font-size: 20px;
+  color: var(--gold-primary);
+}
+
+.help-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.help-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.help-icon {
+  font-size: 18px;
+}
+
+.help-close-button {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, var(--gold-primary) 0%, var(--gold-secondary) 100%);
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--bg-darkest);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.help-close-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+}
+
+.help-button {
+  background: rgba(255, 215, 0, 0.2) !important;
+  border: 1px solid var(--gold-primary) !important;
+}
+
+/* Controls Legend - permanent sichtbar während des Spiels */
+
+.controls-legend {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  padding: 8px 16px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  backdrop-filter: blur(5px);
+}
+
+.control-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.control-hint .key {
+  font-size: 20px;
+}
+
+/* Game Footer */
+
+.game-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+}
+
+.collected-items {
+  display: flex;
+  gap: 20px;
+}
+
+.collected-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 16px;
+  color: var(--text-light);
+}
+
+.collected-item .icon {
+  font-size: 20px;
+}
+
+.milestone-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.progress-bar {
+  width: 150px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold-primary), var(--gold-secondary));
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+
+.next-milestone {
+  font-size: 14px;
+  color: var(--text-dim);
+}
+
+.multiplier-badge {
+  padding: 4px 10px;
+  background: rgba(74, 222, 128, 0.2);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--success);
+}
+
+/* === RESULT SCREEN === */
+
+.result-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 1001;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.result-content {
+  text-align: center;
+  padding: 20px 24px;
+  max-width: 400px;
+  width: 100%;
+  background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
+  border-radius: 16px;
+  border: 3px solid var(--gold-primary);
+  box-shadow: 0 0 50px rgba(255, 215, 0, 0.3);
+  margin: 10px auto;
+}
+
+.result-title {
+  font-size: 32px;
+  font-weight: 900;
+  margin-bottom: 4px;
+}
+
+.result-title.won {
+  color: var(--gold-primary);
+  text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+}
+
+.result-title.lost {
+  color: var(--danger);
+}
+
+.result-distance {
+  font-size: 18px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.result-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.result-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+.result-stat .label {
+  color: var(--text-dim);
+}
+
+.result-stat .value {
+  font-weight: 600;
+  color: var(--text-light);
+}
+
+.result-stat .value.positive {
+  color: var(--success);
+}
+
+.result-stat .value.negative {
+  color: var(--danger);
+}
+
+.result-total {
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.result-total .value {
+  font-size: 18px;
+}
+
+.result-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.result-button {
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.result-button.primary {
+  background: linear-gradient(135deg, var(--gold-primary) 0%, var(--gold-secondary) 100%);
+  color: var(--bg-darkest);
+}
+
+.result-button.secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-light);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.result-button:hover {
+  transform: scale(1.05);
+}
+
+/* === TOUCH CONTROLS === */
+
+.touch-controls {
+  display: none;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.touch-button {
+  flex: 1;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  font-size: 32px;
+  color: var(--text-light);
+  cursor: pointer;
+  transition: all 0.1s;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.touch-button:active {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(0.95);
+}
+
+.touch-button.jump {
+  border-color: var(--success);
+}
+
+.touch-button.duck {
+  border-color: var(--warning);
+}
+
+/* Touch-Geräte */
+@media (pointer: coarse) {
+  .touch-controls {
+    display: flex;
+  }
+}
+
+/* === RESPONSIVE === */
+
+@media (max-width: 600px) {
+  .runner-betting-phase {
+    padding: 16px;
+    border-radius: 15px;
+  }
+
+  .game-title h2 {
+    font-size: 22px;
+  }
+
+  .xp-value {
+    font-size: 28px;
+  }
+
+  .bet-options {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .bet-option {
+    padding: 12px;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .game-stats {
+    gap: 12px;
+  }
+
+  .stat-value {
+    font-size: 16px;
+  }
+
+  .collected-items {
+    gap: 12px;
+  }
+
+  .progress-bar {
+    width: 100px;
+  }
+
+  .result-title {
+    font-size: 36px;
+  }
+}
+
+/* === ANIMATIONEN === */
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-slide-up {
+  animation: slideInUp 0.4s ease-out;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s ease-out;
+}
+
+/* === SCROLLBAR === */
+
+.runner-betting-phase::-webkit-scrollbar {
+  width: 6px;
+}
+
+.runner-betting-phase::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.runner-betting-phase::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.runner-betting-phase::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}

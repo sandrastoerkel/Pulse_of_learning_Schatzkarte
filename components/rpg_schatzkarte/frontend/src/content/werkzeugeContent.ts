@@ -1,5 +1,5 @@
 // ============================================
-// Insel der 7 Werkzeuge - Content nach Altersstufen
+// Cleverer lernen - Content nach Altersstufen
 // Thema: Die 7 Power-Techniken (evidenzbasierte Lernstrategien)
 // Quellen: Siehe /docs/effektstaerken_wissenschaftlich.docx
 // ============================================

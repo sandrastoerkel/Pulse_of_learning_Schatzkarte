@@ -1,5 +1,5 @@
 // ============================================
-// Insel der Brücken - Content nach Altersstufen
+// Transferlernen - Content nach Altersstufen
 // Thema: Transfer (Wissen übertragen)
 // Quelle: utils/learnstrat_challenges/transfer_content.py
 // ============================================

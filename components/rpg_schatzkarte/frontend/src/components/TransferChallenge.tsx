@@ -1,6 +1,6 @@
 // ============================================
 // Transfer Challenge - Hauptkomponente
-// Insel der Brücken - Interaktive Lernreise
+// Transferlernen - Interaktive Lernreise
 // NEUE VERSION: Kreative, handlungsorientierte Übungen
 // Für Grundschule (8-10 Jahre)
 // ============================================
@@ -160,7 +160,7 @@ export function TransferChallenge({
           >
             🌉
           </motion.span>
-          Insel der Brücken
+          Transferlernen
         </h1>
         <div className="xp-badge">
           <motion.span

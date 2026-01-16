@@ -1,5 +1,5 @@
 // ============================================
-// Wohlfühl-Dorf Island Experience
+// Dich in der Schule wohlfühlen Island Experience
 // Schöne Animationen wie die anderen Inseln
 // ============================================
 
@@ -49,7 +49,7 @@ export function WohlfuehlDorfIslandExperience({ ageGroup, onClose, onQuestComple
         <button className="back-btn" onClick={onClose}>← Zurück</button>
         <h1 className="island-title">
           <motion.span className="title-icon" animate={{ scale: [1, 1.1, 1] }} transition={{ repeat: Infinity, duration: 2.5 }}>🏠</motion.span>
-          Wohlfühl-Dorf
+          Dich in der Schule wohlfühlen
         </h1>
         <div className="xp-badge">
           <motion.span className="xp-icon" animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 2 }}>⭐</motion.span>

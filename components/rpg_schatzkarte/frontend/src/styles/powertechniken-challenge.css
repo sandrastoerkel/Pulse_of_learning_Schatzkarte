@@ -26,9 +26,9 @@
   --pt-bg-light: #f5f5dc;
 
   /* Text */
-  --pt-text-light: #f5f5f5;
+  --pt-text-light: #ffffff;
   --pt-text-dark: #1f2937;
-  --pt-text-muted: #9ca3af;
+  --pt-text-muted: #d1d5db;
 
   /* Schatten & Effekte */
   --pt-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
@@ -78,6 +78,40 @@
 }
 
 /* ============================================
+   TEXT-FARBEN OVERRIDE (Sichtbarkeit garantieren)
+   ============================================ */
+
+/* Alle Texte im dunklen Container sind weiß */
+.powertechniken-challenge,
+.powertechniken-challenge p,
+.powertechniken-challenge span,
+.powertechniken-challenge h1,
+.powertechniken-challenge h2,
+.powertechniken-challenge h3,
+.powertechniken-challenge h4,
+.powertechniken-challenge label {
+  color: #ffffff;
+}
+
+/* Spezifische Elemente mit garantierter Sichtbarkeit */
+.powertechniken-challenge .progress-text {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8) !important;
+}
+
+.powertechniken-challenge .overview-intro {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6) !important;
+}
+
+.powertechniken-challenge .back-btn {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+/* ============================================
    HEADER
    ============================================ */
 
@@ -93,19 +127,20 @@
 }
 
 .back-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  color: var(--pt-text-light);
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  color: #ffffff;
   padding: 10px 20px;
   border-radius: 25px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
   transition: var(--pt-transition);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .back-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.25);
   transform: translateX(-5px);
 }
 
@@ -209,7 +244,9 @@
 .progress-text {
   text-align: center;
   font-size: 14px;
-  color: var(--pt-text-muted);
+  color: #ffffff;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* ============================================
@@ -253,11 +290,13 @@
 .overview-intro {
   text-align: center;
   font-size: 1.1em;
-  color: var(--pt-text-light);
+  color: #ffffff;
   margin-bottom: 25px;
   padding: 15px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 15px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  font-weight: 500;
 }
 
 .techniques-grid {

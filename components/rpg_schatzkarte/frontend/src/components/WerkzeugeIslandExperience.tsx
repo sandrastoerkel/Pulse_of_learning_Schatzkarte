@@ -133,7 +133,7 @@ export function WerkzeugeIslandExperience({
           >
             🛠️
           </motion.span>
-          Insel der 7 Werkzeuge
+          Cleverer lernen
         </h1>
         <div className="xp-badge">
           <motion.span
@@ -712,7 +712,7 @@ function QuizPhase({ ageGroup, onComplete, onBack }: QuizPhaseProps) {
     return (
       <BattleQuiz
         quiz={{ questions: getQuizQuestions() } as ExtendedQuiz}
-        islandName="Insel der 7 Werkzeuge"
+        islandName="Cleverer lernen"
         enableLives={true}
         maxLives={3}
         onComplete={(victory, score, streak) => {

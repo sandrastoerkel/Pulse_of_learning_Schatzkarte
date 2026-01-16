@@ -1,5 +1,57 @@
 # Schatzkarte - Status Übersicht
-## Stand: 14. Januar 2025
+## Stand: 16. Januar 2025
+
+---
+
+# Änderungen vom 16. Januar 2025
+
+## Custom SVG Icons komplett!
+
+Alle Elemente auf der Weltkarte haben jetzt handgezeichnete SVG-Icons mit Animationen:
+
+### 15 Insel-Icons
+
+| Insel | Icon | Features |
+|-------|------|----------|
+| Starthafen | StartHafenIcon | Hafen mit Leuchtturm |
+| Festung | FestungIcon | Burg mit Fahnen |
+| Werkzeuge | WerkzeugeIcon | Werkzeugkasten |
+| Vulkan | VulkanIcon | Lava-Animation |
+| Meisterberg | MeisterBergIcon | Goldene Krone |
+| Brücken | BrueckenIcon | Regenbogenbrücke |
+| Fäden | FaedenIcon | Spinnenetz |
+| Spiegel-See | SpiegelSeeIcon | Mystische Reflexion |
+| Ruhe-Oase | RuheOaseIcon | Palmen & Wasserfall |
+| Ausdauer-Gipfel | AusdauerGipfelIcon | Schneebedeckt |
+| Fokus-Leuchtturm | FokusLeuchtturmIcon | Strahlend |
+| Wachstums-Garten | WachstumGartenIcon | Blumen & Schmetterlinge |
+| Lehrer-Turm | LehrerTurmIcon | Sterne |
+| Wohlfühl-Dorf | WohlfuehlDorfIcon | Herzen |
+| Schutz-Burg | SchutzBurgIcon | Schutzschild |
+
+### 3 Schiff-Icons
+
+| Schiff | Icon | Beschreibung |
+|--------|------|--------------|
+| Goldener Schlüssel | GoldenKeyIcon | Bandura - 4 Quellen |
+| Hattie-Waage | HattieWaageIcon | Selbsteinschätzung |
+| Polarstern | PolarsternIcon | Navigation/Ziele |
+
+### 1 Widget-Icon
+
+| Widget | Icon | Beschreibung |
+|--------|------|--------------|
+| Lerntechniken | LerntechnikenIcon | Zauberbuch mit Symbolen |
+
+## UI-Verbesserungen
+
+| Änderung | Details |
+|----------|---------|
+| **Widget-Styling** | Lerntechniken & Tagebuch wie Schiffe (transparent, Label unten) |
+| **Legende** | Emoji-Indikatoren statt farbiger Punkte (⭐ = Fertig, 🔒 = Gesperrt) |
+| **Avatar** | Größer (80px → 110px) |
+| **Text-Lesbarkeit** | PowertechnikenChallenge: Weißer Text mit Shadows |
+| **Admin TestPanel** | `is_admin=True` Parameter für Streamlit |
 
 ---
 
@@ -159,13 +211,16 @@ Diese Inseln haben das neue Design-System, aber noch keinen Inhalt:
 
 | Komponente | Status | Beschreibung |
 |------------|:------:|--------------|
-| 🔑 Bandura-Schiff | ✅ | "Der goldene Schlüssel" - 4 Quellen der Selbstwirksamkeit |
-| 💪 Hattie-Schiff | ✅ | "Superpower" - Selbsteinschätzung trainieren |
-| 📓 Superhelden-Tagebuch | ✅ | Tägliche Erfolge aufschreiben (nur Grundschule) |
+| 🔑 Bandura-Schiff | ✅ | "Der goldene Schlüssel" - 4 Quellen (+ GoldenKeyIcon) |
+| 💪 Hattie-Schiff | ✅ | "Superpower" - Selbsteinschätzung (+ HattieWaageIcon) |
+| ⭐ Polarstern | ✅ | Zielnavigation (+ PolarsternIcon) |
+| 📓 Superhelden-Tagebuch | ✅ | Tägliche Erfolge (transparent, Label unten) |
+| 📚 Lerntechniken-Widget | ✅ | Übersicht (+ LerntechnikenIcon, transparent) |
 | 🧠 Brainy | ✅ | Maskottchen mit Hilfe-Tipps |
 | ⚔️ BattleQuiz | ✅ | Quiz mit Leben-System |
 | 🎓 Lerntechniken-Zertifikat | ✅ | PNG-Download für Werkzeuge-Insel |
-| 📹 Video-Chat | ✅ | Jitsi Meet für Lerngruppen (Coach plant, Kinder treten bei) |
+| 📹 Video-Chat | ✅ | Jitsi Meet für Lerngruppen |
+| 🎨 Custom SVG Icons | ✅ | 15 Inseln + 3 Schiffe + 1 Widget |
 
 ---
 
@@ -252,6 +307,39 @@ frontend/src/hooks/
 └── ✅ useMeeting.ts
 ```
 
+## Icon-Dateien (NEU 16.01.2025)
+
+```
+frontend/src/components/icons/
+├── ✅ index.ts                  - Alle Exports
+├── ✅ IconDefs.ts               - Gemeinsame Props
+│
+│   # Insel-Icons (15)
+├── ✅ StartHafenIcon.tsx
+├── ✅ FestungIcon.tsx
+├── ✅ WerkzeugeIcon.tsx
+├── ✅ VulkanIcon.tsx
+├── ✅ MeisterBergIcon.tsx
+├── ✅ BrueckenIcon.tsx
+├── ✅ FaedenIcon.tsx
+├── ✅ SpiegelSeeIcon.tsx
+├── ✅ RuheOaseIcon.tsx
+├── ✅ AusdauerGipfelIcon.tsx
+├── ✅ FokusLeuchtturmIcon.tsx
+├── ✅ WachstumGartenIcon.tsx
+├── ✅ LehrerTurmIcon.tsx
+├── ✅ WohlfuehlDorfIcon.tsx
+├── ✅ SchutzBurgIcon.tsx
+│
+│   # Schiff-Icons (3)
+├── ✅ GoldenKeyIcon.tsx
+├── ✅ HattieWaageIcon.tsx
+├── ✅ PolarsternIcon.tsx
+│
+│   # Widget-Icons (1)
+└── ✅ LerntechnikenIcon.tsx
+```
+
 ## Content-Dateien
 
 ```
@@ -280,4 +368,4 @@ frontend/src/content/
 
 ---
 
-**Letzte Aktualisierung:** 14. Januar 2025
+**Letzte Aktualisierung:** 16. Januar 2025

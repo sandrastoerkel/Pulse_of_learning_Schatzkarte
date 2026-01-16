@@ -53,6 +53,8 @@ interface QuestModalProps {
   onOpenHattie?: () => void;
   // Direkt zur Challenge der 7 Werkzeuge springen (wenn von Lerntechniken-Widget geöffnet)
   startWerkzeugeWithChallenge?: boolean;
+  // Polarstern-Widget öffnen (für Starthafen)
+  onPolarsternClick?: () => void;
 }
 
 interface TutorialStep {
@@ -175,7 +177,8 @@ export function QuestModal({
   onOpenTagebuch,
   onOpenBandura,
   onOpenHattie,
-  startWerkzeugeWithChallenge = false
+  startWerkzeugeWithChallenge = false,
+  onPolarsternClick
 }: QuestModalProps) {
   const [activeQuest, setActiveQuest] = useState<QuestType | null>(null);
   const [showReward, setShowReward] = useState(false);
@@ -328,7 +331,7 @@ export function QuestModal({
               onClose={onClose}
               onQuestComplete={onQuestComplete}
             />
-          ) : /* Festung der Stärke: Vollständige animierte Experience */
+          ) : /* Mental stark: Vollständige animierte Experience */
           island.id === 'festung' ? (
             <FestungIslandExperience
               ageGroup={ageGroup}
@@ -338,7 +341,7 @@ export function QuestModal({
               onOpenBandura={onOpenBandura}
               onOpenHattie={onOpenHattie}
             />
-          ) : /* Insel der 7 Werkzeuge: Vollständige animierte Experience */
+          ) : /* Cleverer lernen: Vollständige animierte Experience */
           island.id === 'werkzeuge' ? (
             <WerkzeugeIslandExperience
               ageGroup={ageGroup}
@@ -352,6 +355,7 @@ export function QuestModal({
               ageGroup={ageGroup}
               onClose={onClose}
               onQuestComplete={onQuestComplete}
+              onPolarsternClick={onPolarsternClick}
             />
           ) : /* Insel der Fäden: Birkenbihl's Faden-Prinzip */
           island.id === 'faeden' ? (
@@ -360,63 +364,63 @@ export function QuestModal({
               onClose={onClose}
               onQuestComplete={onQuestComplete}
             />
-          ) : /* Spiegel-See: Metakognition */
+          ) : /* Über dein Lernen nachdenken: Metakognition */
           island.id === 'spiegel_see' ? (
             <SpiegelSeeIslandExperience
               ageGroup={ageGroup}
               onClose={onClose}
               onQuestComplete={onQuestComplete}
             />
-          ) : /* Vulkan der Motivation */
+          ) : /* Was dich antreibt */
           island.id === 'vulkan' ? (
             <VulkanIslandExperience
               ageGroup={ageGroup}
               onClose={onClose}
               onQuestComplete={onQuestComplete}
             />
-          ) : /* Ruhe-Oase */
+          ) : /* Weniger Stress beim Lernen */
           island.id === 'ruhe_oase' ? (
             <RuheOaseIslandExperience
               ageGroup={ageGroup}
               onClose={onClose}
               onQuestComplete={onQuestComplete}
             />
-          ) : /* Ausdauer-Gipfel */
+          ) : /* Länger dranbleiben können */
           island.id === 'ausdauer_gipfel' ? (
             <AusdauerGipfelIslandExperience
               ageGroup={ageGroup}
               onClose={onClose}
               onQuestComplete={onQuestComplete}
             />
-          ) : /* Fokus-Leuchtturm */
+          ) : /* Fokus halten */
           island.id === 'fokus_leuchtturm' ? (
             <FokusLeuchtturmIslandExperience
               ageGroup={ageGroup}
               onClose={onClose}
               onQuestComplete={onQuestComplete}
             />
-          ) : /* Wachstums-Garten */
+          ) : /* Glauben, dass du wachsen kannst */
           island.id === 'wachstum_garten' ? (
             <WachstumGartenIslandExperience
               ageGroup={ageGroup}
               onClose={onClose}
               onQuestComplete={onQuestComplete}
             />
-          ) : /* Lehrer-Turm */
+          ) : /* Besser mit Lehrern klarkommen */
           island.id === 'lehrer_turm' ? (
             <LehrerTurmIslandExperience
               ageGroup={ageGroup}
               onClose={onClose}
               onQuestComplete={onQuestComplete}
             />
-          ) : /* Wohlfühl-Dorf */
+          ) : /* Dich in der Schule wohlfühlen */
           island.id === 'wohlfuehl_dorf' ? (
             <WohlfuehlDorfIslandExperience
               ageGroup={ageGroup}
               onClose={onClose}
               onQuestComplete={onQuestComplete}
             />
-          ) : /* Schutz-Burg */
+          ) : /* Wenn andere dich fertig machen */
           island.id === 'schutz_burg' ? (
             <SchutzBurgIslandExperience
               ageGroup={ageGroup}

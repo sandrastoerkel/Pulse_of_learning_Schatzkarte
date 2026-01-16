@@ -1,5 +1,5 @@
 // ============================================
-// Ausdauer-Gipfel Island Experience
+// Länger dranbleiben können Island Experience
 // Schöne Animationen wie die anderen Inseln
 // ============================================
 
@@ -49,7 +49,7 @@ export function AusdauerGipfelIslandExperience({ ageGroup, onClose, onQuestCompl
         <button className="back-btn" onClick={onClose}>← Zurück</button>
         <h1 className="island-title">
           <motion.span className="title-icon" animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 2 }}>🏆</motion.span>
-          Ausdauer-Gipfel
+          Länger dranbleiben können
         </h1>
         <div className="xp-badge">
           <motion.span className="xp-icon" animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 2 }}>⭐</motion.span>

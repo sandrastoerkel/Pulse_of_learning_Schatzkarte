@@ -106,6 +106,7 @@ export interface IslandProgress {
 export interface HeroData {
   name: string;
   avatar: HeroAvatar;
+  companion?: CompanionType;  // Ausgewählter Lernbegleiter
   level: number;
   xp: number;
   xp_to_next_level: number;
@@ -115,6 +116,16 @@ export interface HeroData {
 }
 
 export type HeroAvatar = 'warrior' | 'mage' | 'ranger' | 'healer';
+
+// Lernbegleiter (auswählbar)
+export type CompanionType = 'draki' | 'shadow' | 'phoenix' | 'knight' | 'brainy';
+
+export interface CompanionInfo {
+  id: CompanionType;
+  name: string;
+  description: string;
+  image: string;
+}
 
 export interface Item {
   id: string;
@@ -151,7 +162,8 @@ export interface TagebuchEintrag {
 
 // Aktionen die an Python zurueckgegeben werden
 export interface SchatzkartAction {
-  action: 'quest_completed' | 'treasure_collected' | 'xp_earned' | 'item_received' | 'bandura_entry' | 'hattie_entry' | 'hattie_prediction' | 'hattie_complete' | 'tagebuch_entry';
+  action: 'quest_completed' | 'treasure_collected' | 'xp_earned' | 'item_received' | 'bandura_entry' | 'hattie_entry' | 'hattie_prediction' | 'hattie_complete' | 'tagebuch_entry' | 'polarstern_clicked' | 'companion_selected' | 'minigame_completed';
+  companionId?: CompanionType;
   islandId?: string;
   questType?: QuestType;
   treasureId?: string;
@@ -163,6 +175,10 @@ export interface SchatzkartAction {
   description?: string;
   // Tagebuch spezifisch
   tagebuchEntry?: TagebuchEintrag;
+  // MiniGame spezifisch
+  minigameType?: string;
+  score?: number;
+  maxScore?: number;
 }
 
 // Bandura-Quellen Konfiguration
@@ -209,3 +225,188 @@ export interface ExtendedQuiz {
 
 // Animation States
 export type AnimationState = 'idle' | 'attack' | 'damage' | 'victory' | 'defeat';
+
+// ============================================
+// AVATAAARS AVATAR TYPES
+// ============================================
+
+// Visuelle Teile des Avatars (Avataaars-kompatibel)
+export interface AvatarVisuals {
+  // Stil
+  avatarStyle: AvatarStyle;
+
+  // Kopf/Haare
+  topType: TopType;
+  hairColor: HairColor;
+
+  // Accessoires
+  accessoriesType: AccessoriesType;
+
+  // Gesichtsbehaarung (optional, eher für Erwachsene)
+  facialHairType: FacialHairType;
+  facialHairColor: HairColor;
+
+  // Gesicht
+  eyeType: EyeType;
+  eyebrowType: EyebrowType;
+  mouthType: MouthType;
+
+  // Haut
+  skinColor: SkinColor;
+
+  // Kleidung
+  clotheType: ClotheType;
+  clotheColor: ClotheColor;
+  graphicType: GraphicType;
+}
+
+// Ausgerüstete Shop-Items (für spätere Erweiterung)
+export interface AvatarEquipped {
+  hat: string | null;
+  glasses: string | null;
+  accessory: string | null;
+  cape: string | null;
+  effect: string | null;
+  frame: string | null;
+}
+
+// Kompletter Avatar
+export interface CustomAvatar {
+  visuals: AvatarVisuals;
+  equipped: AvatarEquipped;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// === AVATAAARS OPTION TYPES ===
+
+export type AvatarStyle = 'Circle' | 'Transparent';
+
+export type TopType =
+  | 'NoHair' | 'Eyepatch' | 'Hat' | 'Hijab' | 'Turban'
+  | 'WinterHat1' | 'WinterHat2' | 'WinterHat3' | 'WinterHat4'
+  | 'LongHairBigHair' | 'LongHairBob' | 'LongHairBun' | 'LongHairCurly' | 'LongHairCurvy'
+  | 'LongHairDreads' | 'LongHairFrida' | 'LongHairFro' | 'LongHairFroBand'
+  | 'LongHairMiaWallace' | 'LongHairNotTooLong' | 'LongHairShavedSides'
+  | 'LongHairStraight' | 'LongHairStraight2' | 'LongHairStraightStrand'
+  | 'ShortHairDreads01' | 'ShortHairDreads02' | 'ShortHairFrizzle'
+  | 'ShortHairShaggy' | 'ShortHairShaggyMullet' | 'ShortHairShortCurly'
+  | 'ShortHairShortFlat' | 'ShortHairShortRound' | 'ShortHairShortWaved'
+  | 'ShortHairSides' | 'ShortHairTheCaesar' | 'ShortHairTheCaesarSidePart';
+
+export type HairColor =
+  | 'Auburn' | 'Black' | 'Blonde' | 'BlondeGolden' | 'Brown'
+  | 'BrownDark' | 'PastelPink' | 'Blue' | 'Platinum' | 'Red' | 'SilverGray';
+
+export type AccessoriesType =
+  | 'Blank' | 'Kurt' | 'Prescription01' | 'Prescription02'
+  | 'Round' | 'Sunglasses' | 'Wayfarers';
+
+export type FacialHairType =
+  | 'Blank' | 'BeardMedium' | 'BeardLight' | 'BeardMajestic'
+  | 'MoustacheFancy' | 'MoustacheMagnum';
+
+export type EyeType =
+  | 'Close' | 'Cry' | 'Default' | 'Dizzy' | 'EyeRoll'
+  | 'Happy' | 'Hearts' | 'Side' | 'Squint' | 'Surprised'
+  | 'Wink' | 'WinkWacky';
+
+export type EyebrowType =
+  | 'Angry' | 'AngryNatural' | 'Default' | 'DefaultNatural'
+  | 'FlatNatural' | 'FrownNatural' | 'RaisedExcited' | 'RaisedExcitedNatural'
+  | 'SadConcerned' | 'SadConcernedNatural' | 'UnibrowNatural' | 'UpDown' | 'UpDownNatural';
+
+export type MouthType =
+  | 'Concerned' | 'Default' | 'Disbelief' | 'Eating' | 'Grimace'
+  | 'Sad' | 'ScreamOpen' | 'Serious' | 'Smile' | 'Tongue' | 'Twinkle' | 'Vomit';
+
+export type SkinColor =
+  | 'Tanned' | 'Yellow' | 'Pale' | 'Light' | 'Brown' | 'DarkBrown' | 'Black';
+
+export type ClotheType =
+  | 'BlazerShirt' | 'BlazerSweater' | 'CollarSweater' | 'GraphicShirt'
+  | 'Hoodie' | 'Overall' | 'ShirtCrewNeck' | 'ShirtScoopNeck' | 'ShirtVNeck';
+
+export type ClotheColor =
+  | 'Black' | 'Blue01' | 'Blue02' | 'Blue03' | 'Gray01' | 'Gray02'
+  | 'Heather' | 'PastelBlue' | 'PastelGreen' | 'PastelOrange'
+  | 'PastelRed' | 'PastelYellow' | 'Pink' | 'Red' | 'White';
+
+export type GraphicType =
+  | 'Bat' | 'Cumbia' | 'Deer' | 'Diamond' | 'Hola' | 'Pizza'
+  | 'Resist' | 'Selena' | 'Bear' | 'SkullOutline' | 'Skull';
+
+// Avatar Part Option (für UI)
+export interface AvatarPartOption {
+  id: string;
+  name: string;
+  icon?: string;
+  previewPath?: string;
+}
+
+export interface AvatarCategory {
+  id: string;
+  name: string;
+  icon: string;
+  options: AvatarPartOption[];
+}
+
+// ============================================
+// AVATAR SHOP TYPES
+// ============================================
+
+// Seltenheit für Shop-Items
+export type Rarity = 'common' | 'rare' | 'epic' | 'legendary';
+
+// Shop-Item Slot (welcher Ausrüstungsplatz)
+export type ItemSlot = 'hat' | 'glasses' | 'accessory' | 'cape' | 'effect' | 'frame';
+
+// Shop-Item Definition
+export interface ShopItem {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;              // Emoji
+  slot: ItemSlot;
+  price: number;             // In Gold
+  rarity: Rarity;
+  visualData?: {
+    color?: string;          // Für Effekte/Auras
+    borderColor?: string;    // Für Rahmen
+  };
+  // Mapping zu echten Avataaars-Eigenschaften
+  avataaarsMapping?: {
+    property: keyof AvatarVisuals;
+    value: string;
+  };
+}
+
+// ============================================
+// REWARD & ACHIEVEMENT TYPES
+// ============================================
+
+// Achievement Interface
+export interface Achievement {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  unlockedAt?: string;
+  bonusXP?: number;
+}
+
+// Level-Up Info (für RewardModal)
+export interface LevelUpInfo {
+  oldLevel: number;
+  newLevel: number;
+  newTitle?: string;
+  goldBonus?: number;
+}
+
+// Insel-Belohnung (für RewardModal)
+export interface IslandReward {
+  islandName: string;
+  xpEarned: number;
+  goldEarned: number;
+  itemUnlocked?: ShopItem;
+}

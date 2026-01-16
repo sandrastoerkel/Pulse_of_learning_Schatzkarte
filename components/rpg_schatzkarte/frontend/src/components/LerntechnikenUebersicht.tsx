@@ -205,7 +205,7 @@ export function LerntechnikenUebersicht({
       <div className="uebersicht-actions">
         <button className="challenge-link-btn" onClick={handleGoToChallenge}>
           <span className="btn-icon">🏝️</span>
-          <span className="btn-text">Zur Insel der 7 Werkzeuge</span>
+          <span className="btn-text">Zur Cleverer lernen</span>
         </button>
       </div>
     </div>

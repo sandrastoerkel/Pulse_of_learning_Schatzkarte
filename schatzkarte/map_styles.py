@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-CSS-Styles fuer die WOW-Schatzkarte.
-Alle viralen Elemente: Pulsieren, Nebel, Confetti, Glitzer
+CSS-Styles für die WOW-Schatzkarte.
+Alle viralen Elemente: Pulsieren, Nebel, Confetti, Glitzer + POLARSTERN
 """
 
 def get_map_css():
@@ -14,7 +14,7 @@ def get_map_css():
 .ocean-bg {
     background: linear-gradient(180deg, 
         #87CEEB 0%,      /* Himmel */
-        #1E90FF 30%,     /* Uebergang */
+        #1E90FF 30%,     /* Übergang */
         #0077BE 60%,     /* Tiefes Meer */
         #005A8C 100%);
     min-height: 500px;
@@ -64,7 +64,7 @@ def get_map_css():
     z-index: 10;
 }
 
-/* Grosses Emoji-Icon */
+/* Großes Emoji-Icon */
 .island-icon {
     font-size: 50px;
     display: block;
@@ -93,9 +93,9 @@ def get_map_css():
     }
 }
 
-/* Stern-Badge fuer aktuelle Insel */
+/* Stern-Badge für aktuelle Insel */
 .island-current::before {
-    content: '\2B50';
+    content: '⭐';
     position: absolute;
     top: -15px;
     right: -15px;
@@ -110,7 +110,7 @@ def get_map_css():
 }
 
 /* ===============================================================
-   GESPERRTE INSEL - MYSTERIOSER NEBEL
+   GESPERRTE INSEL - MYSTERIÖSER NEBEL
    =============================================================== */
 
 .island-locked {
@@ -121,7 +121,7 @@ def get_map_css():
 }
 
 .island-locked::after {
-    content: '\1F512';
+    content: '🔒';
     position: absolute;
     top: 50%;
     left: 50%;
@@ -147,7 +147,7 @@ def get_map_css():
 }
 
 .island-completed::after {
-    content: '\2705';
+    content: '✅';
     position: absolute;
     top: -10px;
     right: -10px;
@@ -378,17 +378,16 @@ def get_map_css():
 }
 
 /* ===============================================================
-   KLICKBARE INSEL-KARTEN (NEU)
-   Der Button wird transparent ueber die Karte gelegt.
-   Zum Rueckgaengig machen: Diesen CSS-Block loeschen
+   KLICKBARE INSEL-KARTEN
+   Der Button wird transparent über die Karte gelegt.
    =============================================================== */
 
-/* Container der sowohl Karte als auch Button enthaelt */
+/* Container der sowohl Karte als auch Button enthält */
 div[data-testid="column"] > div[data-testid="stVerticalBlockBorderWrapper"] {
     position: relative;
 }
 
-/* Button absolut positionieren ueber der Karte */
+/* Button absolut positionieren über der Karte */
 div[data-testid="column"] .stButton {
     position: absolute !important;
     top: 0 !important;
@@ -406,6 +405,306 @@ div[data-testid="column"] .stButton button {
     cursor: pointer !important;
     background: transparent !important;
     border: none !important;
+}
+
+/* ===============================================================
+   ⭐ POLARSTERN - FLOATING LINK (NEU!)
+   =============================================================== */
+
+/* Pulsierender Polarstern-Button */
+.polarstern-floating {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 1000;
+    background: linear-gradient(135deg, #1a237e, #311b92);
+    border-radius: 50px;
+    padding: 12px 20px;
+    cursor: pointer;
+    animation: polarstern-pulse 2s ease-in-out infinite, polarstern-float 3s ease-in-out infinite;
+    border: 2px solid gold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.polarstern-floating:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 25px rgba(255, 215, 0, 0.5);
+}
+
+@keyframes polarstern-pulse {
+    0%, 100% { 
+        box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7),
+                    0 4px 15px rgba(0,0,0,0.3);
+    }
+    50% { 
+        box-shadow: 0 0 30px 15px rgba(255, 215, 0, 0.4),
+                    0 4px 15px rgba(0,0,0,0.3);
+    }
+}
+
+@keyframes polarstern-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.polarstern-icon {
+    font-size: 24px;
+    animation: polarstern-spin 4s linear infinite;
+}
+
+@keyframes polarstern-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.polarstern-label {
+    font-size: 14px;
+}
+
+.polarstern-badge {
+    background: #FFD700;
+    color: #1a237e;
+    border-radius: 12px;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* ===============================================================
+   ⭐ POLARSTERN - MODAL STYLES (NEU!)
+   =============================================================== */
+
+.polarstern-modal-header {
+    background: linear-gradient(135deg, #1a237e 0%, #0d1b3e 100%);
+    color: white;
+    padding: 25px;
+    border-radius: 15px 15px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.polarstern-modal-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,215,0,0.1) 0%, transparent 50%);
+    animation: rotate-stars 20s linear infinite;
+}
+
+@keyframes rotate-stars {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.polarstern-modal-icon {
+    font-size: 3em;
+    animation: twinkle 2s ease-in-out infinite;
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.1); }
+}
+
+.polarstern-modal-title {
+    font-size: 1.8em;
+    font-weight: bold;
+    margin: 10px 0 5px 0;
+    background: linear-gradient(90deg, #FFD700, #FFA500, #FFD700);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 3s linear infinite;
+    position: relative;
+    z-index: 1;
+}
+
+/* ===============================================================
+   ⭐ POLARSTERN - GOAL CARD STYLES (NEU!)
+   =============================================================== */
+
+.polarstern-goal-card {
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 20px;
+    margin: 15px 0;
+    border-left: 5px solid var(--goal-color, #FFD700);
+    color: white;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.polarstern-goal-card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 5px 20px rgba(255, 215, 0, 0.2);
+}
+
+.polarstern-goal-card.achieved {
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(76, 175, 80, 0.1));
+    border-left-color: #4CAF50;
+}
+
+.polarstern-goal-type-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.polarstern-goal-section {
+    margin: 12px 0;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+.polarstern-goal-section-label {
+    font-size: 0.85em;
+    opacity: 0.7;
+    margin-bottom: 5px;
+}
+
+/* ===============================================================
+   ⭐ POLARSTERN - STATS BOX (NEU!)
+   =============================================================== */
+
+.polarstern-stats {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.polarstern-stat-item {
+    text-align: center;
+}
+
+.polarstern-stat-number {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #FFD700;
+}
+
+.polarstern-stat-label {
+    font-size: 0.85em;
+    opacity: 0.7;
+}
+
+/* ===============================================================
+   ⭐ POLARSTERN - CELEBRATION ANIMATION (NEU!)
+   =============================================================== */
+
+@keyframes celebrate {
+    0% { transform: scale(1); }
+    25% { transform: scale(1.1) rotate(-5deg); }
+    50% { transform: scale(1.2) rotate(5deg); }
+    75% { transform: scale(1.1) rotate(-5deg); }
+    100% { transform: scale(1); }
+}
+
+.polarstern-goal-achieved-animation {
+    animation: celebrate 0.5s ease-in-out;
+}
+
+/* Sterne-Regen bei erreichtem Ziel */
+@keyframes star-rain {
+    0% {
+        opacity: 1;
+        transform: translateY(-100px) rotate(0deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(100vh) rotate(720deg);
+    }
+}
+
+.star-rain-piece {
+    position: fixed;
+    font-size: 20px;
+    animation: star-rain 3s ease-out forwards;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+/* ===============================================================
+   ⭐ POLARSTERN - EMPTY STATE (NEU!)
+   =============================================================== */
+
+.polarstern-empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    opacity: 0.8;
+}
+
+.polarstern-empty-state-icon {
+    font-size: 4em;
+    margin-bottom: 15px;
+    animation: twinkle 2s ease-in-out infinite;
+}
+</style>
+"""
+
+
+def get_polarstern_inline_css() -> str:
+    """
+    Gibt nur die Polarstern-spezifischen CSS-Styles zurück.
+    Für Verwendung wenn nur Polarstern-Styles benötigt werden.
+    """
+    return """
+<style>
+/* Polarstern Floating Button */
+.polarstern-floating {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 1000;
+    background: linear-gradient(135deg, #1a237e, #311b92);
+    border-radius: 50px;
+    padding: 12px 20px;
+    cursor: pointer;
+    animation: polarstern-pulse 2s ease-in-out infinite, polarstern-float 3s ease-in-out infinite;
+    border: 2px solid gold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    font-weight: bold;
+}
+
+@keyframes polarstern-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); }
+    50% { box-shadow: 0 0 30px 15px rgba(255, 215, 0, 0.4); }
+}
+
+@keyframes polarstern-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.polarstern-icon {
+    font-size: 24px;
+    animation: polarstern-spin 4s linear infinite;
+}
+
+@keyframes polarstern-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 </style>
 """

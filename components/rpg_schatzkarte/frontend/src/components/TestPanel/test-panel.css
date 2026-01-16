@@ -1,0 +1,520 @@
+/* ============================================
+   TestPanel.css - Admin Test & Demo Panel
+   ============================================ */
+
+/* Toggle Button */
+.test-panel-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 9999;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.test-panel-toggle:hover {
+  box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+}
+
+/* Main Panel */
+.test-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 380px;
+  height: 100vh;
+  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+  border-left: 3px solid #667eea;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -5px 0 30px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+/* Header */
+.test-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.test-panel__header h2 {
+  margin: 0;
+  font-size: 18px;
+  color: white;
+  font-weight: 600;
+}
+
+.test-panel__close {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.test-panel__close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Tabs */
+.test-panel__tabs {
+  display: flex;
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.test-panel__tabs .tab {
+  flex: 1;
+  padding: 12px 8px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-bottom: 3px solid transparent;
+}
+
+.test-panel__tabs .tab:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.test-panel__tabs .tab.active {
+  color: white;
+  background: rgba(102, 126, 234, 0.2);
+  border-bottom-color: #667eea;
+}
+
+/* Content */
+.test-panel__content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.tab-content h3 {
+  margin: 0 0 15px 0;
+  font-size: 14px;
+  color: #a0aec0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Value Controls */
+.value-control {
+  margin-bottom: 20px;
+}
+
+.value-control label {
+  display: block;
+  margin-bottom: 8px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.value-row {
+  display: flex;
+  gap: 8px;
+}
+
+.value-row input {
+  flex: 1;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: white;
+  font-size: 14px;
+}
+
+.value-row input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.value-row button {
+  padding: 8px 12px;
+  background: rgba(102, 126, 234, 0.3);
+  border: 1px solid rgba(102, 126, 234, 0.5);
+  border-radius: 6px;
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.value-row button:hover {
+  background: rgba(102, 126, 234, 0.5);
+}
+
+.value-control select {
+  width: 100%;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.value-control select option {
+  background: #1a1a2e;
+  color: white;
+}
+
+/* Quick Actions */
+.quick-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.btn-action {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-unlock-all {
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+  color: white;
+}
+
+.btn-unlock-all:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(74, 222, 128, 0.4);
+}
+
+.btn-reset-all {
+  background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+  color: white;
+}
+
+.btn-reset-all:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(248, 113, 113, 0.4);
+}
+
+/* Islands List */
+.islands-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.island-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s;
+}
+
+.island-item.locked {
+  opacity: 0.6;
+}
+
+.island-item.complete {
+  background: rgba(74, 222, 128, 0.1);
+  border-color: rgba(74, 222, 128, 0.3);
+}
+
+.island-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.island-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.island-icon {
+  font-size: 20px;
+}
+
+.island-name {
+  color: white;
+  font-size: 13px;
+}
+
+.island-status {
+  font-size: 14px;
+}
+
+.island-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.btn-small {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-unlock {
+  background: rgba(74, 222, 128, 0.3);
+}
+
+.btn-unlock:hover {
+  background: rgba(74, 222, 128, 0.5);
+}
+
+.btn-complete {
+  background: rgba(96, 165, 250, 0.3);
+}
+
+.btn-complete:hover {
+  background: rgba(96, 165, 250, 0.5);
+}
+
+.btn-reset {
+  background: rgba(248, 113, 113, 0.3);
+}
+
+.btn-reset:hover {
+  background: rgba(248, 113, 113, 0.5);
+}
+
+/* Hint Text */
+.hint {
+  margin-top: 15px;
+  padding: 12px;
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 8px;
+  color: #ffc107;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* Rewards Grid */
+.rewards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.reward-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.reward-btn:hover {
+  transform: translateY(-3px);
+}
+
+.reward-icon {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.reward-label {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.reward-won {
+  background: linear-gradient(135deg, rgba(74, 222, 128, 0.2) 0%, rgba(34, 197, 94, 0.2) 100%);
+  border-color: rgba(74, 222, 128, 0.5);
+  color: #4ade80;
+}
+
+.reward-won:hover {
+  background: linear-gradient(135deg, rgba(74, 222, 128, 0.3) 0%, rgba(34, 197, 94, 0.3) 100%);
+}
+
+.reward-lost {
+  background: linear-gradient(135deg, rgba(248, 113, 113, 0.2) 0%, rgba(239, 68, 68, 0.2) 100%);
+  border-color: rgba(248, 113, 113, 0.5);
+  color: #f87171;
+}
+
+.reward-lost:hover {
+  background: linear-gradient(135deg, rgba(248, 113, 113, 0.3) 0%, rgba(239, 68, 68, 0.3) 100%);
+}
+
+.reward-achievement {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(245, 158, 11, 0.2) 100%);
+  border-color: rgba(251, 191, 36, 0.5);
+  color: #fbbf24;
+}
+
+.reward-achievement:hover {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.3) 0%, rgba(245, 158, 11, 0.3) 100%);
+}
+
+.reward-levelup {
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+  border-color: rgba(96, 165, 250, 0.5);
+  color: #60a5fa;
+}
+
+.reward-levelup:hover {
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%);
+}
+
+.reward-island {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+  border-color: rgba(168, 85, 247, 0.5);
+  color: #a855f7;
+}
+
+.reward-island:hover {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%);
+}
+
+.reward-selector {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.2) 0%, rgba(219, 39, 119, 0.2) 100%);
+  border-color: rgba(236, 72, 153, 0.5);
+  color: #ec4899;
+}
+
+.reward-selector:hover {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.3) 0%, rgba(219, 39, 119, 0.3) 100%);
+}
+
+/* Games Grid */
+.games-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.game-btn {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px 20px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+  border: 2px solid rgba(102, 126, 234, 0.4);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.game-btn:hover {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
+  transform: translateX(5px);
+}
+
+.game-icon {
+  font-size: 32px;
+}
+
+.game-name {
+  display: block;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.game-desc {
+  display: block;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+}
+
+/* Extra Actions */
+.extra-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.extra-actions .btn-action {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #f87171;
+}
+
+.extra-actions .btn-action:hover {
+  background: rgba(239, 68, 68, 0.3);
+}
+
+/* Footer */
+.test-panel__footer {
+  padding: 12px 20px;
+  background: rgba(0, 0, 0, 0.3);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.shortcut-hint {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 11px;
+}
+
+/* Scrollbar Styling */
+.test-panel__content::-webkit-scrollbar,
+.islands-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.test-panel__content::-webkit-scrollbar-track,
+.islands-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+.test-panel__content::-webkit-scrollbar-thumb,
+.islands-list::-webkit-scrollbar-thumb {
+  background: rgba(102, 126, 234, 0.5);
+  border-radius: 3px;
+}
+
+.test-panel__content::-webkit-scrollbar-thumb:hover,
+.islands-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(102, 126, 234, 0.7);
+}

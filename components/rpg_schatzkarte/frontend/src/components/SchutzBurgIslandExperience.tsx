@@ -1,5 +1,5 @@
 // ============================================
-// Schutz-Burg Island Experience
+// Wenn andere dich fertig machen Island Experience
 // Schöne Animationen wie die anderen Inseln
 // ============================================
 
@@ -49,7 +49,7 @@ export function SchutzBurgIslandExperience({ ageGroup, onClose, onQuestComplete 
         <button className="back-btn" onClick={onClose}>← Zurück</button>
         <h1 className="island-title">
           <motion.span className="title-icon" animate={{ rotate: [0, 5, -5, 0] }} transition={{ repeat: Infinity, duration: 3 }}>🛡️</motion.span>
-          Schutz-Burg
+          Wenn andere dich fertig machen
         </h1>
         <div className="xp-badge">
           <motion.span className="xp-icon" animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 2 }}>⭐</motion.span>

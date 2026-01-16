@@ -1,5 +1,5 @@
 // ============================================
-// Insel der 7 Werkzeuge - Quiz (Grundschule)
+// Cleverer lernen - Quiz (Grundschule)
 // Thema: Die 7 Power-Lerntechniken
 // Basierend auf Hattie, Dunlosky, Bjork
 // ============================================

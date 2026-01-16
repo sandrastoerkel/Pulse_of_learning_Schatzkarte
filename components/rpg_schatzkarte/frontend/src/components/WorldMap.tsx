@@ -213,13 +213,13 @@ export function WorldMap({
         <div
           className="challenge-ship hattie-ship"
           onClick={onHattieShipClick}
-          title="Superpower: Trainiere deine Selbsteinschätzung"
+          title="Selbsteinschätzung: Trainiere deine Fähigkeit, dich selbst einzuschätzen"
         >
           <div className="ship-body">
             <span className="ship-icon">💪</span>
             <span className="ship-flag">⭐</span>
           </div>
-          <div className="ship-label">Superpower</div>
+          <div className="ship-label">Selbsteinschätzung</div>
           <div className="ship-waves">〰️</div>
         </div>
 
