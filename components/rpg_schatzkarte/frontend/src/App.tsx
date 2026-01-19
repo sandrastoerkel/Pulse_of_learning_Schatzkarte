@@ -1294,15 +1294,26 @@ function RPGSchatzkarteStreamlit({ args }: ComponentProps) {
 
   // Streamlit-Höhe setzen - WICHTIG: muss immer aufgerufen werden
   useEffect(() => {
-    // Landing Page braucht mehr Höhe
-    const height = view === 'landing' ? 4000 : 700;
+    // Landing Page braucht mehr Höhe (mit neuem 3-Bausteine-Konzept)
+    const height = view === 'landing' ? 5500 : 700;
     Streamlit.setFrameHeight(height);
 
     // Regelmäßig Höhe aktualisieren für Landing Page
     if (view === 'landing') {
       const interval = setInterval(() => {
-        Streamlit.setFrameHeight(4000);
-      }, 1000);
+        // Dynamisch die echte Höhe ermitteln
+        const body = document.body;
+        const html = document.documentElement;
+        const contentHeight = Math.max(
+          body.scrollHeight,
+          body.offsetHeight,
+          html.clientHeight,
+          html.scrollHeight,
+          html.offsetHeight
+        );
+        // Mindestens 5500, aber mehr wenn nötig
+        Streamlit.setFrameHeight(Math.max(5500, contentHeight + 100));
+      }, 500);
       return () => clearInterval(interval);
     }
   }, [view]);
