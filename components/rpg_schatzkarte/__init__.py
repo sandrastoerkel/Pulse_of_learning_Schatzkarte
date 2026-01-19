@@ -116,6 +116,47 @@ def rpg_schatzkarte(
     return component_value
 
 
+def landing_page(
+    height: int = 4000,
+    key: str = None
+) -> dict:
+    """
+    Rendert die Landing Page Component.
+
+    Args:
+        height: Höhe der Komponente in Pixeln
+        key: Eindeutiger Key für die Komponente
+
+    Returns:
+        Dict mit Aktion wenn User etwas klickt, sonst None
+        - action: 'go_to_map' wenn User zur Schatzkarte navigieren will
+    """
+    # Komponente im Landing-Page-Modus rendern
+    component_value = _component_func(
+        view="landing",
+        islands=[],
+        userProgress={},
+        heroData={
+            "name": "Lern-Held",
+            "avatar": "warrior",
+            "level": 1,
+            "xp": 0,
+            "xp_to_next_level": 100,
+            "gold": 0,
+            "items": [],
+            "titles": []
+        },
+        unlockedIslands=[],
+        currentIsland=None,
+        ageGroup="grundschule",
+        isAdmin=False,
+        key=key,
+        default=None,
+    )
+
+    return component_value
+
+
 # Hilfsfunktionen für die Daten-Transformation
 
 def islands_to_react_format(islands_data: list) -> list:

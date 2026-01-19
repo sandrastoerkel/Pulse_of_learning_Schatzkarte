@@ -40,6 +40,7 @@ import './styles/hattie-challenge.css';
 import './styles/superhelden-tagebuch.css';
 import './styles/brainy.css';
 import { Brainy } from './components/Brainy';
+import { LandingPageV5 } from './components/LandingPageV5';
 import { MemoryGame, RewardModal, MiniGameSelector } from './components/MiniGames';
 import { RunnerGame } from './components/MiniGames/Runner/RunnerGame';
 import { TestPanel } from './components/TestPanel';
@@ -1278,6 +1279,7 @@ function ThemeSwitcher({
 
 // Streamlit-Wrapper Komponente
 function RPGSchatzkarteStreamlit({ args }: ComponentProps) {
+  const view: string = args?.view || 'map'; // 'landing' oder 'map'
   const islands: Island[] = args?.islands || DEFAULT_ISLANDS;
   const userProgress: UserProgress = args?.userProgress || {};
   const heroData: HeroData = args?.heroData || DEFAULT_HERO;
@@ -1288,14 +1290,37 @@ function RPGSchatzkarteStreamlit({ args }: ComponentProps) {
   const isAdmin: boolean = args?.isAdmin || args?.ageGroup === 'paedagoge' || false;
   const [currentTheme, setCurrentTheme] = useState<ThemeType>(loadSavedTheme);
 
+  // Streamlit-Höhe setzen - WICHTIG: muss immer aufgerufen werden
   useEffect(() => {
-    Streamlit.setFrameHeight(700);
-  }, []);
+    // Landing Page braucht mehr Höhe
+    const height = view === 'landing' ? 4000 : 700;
+    Streamlit.setFrameHeight(height);
+
+    // Regelmäßig Höhe aktualisieren für Landing Page
+    if (view === 'landing') {
+      const interval = setInterval(() => {
+        Streamlit.setFrameHeight(4000);
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [view]);
 
   const handleAction = useCallback((action: SchatzkartAction) => {
     Streamlit.setComponentValue(action);
   }, []);
 
+  // Landing Page anzeigen
+  if (view === 'landing') {
+    return (
+      <LandingPageV5
+        onClose={() => {
+          Streamlit.setComponentValue({ action: 'go_to_map' });
+        }}
+      />
+    );
+  }
+
+  // Schatzkarte anzeigen (default)
   return (
     <div className={`theme-${currentTheme}`}>
       <ThemeSwitcher
@@ -1320,9 +1345,19 @@ function RPGSchatzkarteStreamlit({ args }: ComponentProps) {
 function RPGSchatzkarteDev() {
   const [currentTheme, setCurrentTheme] = useState<ThemeType>(loadSavedTheme);
   const [ageGroup, setAgeGroup] = useState<AgeGroup>('grundschule');
+  const [showLanding, setShowLanding] = useState(true); // Starte mit Landing Page
 
   // Mehr Inseln freigeschaltet für Demo
   const unlockedIslands = ['start', 'festung', 'werkzeuge', 'bruecken', 'faeden', 'spiegel_see', 'vulkan', 'ruhe_oase'];
+
+  // Landing Page anzeigen
+  if (showLanding) {
+    return (
+      <LandingPageV5
+        onClose={() => setShowLanding(false)}
+      />
+    );
+  }
 
   return (
     <div className={`theme-${currentTheme}`}>
@@ -1331,7 +1366,25 @@ function RPGSchatzkarteDev() {
         onThemeChange={setCurrentTheme}
       />
 
-      {/* Altersstufen-Auswahl für Dev - jetzt im TestPanel integriert */}
+      {/* Button um zurück zur Landing Page zu gehen */}
+      <button
+        onClick={() => setShowLanding(true)}
+        style={{
+          position: 'fixed',
+          top: '10px',
+          left: '10px',
+          zIndex: 1000,
+          padding: '8px 16px',
+          background: '#16a34a',
+          color: 'white',
+          border: 'none',
+          borderRadius: '8px',
+          cursor: 'pointer',
+          fontSize: '14px'
+        }}
+      >
+        ← Landing Page
+      </button>
 
       <RPGSchatzkarteContent
         islands={DEFAULT_ISLANDS}
