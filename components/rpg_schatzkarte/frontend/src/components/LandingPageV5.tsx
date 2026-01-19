@@ -397,17 +397,19 @@ export function LandingPageV5({ onClose }: LandingPageV5Props) {
       <section style={{ padding: '80px 24px', background: 'white' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '50px', alignItems: 'center' }}>
-            {/* Bild */}
-            <div style={{ flex: '1 1 400px', position: 'relative' }}>
-              <div style={{ borderRadius: '20px', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.15)' }}>
-                <img
-                  src="images/stressed-parent.jpg"
-                  alt="Frustrierte Mutter bei Hausaufgaben"
-                  style={{ width: '100%', height: 'auto', display: 'block' }}
-                />
-              </div>
-              <div style={{ position: 'absolute', top: '-12px', right: '-12px', background: '#ef4444', color: 'white', padding: '10px 18px', borderRadius: '20px', fontSize: '14px', fontWeight: 700, boxShadow: '0 4px 12px rgba(239,68,68,0.4)' }}>
-                Kommt dir das bekannt vor?
+            {/* Mein Ansatz */}
+            <div style={{ flex: '1 1 400px' }}>
+              <div style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)', borderRadius: '20px', padding: '40px', border: '2px solid #86efac' }}>
+                <div style={{ fontSize: '48px', marginBottom: '20px' }}>🎯</div>
+                <h3 style={{ fontSize: '24px', fontWeight: 700, color: '#15803d', marginBottom: '16px' }}>
+                  Mein Ansatz
+                </h3>
+                <p style={{ fontSize: '18px', color: '#374151', lineHeight: 1.7, marginBottom: '16px' }}>
+                  Ich übersetze internationale Lernforschung in <strong>praktische Methoden für das deutsche Schulsystem</strong>.
+                </p>
+                <p style={{ fontSize: '18px', color: '#374151', lineHeight: 1.7 }}>
+                  Keine graue Theorie – sondern <strong>Techniken, die dein Kind sofort im Schulalltag anwenden kann</strong>.
+                </p>
               </div>
             </div>
             {/* Text */}
@@ -483,7 +485,9 @@ export function LandingPageV5({ onClose }: LandingPageV5Props) {
           </div>
 
           <div style={{ textAlign: 'center', marginTop: '50px' }}>
-            <button style={{ background: '#16a34a', color: 'white', padding: '18px 36px', borderRadius: '30px', fontWeight: 700, fontSize: '18px', boxShadow: '0 8px 25px rgba(22,163,74,0.3)', border: 'none', cursor: 'pointer' }}>
+            <button
+              onClick={() => document.getElementById('kontakt')?.scrollIntoView({ behavior: 'smooth' })}
+              style={{ background: '#16a34a', color: 'white', padding: '18px 36px', borderRadius: '30px', fontWeight: 700, fontSize: '18px', boxShadow: '0 8px 25px rgba(22,163,74,0.3)', border: 'none', cursor: 'pointer' }}>
               Mehr erfahren & Erstgespräch buchen →
             </button>
           </div>
@@ -524,7 +528,7 @@ export function LandingPageV5({ onClose }: LandingPageV5Props) {
       </section>
 
       {/* CTA */}
-      <section style={{ padding: '80px 24px', background: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)' }}>
+      <section id="kontakt" style={{ padding: '80px 24px', background: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)' }}>
         <div style={{ maxWidth: '600px', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '40px' }}>
             <h2 style={{ fontSize: '32px', fontWeight: 800, marginBottom: '16px', color: 'white' }}>Bereit für den nächsten Schritt?</h2>
