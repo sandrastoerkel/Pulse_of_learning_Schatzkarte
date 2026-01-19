@@ -55,6 +55,9 @@ interface QuestModalProps {
   startWerkzeugeWithChallenge?: boolean;
   // Polarstern-Widget öffnen (für Starthafen)
   onPolarsternClick?: () => void;
+  // Lernbegleiter auswählen (für Starthafen)
+  onOpenCompanionSelector?: () => void;
+  selectedCompanion?: string;
 }
 
 interface TutorialStep {
@@ -178,7 +181,9 @@ export function QuestModal({
   onOpenBandura,
   onOpenHattie,
   startWerkzeugeWithChallenge = false,
-  onPolarsternClick
+  onPolarsternClick,
+  onOpenCompanionSelector,
+  selectedCompanion
 }: QuestModalProps) {
   const [activeQuest, setActiveQuest] = useState<QuestType | null>(null);
   const [showReward, setShowReward] = useState(false);
@@ -356,6 +361,8 @@ export function QuestModal({
               onClose={onClose}
               onQuestComplete={onQuestComplete}
               onPolarsternClick={onPolarsternClick}
+              onOpenCompanionSelector={onOpenCompanionSelector}
+              selectedCompanion={selectedCompanion}
             />
           ) : /* Insel der Fäden: Birkenbihl's Faden-Prinzip */
           island.id === 'faeden' ? (

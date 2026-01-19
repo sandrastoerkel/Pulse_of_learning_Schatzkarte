@@ -110,6 +110,40 @@ const TABS: { id: TabId; icon: string; label: string }[] = [
   { id: 'history', icon: '📜', label: 'Verlauf' }
 ];
 
+// ============================================
+// INSPIRIERENDE BILDER FÜR JEDE QUELLE
+// ============================================
+const BANDURA_IMAGES: Record<BanduraSourceId, { url: string; label: string }[]> = {
+  mastery: [
+    { url: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=300&h=180&fit=crop', label: 'Gipfel erreicht' },
+    { url: 'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=300&h=180&fit=crop', label: 'Stark & fit' },
+    { url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=300&h=180&fit=crop', label: 'Problem gelöst' },
+    { url: 'https://images.unsplash.com/photo-1533022139390-e31c488d69e2?w=300&h=180&fit=crop', label: 'Ins Ziel gelaufen' },
+    { url: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=300&h=180&fit=crop', label: 'Präsentation gemeistert' },
+  ],
+  vicarious: [
+    { url: 'https://images.unsplash.com/photo-1529390079861-591de354faf5?w=300&h=180&fit=crop', label: 'Vom Mentor lernen' },
+    { url: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=300&h=180&fit=crop', label: 'Sportliche Vorbilder' },
+    { url: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=300&h=180&fit=crop', label: 'Gemeinsam lernen' },
+    { url: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=300&h=180&fit=crop', label: 'Von den Besten lernen' },
+    { url: 'https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?w=300&h=180&fit=crop', label: 'Inspirierende Menschen' },
+  ],
+  persuasion: [
+    { url: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=300&h=180&fit=crop', label: 'Freunde feiern' },
+    { url: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=300&h=180&fit=crop', label: 'Unterstützung' },
+    { url: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=300&h=180&fit=crop', label: 'High Five!' },
+    { url: 'https://images.unsplash.com/photo-1544928147-79a2dbc1f389?w=300&h=180&fit=crop', label: 'Applaus' },
+    { url: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=300&h=180&fit=crop', label: 'Teamwork' },
+  ],
+  physiological: [
+    { url: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=300&h=180&fit=crop', label: 'Meditation' },
+    { url: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=300&h=180&fit=crop', label: 'Yoga & Balance' },
+    { url: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=180&fit=crop', label: 'Entspannung' },
+    { url: 'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=300&h=180&fit=crop', label: 'Natur & Ruhe' },
+    { url: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=300&h=180&fit=crop', label: 'Sport & Energie' },
+  ],
+};
+
 // Level-System
 const LEVEL_INFO: Record<number, { icon: string; name: string; xpRequired: number }> = {
   1: { icon: '🌱', name: 'Anfänger', xpRequired: 0 },
@@ -484,6 +518,28 @@ export function BanduraChallenge({
                   exit={{ opacity: 0, height: 0, y: 20 }}
                   transition={{ type: 'spring' as const, stiffness: 300, damping: 25 }}
                 >
+                  {/* Inspirierende Bildergalerie */}
+                  <motion.div
+                    className="inspiration-gallery"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                  >
+                    {BANDURA_IMAGES[selectedSource].map((img, idx) => (
+                      <motion.div
+                        key={idx}
+                        className="inspiration-image"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: idx * 0.1 }}
+                        whileHover={{ scale: 1.05, y: -5 }}
+                      >
+                        <img src={img.url} alt={img.label} />
+                        <span className="image-label">{img.label}</span>
+                      </motion.div>
+                    ))}
+                  </motion.div>
+
                   <div className="form-header">
                     <span className="form-icon">{BANDURA_SOURCES[selectedSource].icon}</span>
                     <span className="form-prompt">{BANDURA_SOURCES[selectedSource].prompt}</span>

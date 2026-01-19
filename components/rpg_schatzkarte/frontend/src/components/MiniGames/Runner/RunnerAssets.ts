@@ -256,6 +256,91 @@ export const COLLECTIBLE_DEFINITIONS: Record<CollectibleType, CollectibleDefinit
   }
 };
 
+// === POWER-UP TYPEN ===
+
+export type PowerUpType = 'shield' | 'magnet' | 'doubleXP' | 'slowmo';
+
+export interface PowerUpDefinition {
+  type: PowerUpType;
+  emoji: string;
+  color: string;
+  glowColor: string;
+  size: number;
+  duration: number;           // Dauer in Frames (60 = 1 Sekunde)
+  description: string;
+  spawnWeight: number;
+  minDistance: number;        // Ab welcher Distanz spawnt dieses Power-Up
+}
+
+export const POWERUP_DEFINITIONS: Record<PowerUpType, PowerUpDefinition> = {
+  shield: {
+    type: 'shield',
+    emoji: '🛡️',
+    color: '#3B82F6',
+    glowColor: 'rgba(59, 130, 246, 0.6)',
+    size: 40,
+    duration: 300,            // 5 Sekunden
+    description: 'Unverwundbar!',
+    spawnWeight: 0.3,
+    minDistance: 100
+  },
+  magnet: {
+    type: 'magnet',
+    emoji: '🧲',
+    color: '#EF4444',
+    glowColor: 'rgba(239, 68, 68, 0.6)',
+    size: 38,
+    duration: 360,            // 6 Sekunden
+    description: 'Münzmagnet!',
+    spawnWeight: 0.35,
+    minDistance: 50
+  },
+  doubleXP: {
+    type: 'doubleXP',
+    emoji: '✨',
+    color: '#A855F7',
+    glowColor: 'rgba(168, 85, 247, 0.6)',
+    size: 36,
+    duration: 300,            // 5 Sekunden
+    description: '2x XP!',
+    spawnWeight: 0.25,
+    minDistance: 150
+  },
+  slowmo: {
+    type: 'slowmo',
+    emoji: '⏱️',
+    color: '#06B6D4',
+    glowColor: 'rgba(6, 182, 212, 0.6)',
+    size: 36,
+    duration: 180,            // 3 Sekunden
+    description: 'Zeitlupe!',
+    spawnWeight: 0.1,
+    minDistance: 200
+  }
+};
+
+/**
+ * Wählt einen zufälligen Power-Up-Typ
+ */
+export function getRandomPowerUpType(distance: number): PowerUpType | null {
+  const available = Object.values(POWERUP_DEFINITIONS)
+    .filter(p => distance >= p.minDistance);
+
+  if (available.length === 0) return null;
+
+  const totalWeight = available.reduce((sum, p) => sum + p.spawnWeight, 0);
+  let random = Math.random() * totalWeight;
+
+  for (const powerUp of available) {
+    random -= powerUp.spawnWeight;
+    if (random <= 0) {
+      return powerUp.type;
+    }
+  }
+
+  return 'magnet'; // Fallback
+}
+
 // === HINTERGRUND-LAYER (Parallax) ===
 
 export interface BackgroundLayer {
@@ -304,7 +389,7 @@ export const BACKGROUND_LAYERS: BackgroundLayer[] = [
   {
     id: 'trees-far',
     speedMultiplier: 0.4,
-    yPosition: 140,
+    yPosition: 270,
     elements: [
       { emoji: '🌲', width: 40, height: 60, yOffset: 0, frequency: 0.4 },
       { emoji: '🌳', width: 50, height: 55, yOffset: 5, frequency: 0.3 }
@@ -313,7 +398,7 @@ export const BACKGROUND_LAYERS: BackgroundLayer[] = [
   {
     id: 'trees-near',
     speedMultiplier: 0.6,
-    yPosition: 170,
+    yPosition: 310,
     elements: [
       { emoji: '🌲', width: 50, height: 70, yOffset: -10, frequency: 0.25 },
       { emoji: '🌴', width: 45, height: 75, yOffset: -15, frequency: 0.15 }

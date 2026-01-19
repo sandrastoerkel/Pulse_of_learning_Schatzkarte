@@ -64,8 +64,8 @@ const DEFAULT_HERO: HeroData = {
 
 // Standard-Daten für Development - echte Inseln aus der App
 const DEFAULT_ISLANDS: Island[] = [
-  // Starthafen
-  { id: 'start', name: 'Starthafen', icon: '🚢', color: '#4fc3f7', week: 0, treasures: [{ name: 'Kompass der Reise', icon: '🧭', xp: 20 }] },
+  // Basis-Camp
+  { id: 'start', name: 'Basis-Camp', icon: '🏕️', color: '#4fc3f7', week: 0, treasures: [{ name: 'Kompass der Reise', icon: '🧭', xp: 20 }] },
   // Feste Inseln (Woche 1-4)
   { id: 'festung', name: 'Mental stark', icon: '💪', color: '#ffb74d', week: 1, treasures: [{ name: 'Kleine Siege', icon: '💎', xp: 50 }, { name: 'Vorbilder', icon: '💎', xp: 50 }] },
   { id: 'werkzeuge', name: 'Cleverer lernen', icon: '📚', color: '#81c784', week: 2, treasures: [{ name: 'Magische Tomate', icon: '🍅', xp: 50 }, { name: 'Erinnerungs-Spiegel', icon: '🔄', xp: 50 }] },
@@ -888,6 +888,8 @@ function RPGSchatzkarteContent({
           onOpenHattie={handleHattieShipClick}
           startWerkzeugeWithChallenge={startWerkzeugeWithChallenge}
           onPolarsternClick={handlePolarsternClick}
+          onOpenCompanionSelector={() => setShowCompanionSelector(true)}
+          selectedCompanion={selectedCompanion}
         />
       )}
 

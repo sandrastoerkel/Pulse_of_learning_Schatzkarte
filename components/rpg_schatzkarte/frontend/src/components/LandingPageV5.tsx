@@ -494,6 +494,145 @@ export function LandingPageV5({ onClose }: LandingPageV5Props) {
         </div>
       </section>
 
+      {/* SO FUNKTIONIERT DIE LERNBEGLEITUNG */}
+      <section style={{ padding: '80px 24px', background: 'white', borderTop: '1px solid #e5e7eb' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '50px' }}>
+            <span style={{ display: 'inline-block', background: '#dbeafe', color: '#1d4ed8', padding: '10px 20px', borderRadius: '20px', fontSize: '14px', fontWeight: 700, marginBottom: '16px' }}>🎯 Das Konzept</span>
+            <h2 style={{ fontSize: '36px', fontWeight: 800, color: '#111827', marginBottom: '16px' }}>So funktioniert die Lernbegleitung</h2>
+            <p style={{ fontSize: '18px', color: '#4b5563', maxWidth: '700px', margin: '0 auto' }}>
+              Nicht alleine lassen – aber auch nicht abhängig machen. <br/>
+              <strong>Drei Bausteine</strong>, die ineinandergreifen.
+            </p>
+          </div>
+
+          {/* 3 Säulen */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px', justifyContent: 'center', marginBottom: '50px' }}>
+
+            {/* Säule 1: Live-Kleingruppen */}
+            <div style={{
+              flex: '1 1 300px',
+              maxWidth: '340px',
+              background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
+              borderRadius: '20px',
+              padding: '30px',
+              border: '2px solid #86efac',
+              position: 'relative',
+              overflow: 'hidden'
+            }}>
+              <div style={{ position: 'absolute', top: '-20px', right: '-20px', fontSize: '120px', opacity: 0.1 }}>🎥</div>
+              <div style={{ position: 'relative', zIndex: 1 }}>
+                <div style={{ fontSize: '48px', marginBottom: '16px' }}>🎥👥</div>
+                <div style={{ background: '#16a34a', color: 'white', display: 'inline-block', padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700, marginBottom: '12px' }}>BAUSTEIN 1</div>
+                <h3 style={{ fontSize: '22px', fontWeight: 700, color: '#15803d', marginBottom: '8px' }}>Live-Kleingruppen</h3>
+                <p style={{ color: '#16a34a', fontSize: '14px', fontWeight: 600, marginBottom: '12px' }}>2× pro Woche · bis 8 Kinder</p>
+                <p style={{ color: '#166534', fontSize: '15px', marginBottom: '16px', lineHeight: 1.6 }}>
+                  In regelmäßigen Video-Calls werden <strong>Lerninhalte vermittelt</strong>, Techniken eingeübt und Fragen beantwortet.
+                </p>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                  {['Lerntechniken aktiv einüben', 'Fragen direkt klären', 'Voneinander lernen', 'Selbstvertrauen aufbauen'].map((item, i) => (
+                    <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', fontSize: '14px', color: '#15803d' }}>
+                      <span style={{ color: '#22c55e', fontWeight: 700 }}>✓</span> {item}
+                    </li>
+                  ))}
+                </ul>
+                <div style={{ marginTop: '16px', padding: '12px', background: 'rgba(255,255,255,0.7)', borderRadius: '12px', textAlign: 'center' }}>
+                  <span style={{ fontSize: '14px', color: '#15803d', fontStyle: 'italic' }}>"Wenn die das können, kann ich das auch!"</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Säule 2: Interaktives Selbstlernen */}
+            <div style={{
+              flex: '1 1 300px',
+              maxWidth: '340px',
+              background: 'linear-gradient(135deg, #fefce8 0%, #fef3c7 100%)',
+              borderRadius: '20px',
+              padding: '30px',
+              border: '2px solid #fcd34d',
+              position: 'relative',
+              overflow: 'hidden'
+            }}>
+              <div style={{ position: 'absolute', top: '-20px', right: '-20px', fontSize: '120px', opacity: 0.1 }}>🗺️</div>
+              <div style={{ position: 'relative', zIndex: 1 }}>
+                <div style={{ fontSize: '48px', marginBottom: '16px' }}>🗺️🎮</div>
+                <div style={{ background: '#d97706', color: 'white', display: 'inline-block', padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700, marginBottom: '12px' }}>BAUSTEIN 2</div>
+                <h3 style={{ fontSize: '22px', fontWeight: 700, color: '#b45309', marginBottom: '8px' }}>Interaktives Selbstlernen</h3>
+                <p style={{ color: '#d97706', fontSize: '14px', fontWeight: 600, marginBottom: '12px' }}>Jederzeit · Im eigenen Tempo</p>
+                <p style={{ color: '#92400e', fontSize: '15px', marginBottom: '16px', lineHeight: 1.6 }}>
+                  Mit der <strong>Schatzkarte</strong> üben die Kinder eigenständig – spielerisch, mit Challenges und Gaming-Elementen.
+                </p>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                  {['Interaktive Schatzkarte', 'Spannende Challenges', 'Gaming-Elemente & Belohnungen', 'Fortschritte sichtbar machen'].map((item, i) => (
+                    <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', fontSize: '14px', color: '#b45309' }}>
+                      <span style={{ color: '#22c55e', fontWeight: 700 }}>✓</span> {item}
+                    </li>
+                  ))}
+                </ul>
+                <div style={{ marginTop: '16px', padding: '12px', background: 'rgba(255,255,255,0.7)', borderRadius: '12px', textAlign: 'center' }}>
+                  <span style={{ fontSize: '14px', color: '#b45309', fontStyle: 'italic' }}>"Lernen macht ja richtig Spaß!"</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Säule 3: Eltern-Workshop */}
+            <div style={{
+              flex: '1 1 300px',
+              maxWidth: '340px',
+              background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
+              borderRadius: '20px',
+              padding: '30px',
+              border: '2px solid #93c5fd',
+              position: 'relative',
+              overflow: 'hidden'
+            }}>
+              <div style={{ position: 'absolute', top: '-20px', right: '-20px', fontSize: '120px', opacity: 0.1 }}>👨‍👩‍👧</div>
+              <div style={{ position: 'relative', zIndex: 1 }}>
+                <div style={{ fontSize: '48px', marginBottom: '16px' }}>👨‍👩‍👧‍👦</div>
+                <div style={{ background: '#1d4ed8', color: 'white', display: 'inline-block', padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 700, marginBottom: '12px' }}>BAUSTEIN 3</div>
+                <h3 style={{ fontSize: '22px', fontWeight: 700, color: '#1e40af', marginBottom: '8px' }}>Eltern-Workshop</h3>
+                <p style={{ color: '#1d4ed8', fontSize: '14px', fontWeight: 600, marginBottom: '12px' }}>Exklusiv für Eltern</p>
+                <p style={{ color: '#1e3a8a', fontSize: '15px', marginBottom: '16px', lineHeight: 1.6 }}>
+                  Eltern lernen, <strong>wie sie ihr Kind optimal unterstützen</strong> – ohne Druck, mit den richtigen Strategien.
+                </p>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                  {['Richtig Feedback geben', 'Motivation fördern', 'Lernumgebung gestalten', 'Stressfrei durch Prüfungen'].map((item, i) => (
+                    <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', fontSize: '14px', color: '#1e40af' }}>
+                      <span style={{ color: '#22c55e', fontWeight: 700 }}>✓</span> {item}
+                    </li>
+                  ))}
+                </ul>
+                <div style={{ marginTop: '16px', padding: '12px', background: 'rgba(255,255,255,0.7)', borderRadius: '12px', textAlign: 'center' }}>
+                  <span style={{ fontSize: '14px', color: '#1e40af', fontStyle: 'italic' }}>"Endlich weiß ich, wie ich helfen kann!"</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Verbindungspfeile und Erklärung */}
+          <div style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginBottom: '30px', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '24px' }}>🎥</span>
+                <span style={{ fontSize: '20px', color: '#9ca3af' }}>+</span>
+                <span style={{ fontSize: '24px' }}>🗺️</span>
+                <span style={{ fontSize: '20px', color: '#9ca3af' }}>+</span>
+                <span style={{ fontSize: '24px' }}>👨‍👩‍👧‍👦</span>
+                <span style={{ fontSize: '20px', color: '#9ca3af' }}>=</span>
+                <span style={{ fontSize: '24px' }}>🎓</span>
+              </div>
+            </div>
+            <div style={{ background: '#f8fafc', borderRadius: '16px', padding: '24px', border: '1px solid #e2e8f0' }}>
+              <p style={{ fontSize: '17px', color: '#374151', lineHeight: 1.7, margin: 0 }}>
+                <strong style={{ color: '#111827' }}>Mein Ziel:</strong> Dein Kind soll <em>nicht</em> von mir abhängig werden –
+                sondern lernen, <strong style={{ color: '#16a34a' }}>wie es selbstständig erfolgreich lernt</strong>.
+                Die Live-Sessions geben den Kickstart, die Schatzkarte begleitet im Alltag – und die Eltern wissen, wie sie unterstützen können.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* FÜR WEN */}
       <section style={{ padding: '80px 24px', background: 'white' }}>
         <div style={{ maxWidth: '1000px', margin: '0 auto' }}>

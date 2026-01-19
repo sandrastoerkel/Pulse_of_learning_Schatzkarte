@@ -17,8 +17,8 @@ FINALE_ISLAND = "meister_berg"
 # Alle Inseln
 ISLANDS = {
     "start": {
-        "name": "Starthafen",
-        "icon": "🚢",
+        "name": "Basis-Camp",
+        "icon": "🏕️",
         "color": "#4fc3f7",
         "week": 0,
         "description": "Willkommen auf deiner Lernreise!",

@@ -1,5 +1,5 @@
 // ============================================
-// Starthafen Island Experience - Tutorial & Einführung
+// Basis-Camp Island Experience - Tutorial & Einführung
 // Schöne Animationen wie die anderen Inseln
 // ============================================
 
@@ -16,7 +16,9 @@ interface StarthafenIslandProps {
   ageGroup: AgeGroup;
   onClose: () => void;
   onQuestComplete: (questType: string, xp: number, gold?: number) => void;
-  onPolarsternClick?: () => void;  // NEU: Polarstern-Widget öffnen
+  onPolarsternClick?: () => void;  // Polarstern-Widget öffnen
+  onOpenCompanionSelector?: () => void;  // Lernbegleiter auswählen
+  selectedCompanion?: string;  // Aktuell gewählter Begleiter
 }
 
 interface FeatureCard {
@@ -48,13 +50,13 @@ const FEATURE_CARDS: FeatureCard[] = [
   },
   {
     id: 'ships',
-    icon: '🚢',
-    title: 'Die Schiffe',
-    description: 'Zwei besondere Begleiter',
+    icon: '🔑',
+    title: 'Lerntechniken & Goldener Schlüssel',
+    description: 'Deine täglichen Begleiter',
     color: '#ffb74d',
     details: [
-      '🌟 Der goldene Schlüssel - Erfolge sammeln',
-      '🎯 Superpower - Selbsteinschätzung trainieren'
+      '🔑 Goldener Schlüssel - Selbstvertrauen aufbauen',
+      '🎯 Lerntechniken - cleverer lernen'
     ]
   },
   {
@@ -86,11 +88,11 @@ const FEATURE_CARDS: FeatureCard[] = [
 const WELCOME_MESSAGES: Record<AgeGroup, { title: string; intro: string }> = {
   grundschule: {
     title: 'Willkommen!',
-    intro: 'Du stehst am Anfang einer aufregenden Lernreise! Hier im Starthafen erfährst du, wie alles funktioniert. Bist du bereit, die Welt des Wissens zu entdecken?'
+    intro: 'Du stehst am Anfang einer aufregenden Lernreise! Hier im Basis-Camp erfährst du, wie alles funktioniert. Bist du bereit, die Welt des Wissens zu entdecken?'
   },
   unterstufe: {
     title: 'Willkommen!',
-    intro: 'Der Starthafen ist dein Tor zu einer Reise durch die Welt des effektiven Lernens. Hier lernst du die wichtigsten Werkzeuge und Strategien kennen, die dich zum Lern-Meister machen.'
+    intro: 'Der Basis-Camp ist dein Tor zu einer Reise durch die Welt des effektiven Lernens. Hier lernst du die wichtigsten Werkzeuge und Strategien kennen, die dich zum Lern-Meister machen.'
   },
   mittelstufe: {
     title: 'Willkommen!',
@@ -115,6 +117,8 @@ export function StarthafenIslandExperience({
   onClose,
   onQuestComplete,
   onPolarsternClick,
+  onOpenCompanionSelector,
+  selectedCompanion,
 }: StarthafenIslandProps) {
   const [currentPhase, setCurrentPhase] = useState<'welcome' | 'features' | 'ready'>('welcome');
   const [expandedFeature, setExpandedFeature] = useState<string | null>(null);
@@ -173,7 +177,7 @@ export function StarthafenIslandExperience({
           >
             🚢
           </motion.span>
-          Starthafen
+          Basis-Camp
         </h1>
         <div className="xp-badge">
           <motion.span
@@ -261,18 +265,57 @@ export function StarthafenIslandExperience({
             </motion.p>
 
             <motion.div
-              className="captain-speech"
+              className="companion-choice"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.5 }}
+              onClick={onOpenCompanionSelector}
+              style={{
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                borderRadius: '20px',
+                padding: '1.5rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem',
+                border: '3px solid #a78bfa',
+                boxShadow: '0 8px 32px rgba(102, 126, 234, 0.4)',
+              }}
+              whileHover={{ scale: 1.03, boxShadow: '0 12px 40px rgba(102, 126, 234, 0.5)' }}
+              whileTap={{ scale: 0.98 }}
             >
-              <div className="captain-avatar">🧙‍♂️</div>
-              <div className="speech-bubble">
-                <p>
-                  <strong>Kapitän Wissen:</strong> "Ahoi! Ich bin dein Begleiter auf dieser Reise.
-                  Lass mich dir zeigen, was dich hier erwartet!"
+              <motion.span
+                style={{ fontSize: '3rem' }}
+                animate={{ y: [0, -5, 0], rotate: [0, 5, -5, 0] }}
+                transition={{ repeat: Infinity, duration: 2 }}
+              >
+                {selectedCompanion === 'draki' ? '🐉' :
+                 selectedCompanion === 'shadow' ? '🐱' :
+                 selectedCompanion === 'phoenix' ? '🦅' :
+                 selectedCompanion === 'knight' ? '⚔️' :
+                 selectedCompanion === 'brainy' ? '🧠' : '🐉'}
+              </motion.span>
+              <div style={{ flex: 1 }}>
+                <h3 style={{ color: 'white', margin: '0 0 0.3rem 0', fontSize: '1.2rem', fontWeight: 700 }}>
+                  {selectedCompanion ? 'Dein Lernbegleiter' : 'Wähle deinen Lernbegleiter!'}
+                </h3>
+                <p style={{ color: 'rgba(255,255,255,0.9)', margin: 0, fontSize: '0.95rem' }}>
+                  {selectedCompanion ? 'Tippe um zu wechseln' : 'Wer begleitet dich auf deiner Reise?'}
                 </p>
               </div>
+              <motion.span
+                style={{
+                  fontSize: '1.3rem',
+                  background: 'rgba(255,255,255,0.2)',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '30px',
+                  color: 'white',
+                }}
+                animate={{ x: [0, 5, 0] }}
+                transition={{ repeat: Infinity, duration: 1.5 }}
+              >
+                →
+              </motion.span>
             </motion.div>
 
             <motion.button
@@ -394,7 +437,7 @@ export function StarthafenIslandExperience({
             <h2 className="ready-title">Du bist bereit!</h2>
 
             <p className="ready-text">
-              Du hast den Starthafen erkundet. Jetzt kommt deine <strong>erste wichtige Aufgabe</strong>:
+              Du hast den Basis-Camp erkundet. Jetzt kommt deine <strong>erste wichtige Aufgabe</strong>:
             </p>
 
             {/* Polarstern - Kompass der Reise */}
