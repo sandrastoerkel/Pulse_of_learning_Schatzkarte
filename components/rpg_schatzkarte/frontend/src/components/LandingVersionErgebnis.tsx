@@ -134,26 +134,12 @@ export default function LandingVersionErgebnis({ onClose }: { onClose?: () => vo
           margin: '0 auto',
           padding: '16px 32px',
           display: 'flex',
-          justifyContent: 'space-between',
+          justifyContent: 'center',
           alignItems: 'center'
         }}>
           <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: '1.4rem' }}>
             <span style={{ color: '#059669' }}>Pulse</span> of Learning
           </div>
-          <button style={{
-            background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-            color: '#fff',
-            padding: '12px 28px',
-            borderRadius: '50px',
-            border: 'none',
-            fontWeight: 600,
-            fontSize: '0.95rem',
-            cursor: 'pointer',
-            boxShadow: '0 4px 14px rgba(5, 150, 105, 0.35)',
-            transition: 'all 0.3s ease'
-          }}>
-            Kostenlos starten
-          </button>
         </div>
       </nav>
 
