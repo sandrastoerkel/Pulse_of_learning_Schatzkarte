@@ -5,5 +5,5 @@
 export { WorldMap, ISLAND_POSITIONS } from './WorldMap';
 export { QuestCard, QuestMarker, getQuestStatus, getProgressPercent } from './QuestCard';
 export { HeroStatus, InventoryModal } from './HeroStatus';
-export { QuestModal } from './QuestModal';
+export { QuestModal } from './QuestModal/index';
 export { BattleQuiz } from './BattleQuiz';
