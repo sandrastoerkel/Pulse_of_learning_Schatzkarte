@@ -162,7 +162,7 @@ export interface TagebuchEintrag {
 
 // Aktionen die an Python zurueckgegeben werden
 export interface SchatzkartAction {
-  action: 'quest_completed' | 'treasure_collected' | 'xp_earned' | 'item_received' | 'bandura_entry' | 'hattie_entry' | 'hattie_prediction' | 'hattie_complete' | 'tagebuch_entry' | 'polarstern_clicked' | 'companion_selected' | 'minigame_completed';
+  action: 'quest_completed' | 'treasure_collected' | 'xp_earned' | 'item_received' | 'bandura_entry' | 'hattie_entry' | 'hattie_prediction' | 'hattie_complete' | 'tagebuch_entry' | 'polarstern_clicked' | 'companion_selected' | 'minigame_completed' | 'auto_open_handled' | 'go_to_map';
   companionId?: CompanionType;
   islandId?: string;
   questType?: QuestType;
@@ -179,6 +179,8 @@ export interface SchatzkartAction {
   minigameType?: string;
   score?: number;
   maxScore?: number;
+  // Polarstern - woher der User kam
+  sourceIsland?: string | null;
 }
 
 // Bandura-Quellen Konfiguration

@@ -34,10 +34,13 @@
   --radius-xl: 30px;
 
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-  background: linear-gradient(180deg, #f1f8e9 0%, #dcedc8 100%);
+  background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 100%), url('/werkzeuge-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   min-height: 100%;
   padding: 1rem;
-  color: var(--dark);
+  color: var(--white);
 }
 
 /* ============================================
@@ -54,7 +57,8 @@
 .werkzeuge-island .island-title {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--dark);
+  color: var(--white);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -115,8 +119,9 @@
 
 .werkzeuge-island .subtitle-text {
   font-size: 0.9rem;
-  color: var(--dark);
-  opacity: 0.8;
+  color: var(--white);
+  opacity: 0.9;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
 
 .werkzeuge-island .effect-badge {
@@ -152,10 +157,11 @@
 
 .werkzeuge-island .progress-text {
   font-size: 0.8rem;
-  color: var(--dark);
-  opacity: 0.7;
+  color: var(--white);
+  opacity: 0.9;
   text-align: center;
   display: block;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
 /* ============================================
@@ -198,9 +204,10 @@
 .werkzeuge-island .overview-intro {
   text-align: center;
   font-size: 1rem;
-  color: var(--dark);
+  color: var(--white);
   margin-bottom: 1.5rem;
   line-height: 1.5;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
 .werkzeuge-island .quests-grid {
@@ -211,8 +218,10 @@
 
 .werkzeuge-island .quest-card {
   position: relative;
-  background: var(--white);
-  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: var(--radius-lg);
   padding: 1.25rem 1rem;
   cursor: pointer;
@@ -260,17 +269,19 @@
   display: block;
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--dark);
+  color: var(--white);
   margin-bottom: 0.25rem;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
 
 .werkzeuge-island .quest-description {
   display: block;
   font-size: 0.75rem;
-  color: var(--dark);
-  opacity: 0.7;
+  color: var(--white);
+  opacity: 0.9;
   margin-bottom: 0.75rem;
   line-height: 1.3;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
 .werkzeuge-island .completed-badge {
@@ -290,12 +301,12 @@
 }
 
 .werkzeuge-island .xp-preview {
-  background: var(--light);
+  background: rgba(255, 255, 255, 0.2);
   padding: 0.3rem 0.6rem;
   border-radius: var(--radius-xl);
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--white);
 }
 
 /* ============================================
@@ -328,7 +339,10 @@
    ============================================ */
 
 .werkzeuge-island .phase-container {
-  background: var(--white);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-md);
@@ -447,15 +461,20 @@
 }
 
 .werkzeuge-island .scroll-intro {
-  background: var(--light);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: var(--radius-md);
   padding: 1rem;
   margin-bottom: 1.5rem;
   line-height: 1.6;
+  color: var(--white);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
 .werkzeuge-island .scroll-intro strong {
-  color: var(--primary);
+  color: #7bed9f;
 }
 
 .werkzeuge-island .scroll-sections {
@@ -465,8 +484,10 @@
 }
 
 .werkzeuge-island .scroll-section {
-  background: var(--white);
-  border: 2px solid var(--light);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: var(--radius-md);
   overflow: hidden;
   border-left: 4px solid var(--section-color);
@@ -477,7 +498,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
-  background: var(--light);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .werkzeuge-island .section-header.clickable {
@@ -486,7 +507,7 @@
 }
 
 .werkzeuge-island .section-header.clickable:hover {
-  background: #e8f5e9;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .werkzeuge-island .section-icon {
@@ -497,23 +518,26 @@
   flex: 1;
   margin: 0;
   font-size: 0.95rem;
-  color: var(--dark);
+  color: var(--white);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
 .werkzeuge-island .expander-arrow {
   font-size: 0.8rem;
-  color: var(--dark);
-  opacity: 0.5;
+  color: var(--white);
+  opacity: 0.7;
 }
 
 .werkzeuge-island .section-content {
   padding: 1rem;
   line-height: 1.6;
   overflow: hidden;
+  color: var(--white);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
 .werkzeuge-island .section-content strong {
-  color: var(--primary);
+  color: #7bed9f;
 }
 
 .werkzeuge-island .section-content ul {
@@ -532,6 +556,8 @@
   border-left: 3px solid var(--primary);
   border-radius: var(--radius-sm);
   font-style: italic;
+  color: #2c3e50;
+  text-shadow: none;
 }
 
 .werkzeuge-island .section-content table {
@@ -545,11 +571,12 @@
 .werkzeuge-island .section-content td {
   padding: 0.5rem;
   text-align: left;
-  border: 1px solid var(--light);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: var(--white);
 }
 
 .werkzeuge-island .section-content th {
-  background: var(--light);
+  background: rgba(255,255,255,0.15);
   font-weight: 600;
 }
 
@@ -655,14 +682,16 @@
 
 .werkzeuge-island .quiz-intro h3 {
   font-size: 1.3rem;
-  color: var(--dark);
+  color: #FFD700;
   margin: 0 0 0.5rem 0;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
 .werkzeuge-island .quiz-intro > p {
-  color: var(--dark);
-  opacity: 0.8;
+  color: var(--white);
+  opacity: 0.9;
   margin: 0 0 1.5rem 0;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
 
 .werkzeuge-island .quiz-info {
@@ -678,7 +707,8 @@
   align-items: center;
   gap: 0.4rem;
   font-size: 0.9rem;
-  color: var(--dark);
+  color: var(--white);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
 .werkzeuge-island .info-icon {
@@ -717,14 +747,16 @@
 
 .werkzeuge-island .challenge-intro h3 {
   font-size: 1.3rem;
-  color: var(--dark);
+  color: #FFD700;
   margin: 0 0 0.5rem 0;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
 .werkzeuge-island .challenge-intro > p {
-  color: var(--dark);
-  opacity: 0.8;
+  color: var(--white);
+  opacity: 0.9;
   margin: 0 0 1.5rem 0;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
 
 .werkzeuge-island .techniques-preview {
@@ -744,6 +776,7 @@
   border-radius: var(--radius-md);
   font-size: 0.9rem;
   text-align: left;
+  color: #2c3e50;
 }
 
 .werkzeuge-island .technique-item span {

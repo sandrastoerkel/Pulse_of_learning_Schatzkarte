@@ -34,10 +34,14 @@
   --radius-xl: 30px;
 
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-  background: var(--gradient-ocean);
+  background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 100%), url('/basecamp-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   min-height: 100%;
   padding: 1rem;
-  color: var(--dark);
+  color: var(--white);
+  position: relative;
 }
 
 /* ============================================
@@ -92,6 +96,27 @@
   font-weight: 600;
   font-size: 0.9rem;
   box-shadow: var(--shadow-md);
+}
+
+.starthafen-island .xp-display {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: linear-gradient(135deg, #4fc3f7 0%, #29b6f6 100%);
+  color: var(--white);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-xl);
+  font-weight: 700;
+  font-size: 1rem;
+  box-shadow: var(--shadow-lg);
+  z-index: 10;
+}
+
+.starthafen-island .xp-display .xp-icon {
+  font-size: 1.2rem;
 }
 
 .starthafen-island .xp-icon {
@@ -185,11 +210,14 @@
    ============================================ */
 
 .starthafen-island .phase-content {
-  background: var(--white);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
   box-shadow: var(--shadow-md);
   text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* ============================================
@@ -204,19 +232,21 @@
 
 .starthafen-island .welcome-title {
   font-size: 1.5rem;
-  color: var(--dark);
+  color: var(--white);
   margin: 0 0 1rem 0;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 .starthafen-island .welcome-intro {
   font-size: 1rem;
-  color: var(--dark);
-  opacity: 0.85;
+  color: var(--white);
+  opacity: 0.95;
   line-height: 1.6;
   margin-bottom: 1.5rem;
   max-width: 500px;
   margin-left: auto;
   margin-right: auto;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
 
 .starthafen-island .captain-speech {

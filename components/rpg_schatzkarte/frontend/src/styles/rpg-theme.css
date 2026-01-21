@@ -2839,11 +2839,12 @@ body {
 }
 
 .back-btn {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.9);
   border: 2px solid var(--text-muted);
   border-radius: 20px;
   padding: 10px 25px;
-  color: var(--text-light);
+  color: #1a1a2e;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -2975,6 +2976,12 @@ body {
   display: flex;
   justify-content: space-between;
   margin-bottom: 5px;
+}
+
+/* HP-Text innerhalb von hp-label soll nicht absolut positioniert sein */
+.hp-label .hp-text {
+  position: static;
+  transform: none;
 }
 
 .hp-bar {

@@ -35,6 +35,8 @@ export { SchutzBurgIcon } from './SchutzBurgIcon';      // Mobbing-Schutz
 // ============================================
 
 export { LerntechnikenIcon } from './LerntechnikenIcon'; // Lernstrategien-Übersicht
+export { StationenIcon } from './StationenIcon';         // Wegweiser für Stationen
+export { BaseCampIcon } from './BaseCampIcon';           // Gemütliches Lager/Camp
 
 // ============================================
 // SCHIFF-ICONS (Ship Icons)

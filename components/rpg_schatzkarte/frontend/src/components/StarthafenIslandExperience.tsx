@@ -1,11 +1,12 @@
 // ============================================
-// Basis-Camp Island Experience - Tutorial & Einführung
+// Base Camp Island Experience - Tutorial & Einführung
 // Schöne Animationen wie die anderen Inseln
 // ============================================
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AgeGroup } from '../types';
+import { BaseCampIcon } from './icons';
 import '../styles/starthafen-island.css';
 
 // ============================================
@@ -19,6 +20,7 @@ interface StarthafenIslandProps {
   onPolarsternClick?: () => void;  // Polarstern-Widget öffnen
   onOpenCompanionSelector?: () => void;  // Lernbegleiter auswählen
   selectedCompanion?: string;  // Aktuell gewählter Begleiter
+  initialPhase?: 'welcome' | 'features' | 'ready';  // Start-Phase
 }
 
 interface FeatureCard {
@@ -43,32 +45,9 @@ const FEATURE_CARDS: FeatureCard[] = [
     color: '#81c784',
     details: [
       '📜 Lernvideo anschauen',
-      '📖 Schriftrolle studieren',
+      '📖 Schriftrolle durchlesen (begleitend - nicht auswendig lernen!)',
       '⚔️ Quiz-Kampf bestehen',
       '🏆 Challenge meistern'
-    ]
-  },
-  {
-    id: 'ships',
-    icon: '🔑',
-    title: 'Lerntechniken & Goldener Schlüssel',
-    description: 'Deine täglichen Begleiter',
-    color: '#ffb74d',
-    details: [
-      '🔑 Goldener Schlüssel - Selbstvertrauen aufbauen',
-      '🎯 Lerntechniken - cleverer lernen'
-    ]
-  },
-  {
-    id: 'xp',
-    icon: '⭐',
-    title: 'XP & Level',
-    description: 'Werde stärker mit jeder Quest',
-    color: '#ba68c8',
-    details: [
-      '⭐ XP für jede abgeschlossene Aufgabe',
-      '🏅 Level aufsteigen',
-      '🪙 Gold für besondere Items'
     ]
   },
   {
@@ -82,17 +61,40 @@ const FEATURE_CARDS: FeatureCard[] = [
       '🎯 Verfolge deinen Fortschritt',
       '🏆 Feiere deine Erfolge!'
     ]
+  },
+  {
+    id: 'xp',
+    icon: '⭐',
+    title: 'XP & Level',
+    description: 'Werde stärker mit jeder Quest',
+    color: '#ba68c8',
+    details: [
+      '⭐ XP sammeln und bei Memory & Runner Game einlösen',
+      '🏅 Level aufsteigen',
+      '🪙 Gold im Avatar-Shop einlösen'
+    ]
+  },
+  {
+    id: 'ships',
+    icon: '🔑',
+    title: 'Goldener Schlüssel & Selbsteinschätzung',
+    description: 'Deine täglichen Begleiter',
+    color: '#ffb74d',
+    details: [
+      '🔑 Goldener Schlüssel - Selbstvertrauen aufbauen',
+      '📊 Selbsteinschätzung - laut Lernforscher Hattie die Nr. 1 für effektives Lernen!'
+    ]
   }
 ];
 
 const WELCOME_MESSAGES: Record<AgeGroup, { title: string; intro: string }> = {
   grundschule: {
     title: 'Willkommen!',
-    intro: 'Du stehst am Anfang einer aufregenden Lernreise! Hier im Basis-Camp erfährst du, wie alles funktioniert. Bist du bereit, die Welt des Wissens zu entdecken?'
+    intro: 'Du stehst am Anfang einer aufregenden Lernreise! Hier im Base Camp erfährst du, wie alles funktioniert. Bist du bereit, die Welt des Wissens zu entdecken?'
   },
   unterstufe: {
     title: 'Willkommen!',
-    intro: 'Der Basis-Camp ist dein Tor zu einer Reise durch die Welt des effektiven Lernens. Hier lernst du die wichtigsten Werkzeuge und Strategien kennen, die dich zum Lern-Meister machen.'
+    intro: 'Der Base Camp ist dein Tor zu einer Reise durch die Welt des effektiven Lernens. Hier lernst du die wichtigsten Werkzeuge und Strategien kennen, die dich zum Lern-Meister machen.'
   },
   mittelstufe: {
     title: 'Willkommen!',
@@ -119,8 +121,9 @@ export function StarthafenIslandExperience({
   onPolarsternClick,
   onOpenCompanionSelector,
   selectedCompanion,
+  initialPhase = 'welcome',
 }: StarthafenIslandProps) {
-  const [currentPhase, setCurrentPhase] = useState<'welcome' | 'features' | 'ready'>('welcome');
+  const [currentPhase, setCurrentPhase] = useState<'welcome' | 'features' | 'ready'>(initialPhase);
   const [expandedFeature, setExpandedFeature] = useState<string | null>(null);
   const [totalXP, setTotalXP] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -170,14 +173,14 @@ export function StarthafenIslandExperience({
           ← Zurück
         </button>
         <h1 className="island-title">
-          <motion.span
+          <motion.div
             className="title-icon"
-            animate={{ y: [0, -5, 0], rotate: [0, 5, -5, 0] }}
+            animate={{ y: [0, -5, 0] }}
             transition={{ repeat: Infinity, duration: 3 }}
           >
-            🚢
-          </motion.span>
-          Basis-Camp
+            <BaseCampIcon size={40} animated={true} />
+          </motion.div>
+          Base Camp
         </h1>
         <div className="xp-badge">
           <motion.span
@@ -242,17 +245,6 @@ export function StarthafenIslandExperience({
             exit={{ opacity: 0, y: -30 }}
             className="phase-content welcome-phase"
           >
-            <motion.div
-              className="welcome-icon"
-              animate={{
-                y: [0, -10, 0],
-                rotate: [0, 5, -5, 0]
-              }}
-              transition={{ repeat: Infinity, duration: 3 }}
-            >
-              ⛵
-            </motion.div>
-
             <h2 className="welcome-title">{welcomeContent.title}</h2>
 
             <motion.p
@@ -437,7 +429,7 @@ export function StarthafenIslandExperience({
             <h2 className="ready-title">Du bist bereit!</h2>
 
             <p className="ready-text">
-              Du hast den Basis-Camp erkundet. Jetzt kommt deine <strong>erste wichtige Aufgabe</strong>:
+              Du hast den Base Camp erkundet. Jetzt kommt deine <strong>erste wichtige Aufgabe</strong>:
             </p>
 
             {/* Polarstern - Kompass der Reise */}

@@ -13,6 +13,7 @@ import { BRUECKEN_QUIZ_QUESTIONS_UNTERSTUFE } from '../content/brueckenQuizConte
 import { BRUECKEN_QUIZ_QUESTIONS_MITTELSTUFE } from '../content/brueckenQuizContent_mittelstufe';
 import { BattleQuiz } from './BattleQuiz';
 import { TransferChallenge } from './TransferChallenge';
+import { BrueckenIcon } from './icons';
 import '../styles/bruecken-island.css';
 
 // ============================================
@@ -123,13 +124,13 @@ export function BrueckenIslandExperience({
           ← Zurück
         </button>
         <h1 className="island-title">
-          <motion.span
+          <motion.div
             className="title-icon"
-            animate={{ rotate: [0, 10, -10, 0] }}
+            animate={{ scale: [1, 1.1, 1] }}
             transition={{ repeat: Infinity, duration: 3 }}
           >
-            🌉
-          </motion.span>
+            <BrueckenIcon size={40} animated={true} />
+          </motion.div>
           Transferlernen
         </h1>
         <div className="xp-badge">

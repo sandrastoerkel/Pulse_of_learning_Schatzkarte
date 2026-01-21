@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AgeGroup } from '../types';
+import { VulkanIcon } from './icons';
 import '../styles/vulkan-island.css';
 
 // ============================================
@@ -103,13 +104,13 @@ export function VulkanIslandExperience({
       <div className="island-header">
         <button className="back-btn" onClick={onClose}>← Zurück</button>
         <h1 className="island-title">
-          <motion.span
+          <motion.div
             className="title-icon"
-            animate={{ scale: [1, 1.2, 1], rotate: [0, 5, -5, 0] }}
+            animate={{ scale: [1, 1.1, 1] }}
             transition={{ repeat: Infinity, duration: 2 }}
           >
-            🔥
-          </motion.span>
+            <VulkanIcon size={40} animated={true} />
+          </motion.div>
           Was dich antreibt
         </h1>
         <div className="xp-badge">
@@ -143,7 +144,7 @@ export function VulkanIslandExperience({
             <motion.div className="coming-soon-banner" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }}>
               <motion.span className="coming-soon-icon" animate={{ y: [0, -5, 0], scale: [1, 1.1, 1] }} transition={{ repeat: Infinity, duration: 2 }}>🌋</motion.span>
               <h3>Inhalte in Arbeit</h3>
-              <p>Diese Insel wird bald mit spannenden Inhalten gefüllt!</p>
+              <p>Diese Station wird bald mit spannenden Inhalten gefüllt!</p>
             </motion.div>
             <div className="quests-grid">
               {(Object.keys(QUEST_INFO) as QuestKey[]).map((questKey, index) => (

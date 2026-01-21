@@ -1,9 +1,97 @@
 # Pulse of Learning - Schatzkarte
-## Dokumentation Stand 16. Januar 2025
+## Dokumentation Stand 21. Januar 2025
 
 ---
 
-# HEUTIGE ÄNDERUNGEN (16. Januar 2025)
+# HEUTIGE ÄNDERUNGEN (21. Januar 2025)
+
+## 🖼️ Hintergrundbilder für Insel-Experiences
+
+### Neues Design-Feature: Immersive Hintergründe mit Glaseffekt
+
+Die Insel-Experiences haben jetzt atmosphärische Hintergrundbilder mit transparenten, verschwommenen Container-Elementen für einen modernen Glaseffekt.
+
+### Fertige Inseln mit Hintergrundbildern:
+
+| Insel | Hintergrundbild | CSS-Datei |
+|-------|-----------------|-----------|
+| 🏠 Base Camp (Starthafen) | `/public/basecamp-bg.jpg` | `starthafen-island.css` |
+| 🏰 Mental stark (Festung) | `/public/festung-bg.jpg` | `festung-island.css` |
+| 🔧 Cleverer lernen (Werkzeuge) | `/public/werkzeuge-bg.jpg` | `werkzeuge-island.css` |
+| 🧵 Station der Fäden | `/public/faeden-bg.jpg` | `faeden-island.css` |
+| 🔧 PowertechnikenChallenge | `/public/werkzeuge-bg.jpg` | `powertechniken-challenge.css` |
+
+### CSS-Muster für Hintergrundbilder:
+
+```css
+/* Haupt-Container mit Hintergrundbild */
+.insel-island {
+  background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 100%),
+              url('/hintergrund-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: var(--white);
+}
+
+/* Transparente Container mit Glaseffekt */
+.insel-island .phase-container,
+.insel-island .quest-card,
+.insel-island .scroll-section {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Weiße Textfarbe mit Schatten für Lesbarkeit */
+.insel-island h1, .insel-island h2, .insel-island h3,
+.insel-island p, .insel-island li {
+  color: var(--white);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+/* Spezialfall: Heller Hintergrund mit dunklem Text */
+.insel-island .speech-bubble {
+  background: rgba(255, 255, 255, 0.9);
+  color: #2c3e50 !important;
+}
+```
+
+### Bilder in `/public/` Ordner:
+- `basecamp-bg.jpg` - Hafen/Segelboot-Szene
+- `festung-bg.jpg` - Mittelalterliche Burg
+- `werkzeuge-bg.jpg` - Werkstatt/Tools
+- `faeden-bg.jpg` - Plasma/Neuronales Netzwerk
+
+### TODO: Fehlende Hintergrundbilder
+
+Diese Inseln brauchen noch Hintergrundbilder:
+- [ ] 🌉 Brücken (`bruecken-island.css`)
+- [ ] 🧠 Spiegel-See (`spiegel-see-island.css`)
+- [ ] 🔥 Vulkan (`vulkan-island.css`)
+- [ ] 😌 Ruhe-Oase (`ruhe-oase-island.css`)
+- [ ] 🏆 Ausdauer-Gipfel (`ausdauer-gipfel-island.css`)
+- [ ] 🎯 Fokus-Leuchtturm (`fokus-leuchtturm-island.css`)
+- [ ] 🌱 Wachstums-Garten (`wachstum-garten-island.css`)
+- [ ] 🏫 Lehrer-Turm (`lehrer-turm-island.css`)
+- [ ] 🏠 Wohlfühl-Dorf (`wohlfuehl-dorf-island.css`)
+- [ ] 🛡️ Schutz-Burg (`schutz-burg-island.css`)
+- [ ] ⛰️ Berg der Meisterschaft (`meister-berg-island.css`)
+
+### Anleitung für neue Hintergrundbilder:
+
+1. **Bild vorbereiten**: JPG-Format, ca. 1920x1080px
+2. **Bild kopieren**: In `/components/rpg_schatzkarte/frontend/public/` speichern
+3. **CSS anpassen**: In der entsprechenden CSS-Datei:
+   - Haupt-Container: `background: linear-gradient(...), url('/name-bg.jpg')`
+   - `.phase-container`, `.quest-card`, `.scroll-section`: Transparent machen
+   - Textfarben: Weiß mit `text-shadow`
+4. **Build erstellen**: `npm run build` im frontend-Verzeichnis
+
+---
+
+# ÄNDERUNGEN (16. Januar 2025)
 
 ## 1. Alle 15 Custom SVG Insel-Icons integriert
 
@@ -1236,6 +1324,9 @@ components/rpg_schatzkarte/frontend/
 
 | Datum | Was | Details |
 |-------|-----|---------|
+| **21.01.2025** | **🖼️ Hintergrundbilder** | 4 Inseln mit immersiven Hintergründen: Starthafen, Festung, Werkzeuge, Fäden |
+| 21.01.2025 | Glaseffekt-Design | Transparente Container mit backdrop-filter blur für modernen Look |
+| 21.01.2025 | PowertechnikenChallenge | Komplett auf neues Design umgestellt mit werkzeuge-bg.jpg |
 | **16.01.2025** | **🎨 15 Custom SVG Icons** | Alle 15 Insel-Icons + 3 Schiff-Icons + Lerntechniken-Icon komplett |
 | 16.01.2025 | Widget-Redesign | Lerntechniken & Tagebuch wie Schiffe gestaltet (transparent, Label unten) |
 | 16.01.2025 | Legende aktualisiert | Farbige Punkte → Emoji-Indikatoren (⭐/🔒) |
@@ -1292,6 +1383,57 @@ cd /Users/sandra/Documents/Pulse_of_learning/Pulse_of_learning_Schatzkarte
 # App starten (Build ist bereits fertig!)
 streamlit run Home.py
 ```
+
+## 🖼️ AKTUELL: Hintergrundbilder für Inseln
+
+**Stand:** 4 von 15 Inseln haben Hintergrundbilder.
+
+### So fügst du ein neues Hintergrundbild hinzu:
+
+1. **Bild finden**: Unsplash oder ähnlich (frei verwendbar)
+2. **Bild speichern**: Als `[insel]-bg.jpg` in `/components/rpg_schatzkarte/frontend/public/`
+3. **CSS anpassen**: Die entsprechende `[insel]-island.css` Datei bearbeiten:
+
+```css
+/* 1. Haupt-Container */
+.[insel]-island {
+  background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 100%),
+              url('/[insel]-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: var(--white);
+}
+
+/* 2. Container transparent machen */
+.[insel]-island .phase-container,
+.[insel]-island .quest-card,
+.[insel]-island .scroll-section,
+.[insel]-island .scroll-intro {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* 3. Text weiß mit Schatten */
+.[insel]-island h1, .[insel]-island h2, .[insel]-island h3,
+.[insel]-island p, .[insel]-island li {
+  color: var(--white);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+```
+
+4. **Build**: `cd components/rpg_schatzkarte/frontend && npm run build`
+
+### Fertige Beispiele:
+- `starthafen-island.css` - Base Camp
+- `festung-island.css` - Mental stark
+- `werkzeuge-island.css` - Cleverer lernen
+- `faeden-island.css` - Station der Fäden
+- `powertechniken-challenge.css` - Challenge 7
+
+---
 
 ## 🎨 Design-System ist FERTIG!
 

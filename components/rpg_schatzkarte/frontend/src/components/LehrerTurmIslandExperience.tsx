@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AgeGroup } from '../types';
+import { LehrerTurmIcon } from './icons';
 import '../styles/lehrer-turm-island.css';
 
 type QuestKey = 'video' | 'scroll' | 'quiz' | 'challenge';
@@ -48,7 +49,7 @@ export function LehrerTurmIslandExperience({ ageGroup, onClose, onQuestComplete 
       <div className="island-header">
         <button className="back-btn" onClick={onClose}>← Zurück</button>
         <h1 className="island-title">
-          <motion.span className="title-icon" animate={{ y: [0, -3, 0] }} transition={{ repeat: Infinity, duration: 2 }}>🏫</motion.span>
+          <motion.div className="title-icon" animate={{ scale: [1, 1.1, 1] }} transition={{ repeat: Infinity, duration: 2 }}><LehrerTurmIcon size={40} animated={true} /></motion.div>
           Besser mit Lehrern klarkommen
         </h1>
         <div className="xp-badge">
@@ -82,7 +83,7 @@ export function LehrerTurmIslandExperience({ ageGroup, onClose, onQuestComplete 
             <motion.div className="coming-soon-banner" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
               <motion.span className="coming-soon-icon" animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 2.5 }}>🎓</motion.span>
               <h3>Inhalte in Arbeit</h3>
-              <p>Diese Insel wird bald mit spannenden Inhalten gefüllt!</p>
+              <p>Diese Station wird bald mit spannenden Inhalten gefüllt!</p>
             </motion.div>
             <div className="quests-grid">
               {(Object.keys(QUEST_INFO) as QuestKey[]).map((questKey, index) => (

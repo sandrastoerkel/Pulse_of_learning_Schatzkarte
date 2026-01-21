@@ -492,8 +492,17 @@ def render_polarstern_modal(user_id: str, age_group: str = 'unterstufe'):
     st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        if st.button("🗺️ Zurück zur Schatzkarte", key="close_polarstern_modal", use_container_width=True, type="primary"):
+        # Button-Text abhängig davon woher der User kam
+        source_island = st.session_state.get("polarstern_source_island")
+        button_text = "🏕️ Zurück zum Base Camp" if source_island == "start" else "🗺️ Zurück zur Schatzkarte"
+
+        if st.button(button_text, key="close_polarstern_modal", use_container_width=True, type="primary"):
             st.session_state.show_polarstern_modal = False
+            # Wenn User vom Base Camp kam, dorthin zurückkehren (in 'ready' Phase)
+            if source_island:
+                st.session_state.auto_open_island = source_island
+                st.session_state.auto_open_phase = 'ready'  # Direkt zur "Loslegen" Phase
+                st.session_state.polarstern_source_island = None  # Zurücksetzen
             st.rerun()
 
     return True

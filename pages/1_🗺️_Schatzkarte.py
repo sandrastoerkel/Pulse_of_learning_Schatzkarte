@@ -352,6 +352,10 @@ st.markdown(f"""
 
 # React-Komponente aufrufen (Hoehe wird per CSS auf 100vh gesetzt)
 # Der Polarstern ist jetzt direkt auf der Karte (in der React-Komponente)
+# Auto-Open Island: Wird gesetzt wenn User z.B. vom Base Camp zum Polarstern ging und zurückkehrt
+auto_open_island = st.session_state.get("auto_open_island")
+auto_open_phase = st.session_state.get("auto_open_phase")
+
 result = rpg_schatzkarte(
     islands=islands,
     user_progress=user_data.get("progress", {}),
@@ -360,6 +364,8 @@ result = rpg_schatzkarte(
     current_island=current_island,
     age_group=age_group,
     is_admin=True,  # Admin-TestPanel aktivieren
+    auto_open_island=auto_open_island,  # Automatisch eine Insel öffnen (z.B. nach Polarstern)
+    auto_open_phase=auto_open_phase,  # Phase für die Insel (z.B. 'ready' für Base Camp)
     height=900,  # Basis-Hoehe, wird per CSS auf calc(100vh - 60px) ueberschrieben
     key="rpg_schatzkarte"
 )
@@ -375,7 +381,16 @@ if result:
     # Polarstern-Klick SOFORT verarbeiten (kein Duplikat-Schutz nötig)
     if action == "polarstern_clicked":
         st.session_state.show_polarstern_modal = True
+        # Merken woher der User kam (z.B. Base Camp), um dorthin zurückzukehren
+        source_island = result.get("sourceIsland")
+        if source_island:
+            st.session_state.polarstern_source_island = source_island
         st.rerun()
+
+    # Auto-Open wurde verarbeitet - Session State zurücksetzen
+    if action == "auto_open_handled":
+        st.session_state.auto_open_island = None
+        # Kein rerun nötig, React hat die Insel bereits geöffnet
 
     # Duplikat-Schutz: gleiche Aktion nicht doppelt verarbeiten
     action_key = f"{action}_{island_id}_{result.get('questType', '')}_{result.get('treasureId', '')}"

@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AgeGroup } from '../types';
 import { FAEDEN_CONTENT, ContentSection, IslandContent } from '../content/faedenContent';
 import { FaedenChallenge, FaedenProgress as ChallengeProgress, DEFAULT_FAEDEN_PROGRESS } from './FaedenChallenge';
+import { FaedenIcon } from './icons';
 import '../styles/faeden-island.css';
 
 // ============================================
@@ -151,14 +152,14 @@ export function FaedenIslandExperience({
           ← Zurück
         </button>
         <h1 className="island-title">
-          <motion.span
+          <motion.div
             className="title-icon"
-            animate={{ rotate: [0, 10, -10, 0] }}
+            animate={{ scale: [1, 1.1, 1] }}
             transition={{ repeat: Infinity, duration: 3 }}
           >
-            🧵
-          </motion.span>
-          Insel der Fäden
+            <FaedenIcon size={40} animated={true} />
+          </motion.div>
+          Station der Fäden
         </h1>
         <div className="xp-badge">
           <motion.span

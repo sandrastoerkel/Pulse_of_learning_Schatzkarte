@@ -801,7 +801,7 @@ export function FaedenChallenge({
           >
             🧵
           </motion.span>
-          Insel der Fäden
+          Station der Fäden
         </h1>
         <div className="xp-badge">
           <motion.span
@@ -2055,7 +2055,7 @@ function CertificateView({ progress, onBack }: { progress: FaedenProgress; onBac
               </div>
               <div className="certificate-signature">
                 <span className="signature-line">________________</span>
-                <span className="signature-label">Insel der Fäden</span>
+                <span className="signature-label">Station der Fäden</span>
               </div>
             </div>
             <div className="certificate-quote">

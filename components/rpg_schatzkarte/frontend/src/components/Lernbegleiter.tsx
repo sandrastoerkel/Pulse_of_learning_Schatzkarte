@@ -38,16 +38,16 @@ export type LernkonText =
 // Tipps pro Kontext (mehrere zur Auswahl)
 const TIPPS: Record<LernkonText, string[]> = {
   map: [
-    "Klick auf eine Insel, um dein nächstes Abenteuer zu starten!",
+    "Klick auf eine Station, um dein nächstes Abenteuer zu starten!",
     "Die goldenen Sterne zeigen abgeschlossene Quests - sammle sie alle!",
-    "Jede Insel hat ein besonderes Thema, das dir beim Lernen hilft.",
-    "Folge dem Pfad von Insel zu Insel - so lernst du Schritt für Schritt!",
+    "Jede Station hat ein besonderes Thema, das dir beim Lernen hilft.",
+    "Folge dem Pfad von Station zu Station - so lernst du Schritt für Schritt!",
     "Die Schiffe im Meer haben besondere Challenges für dich!",
   ],
   island_start: [
-    "Willkommen im Basis-Camp! Hier beginnt deine Lernreise.",
+    "Willkommen im Base Camp! Hier beginnt deine Lernreise.",
     "Wähle deinen Lernbegleiter - ich bin für dich da!",
-    "Das Basis-Camp ist dein sicherer Ort - komm jederzeit zurück!",
+    "Das Base Camp ist dein sicherer Ort - komm jederzeit zurück!",
     "Setze dir ein Ziel mit dem Polarstern - wohin soll die Reise gehen?",
   ],
   island_festung: [

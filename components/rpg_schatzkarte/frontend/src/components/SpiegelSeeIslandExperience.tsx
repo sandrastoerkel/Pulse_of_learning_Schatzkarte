@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AgeGroup } from '../types';
+import { SpiegelSeeIcon } from './icons';
 import '../styles/spiegel-see-island.css';
 
 // ============================================
@@ -108,13 +109,13 @@ export function SpiegelSeeIslandExperience({
           ← Zurück
         </button>
         <h1 className="island-title">
-          <motion.span
+          <motion.div
             className="title-icon"
-            animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
+            animate={{ scale: [1, 1.1, 1] }}
             transition={{ repeat: Infinity, duration: 3 }}
           >
-            🧠
-          </motion.span>
+            <SpiegelSeeIcon size={40} animated={true} />
+          </motion.div>
           Über dein Lernen nachdenken
         </h1>
         <div className="xp-badge">
@@ -198,7 +199,7 @@ export function SpiegelSeeIslandExperience({
                 🚧
               </motion.span>
               <h3>Inhalte in Arbeit</h3>
-              <p>Diese Insel wird bald mit spannenden Inhalten gefüllt!</p>
+              <p>Diese Station wird bald mit spannenden Inhalten gefüllt!</p>
             </motion.div>
 
             <div className="quests-grid">

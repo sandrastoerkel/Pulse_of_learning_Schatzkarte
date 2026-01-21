@@ -146,7 +146,7 @@ export const TestPanel: React.FC<TestPanelProps> = ({
                 className={`tab ${activeTab === 'islands' ? 'active' : ''}`}
                 onClick={() => setActiveTab('islands')}
               >
-                🏝️ Inseln
+                📍 Stationen
               </button>
               <button
                 className={`tab ${activeTab === 'rewards' ? 'active' : ''}`}
@@ -236,7 +236,7 @@ export const TestPanel: React.FC<TestPanelProps> = ({
               {/* === INSELN TAB === */}
               {activeTab === 'islands' && (
                 <div className="tab-content">
-                  <h3>Inseln & Pfade</h3>
+                  <h3>Stationen & Pfade</h3>
 
                   {/* Schnell-Aktionen */}
                   <div className="quick-actions">
@@ -307,7 +307,7 @@ export const TestPanel: React.FC<TestPanelProps> = ({
                   </div>
 
                   <p className="hint">
-                    💡 Tipp: Markiere Inseln als abgeschlossen um zu sehen, ob die Pfade zur nächsten Insel erscheinen.
+                    💡 Tipp: Markiere Stationen als abgeschlossen um zu sehen, ob die Pfade zur nächsten Station erscheinen.
                   </p>
                 </div>
               )}
@@ -354,8 +354,8 @@ export const TestPanel: React.FC<TestPanelProps> = ({
                       className="reward-btn reward-island"
                       onClick={() => onTriggerReward('island_complete')}
                     >
-                      <span className="reward-icon">🏝️</span>
-                      <span className="reward-label">Insel komplett</span>
+                      <span className="reward-icon">📍</span>
+                      <span className="reward-label">Station komplett</span>
                     </button>
 
                     <button

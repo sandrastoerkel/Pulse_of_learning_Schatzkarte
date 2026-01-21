@@ -6,6 +6,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Confetti from 'react-confetti';
+import { HattieWaageIcon } from './icons';
 
 import type {
   HattieSubjectId,
@@ -1153,16 +1154,16 @@ export function HattieChallenge({
         transition={{ type: 'spring', stiffness: 300 }}
       >
         <div className="header-title">
-          <motion.span
+          <motion.div
             className="header-icon"
-            animate={{ rotate: [0, 10, -10, 0] }}
-            transition={{ duration: 3, repeat: Infinity }}
+            animate={{ scale: [1, 1.1, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
           >
-            💪
-          </motion.span>
+            <HattieWaageIcon size={40} animated={true} />
+          </motion.div>
           <div>
-            <h3>Superpower</h3>
-            <p>Trainiere deine Selbsteinschätzung</p>
+            <h3>Selbsteinschätzung</h3>
+            <p>Trainiere deine Fähigkeit, dich selbst einzuschätzen</p>
           </div>
         </div>
         {onClose && (

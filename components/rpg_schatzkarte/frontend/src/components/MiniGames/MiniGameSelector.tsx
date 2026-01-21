@@ -41,8 +41,8 @@ const TRIGGER_TEXTS: Record<RewardTrigger, { title: string; description: string 
     description: 'Du hast alle 4 Quellen der Selbstwirksamkeit erkundet.'
   },
   island_complete: {
-    title: '🏝️ Insel abgeschlossen!',
-    description: 'Du hast alle Aufgaben auf dieser Insel gemeistert.'
+    title: '📍 Station abgeschlossen!',
+    description: 'Du hast alle Aufgaben auf dieser Station gemeistert.'
   },
   level_up: {
     title: '⬆️ Level Up!',

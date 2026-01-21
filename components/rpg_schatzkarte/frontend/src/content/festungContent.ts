@@ -140,7 +140,7 @@ Das ist wie bei einem Videospiel: Wenn du einen Level schaffst, von dem du dacht
       },
       {
         title: "🚢 Deine Begleiter auf der Lernreise",
-        content: `**Der goldene Schlüssel** und die **Superpower** sind zwei besondere Werkzeuge, die dich auf deiner *gesamten Lernreise* begleiten!
+        content: `**Der goldene Schlüssel** und die **Selbsteinschätzung** sind zwei besondere Werkzeuge, die dich auf deiner *gesamten Lernreise* begleiten!
 
 🗺️ Du findest sie als **freischwebende Symbole** auf der Schatzkarte. Klicke jederzeit darauf, um neue Einträge hinzuzufügen und XP zu sammeln.
 
@@ -313,7 +313,7 @@ Aber wenn dein Kumpel, der auch Probleme hatte, es erklärt – das wirkt!
       },
       {
         title: "🚢 Deine Begleiter auf der Lernreise",
-        content: `**Der goldene Schlüssel** und die **Superpower** sind zwei mächtige Werkzeuge, die dich auf deiner *gesamten Lernreise* begleiten!
+        content: `**Der goldene Schlüssel** und die **Selbsteinschätzung** sind zwei mächtige Werkzeuge, die dich auf deiner *gesamten Lernreise* begleiten!
 
 🗺️ Du findest sie als **freischwebende Symbole** auf der Schatzkarte. Klicke jederzeit darauf, um neue Einträge hinzuzufügen und XP zu sammeln.
 
@@ -513,7 +513,7 @@ Und wenn etwas nicht klappt: Es lag an der Strategie, nicht an dir. Strategien k
       },
       {
         title: "🚢 Deine Begleiter auf der gesamten Lernreise",
-        content: `**Der goldene Schlüssel** und die **Superpower** sind zwei evidenzbasierte Werkzeuge, die dich auf deiner *gesamten Lernreise* begleiten!
+        content: `**Der goldene Schlüssel** und die **Selbsteinschätzung** sind zwei evidenzbasierte Werkzeuge, die dich auf deiner *gesamten Lernreise* begleiten!
 
 🗺️ Du findest sie als **freischwebende Symbole** auf der Schatzkarte. Klicke jederzeit darauf, um neue Einträge hinzuzufügen und XP zu sammeln.
 

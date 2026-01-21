@@ -573,7 +573,7 @@ def render_island_modal(island_id: str, user_id: str, is_preview: bool = False):
 
 
 def _render_welcome_modal(island: dict, user_id: str, is_preview: bool):
-    """Rendert das Modal für das Basis-Camp."""
+    """Rendert das Modal für das Base Camp."""
     content = island.get("content", {})
 
     # Begrüßungsvideo

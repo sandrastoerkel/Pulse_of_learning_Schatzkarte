@@ -12,6 +12,7 @@ import { SUPERHELDEN_QUIZ_QUESTIONS } from '../content/festungQuizContent';
 import { SUPERHELDEN_QUIZ_QUESTIONS as SUPERHELDEN_QUIZ_UNTERSTUFE } from '../content/festungQuizContent_unterstufe';
 import { BattleQuiz } from './BattleQuiz';
 import { TagebuchStartButton } from './SuperheldenTagebuch';
+import { HattieWaageIcon, FestungIcon } from './icons';
 import '../styles/festung-island.css';
 
 // ============================================
@@ -128,13 +129,13 @@ export function FestungIslandExperience({
           ← Zurück
         </button>
         <h1 className="island-title">
-          <motion.span
+          <motion.div
             className="title-icon"
-            animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
+            animate={{ scale: [1, 1.1, 1] }}
             transition={{ repeat: Infinity, duration: 3 }}
           >
-            🏰
-          </motion.span>
+            <FestungIcon size={40} animated={true} />
+          </motion.div>
           Mental stark
         </h1>
         <div className="xp-badge">
@@ -944,16 +945,9 @@ function ChallengePhase({ onComplete, onBack, onOpenBandura, onOpenHattie, onClo
         animate={{ opacity: 1, y: 0 }}
       >
         <div className="ships-intro">
-          <motion.div
-            className="ships-icon"
-            animate={{ y: [0, -5, 0] }}
-            transition={{ repeat: Infinity, duration: 2 }}
-          >
-            🚢
-          </motion.div>
           <h3>Deine Begleiter auf der Lernreise</h3>
           <p>
-            <strong>Der goldene Schlüssel</strong> und die <strong>Superpower</strong> sind
+            <strong>Der goldene Schlüssel</strong> und die <strong>Selbsteinschätzung</strong> sind
             zwei mächtige Werkzeuge, die dich auf deiner <em>gesamten Lernreise</em> begleiten!
           </p>
         </div>
@@ -1007,14 +1001,14 @@ function ChallengePhase({ onComplete, onBack, onOpenBandura, onOpenHattie, onClo
             transition={{ delay: 0.3 }}
           >
             <div className="ship-card-header">
-              <motion.span
+              <motion.div
                 className="ship-icon"
-                animate={{ scale: [1, 1.2, 1] }}
+                animate={{ scale: [1, 1.1, 1] }}
                 transition={{ repeat: Infinity, duration: 2 }}
               >
-                🎯
-              </motion.span>
-              <h4>Superpower</h4>
+                <HattieWaageIcon size={32} animated={true} />
+              </motion.div>
+              <h4>Selbsteinschätzung</h4>
             </div>
             <p>Trainiere deine Selbsteinschätzung mit Vorhersagen</p>
             <div className="ship-card-footer">

@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AgeGroup } from '../types';
+import { MeisterBergIcon } from './icons';
 import '../styles/meister-berg-island.css';
 
 type QuestKey = 'video' | 'scroll' | 'quiz' | 'challenge';
@@ -48,7 +49,7 @@ export function MeisterBergIslandExperience({ ageGroup, onClose, onQuestComplete
       <div className="island-header">
         <button className="back-btn" onClick={onClose}>← Zurück</button>
         <h1 className="island-title">
-          <motion.span className="title-icon" animate={{ y: [0, -8, 0], scale: [1, 1.1, 1] }} transition={{ repeat: Infinity, duration: 2.5 }}>⛰️</motion.span>
+          <motion.div className="title-icon" animate={{ scale: [1, 1.1, 1] }} transition={{ repeat: Infinity, duration: 2.5 }}><MeisterBergIcon size={40} animated={true} /></motion.div>
           Berg der Meisterschaft
         </h1>
         <div className="xp-badge">

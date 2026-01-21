@@ -64,13 +64,13 @@ const DEFAULT_HERO: HeroData = {
 
 // Standard-Daten für Development - echte Inseln aus der App
 const DEFAULT_ISLANDS: Island[] = [
-  // Basis-Camp
-  { id: 'start', name: 'Basis-Camp', icon: '🏕️', color: '#4fc3f7', week: 0, treasures: [{ name: 'Kompass der Reise', icon: '🧭', xp: 20 }] },
+  // Base Camp
+  { id: 'start', name: 'Base Camp', icon: '🏕️', color: '#4fc3f7', week: 0, treasures: [{ name: 'Kompass der Reise', icon: '🧭', xp: 20 }] },
   // Feste Inseln (Woche 1-4)
   { id: 'festung', name: 'Mental stark', icon: '💪', color: '#ffb74d', week: 1, treasures: [{ name: 'Kleine Siege', icon: '💎', xp: 50 }, { name: 'Vorbilder', icon: '💎', xp: 50 }] },
   { id: 'werkzeuge', name: 'Cleverer lernen', icon: '📚', color: '#81c784', week: 2, treasures: [{ name: 'Magische Tomate', icon: '🍅', xp: 50 }, { name: 'Erinnerungs-Spiegel', icon: '🔄', xp: 50 }] },
   { id: 'bruecken', name: 'Transferlernen', icon: '🌉', color: '#fff176', week: 3, treasures: [{ name: 'Teil weg = Minus', icon: '🌉', xp: 60 }] },
-  { id: 'faeden', name: 'Insel der Fäden', icon: '🧵', color: '#ba68c8', week: 4, treasures: [{ name: 'Faden-Spule', icon: '🧵', xp: 50 }, { name: 'Netz-Karte', icon: '🕸', xp: 60 }] },
+  { id: 'faeden', name: 'Station der Fäden', icon: '🧵', color: '#ba68c8', week: 4, treasures: [{ name: 'Faden-Spule', icon: '🧵', xp: 50 }, { name: 'Netz-Karte', icon: '🕸', xp: 60 }] },
   // Flexible Inseln (Woche 5-13)
   { id: 'spiegel_see', name: 'Über dein Lernen nachdenken', icon: '🧠', color: '#90caf9', week: 5, treasures: [{ name: 'Spiegel der Erkenntnis', icon: '🪞', xp: 50 }] },
   { id: 'vulkan', name: 'Was dich antreibt', icon: '🔥', color: '#ef5350', week: 6, treasures: [{ name: 'Freiheits-Flamme', icon: '🔥', xp: 50 }] },
@@ -110,7 +110,9 @@ function RPGSchatzkarteContent({
   isAdmin = false,
   onAction,
   onProgressChange,
-  onUnlockedIslandsChange
+  onUnlockedIslandsChange,
+  autoOpenIsland,
+  autoOpenPhase
 }: {
   islands: Island[];
   userProgress: UserProgress;
@@ -122,6 +124,8 @@ function RPGSchatzkarteContent({
   onAction?: (action: SchatzkartAction) => void;
   onProgressChange?: (progress: UserProgress) => void;
   onUnlockedIslandsChange?: (islands: string[]) => void;
+  autoOpenIsland?: string | null;
+  autoOpenPhase?: string | null;
 }) {
   // Lokaler State für TestPanel-Manipulationen
   const [userProgress, setUserProgress] = useState<UserProgress>(initialProgress);
@@ -130,6 +134,7 @@ function RPGSchatzkarteContent({
   const [playerLevel, setPlayerLevel] = useState(heroData.level);
   const [selectedIsland, setSelectedIsland] = useState<Island | null>(null);
   const [showQuestModal, setShowQuestModal] = useState(false);
+  const [initialIslandPhase, setInitialIslandPhase] = useState<string | null>(null);  // Phase für Auto-Open
   const [showBanduraModal, setShowBanduraModal] = useState(false);
   const [showHattieModal, setShowHattieModal] = useState(false);
   const [banduraCompletedToday, setBanduraCompletedToday] = useState<BanduraSourceId[]>([]);
@@ -218,6 +223,7 @@ function RPGSchatzkarteContent({
     }
   });
 
+
   // Zeige Avatar Creator automatisch beim ersten Besuch (kein Avatar vorhanden)
   useEffect(() => {
     // Prüfe ob Avatar existiert
@@ -233,6 +239,26 @@ function RPGSchatzkarteContent({
       return () => clearTimeout(timer);
     }
   }, [customAvatar, showAvatarCreator]);
+
+  // Auto-Open Island (z.B. nach Rückkehr von Polarstern)
+  useEffect(() => {
+    if (autoOpenIsland) {
+      const island = islands.find(i => i.id === autoOpenIsland);
+      if (island) {
+        console.log('Auto-opening island:', autoOpenIsland, 'with phase:', autoOpenPhase);
+        setSelectedIsland(island);
+        setInitialIslandPhase(autoOpenPhase || null);  // Phase setzen (z.B. 'ready' für Base Camp)
+        setShowQuestModal(true);
+        // Bestätigung an Streamlit senden, dass die Insel geöffnet wurde
+        if (onAction) {
+          onAction({
+            action: 'auto_open_handled',
+            islandId: autoOpenIsland
+          });
+        }
+      }
+    }
+  }, [autoOpenIsland, autoOpenPhase, islands, onAction]);
 
   // Kontext für Lernbegleiter-Tipps ermitteln
   const currentLernkontext: LernkonText = useMemo(() => {
@@ -275,6 +301,36 @@ function RPGSchatzkarteContent({
       setPlayerGold(prev => prev + goldEarned);
     }
 
+    // Lokalen Progress basierend auf questType aktualisieren
+    const questTypeToProgressKey: Record<string, keyof typeof userProgress[string]> = {
+      'wisdom': 'video_watched',
+      'scroll': 'explanation_read',
+      'battle': 'quiz_passed',
+      'challenge': 'challenge_completed'
+    };
+
+    const progressKey = questTypeToProgressKey[questType];
+    if (progressKey) {
+      setUserProgress(prev => {
+        const currentProgress = prev[selectedIsland.id] || {
+          video_watched: false,
+          explanation_read: false,
+          quiz_passed: false,
+          challenge_completed: false,
+          treasures_collected: []
+        };
+        const newProgress = {
+          ...prev,
+          [selectedIsland.id]: {
+            ...currentProgress,
+            [progressKey]: true
+          }
+        };
+        onProgressChange?.(newProgress);
+        return newProgress;
+      });
+    }
+
     const action: SchatzkartAction = {
       action: 'quest_completed',
       islandId: selectedIsland.id,
@@ -286,7 +342,7 @@ function RPGSchatzkarteContent({
 
     if (onAction) onAction(action);
     console.log('Quest completed:', action);
-  }, [selectedIsland, onAction]);
+  }, [selectedIsland, onAction, onProgressChange]);
 
   const handleTreasureCollected = useCallback((treasureId: string, xp: number) => {
     if (!selectedIsland) return;
@@ -374,14 +430,15 @@ function RPGSchatzkarteContent({
     if (onAction) {
       onAction({
         action: 'polarstern_clicked',
-        islandId: 'polarstern'
+        islandId: 'polarstern',
+        sourceIsland: selectedIsland?.id || null  // Merken woher der User kam
       });
     } else {
       // Dev-Modus ohne Streamlit: Placeholder anzeigen
       setShowPolarsternModal(true);
     }
-    console.log('Polarstern clicked');
-  }, [onAction]);
+    console.log('Polarstern clicked from:', selectedIsland?.id);
+  }, [onAction, selectedIsland]);
 
   // Neue Vorhersage anlegen (pending)
   const handleNewPrediction = useCallback((
@@ -890,6 +947,7 @@ function RPGSchatzkarteContent({
           onPolarsternClick={handlePolarsternClick}
           onOpenCompanionSelector={() => setShowCompanionSelector(true)}
           selectedCompanion={selectedCompanion}
+          initialPhase={initialIslandPhase || undefined}
         />
       )}
 
@@ -1048,7 +1106,7 @@ function RPGSchatzkarteContent({
           goldBonus: 100
         } : undefined}
         islandReward={rewardType === 'island_complete' ? {
-          islandName: 'Demo-Insel',
+          islandName: 'Demo-Station',
           xpEarned: 200,
           goldEarned: 50
         } : undefined}
@@ -1195,7 +1253,7 @@ function RPGSchatzkarteContent({
         <div className="tip-of-the-day">
           <span className="tip-icon">💡</span>
           <span className="tip-text">
-            Tipp: Schließe alle Quests einer Insel ab, um Bonus-XP zu erhalten!
+            Tipp: Schließe alle Quests einer Station ab, um Bonus-XP zu erhalten!
           </span>
         </div>
       </footer>
@@ -1290,6 +1348,9 @@ function RPGSchatzkarteStreamlit({ args }: ComponentProps) {
   const ageGroup: AgeGroup = args?.ageGroup || 'grundschule';
   // Admin-Modus: wird von Streamlit übergeben (z.B. für Pädagogen/Admins)
   const isAdmin: boolean = args?.isAdmin || args?.ageGroup === 'paedagoge' || false;
+  // Auto-Open: Öffnet automatisch eine Insel (z.B. nach Rückkehr von Polarstern)
+  const autoOpenIsland: string | null = args?.autoOpenIsland || null;
+  const autoOpenPhase: string | null = args?.autoOpenPhase || null;
   const [currentTheme, setCurrentTheme] = useState<ThemeType>(loadSavedTheme);
 
   // Streamlit-Höhe setzen - WICHTIG: muss immer aufgerufen werden
@@ -1349,6 +1410,8 @@ function RPGSchatzkarteStreamlit({ args }: ComponentProps) {
         ageGroup={ageGroup}
         isAdmin={isAdmin}
         onAction={handleAction}
+        autoOpenIsland={autoOpenIsland}
+        autoOpenPhase={autoOpenPhase}
       />
     </div>
   );

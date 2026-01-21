@@ -48,7 +48,10 @@
 
 .powertechniken-challenge {
   min-height: 100vh;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%);
+  background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.6) 100%), url('/werkzeuge-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   padding: 20px;
   font-family: var(--pt-font-body);
   color: var(--pt-text-light);
@@ -56,20 +59,9 @@
   overflow-x: hidden;
 }
 
-/* Hintergrund-Muster */
+/* Hintergrund-Muster entfernt - jetzt mit Foto */
 .powertechniken-challenge::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: 
-    radial-gradient(circle at 20% 30%, rgba(230, 0, 18, 0.1) 0%, transparent 30%),
-    radial-gradient(circle at 80% 70%, rgba(10, 185, 230, 0.1) 0%, transparent 30%),
-    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 0;
+  display: none;
 }
 
 .powertechniken-challenge > * {
@@ -120,9 +112,11 @@
   align-items: center;
   justify-content: space-between;
   padding: 15px 20px;
-  background: linear-gradient(180deg, rgba(45, 45, 68, 0.9) 0%, rgba(45, 45, 68, 0.7) 100%);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius: 20px;
-  border: 2px solid var(--pt-gold-dark);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   margin-bottom: 15px;
 }
 
@@ -193,11 +187,13 @@
    ============================================ */
 
 .progress-bar-container {
-  background: rgba(45, 45, 68, 0.8);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius: 15px;
   padding: 15px 20px;
   margin-bottom: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .progress-bar {
@@ -310,8 +306,10 @@
    ============================================ */
 
 .technique-card {
-  background: linear-gradient(180deg, var(--pt-bg-card) 0%, #1f1f35 100%);
-  border: 3px solid var(--technique-color, var(--pt-secondary));
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 2px solid var(--technique-color, var(--pt-secondary));
   border-radius: 20px;
   padding: 20px 15px;
   cursor: pointer;
@@ -466,10 +464,12 @@
    ============================================ */
 
 .technique-detail-container {
-  background: rgba(45, 45, 68, 0.9);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius: 25px;
   overflow: hidden;
-  border: 3px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .detail-header {
@@ -548,10 +548,18 @@
   margin: 0 auto;
 }
 
-/* Speech Bubble */
+/* Speech Bubble - heller Hintergrund mit dunklem Text */
+.powertechniken-challenge .speech-bubble,
+.powertechniken-challenge .speech-bubble p,
+.powertechniken-challenge .speech-bubble span {
+  color: #2c3e50 !important;
+}
+
 .speech-bubble {
-  background: linear-gradient(180deg, #fff 0%, #f5f5f5 100%);
-  color: var(--pt-text-dark);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   padding: 25px;
   border-radius: 20px;
   position: relative;
@@ -567,28 +575,29 @@
   bottom: -15px;
   left: 30px;
   border: 15px solid transparent;
-  border-top-color: #f5f5f5;
+  border-top-color: rgba(255, 255, 255, 0.85);
 }
 
-/* Kurzanleitung Box */
+/* Kurzanleitung Box - heller Hintergrund mit dunklem Text */
+.powertechniken-challenge .kurzanleitung-box,
+.powertechniken-challenge .kurzanleitung-box p,
+.powertechniken-challenge .kurzanleitung-box span {
+  color: #2c3e50 !important;
+}
+
+.powertechniken-challenge .kurzanleitung-box h4 {
+  color: #0891b2 !important;
+}
+
 .kurzanleitung-box {
-  background: rgba(10, 185, 230, 0.1);
-  border: 2px solid var(--pt-secondary);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-left: 4px solid var(--pt-secondary);
   border-radius: 15px;
   padding: 20px;
   margin-bottom: 25px;
-}
-
-.kurzanleitung-box h4 {
-  color: var(--pt-secondary);
-  margin: 0 0 10px 0;
-  font-size: 1.1em;
-}
-
-.kurzanleitung-box p {
-  color: var(--pt-text-light);
-  margin: 0;
-  font-size: 1em;
 }
 
 /* Next/Complete Buttons */
@@ -666,7 +675,10 @@
 }
 
 .interactive-exercise {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 20px;
   padding: 25px;
   margin-bottom: 20px;
@@ -901,16 +913,19 @@
   padding: 25px;
   border-radius: 20px;
   margin-bottom: 20px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .result-box.success {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(34, 197, 94, 0.1) 100%);
   border: 2px solid var(--pt-green);
+  border-left: 4px solid var(--pt-green);
 }
 
 .result-box.retry {
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 215, 0, 0.1) 100%);
   border: 2px solid var(--pt-gold);
+  border-left: 4px solid var(--pt-gold);
 }
 
 .result-box .result-icon {
@@ -1600,8 +1615,11 @@
 }
 
 .ideal-for-box {
-  background: rgba(10, 185, 230, 0.1);
-  border: 2px solid var(--pt-secondary);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-left: 4px solid var(--pt-secondary);
   border-radius: 15px;
   padding: 20px;
   margin-bottom: 25px;
@@ -1620,7 +1638,7 @@
 }
 
 .ideal-tag {
-  background: rgba(10, 185, 230, 0.2);
+  background: rgba(255, 255, 255, 0.2);
   color: var(--pt-text-light);
   padding: 8px 15px;
   border-radius: 20px;
@@ -1665,8 +1683,11 @@
 }
 
 .funfact-box {
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(109, 40, 217, 0.2) 100%);
-  border: 2px solid var(--pt-purple);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-left: 4px solid var(--pt-purple);
   border-radius: 20px;
   padding: 30px;
   margin-bottom: 25px;
@@ -1702,7 +1723,10 @@
 }
 
 .certificate-setup {
-  background: rgba(45, 45, 68, 0.9);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 20px;
   padding: 25px;
   margin-bottom: 25px;
@@ -2122,7 +2146,10 @@
   display: flex;
   align-items: center;
   gap: 20px;
-  background: rgba(45, 45, 68, 0.8);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 20px;
   padding: 20px;
   margin-bottom: 20px;
@@ -2217,8 +2244,10 @@
 }
 
 .technique-summary-card {
-  background: var(--pt-bg-card);
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 15px;
   padding: 15px;
   cursor: pointer;
@@ -2917,15 +2946,18 @@
   justify-content: center;
   gap: 10px;
   padding: 10px 16px;
-  background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius: 12px;
   margin-bottom: 16px;
-  border: 2px solid #ffb74d;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-left: 4px solid #ffb74d;
 }
 
 .cycle-label {
   font-size: 14px;
-  color: #e65100;
+  color: #ffb74d;
   font-weight: 600;
 }
 
@@ -2945,18 +2977,21 @@
   font-size: 16px;
   text-transform: uppercase;
   letter-spacing: 1px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .phase-indicator.learn {
-  background: linear-gradient(135deg, #ffebee, #ffcdd2);
-  color: #c62828;
+  color: #ff6b6b;
   border: 2px solid #ef5350;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
 .phase-indicator.break {
-  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
-  color: #2e7d32;
+  color: #7bed9f;
   border: 2px solid #66bb6a;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
 .phase-icon {
@@ -2968,29 +3003,34 @@
   padding: 24px;
   border-radius: 16px;
   margin-top: 20px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .phase-complete.learn-complete {
-  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
   border: 2px solid #66bb6a;
+  border-left: 4px solid #66bb6a;
 }
 
 .phase-complete.break-complete {
-  background: linear-gradient(135deg, #fff3e0, #ffe0b2);
   border: 2px solid #ffb74d;
+  border-left: 4px solid #ffb74d;
 }
 
 .complete-text {
   display: block;
   font-size: 20px;
   font-weight: bold;
-  color: #333;
+  color: var(--pt-text-light);
   margin: 10px 0;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
 .complete-hint {
   font-size: 14px;
-  color: #666;
+  color: var(--pt-text-light);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
   margin-bottom: 16px;
 }
 
@@ -3052,10 +3092,12 @@
 .anki-hint {
   margin-top: 24px;
   padding: 16px 20px;
-  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius: 12px;
-  border: 2px solid #64b5f6;
-  border-left: 5px solid #2196f3;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-left: 4px solid #2196f3;
 }
 
 .anki-hint-header {
@@ -3071,20 +3113,20 @@
 
 .anki-label {
   font-weight: bold;
-  color: #1565c0;
+  color: #64b5f6;
   font-size: 14px;
 }
 
 .anki-text {
   font-size: 13px;
-  color: #333;
+  color: var(--pt-text-light);
   margin: 0 0 8px 0;
   line-height: 1.5;
 }
 
 .anki-link {
   font-size: 12px;
-  color: #1976d2;
+  color: #90caf9;
   margin: 0;
 }
 
@@ -3093,23 +3135,26 @@
    ============================================ */
 
 .interleaving-explanation {
-  background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 16px;
-  border: 2px solid #4dd0e1;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-left: 4px solid #4dd0e1;
 }
 
 .explanation-title {
   font-weight: bold;
-  color: #00838f;
+  color: #4dd0e1;
   margin: 0 0 8px 0;
   font-size: 15px;
 }
 
 .explanation-text {
   font-size: 13px;
-  color: #333;
+  color: var(--pt-text-light);
   margin: 0;
   line-height: 1.5;
 }
@@ -3117,14 +3162,17 @@
 .interleaving-hint {
   margin-top: 24px;
   padding: 16px;
-  background: linear-gradient(135deg, #fff8e1, #ffecb3);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius: 12px;
-  border: 2px solid #ffd54f;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-left: 4px solid #ffd54f;
 }
 
 .hint-title {
   font-weight: bold;
-  color: #f57f17;
+  color: #ffd54f;
   margin: 0 0 12px 0;
   font-size: 14px;
 }
@@ -3138,11 +3186,11 @@
 .hint-tag {
   display: inline-block;
   padding: 6px 12px;
-  background: white;
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 20px;
   font-size: 12px;
-  color: #333;
-  border: 1px solid #ffc107;
+  color: var(--pt-text-light);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 /* Operator-Farben für Interleaving */

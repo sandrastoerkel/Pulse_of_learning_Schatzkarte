@@ -1,5 +1,83 @@
 # Schatzkarte - Status Übersicht
-## Stand: 16. Januar 2025
+## Stand: 21. Januar 2025
+
+---
+
+# ⚠️ MORGEN ALS ERSTES PRÜFEN
+
+**Frage:** Ändert sich der Text (Scroll-Content) wenn man von Grundschule auf Unterstufe/Mittelstufe wechselt?
+
+→ Überprüfen ob `ageGroup` korrekt an die Content-Komponenten weitergegeben wird und der Inhalt sich anpasst.
+
+---
+
+# Änderungen vom 21. Januar 2025
+
+## Hintergrundbilder für Insel-Experiences 🖼️
+
+Neue immersive Hintergrundbilder mit transparenten Glass-Effekt-Containern wurden eingeführt.
+
+### Fertige Inseln mit Hintergrundbild
+
+| Insel | Bilddatei | Beschreibung |
+|-------|-----------|--------------|
+| ⛵ Base Camp | `/public/basecamp-bg.jpg` | Berge/Abenteuer-Landschaft |
+| 🏰 Mental stark (Festung) | `/public/festung-bg.jpg` | Springende Silhouetten im Sonnenuntergang |
+| 🔧 Cleverer lernen (Werkzeuge) | `/public/werkzeuge-bg.jpg` | Glühbirne (Ideen) |
+| 🧵 Station der Fäden | `/public/faeden-bg.jpg` | Plasma/Neuronen-Netzwerk |
+
+### CSS-Muster für Hintergrundbilder
+
+```css
+/* Haupt-Container */
+.island-name {
+  background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 100%), url('/island-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: var(--white);
+}
+
+/* Transparente Container mit Blur */
+.island-name .phase-container,
+.island-name .quest-card {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Text-Lesbarkeit */
+.island-name .text-element {
+  color: var(--white);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+```
+
+### Geänderte CSS-Dateien
+
+| Datei | Änderungen |
+|-------|------------|
+| `starthafen-island.css` | Hintergrundbild, transparente Container |
+| `festung-island.css` | Hintergrundbild, transparente Container, weiße Schrift |
+| `werkzeuge-island.css` | Hintergrundbild, transparente Container, weiße Schrift |
+| `faeden-island.css` | Hintergrundbild, transparente Container, weiße Schrift |
+| `powertechniken-challenge.css` | Hintergrundbild (werkzeuge-bg.jpg), transparente Container |
+
+### TODO: Weitere Inseln mit Hintergrundbildern
+
+Folgende Inseln fehlen noch:
+- 🌉 Brücken
+- 🧠 Spiegel-See
+- 🔥 Vulkan
+- 😌 Ruhe-Oase
+- 🏆 Ausdauer-Gipfel
+- 🎯 Fokus-Leuchtturm
+- 🌱 Wachstums-Garten
+- 🏫 Lehrer-Turm
+- 🏠 Wohlfühl-Dorf
+- 🛡️ Schutz-Burg
+- ⛰️ Berg der Meisterschaft
 
 ---
 
@@ -368,4 +446,4 @@ frontend/src/content/
 
 ---
 
-**Letzte Aktualisierung:** 16. Januar 2025
+**Letzte Aktualisierung:** 21. Januar 2025

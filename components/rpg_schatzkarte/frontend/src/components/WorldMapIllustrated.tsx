@@ -20,7 +20,7 @@ import {
   GoldenKeyIcon,
   HattieWaageIcon,
   PolarsternIcon,
-  StartHafenIcon,
+  BaseCampIcon,
   FestungIcon,
   WerkzeugeIcon,
   VulkanIcon,
@@ -40,7 +40,7 @@ import {
 
 // Mapping: Insel-ID → SVG-Icon Komponente
 const ISLAND_ICONS: Record<string, React.FC<{ size?: number; animated?: boolean; glowing?: boolean }>> = {
-  'start': StartHafenIcon,
+  'start': BaseCampIcon,
   'festung': FestungIcon,
   'werkzeuge': WerkzeugeIcon,
   'vulkan': VulkanIcon,

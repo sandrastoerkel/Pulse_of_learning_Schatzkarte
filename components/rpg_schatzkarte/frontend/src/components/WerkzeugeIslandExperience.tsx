@@ -11,6 +11,7 @@ import { WERKZEUGE_CONTENT, ContentSection, IslandContent } from '../content/wer
 import { WERKZEUGE_QUIZ_QUESTIONS } from '../content/werkzeugeQuizContent';
 import { BattleQuiz } from './BattleQuiz';
 import { PowertechnikenChallenge } from './PowertechnikenChallenge';
+import { WerkzeugeIcon } from './icons';
 import '../styles/werkzeuge-island.css';
 
 // ============================================
@@ -126,13 +127,13 @@ export function WerkzeugeIslandExperience({
           ← Zurück
         </button>
         <h1 className="island-title">
-          <motion.span
+          <motion.div
             className="title-icon"
-            animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
+            animate={{ scale: [1, 1.1, 1] }}
             transition={{ repeat: Infinity, duration: 3 }}
           >
-            🛠️
-          </motion.span>
+            <WerkzeugeIcon size={40} animated={true} />
+          </motion.div>
           Cleverer lernen
         </h1>
         <div className="xp-badge">
