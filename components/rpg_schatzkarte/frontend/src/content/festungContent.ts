@@ -27,6 +27,11 @@ interface IslandContent {
     intro: string;
     sections: ContentSection[];
   };
+  // Separater Content für die VideoPhase "Weisheit erlangen"
+  videoExplanation?: {
+    intro: string;
+    sections: ContentSection[];
+  };
   summary?: string;
 }
 
@@ -39,6 +44,7 @@ const GRUNDSCHULE_CONTENT: IslandContent = {
     url: "https://www.youtube.com/watch?v=-vwiEs8QE2g",
     placeholder: false
   },
+  // Original-Content für "Schriftrolle studieren (optional)"
   explanation: {
     intro: `Stell dir vor, du stehst vor einer richtig schweren Aufgabe. Vielleicht eine Mathe-Aufgabe, die du noch nie gemacht hast. Oder du sollst zum ersten Mal alleine Fahrrad fahren.
 
@@ -146,6 +152,106 @@ Das ist wie bei einem Videospiel: Wenn du einen Level schaffst, von dem du dacht
 
 💡 **Tipp:** Je öfter du die Challenges besuchst, desto stärker wirst du! Du kannst immer wieder neue Einträge hinzufügen.`,
         type: 'success'
+      },
+      {
+        title: "📊 Selbstcheck: Wie ist deine Selbstwirksamkeit?",
+        content: `Beantworte ehrlich (1 = stimmt gar nicht, 5 = stimmt total):`,
+        type: 'selfcheck',
+        selfcheck: {
+          statements: [
+            "Wenn ich übe, werde ich besser",
+            "Auch schwere Aufgaben kann ich lösen, wenn ich dranbleibe",
+            "Fehler sind Teil des Lernens",
+            "Ich kann mich selbst motivieren"
+          ],
+          results: [
+            { range: "16-20", message: "Du bist auf einem guten Weg!", emoji: "🌟" },
+            { range: "11-15", message: "Da geht noch was – nutze die Strategien!", emoji: "💪" },
+            { range: "4-10", message: "Kein Problem, aber fang HEUTE an, daran zu arbeiten.", emoji: "🚀" }
+          ],
+          conclusion: "Dein Gehirn glaubt, was du ihm oft genug sagst. Also sag ihm das Richtige!"
+        }
+      }
+    ]
+  },
+  // Separater Content für "Weisheit erlangen" (mit Videos)
+  videoExplanation: {
+    intro: `<div class="video-intro-container">
+<video controls playsinline class="intro-video">
+<source src="./videos/Bandura_Uebertritt.mov" type="video/quicktime">
+<source src="./videos/Bandura_Uebertritt.mov" type="video/mp4">
+Dein Browser unterstützt dieses Video nicht.
+</video>
+</div>`,
+    sections: [
+      {
+        title: "🌟 Die 4 Superhelden-Kräfte (nach Bandura)",
+        content: `Ein Forscher, Albert Bandura, hat herausgefunden, wie man diese Superkraft bekommt:`,
+        type: 'info'
+      },
+      {
+        title: "🏆 1. Kleine Siege sammeln",
+        content: `Jedes Mal wenn du etwas schaffst, wird dein "Ich-schaff-das-Muskel" stärker!
+
+**💡 Tipp:** Mach große Aufgaben klein.
+Statt *"Ich lerne alle Malaufgaben"* → *"Heute lerne ich nur die 3er-Reihe."*`,
+        type: 'expander',
+        expanded: true
+      },
+      {
+        title: "👀 2. Von anderen abgucken (erlaubt!)",
+        content: `Wenn dein Freund etwas Schweres schafft, denkst du: *"Hey, wenn der das kann, kann ich das auch!"*
+
+**💡 Tipp:** Such dir jemanden, der auch mal Probleme hatte – und frag, wie er es gelernt hat.`,
+        type: 'expander'
+      },
+      {
+        title: "💬 3. Aufmunterung hilft",
+        content: `Wenn Mama, Papa oder dein Lehrer sagt *"Du schaffst das!"* – dann glaubst du es auch mehr.
+
+**💡 Tipp:** Du kannst dir das auch selbst sagen! Sag dir: *"Ich probier's einfach mal."*`,
+        type: 'expander'
+      },
+      {
+        title: "😌 4. Ruhig bleiben",
+        content: `Wenn dein Herz schnell klopft vor einer Aufgabe, denk dran:
+Das ist nicht Angst, das ist **AUFREGUNG**! Dein Körper macht sich bereit!
+
+**💡 Tipp:** Atme 3x tief ein und aus. Dann geht's los!`,
+        type: 'expander'
+      },
+      {
+        title: "📝 Mein Superhelden-Tagebuch",
+        content: `Dein **Superhelden-Tagebuch** wartet auf dich!
+
+Schreibe jeden Tag auf, was du geschafft hast – so sammelst du deine Superkräfte!
+
+🦸 **So findest du es:** Schau auf die Schatzkarte – unten rechts siehst du immer das goldene **📓 Mein Tagebuch** Symbol. Klick drauf und schreib los!`,
+        type: 'success'
+      },
+      {
+        title: "💬 Deine Superhelden-Sätze",
+        content: `**Sag dir diese Sätze – sie machen dich stärker:**
+
+🌟 *"Ich lerne noch!"*
+
+🌟 *"Das ist schwer – aber ich probier's!"*
+
+🌟 *"Ich vergleiche mich mit mir von gestern."*
+
+🌟 *"Jeder Fehler bringt mich weiter."*`,
+        type: 'success'
+      },
+      {
+        title: "🎬 Die Hattie-Methode",
+        content: `<div class="video-intro-container">
+<video controls playsinline class="intro-video">
+<source src="./videos/Hattie_Uebertritt.mov" type="video/quicktime">
+<source src="./videos/Hattie_Uebertritt.mov" type="video/mp4">
+Dein Browser unterstützt dieses Video nicht.
+</video>
+</div>`,
+        type: 'info'
       },
       {
         title: "📊 Selbstcheck: Wie ist deine Selbstwirksamkeit?",

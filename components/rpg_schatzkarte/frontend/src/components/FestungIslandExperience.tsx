@@ -54,7 +54,7 @@ const QUEST_INFO: Record<QuestKey, {
     xp: 25,
   },
   scroll: {
-    name: "Schriftrolle studieren",
+    name: "Schriftrolle studieren (optional)",
     icon: "📖",
     color: "#3498db",
     description: "Lerne über Selbstwirksamkeit.",
@@ -284,8 +284,11 @@ export function FestungIslandExperience({
           >
             <VideoPhase
               content={content}
+              ageGroup={ageGroup}
               onComplete={() => completeQuest('video', QUEST_INFO.video.xp)}
               onBack={() => setCurrentView('overview')}
+              onOpenTagebuch={onOpenTagebuch}
+              onClose={onClose}
             />
           </motion.div>
         )}
@@ -434,16 +437,41 @@ function PhaseHeader({ icon, title, color, onBack }: PhaseHeaderProps) {
 }
 
 // ============================================
-// VIDEO PHASE
+// VIDEO PHASE - Jetzt mit Scroll-Content
 // ============================================
 
 interface VideoPhaseProps {
   content: IslandContent;
+  ageGroup: AgeGroup;
   onComplete: () => void;
   onBack: () => void;
+  onOpenTagebuch?: () => void;
+  onClose: () => void;
 }
 
-function VideoPhase({ content, onComplete, onBack }: VideoPhaseProps) {
+function VideoPhase({ content, ageGroup, onComplete, onBack, onOpenTagebuch, onClose }: VideoPhaseProps) {
+  // Nutze videoExplanation wenn vorhanden, sonst fallback auf explanation
+  const videoContent = content.videoExplanation || content.explanation;
+
+  const [expandedSections, setExpandedSections] = useState<Set<number>>(() => {
+    const initial = new Set<number>();
+    videoContent.sections.forEach((s, i) => {
+      if (s.type === 'expander' && s.expanded) initial.add(i);
+    });
+    return initial;
+  });
+  const [selfcheckAnswers, setSelfcheckAnswers] = useState<Record<number, number>>({});
+  const [showSelfcheckResult, setShowSelfcheckResult] = useState(false);
+
+  const toggleSection = (idx: number) => {
+    setExpandedSections(prev => {
+      const next = new Set(prev);
+      if (next.has(idx)) next.delete(idx);
+      else next.add(idx);
+      return next;
+    });
+  };
+
   return (
     <div className="phase-container video-phase">
       <PhaseHeader
@@ -455,38 +483,88 @@ function VideoPhase({ content, onComplete, onBack }: VideoPhaseProps) {
 
       <motion.div
         className="phase-content"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
       >
-        <div className="video-container">
-          {content.video.placeholder ? (
+        <div className="scroll-container">
+          {/* Titel */}
+          <motion.h3
+            className="scroll-title"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            {content.title}
+          </motion.h3>
+
+          {/* Intro */}
+          <motion.div
+            className="scroll-intro"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            dangerouslySetInnerHTML={{ __html: markdownToHtml(videoContent.intro) }}
+          />
+
+          {/* Sections */}
+          <div className="scroll-sections">
+            {videoContent.sections.map((section, idx) => {
+              // Selfcheck Section
+              if (section.type === 'selfcheck' && section.selfcheck) {
+                return (
+                  <SelfcheckSection
+                    key={idx}
+                    section={section}
+                    index={idx}
+                    answers={selfcheckAnswers}
+                    showResult={showSelfcheckResult}
+                    onAnswer={(sIdx, rating) => {
+                      setSelfcheckAnswers(prev => ({ ...prev, [sIdx]: rating }));
+                      setShowSelfcheckResult(false);
+                    }}
+                    onShowResult={() => setShowSelfcheckResult(true)}
+                  />
+                );
+              }
+
+              // Tagebuch Section mit Button
+              const isTagebuchSection = section.title.includes('Superhelden-Tagebuch');
+
+              return (
+                <div key={idx}>
+                  <ScrollSection
+                    section={section}
+                    index={idx}
+                    isExpanded={expandedSections.has(idx)}
+                    onToggle={() => toggleSection(idx)}
+                  />
+
+                  {/* Tagebuch Button nach Tagebuch-Section */}
+                  {isTagebuchSection && ageGroup === 'grundschule' && onOpenTagebuch && (
+                    <motion.div
+                      className="inline-tagebuch-promo"
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                    >
+                      <TagebuchStartButton onClick={() => {
+                        onClose();
+                        setTimeout(() => onOpenTagebuch && onOpenTagebuch(), 100);
+                      }} />
+                    </motion.div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Summary */}
+          {content.summary && (
             <motion.div
-              className="video-placeholder"
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-            >
-              <motion.div
-                className="play-icon-wrapper"
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{ repeat: Infinity, duration: 2 }}
-              >
-                <span className="play-icon">▶️</span>
-              </motion.div>
-              <h3>Video kommt bald!</h3>
-              <p>Das Erklärvideo ist in Arbeit.</p>
-            </motion.div>
-          ) : (
-            <div className="video-embed">
-              <iframe
-                src={content.video.url
-                  .replace('watch?v=', 'embed/')
-                  .replace('youtu.be/', 'youtube.com/embed/')}
-                title="Lernvideo"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            </div>
+              className="scroll-summary"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              dangerouslySetInnerHTML={{ __html: markdownToHtml(content.summary) }}
+            />
           )}
         </div>
 
@@ -496,7 +574,7 @@ function VideoPhase({ content, onComplete, onBack }: VideoPhaseProps) {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          {content.video.placeholder ? 'Verstanden! ✓' : 'Video abgeschlossen ✓'}
+          Verstanden ✓
         </motion.button>
       </motion.div>
     </div>

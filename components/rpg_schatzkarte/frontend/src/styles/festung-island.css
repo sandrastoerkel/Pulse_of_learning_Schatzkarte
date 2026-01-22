@@ -503,10 +503,46 @@
   padding: 1rem;
   margin-bottom: 1.5rem;
   line-height: 1.6;
+  color: var(--dark);
+}
+
+/* Video Intro Container */
+.festung-island .scroll-intro .video-intro-container {
+  background: transparent;
+  padding: 0;
+}
+
+.festung-island .scroll-intro .intro-video {
+  width: 100%;
+  max-width: 100%;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.festung-island .scroll-intro:has(.video-intro-container) {
+  background: transparent;
+  padding: 0;
+}
+
+/* Video in Section Content */
+.festung-island .section-content .video-intro-container {
+  background: transparent;
+  padding: 0;
+}
+
+.festung-island .section-content .intro-video {
+  width: 100%;
+  max-width: 100%;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
 }
 
 .festung-island .scroll-intro strong {
   color: var(--primary);
+}
+
+.festung-island .scroll-intro em {
+  color: var(--dark);
 }
 
 /* Two columns layout */
@@ -521,21 +557,25 @@
   padding: 0.75rem;
   border-radius: var(--radius-sm);
   text-align: center;
+  color: var(--dark);
 }
 
 .festung-island .scroll-intro .column-box.error {
   background: rgba(231, 76, 60, 0.15);
   border: 1px solid var(--danger);
+  color: var(--danger);
 }
 
 .festung-island .scroll-intro .column-box.success {
   background: rgba(39, 174, 96, 0.15);
   border: 1px solid var(--success);
+  color: var(--success);
 }
 
 .festung-island .scroll-intro .column-box.info {
   background: rgba(52, 152, 219, 0.15);
   border: 1px solid var(--secondary);
+  color: var(--secondary);
 }
 
 .festung-island .scroll-sections {
@@ -590,10 +630,15 @@
   padding: 1rem;
   line-height: 1.6;
   overflow: hidden;
+  color: var(--dark);
 }
 
 .festung-island .section-content strong {
   color: var(--primary);
+}
+
+.festung-island .section-content em {
+  color: var(--dark);
 }
 
 .festung-island .section-content ul {
@@ -626,6 +671,7 @@
   padding: 0.5rem;
   text-align: left;
   border: 1px solid var(--light);
+  color: var(--dark);
 }
 
 .festung-island .section-content th {
@@ -644,14 +690,22 @@
 .festung-island .section-content .column-box {
   padding: 0.75rem;
   border-radius: var(--radius-sm);
+  color: var(--dark);
 }
 
 .festung-island .section-content .column-box.success {
   background: rgba(39, 174, 96, 0.15);
+  color: var(--success);
 }
 
 .festung-island .section-content .column-box.info {
   background: rgba(52, 152, 219, 0.15);
+  color: var(--secondary);
+}
+
+.festung-island .section-content .column-box.error {
+  background: rgba(231, 76, 60, 0.15);
+  color: var(--danger);
 }
 
 .festung-island .scroll-summary {

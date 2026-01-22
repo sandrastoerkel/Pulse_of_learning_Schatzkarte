@@ -4915,6 +4915,11 @@ body {
   box-shadow: 0 0 40px rgba(255, 215, 0, 0.3), 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 
+.companion-selector-modal .modal-header h2 {
+  color: #FFFFFF;
+  text-shadow: 0 2px 8px rgba(255, 215, 0, 0.5);
+}
+
 .companion-intro {
   text-align: center;
   color: #e0e0e0;
@@ -4926,7 +4931,7 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 20px;
-  margin-bottom: 30px;
+  margin-bottom: 15px;
 }
 
 .companion-card {

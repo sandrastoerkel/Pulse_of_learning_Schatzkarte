@@ -240,6 +240,14 @@ function RPGSchatzkarteContent({
     }
   }, [customAvatar, showAvatarCreator]);
 
+  // Sync ageGroup wenn sich die initialAgeGroup ändert (z.B. User wechselt Altersstufe)
+  useEffect(() => {
+    if (initialAgeGroup !== ageGroup) {
+      console.log('AgeGroup sync:', initialAgeGroup, '(was:', ageGroup, ')');
+      setAgeGroup(initialAgeGroup);
+    }
+  }, [initialAgeGroup]);
+
   // Auto-Open Island (z.B. nach Rückkehr von Polarstern)
   useEffect(() => {
     if (autoOpenIsland) {
