@@ -178,8 +178,8 @@ Das ist wie bei einem Videospiel: Wenn du einen Level schaffst, von dem du dacht
   videoExplanation: {
     intro: `<div class="video-intro-container">
 <video controls playsinline class="intro-video">
-<source src="./videos/Bandura_Uebertritt.mov" type="video/quicktime">
-<source src="./videos/Bandura_Uebertritt.mov" type="video/mp4">
+<source src="./videos/Grundschule_mental_stark_Video1.mov" type="video/quicktime">
+<source src="./videos/Grundschule_mental_stark_Video1.mov" type="video/mp4">
 Dein Browser unterstützt dieses Video nicht.
 </video>
 </div>`,
@@ -246,8 +246,8 @@ Schreibe jeden Tag auf, was du geschafft hast – so sammelst du deine Superkrä
         title: "🎬 Die Hattie-Methode",
         content: `<div class="video-intro-container">
 <video controls playsinline class="intro-video">
-<source src="./videos/Hattie_Uebertritt.mov" type="video/quicktime">
-<source src="./videos/Hattie_Uebertritt.mov" type="video/mp4">
+<source src="./videos/Grundschule_mental_stark_Video2mov.mov" type="video/quicktime">
+<source src="./videos/Grundschule_mental_stark_Video2mov.mov" type="video/mp4">
 Dein Browser unterstützt dieses Video nicht.
 </video>
 </div>`,
@@ -287,68 +287,24 @@ const UNTERSTUFE_CONTENT: IslandContent = {
     placeholder: false
   },
   explanation: {
-    intro: `**🎯 Eine Entdeckung, die alles verändert**`,
+    intro: `<div class="video-intro-container">
+<h3>🎬 VIDEO 1: Neuroplastizität – Dein Gehirn ist trainierbar</h3>
+<video controls playsinline class="intro-video">
+<source src="./videos/Neuroplastizitaet_Unterstufe.mov" type="video/quicktime">
+<source src="./videos/Neuroplastizitaet_Unterstufe.mp4" type="video/mp4">
+Dein Browser unterstützt dieses Video nicht.
+</video>
+</div>`,
     sections: [
       {
-        title: "🧠 Neuroplastizität – Dein Gehirn wächst!",
-        content: `**Forscher haben etwas Unglaubliches herausgefunden:**
-
-Dein Gehirn funktioniert wie ein Muskel. Je mehr du übst, desto stärker wird es.
-
-Das nennt man **Neuroplastizität** – und es bedeutet:
-**Deine Fähigkeiten sind nicht festgelegt. Sie können wachsen.**`,
-        type: 'success'
-      },
-      {
-        title: "🔬 Das ist Biologie, keine Floskel",
-        content: `Das ist keine Motivation-Floskel – das ist Biologie.
-Beim Lernen bilden sich neue Verbindungen zwischen Nervenzellen.
-Buchstäblich: **Dein Gehirn baut sich um, wenn du übst.**`,
-        type: 'info'
-      },
-      {
-        title: "📊 Was sagt die Wissenschaft?",
-        content: `**John Hattie** hat über **80 Millionen Schüler** untersucht (kein Witz!).
-Er wollte wissen: Was macht den Unterschied zwischen erfolgreichen und weniger erfolgreichen Schülern?
-
-**Das Ergebnis:**
-- Nicht Intelligenz.
-- Nicht die Schule.
-- Nicht mal die Lehrer (sorry, Lehrer).
-
-**Sondern: Wie du über dich selbst denkst.**
-
-Schüler, die glauben, dass sie eine Aufgabe schaffen können, schaffen sie auch öfter.
-
-Das nennt man **Selbstwirksamkeit** – und die hat eine Effektstärke von **0.63** (alles über 0.40 ist richtig gut!).`,
-        type: 'success'
-      },
-      {
-        title: "❓ Was bedeutet 'Effektstärke'?",
-        content: `**Stell dir vor, du testest zwei Gruppen:**
-- Gruppe A lernt mit einer neuen Methode
-- Gruppe B lernt wie immer
-
-Die **Effektstärke** sagt dir: **Wie viel besser wurde Gruppe A im Vergleich zu Gruppe B?**
-
-**So kannst du dir das merken:**
-
-| Effektstärke | Was bedeutet das? | Beispiel |
-|--------------|-------------------|----------|
-| **0.00** | Kein Unterschied | Wie wenn beide gleich abschneiden |
-| **0.20** | Kleiner Effekt | Wie 1 Monat Extra-Lernen |
-| **0.40** | Mittlerer Effekt | Wie 3-4 Monate Extra-Lernen |
-| **0.60+** | Großer Effekt | Wie ein halbes Schuljahr Extra! |
-
-**Selbstwirksamkeit hat 0.63** – das bedeutet:
-Schüler, die an sich glauben, lernen so viel wie andere in einem **halben Schuljahr extra**! 🚀
-
-*Das ist, als würdest du ein Power-Up bekommen, das dich schneller leveln lässt.*`,
-        type: 'expander'
-      },
-      {
-        title: "🧠 Die 4 Quellen deiner Selbstwirksamkeit (Bandura)",
-        content: `Der Psychologe **Albert Bandura** hat erforscht, woher dieses *"Ich-schaff-das-Gefühl"* kommt:`,
+        title: "🎬 VIDEO 2: Die 4 Quellen nach Bandura – Deine Superheldenkräfte",
+        content: `<div class="video-intro-container">
+<video controls playsinline class="intro-video">
+<source src="./videos/Bandura_Unterstufe.mov" type="video/quicktime">
+<source src="./videos/Bandura_Unterstufe.mp4" type="video/mp4">
+Dein Browser unterstützt dieses Video nicht.
+</video>
+</div>`,
         type: 'info'
       },
       {
@@ -403,13 +359,119 @@ Aber wenn dein Kumpel, der auch Probleme hatte, es erklärt – das wirkt!
         type: 'expander'
       },
       {
-        title: "🎯 Die Hattie-Methode: Erwartungen übertreffen",
-        content: `Hattie nennt das **'Student Expectations'** – und es ist eine der stärksten Methoden überhaupt.
+        title: "🎬 VIDEO 3: Die Hattie-Methode – Übertreffe dich selbst",
+        content: `<div class="video-intro-container">
+<video controls playsinline class="intro-video">
+<source src="./videos/Hattie_Unterstufe.mov" type="video/quicktime">
+<source src="./videos/Hattie_Unterstufe.mp4" type="video/mp4">
+Dein Browser unterstützt dieses Video nicht.
+</video>
+</div>`,
+        type: 'info'
+      },
+      {
+        title: "📊 Selbstcheck: Wie ist deine Selbstwirksamkeit?",
+        content: `Beantworte ehrlich (1 = stimmt gar nicht, 5 = stimmt total):`,
+        type: 'selfcheck',
+        selfcheck: {
+          statements: [
+            "Wenn ich übe, werde ich besser",
+            "Auch schwere Aufgaben kann ich lösen, wenn ich dranbleibe",
+            "Fehler sind Teil des Lernens",
+            "Ich kann mich selbst motivieren"
+          ],
+          results: [
+            { range: "16-20", message: "Du bist auf einem guten Weg!", emoji: "🌟" },
+            { range: "11-15", message: "Da geht noch was – nutze die Strategien!", emoji: "💪" },
+            { range: "4-10", message: "Kein Problem, aber fang HEUTE an, daran zu arbeiten.", emoji: "🚀" }
+          ],
+          conclusion: "Dein Gehirn glaubt, was du ihm oft genug sagst. Also sag ihm das Richtige!"
+        }
+      }
+    ]
+  },
+  // Separater Content für "Weisheit erlangen" (mit Videos)
+  videoExplanation: {
+    intro: `<div class="video-intro-container">
+<h3>🎬 VIDEO 1: Neuroplastizität – Dein Gehirn ist trainierbar</h3>
+<video controls playsinline class="intro-video">
+<source src="./videos/Unterstufe_mental_stark_Video1.mov" type="video/quicktime">
+<source src="./videos/Unterstufe_mental_stark_Video1.mov" type="video/mp4">
+Dein Browser unterstützt dieses Video nicht.
+</video>
+</div>`,
+    sections: [
+      {
+        title: "🎬 VIDEO 2: Die 4 Quellen nach Bandura – Deine Superheldenkräfte",
+        content: `<div class="video-intro-container">
+<video controls playsinline class="intro-video">
+<source src="./videos/Unterstufe_mental_stark_Video2.mov" type="video/quicktime">
+<source src="./videos/Unterstufe_mental_stark_Video2.mov" type="video/mp4">
+Dein Browser unterstützt dieses Video nicht.
+</video>
+</div>`,
+        type: 'info'
+      },
+      {
+        title: "🏆 1. Echte Erfolgserlebnisse (Die Stärkste!)",
+        content: `Nichts überzeugt dein Gehirn mehr als: **Du hast es selbst geschafft.**
 
-**So geht's:**
-1. **Vor dem Test/der Aufgabe:** Schätze realistisch: *"Ich werde wahrscheinlich eine 3 bekommen."*
-2. **Gib dein Bestes**
-3. **Nach dem Ergebnis:** Wenn du BESSER bist als deine Schätzung → **BOOM!** Dein Selbstvertrauen steigt.`,
+**Das Problem:** Wenn eine Aufgabe zu groß ist, gibst du vielleicht auf, bevor du Erfolg hast.
+
+**Die Lösung:** Zerlege große Aufgaben in Mini-Aufgaben.
+
+| ❌ Zu groß | ✅ Mini-Aufgabe |
+|-----------|----------------|
+| "Ich lerne für die Mathe-Arbeit" | "Ich mache heute 10 Bruch-Aufgaben" |
+| "Ich werde besser in Englisch" | "Ich lerne heute 5 Vokabeln" |
+
+**Wichtig:** Schreib auf, was du geschafft hast! Dein Gehirn vergisst Erfolge schneller als Misserfolge.`,
+        type: 'expander',
+        expanded: true
+      },
+      {
+        title: "👀 2. Von anderen lernen",
+        content: `Wenn du siehst, wie jemand **ÄHNLICHES** wie du etwas schafft, denkt dein Gehirn: *"Okay, scheint also möglich zu sein..."*
+
+**⚠️ Achtung:** Es muss jemand sein, der dir ähnlich ist!
+Wenn ein Mathe-Genie die Aufgabe löst, hilft dir das nicht.
+Aber wenn dein Kumpel, der auch Probleme hatte, es erklärt – das wirkt!
+
+**💡 Tipp:** Frag Klassenkameraden: *"Wie hast du das verstanden?"*`,
+        type: 'expander'
+      },
+      {
+        title: "💬 3. Was andere zu dir sagen",
+        content: `Wenn Lehrer oder Eltern sagen *"Du schaffst das!"* – hilft das.
+**ABER:** Nur wenn du es ihnen glaubst.
+
+**Noch stärker:** Sag es dir selbst.
+
+**Dein neuer innerer Spruch:** "Das ist schwer. Aber schwer heißt nicht unmöglich."`,
+        type: 'expander'
+      },
+      {
+        title: "😤 4. Dein Körper-Feeling",
+        content: `Schwitzige Hände vor dem Test? Herzklopfen?
+
+**Das ist ein gutes Zeichen!** Dein Körper macht sich bereit.
+
+**Sag dir:**
+🚀 *"Ich bin aufgeregt – mein Körper ist bereit!"*
+🚀 *"Diese Energie hilft mir, mein Bestes zu geben!"*
+
+**Fun Fact:** Aufregung und Nervosität fühlen sich körperlich fast gleich an. Der Unterschied liegt nur in dem, was du dir sagst!`,
+        type: 'expander'
+      },
+      {
+        title: "🎬 VIDEO 3: Die Hattie-Methode – Übertreffe dich selbst",
+        content: `<div class="video-intro-container">
+<video controls playsinline class="intro-video">
+<source src="./videos/Unterstufe_mental_stark_Video3.mov" type="video/quicktime">
+<source src="./videos/Unterstufe_mental_stark_Video3.mov" type="video/mp4">
+Dein Browser unterstützt dieses Video nicht.
+</video>
+</div>`,
         type: 'info'
       },
       {
