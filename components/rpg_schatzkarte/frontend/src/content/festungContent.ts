@@ -177,11 +177,10 @@ Das ist wie bei einem Videospiel: Wenn du einen Level schaffst, von dem du dacht
   // Separater Content für "Weisheit erlangen" (mit Videos)
   videoExplanation: {
     intro: `<div class="video-intro-container">
-<video controls playsinline class="intro-video">
-<source src="./videos/Grundschule_mental_stark_Video1.mov" type="video/quicktime">
-<source src="./videos/Grundschule_mental_stark_Video1.mov" type="video/mp4">
-Dein Browser unterstützt dieses Video nicht.
-</video>
+<div class="video-card">
+<iframe class="intro-video youtube-embed" src="https://www.youtube.com/embed/K1tNVdUQQ_U" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<div class="video-label">🎬 Die 4 Superhelden-Kräfte</div>
+</div>
 </div>`,
     sections: [
       {
@@ -245,11 +244,10 @@ Schreibe jeden Tag auf, was du geschafft hast – so sammelst du deine Superkrä
       {
         title: "🎬 Die Hattie-Methode",
         content: `<div class="video-intro-container">
-<video controls playsinline class="intro-video">
-<source src="./videos/Grundschule_mental_stark_Video2mov.mov" type="video/quicktime">
-<source src="./videos/Grundschule_mental_stark_Video2mov.mov" type="video/mp4">
-Dein Browser unterstützt dieses Video nicht.
-</video>
+<div class="video-card">
+<iframe class="intro-video youtube-embed" src="https://www.youtube.com/embed/rx8nwNdw7Y0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<div class="video-label">🎬 Die Hattie-Methode</div>
+</div>
 </div>`,
         type: 'info'
       },
@@ -393,22 +391,19 @@ Dein Browser unterstützt dieses Video nicht.
   // Separater Content für "Weisheit erlangen" (mit Videos)
   videoExplanation: {
     intro: `<div class="video-intro-container">
-<h3>🎬 VIDEO 1: Neuroplastizität – Dein Gehirn ist trainierbar</h3>
-<video controls playsinline class="intro-video">
-<source src="./videos/Unterstufe_mental_stark_Video1.mov" type="video/quicktime">
-<source src="./videos/Unterstufe_mental_stark_Video1.mov" type="video/mp4">
-Dein Browser unterstützt dieses Video nicht.
-</video>
+<div class="video-card">
+<iframe class="intro-video youtube-embed" src="https://www.youtube.com/embed/eGKGmNy0xeY" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<div class="video-label">🎬 Neuroplastizität</div>
+</div>
 </div>`,
     sections: [
       {
-        title: "🎬 VIDEO 2: Die 4 Quellen nach Bandura – Deine Superheldenkräfte",
+        title: "🎬 VIDEO 2: Die 4 Quellen nach Bandura",
         content: `<div class="video-intro-container">
-<video controls playsinline class="intro-video">
-<source src="./videos/Unterstufe_mental_stark_Video2.mov" type="video/quicktime">
-<source src="./videos/Unterstufe_mental_stark_Video2.mov" type="video/mp4">
-Dein Browser unterstützt dieses Video nicht.
-</video>
+<div class="video-card">
+<iframe class="intro-video youtube-embed" src="https://www.youtube.com/embed/5Bh4TM9tf_A" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<div class="video-label">🎬 Bandura's 4 Quellen</div>
+</div>
 </div>`,
         type: 'info'
       },
@@ -464,13 +459,12 @@ Aber wenn dein Kumpel, der auch Probleme hatte, es erklärt – das wirkt!
         type: 'expander'
       },
       {
-        title: "🎬 VIDEO 3: Die Hattie-Methode – Übertreffe dich selbst",
+        title: "🎬 VIDEO 3: Die Hattie-Methode",
         content: `<div class="video-intro-container">
-<video controls playsinline class="intro-video">
-<source src="./videos/Unterstufe_mental_stark_Video3.mov" type="video/quicktime">
-<source src="./videos/Unterstufe_mental_stark_Video3.mov" type="video/mp4">
-Dein Browser unterstützt dieses Video nicht.
-</video>
+<div class="video-card">
+<iframe class="intro-video youtube-embed" src="https://www.youtube.com/embed/T2RO8mhUh2w" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<div class="video-label">🎬 Die Hattie-Methode</div>
+</div>
 </div>`,
         type: 'info'
       },

@@ -112,12 +112,12 @@ export const SUPERHELDEN_QUIZ_QUESTIONS: ExtendedQuizQuestion[] = [
     question: "John Hattie hat über 80 Millionen Schüler untersucht. Selbstwirksamkeit hat eine Effektstärke von 0.63. Was bedeutet das konkret?",
     options: [
       "63% der Schüler haben Selbstwirksamkeit",
-      "Schüler, die an sich glauben, lernen so viel wie andere in einem halben Schuljahr EXTRA – bei 0.40 ist der Effekt schon 'richtig gut'!",
+      "Schüler, die an sich glauben, lernen in derselben Zeit so viel wie andere in mehr als einem ganzen Schuljahr – bei 0.40 ist es schon ein normales Schuljahr!",
       "Man braucht 63 Tage zum Üben",
       "6 von 3 Schülern profitieren davon"
     ],
     correct: 1,
-    explanation: "Stark! Eine Effektstärke von 0.63 = etwa ein halbes Schuljahr Lernvorsprung. Das ist wie ein Power-Up, das dich schneller leveln lässt! 📈"
+    explanation: "Stark! Eine Effektstärke von 0.63 = mehr als ein ganzes Schuljahr Lernfortschritt. Das ist wie ein permanentes Power-Up, das dich schneller leveln lässt! 📈"
   } as QuizQuestion,
 
   {

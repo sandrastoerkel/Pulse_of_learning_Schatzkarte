@@ -90,9 +90,9 @@ und **300 Millionen Schueler** - die groesste Datensammlung ueber erfolgreiches 
 | Hausaufgaben | 0.29 |
 
 **Was bedeutet die Effektstaerke?**
-- Ueber 0.40 = gute Wirkung
-- Ueber 0.60 = starke Wirkung
-- Ueber 1.00 = sehr starke Wirkung
+- 0.40 = ein normales Schuljahr Lernfortschritt (der "Umschlagpunkt")
+- Ueber 0.60 = exzellenter Effekt (mehr als ein Schuljahr!)
+- Ueber 1.00 = aussergewoehnlich starke Wirkung
 
 Die Selbst-Einschaetzung mit **1.33** ist damit einer der staerksten Faktoren!
 

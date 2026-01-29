@@ -4,7 +4,7 @@
 // Für alle Altersstufen
 // ============================================
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AgeGroup, ExtendedQuiz } from '../types';
 import { FESTUNG_CONTENT, ContentSection, IslandContent } from '../content/festungContent';
@@ -101,6 +101,9 @@ export function FestungIslandExperience({
 
   // Quest abschließen
   const completeQuest = (quest: QuestKey, xp: number) => {
+    // Zuerst zur Overview wechseln
+    setCurrentView('overview');
+
     if (!progress.completedQuests.includes(quest)) {
       setProgress(prev => ({
         completedQuests: [...prev.completedQuests, quest],
@@ -110,7 +113,10 @@ export function FestungIslandExperience({
       setShowXPReward(xp);
       setTimeout(() => setShowXPReward(null), 2500);
 
-      onQuestComplete(quest, xp, quest === 'quiz' ? 15 : 5);
+      // XP-Kommunikation verzögern, damit der View-Wechsel zuerst passiert
+      setTimeout(() => {
+        onQuestComplete(quest, xp, quest === 'quiz' ? 15 : 5);
+      }, 100);
 
       // Alle fertig? Konfetti!
       if (progress.completedQuests.length === 3) {
@@ -118,7 +124,6 @@ export function FestungIslandExperience({
         setTimeout(() => setShowConfetti(false), 5000);
       }
     }
-    setCurrentView('overview');
   };
 
   return (
@@ -289,6 +294,11 @@ export function FestungIslandExperience({
               onBack={() => setCurrentView('overview')}
               onOpenTagebuch={onOpenTagebuch}
               onClose={onClose}
+              onVideoWatched={(xp) => {
+                setShowXPReward(xp);
+                setTimeout(() => setShowXPReward(null), 2500);
+                onQuestComplete('video-watched', xp, 0);
+              }}
             />
           </motion.div>
         )}
@@ -447,11 +457,61 @@ interface VideoPhaseProps {
   onBack: () => void;
   onOpenTagebuch?: () => void;
   onClose: () => void;
+  onVideoWatched?: (xp: number) => void;
 }
 
-function VideoPhase({ content, ageGroup, onComplete, onBack, onOpenTagebuch, onClose }: VideoPhaseProps) {
+function VideoPhase({ content, ageGroup, onComplete, onBack, onOpenTagebuch, onClose, onVideoWatched }: VideoPhaseProps) {
   // Nutze videoExplanation wenn vorhanden, sonst fallback auf explanation
   const videoContent = content.videoExplanation || content.explanation;
+
+  // State für Video-Modal
+  const [activeVideoModal, setActiveVideoModal] = useState<{
+    src: string;
+    label: string;
+  } | null>(null);
+  const [watchedVideos, setWatchedVideos] = useState<Set<string>>(new Set());
+
+  // Video-Card Klick-Handler für Play-Overlay
+  useEffect(() => {
+    const handleVideoCardClick = (e: Event) => {
+      const target = e.target as HTMLElement;
+      const videoCard = target.closest('.video-card');
+      if (!videoCard) return;
+
+      // Wenn auf Play-Overlay oder Play-Button geklickt
+      if (target.closest('.play-overlay') || target.classList.contains('play-overlay') || target.classList.contains('play-btn')) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Video-Source und Label extrahieren
+        const video = videoCard.querySelector('video') as HTMLVideoElement;
+        const labelEl = videoCard.querySelector('.video-label');
+        if (video) {
+          const source = video.querySelector('source');
+          const src = source?.getAttribute('src') || '';
+          const label = labelEl?.textContent || 'Video';
+          setActiveVideoModal({ src, label });
+        }
+      }
+    };
+
+    document.addEventListener('click', handleVideoCardClick);
+
+    return () => {
+      document.removeEventListener('click', handleVideoCardClick);
+    };
+  }, []);
+
+  // Modal schließen und XP vergeben
+  const handleVideoUnderstood = () => {
+    if (activeVideoModal && !watchedVideos.has(activeVideoModal.src)) {
+      setWatchedVideos(prev => new Set(prev).add(activeVideoModal.src));
+      if (onVideoWatched) {
+        onVideoWatched(20);
+      }
+    }
+    setActiveVideoModal(null);
+  };
 
   const [expandedSections, setExpandedSections] = useState<Set<number>>(() => {
     const initial = new Set<number>();
@@ -577,6 +637,66 @@ function VideoPhase({ content, ageGroup, onComplete, onBack, onOpenTagebuch, onC
           Verstanden ✓
         </motion.button>
       </motion.div>
+
+      {/* Video Modal */}
+      <AnimatePresence>
+        {activeVideoModal && (
+          <motion.div
+            className="video-modal-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setActiveVideoModal(null);
+              }
+            }}
+          >
+            <motion.div
+              className="video-modal"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ type: "spring", bounce: 0.3 }}
+            >
+              <div className="video-modal-header">
+                <h3>{activeVideoModal.label}</h3>
+                <button
+                  className="video-modal-close"
+                  onClick={() => setActiveVideoModal(null)}
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="video-modal-content">
+                <video
+                  controls
+                  autoPlay
+                  playsInline
+                  className="video-modal-player"
+                >
+                  <source src={activeVideoModal.src} type="video/quicktime" />
+                  <source src={activeVideoModal.src} type="video/mp4" />
+                  Dein Browser unterstützt dieses Video nicht.
+                </video>
+              </div>
+              <div className="video-modal-footer">
+                {!watchedVideos.has(activeVideoModal.src) && (
+                  <span className="video-xp-hint">+20 XP</span>
+                )}
+                <motion.button
+                  className="video-modal-btn"
+                  onClick={handleVideoUnderstood}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Verstanden ✓
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

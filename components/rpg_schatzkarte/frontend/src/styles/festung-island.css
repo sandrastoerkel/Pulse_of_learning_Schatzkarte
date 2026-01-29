@@ -506,17 +506,133 @@
   color: var(--dark);
 }
 
-/* Video Intro Container */
+/* Video Intro Container - Kompakte Thumbnail-Darstellung */
+.festung-island .video-intro-container {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem 0;
+}
+
+.festung-island .video-card {
+  position: relative;
+  width: 280px;
+  max-width: 100%;
+  cursor: pointer;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%);
+}
+
+.festung-island .video-card:hover {
+  transform: scale(1.03);
+  box-shadow: var(--shadow-lg);
+}
+
+.festung-island .video-card .intro-video {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: var(--radius-lg);
+}
+
+/* YouTube Shorts (hochkant 9:16) */
+.festung-island .video-card:has(.youtube-embed) {
+  width: 200px;
+  aspect-ratio: 9 / 16;
+  background: transparent;
+}
+
+.festung-island .video-card .youtube-embed {
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: var(--radius-lg);
+}
+
+.festung-island .video-card .play-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.festung-island .video-card:hover .play-overlay {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.festung-island .video-card .play-overlay.hidden,
+.festung-island .video-card.playing .play-overlay {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.festung-island .video-card .play-btn {
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.festung-island .video-card:hover .play-btn {
+  transform: scale(1.1);
+  background: var(--white);
+}
+
+.festung-island .video-card .play-btn::after {
+  content: '';
+  width: 0;
+  height: 0;
+  border-left: 22px solid var(--primary);
+  border-top: 13px solid transparent;
+  border-bottom: 13px solid transparent;
+  margin-left: 5px;
+}
+
+.festung-island .video-card .video-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.5rem 0.75rem;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  color: var(--white);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Video im erweiterten/aktiven Zustand */
+.festung-island .video-card.playing {
+  width: 100%;
+  max-width: 100%;
+}
+
+.festung-island .video-card.playing .play-overlay {
+  display: none;
+}
+
+.festung-island .video-card.playing .video-label {
+  display: none;
+}
+
+/* Scroll-intro spezifisch */
 .festung-island .scroll-intro .video-intro-container {
   background: transparent;
   padding: 0;
-}
-
-.festung-island .scroll-intro .intro-video {
-  width: 100%;
-  max-width: 100%;
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
 }
 
 .festung-island .scroll-intro:has(.video-intro-container) {
@@ -527,14 +643,7 @@
 /* Video in Section Content */
 .festung-island .section-content .video-intro-container {
   background: transparent;
-  padding: 0;
-}
-
-.festung-island .section-content .intro-video {
-  width: 100%;
-  max-width: 100%;
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
+  padding: 0.5rem 0;
 }
 
 .festung-island .scroll-intro strong {
@@ -1194,4 +1303,243 @@
   .festung-island .ship-card {
     min-height: 48px;
   }
+}
+
+/* ============================================
+   VIDEO PHASE - Transparente Hintergründe
+   (Weisheit erlangen)
+   ============================================ */
+
+.festung-island .video-phase .scroll-intro {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--white);
+}
+
+.festung-island .video-phase .scroll-intro strong {
+  color: #ffd700;
+}
+
+.festung-island .video-phase .scroll-section {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.festung-island .video-phase .section-header {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.festung-island .video-phase .section-header h4 {
+  color: var(--white);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.festung-island .video-phase .section-content {
+  color: var(--white);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.festung-island .video-phase .section-content strong {
+  color: #ffd700;
+}
+
+.festung-island .video-phase .section-content em {
+  color: var(--white);
+}
+
+.festung-island .video-phase .section-content blockquote {
+  background: rgba(255, 255, 255, 0.1);
+  border-left-color: #ffd700;
+}
+
+.festung-island .video-phase .section-content table {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.festung-island .video-phase .section-content th {
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--white);
+}
+
+.festung-island .video-phase .section-content td {
+  color: var(--white);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.festung-island .video-phase .section-content th {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.festung-island .video-phase .expander-arrow {
+  color: var(--white);
+}
+
+/* Selfcheck in Video Phase */
+.festung-island .video-phase .selfcheck-intro {
+  color: var(--white);
+}
+
+.festung-island .video-phase .statement-text {
+  color: var(--white);
+}
+
+.festung-island .video-phase .rating-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: var(--white);
+}
+
+.festung-island .video-phase .rating-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: var(--white);
+}
+
+.festung-island .video-phase .rating-btn.selected {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.festung-island .video-phase .selfcheck-result {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.festung-island .video-phase .score-number {
+  color: #ffd700;
+}
+
+.festung-island .video-phase .score-max {
+  color: var(--white);
+}
+
+.festung-island .video-phase .result-text {
+  color: var(--white);
+}
+
+.festung-island .video-phase .result-conclusion {
+  color: var(--white);
+}
+
+/* ============================================
+   VIDEO MODAL
+   ============================================ */
+
+.festung-island .video-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.festung-island .video-modal {
+  background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%);
+  border-radius: var(--radius-lg);
+  max-width: 90vw;
+  max-height: 90vh;
+  width: 100%;
+  max-width: 800px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.festung-island .video-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.festung-island .video-modal-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--white);
+  font-weight: 600;
+}
+
+.festung-island .video-modal-close {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: var(--white);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.festung-island .video-modal-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.festung-island .video-modal-content {
+  padding: 0;
+  background: #000;
+}
+
+.festung-island .video-modal-player {
+  width: 100%;
+  max-height: 60vh;
+  display: block;
+}
+
+.festung-island .video-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.festung-island .video-xp-hint {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: var(--white);
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-xl);
+  font-size: 0.85rem;
+  font-weight: 700;
+  animation: pulse-xp 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-xp {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.festung-island .video-modal-btn {
+  background: var(--gradient-success);
+  color: var(--white);
+  border: none;
+  padding: 0.85rem 2rem;
+  border-radius: var(--radius-xl);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(39, 174, 96, 0.4);
+  transition: all 0.2s;
+}
+
+.festung-island .video-modal-btn:hover {
+  box-shadow: 0 6px 20px rgba(39, 174, 96, 0.5);
 }
