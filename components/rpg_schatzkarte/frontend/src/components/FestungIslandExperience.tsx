@@ -317,6 +317,11 @@ export function FestungIslandExperience({
               onBack={() => setCurrentView('overview')}
               onOpenTagebuch={onOpenTagebuch}
               onClose={onClose}
+              onVideoWatched={(xp) => {
+                setShowXPReward(xp);
+                setTimeout(() => setShowXPReward(null), 2500);
+                onQuestComplete('video-watched', xp, 0);
+              }}
             />
           </motion.div>
         )}
@@ -470,6 +475,8 @@ function VideoPhase({ content, ageGroup, onComplete, onBack, onOpenTagebuch, onC
     label: string;
   } | null>(null);
   const [watchedVideos, setWatchedVideos] = useState<Set<string>>(new Set());
+  const [watchedSectionVideos, setWatchedSectionVideos] = useState<Set<number>>(new Set());
+  const [introVideoWatched, setIntroVideoWatched] = useState(false);
 
   // Video-Card Klick-Handler für Play-Overlay
   useEffect(() => {
@@ -511,6 +518,26 @@ function VideoPhase({ content, ageGroup, onComplete, onBack, onOpenTagebuch, onC
       }
     }
     setActiveVideoModal(null);
+  };
+
+  // Section-Video XP vergeben
+  const handleSectionVideoUnderstood = (sectionIdx: number, xp: number) => {
+    if (!watchedSectionVideos.has(sectionIdx)) {
+      setWatchedSectionVideos(prev => new Set(prev).add(sectionIdx));
+      if (onVideoWatched) {
+        onVideoWatched(xp);
+      }
+    }
+  };
+
+  // Intro-Video XP vergeben
+  const handleIntroVideoUnderstood = (xp: number) => {
+    if (!introVideoWatched) {
+      setIntroVideoWatched(true);
+      if (onVideoWatched) {
+        onVideoWatched(xp);
+      }
+    }
   };
 
   const [expandedSections, setExpandedSections] = useState<Set<number>>(() => {
@@ -565,6 +592,30 @@ function VideoPhase({ content, ageGroup, onComplete, onBack, onOpenTagebuch, onC
             dangerouslySetInnerHTML={{ __html: markdownToHtml(videoContent.intro) }}
           />
 
+          {/* Intro Video Button */}
+          {videoContent.introVideoXP && (
+            <motion.div
+              className="video-understood-container intro-video-btn"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <motion.button
+                className={`video-understood-btn ${introVideoWatched ? 'completed' : ''}`}
+                onClick={() => !introVideoWatched && handleIntroVideoUnderstood(videoContent.introVideoXP!)}
+                whileHover={!introVideoWatched ? { scale: 1.05 } : {}}
+                whileTap={!introVideoWatched ? { scale: 0.95 } : {}}
+                disabled={introVideoWatched}
+              >
+                {introVideoWatched ? (
+                  <>Verstanden ✓</>
+                ) : (
+                  <>Verstanden <span className="xp-badge-inline">+{videoContent.introVideoXP} XP</span></>
+                )}
+              </motion.button>
+            </motion.div>
+          )}
+
           {/* Sections */}
           <div className="scroll-sections">
             {videoContent.sections.map((section, idx) => {
@@ -596,6 +647,8 @@ function VideoPhase({ content, ageGroup, onComplete, onBack, onOpenTagebuch, onC
                     index={idx}
                     isExpanded={expandedSections.has(idx)}
                     onToggle={() => toggleSection(idx)}
+                    onVideoUnderstood={(xp) => handleSectionVideoUnderstood(idx, xp)}
+                    isVideoWatched={watchedSectionVideos.has(idx)}
                   />
 
                   {/* Tagebuch Button nach Tagebuch-Section */}
@@ -634,7 +687,7 @@ function VideoPhase({ content, ageGroup, onComplete, onBack, onOpenTagebuch, onC
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          Verstanden ✓
+          Kapitel abgeschlossen ✓
         </motion.button>
       </motion.div>
 
@@ -712,9 +765,10 @@ interface ScrollPhaseProps {
   onBack: () => void;
   onOpenTagebuch?: () => void;
   onClose: () => void;
+  onVideoWatched?: (xp: number) => void;
 }
 
-function ScrollPhase({ content, ageGroup, onComplete, onBack, onOpenTagebuch, onClose }: ScrollPhaseProps) {
+function ScrollPhase({ content, ageGroup, onComplete, onBack, onOpenTagebuch, onClose, onVideoWatched }: ScrollPhaseProps) {
   const [expandedSections, setExpandedSections] = useState<Set<number>>(() => {
     const initial = new Set<number>();
     content.explanation.sections.forEach((s, i) => {
@@ -724,6 +778,8 @@ function ScrollPhase({ content, ageGroup, onComplete, onBack, onOpenTagebuch, on
   });
   const [selfcheckAnswers, setSelfcheckAnswers] = useState<Record<number, number>>({});
   const [showSelfcheckResult, setShowSelfcheckResult] = useState(false);
+  const [watchedSectionVideos, setWatchedSectionVideos] = useState<Set<number>>(new Set());
+  const [introVideoWatched, setIntroVideoWatched] = useState(false);
 
   const toggleSection = (idx: number) => {
     setExpandedSections(prev => {
@@ -732,6 +788,26 @@ function ScrollPhase({ content, ageGroup, onComplete, onBack, onOpenTagebuch, on
       else next.add(idx);
       return next;
     });
+  };
+
+  // Section-Video XP vergeben
+  const handleSectionVideoUnderstood = (sectionIdx: number, xp: number) => {
+    if (!watchedSectionVideos.has(sectionIdx)) {
+      setWatchedSectionVideos(prev => new Set(prev).add(sectionIdx));
+      if (onVideoWatched) {
+        onVideoWatched(xp);
+      }
+    }
+  };
+
+  // Intro-Video XP vergeben
+  const handleIntroVideoUnderstood = (xp: number) => {
+    if (!introVideoWatched) {
+      setIntroVideoWatched(true);
+      if (onVideoWatched) {
+        onVideoWatched(xp);
+      }
+    }
   };
 
   return (
@@ -767,6 +843,30 @@ function ScrollPhase({ content, ageGroup, onComplete, onBack, onOpenTagebuch, on
             dangerouslySetInnerHTML={{ __html: markdownToHtml(content.explanation.intro) }}
           />
 
+          {/* Intro Video Button */}
+          {content.explanation.introVideoXP && (
+            <motion.div
+              className="video-understood-container intro-video-btn"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <motion.button
+                className={`video-understood-btn ${introVideoWatched ? 'completed' : ''}`}
+                onClick={() => !introVideoWatched && handleIntroVideoUnderstood(content.explanation.introVideoXP!)}
+                whileHover={!introVideoWatched ? { scale: 1.05 } : {}}
+                whileTap={!introVideoWatched ? { scale: 0.95 } : {}}
+                disabled={introVideoWatched}
+              >
+                {introVideoWatched ? (
+                  <>Verstanden ✓</>
+                ) : (
+                  <>Verstanden <span className="xp-badge-inline">+{content.explanation.introVideoXP} XP</span></>
+                )}
+              </motion.button>
+            </motion.div>
+          )}
+
           {/* Sections */}
           <div className="scroll-sections">
             {content.explanation.sections.map((section, idx) => {
@@ -798,6 +898,8 @@ function ScrollPhase({ content, ageGroup, onComplete, onBack, onOpenTagebuch, on
                     index={idx}
                     isExpanded={expandedSections.has(idx)}
                     onToggle={() => toggleSection(idx)}
+                    onVideoUnderstood={(xp) => handleSectionVideoUnderstood(idx, xp)}
+                    isVideoWatched={watchedSectionVideos.has(idx)}
                   />
 
                   {/* Tagebuch Button nach Tagebuch-Section */}
@@ -836,7 +938,7 @@ function ScrollPhase({ content, ageGroup, onComplete, onBack, onOpenTagebuch, on
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          Gelesen ✓
+          Kapitel abgeschlossen ✓
         </motion.button>
       </motion.div>
     </div>
@@ -852,11 +954,14 @@ interface ScrollSectionProps {
   index: number;
   isExpanded: boolean;
   onToggle: () => void;
+  onVideoUnderstood?: (xp: number) => void;
+  isVideoWatched?: boolean;
 }
 
-function ScrollSection({ section, index, isExpanded, onToggle }: ScrollSectionProps) {
+function ScrollSection({ section, index, isExpanded, onToggle, onVideoUnderstood, isVideoWatched }: ScrollSectionProps) {
   const isExpander = section.type === 'expander';
   const sectionType = section.type || 'default';
+  const hasVideoButton = section.videoXP && section.videoXP > 0;
 
   const getTypeColor = () => {
     switch (sectionType) {
@@ -914,6 +1019,30 @@ function ScrollSection({ section, index, isExpanded, onToggle }: ScrollSectionPr
           />
         )}
       </AnimatePresence>
+
+      {/* Video Verstanden Button */}
+      {hasVideoButton && (
+        <motion.div
+          className="video-understood-container"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <motion.button
+            className={`video-understood-btn ${isVideoWatched ? 'completed' : ''}`}
+            onClick={() => !isVideoWatched && onVideoUnderstood && onVideoUnderstood(section.videoXP!)}
+            whileHover={!isVideoWatched ? { scale: 1.05 } : {}}
+            whileTap={!isVideoWatched ? { scale: 0.95 } : {}}
+            disabled={isVideoWatched}
+          >
+            {isVideoWatched ? (
+              <>Verstanden ✓</>
+            ) : (
+              <>Verstanden <span className="xp-badge-inline">+{section.videoXP} XP</span></>
+            )}
+          </motion.button>
+        </motion.div>
+      )}
     </motion.div>
   );
 }
@@ -1232,7 +1361,7 @@ function ChallengePhase({ onComplete, onBack, onOpenBandura, onOpenHattie, onClo
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          Verstanden! ✓
+          Kapitel abgeschlossen ✓
         </motion.button>
       </motion.div>
     </div>

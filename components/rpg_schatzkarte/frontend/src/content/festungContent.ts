@@ -10,6 +10,7 @@ export interface ContentSection {
   content: string;
   type?: 'info' | 'success' | 'warning' | 'expander' | 'selfcheck';
   expanded?: boolean;
+  videoXP?: number; // XP für "Verstanden"-Button bei Video-Sections
   selfcheck?: {
     statements: string[];
     results: { range: string; message: string; emoji: string }[];
@@ -25,11 +26,13 @@ interface IslandContent {
   };
   explanation: {
     intro: string;
+    introVideoXP?: number; // XP für Intro-Video Button
     sections: ContentSection[];
   };
   // Separater Content für die VideoPhase "Weisheit erlangen"
   videoExplanation?: {
     intro: string;
+    introVideoXP?: number; // XP für Intro-Video Button
     sections: ContentSection[];
   };
   summary?: string;
@@ -182,6 +185,7 @@ Das ist wie bei einem Videospiel: Wenn du einen Level schaffst, von dem du dacht
 <div class="video-label">🎬 Die 4 Superhelden-Kräfte</div>
 </div>
 </div>`,
+    introVideoXP: 20,
     sections: [
       {
         title: "🌟 Die 4 Superhelden-Kräfte (nach Bandura)",
@@ -249,7 +253,8 @@ Schreibe jeden Tag auf, was du geschafft hast – so sammelst du deine Superkrä
 <div class="video-label">🎬 Die Hattie-Methode</div>
 </div>
 </div>`,
-        type: 'info'
+        type: 'info',
+        videoXP: 20
       },
       {
         title: "📊 Selbstcheck: Wie ist deine Selbstwirksamkeit?",
@@ -293,6 +298,7 @@ const UNTERSTUFE_CONTENT: IslandContent = {
 Dein Browser unterstützt dieses Video nicht.
 </video>
 </div>`,
+    introVideoXP: 20,
     sections: [
       {
         title: "🎬 VIDEO 2: Die 4 Quellen nach Bandura – Deine Superheldenkräfte",
@@ -303,6 +309,12 @@ Dein Browser unterstützt dieses Video nicht.
 Dein Browser unterstützt dieses Video nicht.
 </video>
 </div>`,
+        type: 'info',
+        videoXP: 20
+      },
+      {
+        title: "📚 Die 4 Quellen nach Bandura",
+        content: `Albert Bandura hat vier Quellen identifiziert, die deine Selbstwirksamkeit stärken:`,
         type: 'info'
       },
       {
@@ -319,8 +331,7 @@ Dein Browser unterstützt dieses Video nicht.
 | "Ich werde besser in Englisch" | "Ich lerne heute 5 Vokabeln" |
 
 **Wichtig:** Schreib auf, was du geschafft hast! Dein Gehirn vergisst Erfolge schneller als Misserfolge.`,
-        type: 'expander',
-        expanded: true
+        type: 'expander'
       },
       {
         title: "👀 2. Von anderen lernen",
@@ -365,7 +376,8 @@ Aber wenn dein Kumpel, der auch Probleme hatte, es erklärt – das wirkt!
 Dein Browser unterstützt dieses Video nicht.
 </video>
 </div>`,
-        type: 'info'
+        type: 'info',
+        videoXP: 20
       },
       {
         title: "📊 Selbstcheck: Wie ist deine Selbstwirksamkeit?",
@@ -396,6 +408,7 @@ Dein Browser unterstützt dieses Video nicht.
 <div class="video-label">🎬 Neuroplastizität</div>
 </div>
 </div>`,
+    introVideoXP: 20,
     sections: [
       {
         title: "🎬 VIDEO 2: Die 4 Quellen nach Bandura",
@@ -405,6 +418,12 @@ Dein Browser unterstützt dieses Video nicht.
 <div class="video-label">🎬 Bandura's 4 Quellen</div>
 </div>
 </div>`,
+        type: 'info',
+        videoXP: 20
+      },
+      {
+        title: "📚 Die 4 Quellen nach Bandura",
+        content: `Albert Bandura hat vier Quellen identifiziert, die deine Selbstwirksamkeit stärken:`,
         type: 'info'
       },
       {
@@ -421,8 +440,7 @@ Dein Browser unterstützt dieses Video nicht.
 | "Ich werde besser in Englisch" | "Ich lerne heute 5 Vokabeln" |
 
 **Wichtig:** Schreib auf, was du geschafft hast! Dein Gehirn vergisst Erfolge schneller als Misserfolge.`,
-        type: 'expander',
-        expanded: true
+        type: 'expander'
       },
       {
         title: "👀 2. Von anderen lernen",
@@ -466,7 +484,8 @@ Aber wenn dein Kumpel, der auch Probleme hatte, es erklärt – das wirkt!
 <div class="video-label">🎬 Die Hattie-Methode</div>
 </div>
 </div>`,
-        type: 'info'
+        type: 'info',
+        videoXP: 20
       },
       {
         title: "⚠️ Der Trick",

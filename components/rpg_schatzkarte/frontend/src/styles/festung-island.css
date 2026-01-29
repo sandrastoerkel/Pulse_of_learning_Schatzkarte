@@ -1543,3 +1543,59 @@
 .festung-island .video-modal-btn:hover {
   box-shadow: 0 6px 20px rgba(39, 174, 96, 0.5);
 }
+
+/* ============================================
+   VIDEO UNDERSTOOD BUTTON
+   ============================================ */
+
+.festung-island .video-understood-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.festung-island .video-understood-container.intro-video-btn {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.festung-island .video-understood-btn {
+  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+  color: var(--white);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-xl);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 15px rgba(39, 174, 96, 0.4);
+  transition: all 0.3s ease;
+}
+
+.festung-island .video-understood-btn:hover:not(:disabled) {
+  box-shadow: 0 6px 20px rgba(39, 174, 96, 0.6);
+  transform: translateY(-2px);
+}
+
+.festung-island .video-understood-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.festung-island .video-understood-btn.completed {
+  background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+  cursor: default;
+  box-shadow: none;
+}
+
+.festung-island .video-understood-btn .xp-badge-inline {
+  background: rgba(255, 255, 255, 0.25);
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 800;
+  animation: pulse-xp 1.5s ease-in-out infinite;
+}
