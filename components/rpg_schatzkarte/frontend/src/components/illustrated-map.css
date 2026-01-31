@@ -564,6 +564,42 @@
   right: 5px;
 }
 
+/* Loot Schiff - RECHTS OBEN (gegenüber Polarstern) */
+.loot-ship {
+  right: 12%;
+  top: 3%;
+}
+
+.loot-ship .ship-icon-container svg {
+  filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.7));
+}
+
+.loot-ship:hover .ship-icon-container svg {
+  filter: drop-shadow(0 0 25px rgba(255, 215, 0, 1)) brightness(1.15);
+}
+
+.loot-ship .ship-badge {
+  top: -5px;
+  right: -5px;
+  background: linear-gradient(135deg, #FF6B6B, #EE5A24);
+  animation: loot-badge-pulse 2s ease-in-out infinite;
+}
+
+@keyframes loot-badge-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 2px 6px rgba(238, 90, 36, 0.4);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(238, 90, 36, 0.6);
+  }
+}
+
+.loot-ship .ship-label {
+  color: #FFD700;
+}
+
 /* Badge für Anzahl aktiver Ziele */
 .ship-badge {
   position: absolute;
@@ -946,6 +982,11 @@
 
   .polarstern-ship {
     left: 50%;
+    top: 6%;
+  }
+
+  .loot-ship {
+    right: 10%;
     top: 6%;
   }
 

@@ -1,9 +1,130 @@
 # Pulse of Learning - Schatzkarte
-## Dokumentation Stand 21. Januar 2025
+## Dokumentation Stand 31. Januar 2025
 
 ---
 
-# HEUTIGE ÄNDERUNGEN (21. Januar 2025)
+# HEUTIGE ÄNDERUNGEN (31. Januar 2025)
+
+## 🃏 Loot / Lernkarten - Neues freischwebendes Element!
+
+### Neues Feature: Spaced Repetition Lernkarten auf der Schatzkarte
+
+Ein neues freischwebendes Element "Loot" wurde zur Schatzkarte hinzugefügt - wie Polarstern, Goldener Schlüssel und Selbsteinschätzung.
+
+### Neue Dateien erstellt:
+
+| Datei | Beschreibung |
+|-------|--------------|
+| `icons/LootIcon.tsx` | SVG-Icon: Gestapelte goldene Karten mit Glanzeffekt und Häkchen-Badge |
+| `LootLernkarten.tsx` | Vollständige Lernkarten-Komponente (~1000 Zeilen) |
+| `styles/loot-lernkarten.css` | Komplettes Styling (~700 Zeilen) |
+| `public/ocr-test.html` | Test-Seite für Tesseract.js OCR (Texterkennung) |
+
+### Features der Lernkarten:
+
+**Dashboard:**
+- 16 Schulfächer zur Auswahl (Englisch, Latein, Französisch, Deutsch, Mathe, Bio, Physik, Chemie, Geschichte, Geo, Musik, Kunst, Informatik, Religion, Spanisch, Sonstiges)
+- Streak-Anzeige (🔥)
+- Münzen-Anzeige (🪙)
+- "Heute fällig" Card mit Direktstart
+
+**Deck-Verwaltung:**
+- Decks pro Fach erstellen
+- Decks umbenennen/löschen
+- Karten hinzufügen (einzeln)
+- **Text-Import**: Vokabellisten einfügen (Tab, -, =, :, ; als Trennzeichen erkannt)
+
+**Spaced Repetition (SM-2 Algorithmus):**
+- Flip-Card Lernmodus mit 3D-Animation
+- 4 Bewertungsstufen: Nochmal, Schwer, Gut, Leicht
+- Automatische Wiederholungsintervalle (1 Tag → 6 Tage → exponentiell)
+- Fortschritts-Tracking pro Karte
+
+**Belohnungssystem:**
+- XP für richtige Antworten (5-15 XP)
+- Münzen für Lernerfolge
+- Konfetti-Animation bei Session-Abschluss
+- Floating Reward Popups (+10 🪙)
+
+### Position auf der Karte:
+
+Das Loot-Icon erscheint **rechts oben** auf der Schatzkarte (gegenüber dem Polarstern).
+- Badge zeigt Anzahl fälliger Karten (pulsiert orange)
+- Hover-Glow-Effekt in Gold
+
+### Integration in App.tsx:
+
+```tsx
+// Neue States
+const [showLootModal, setShowLootModal] = useState(false);
+const [lootDueCount, setLootDueCount] = useState(5);
+
+// Handler
+const handleLootClick = useCallback(() => {
+  setShowLootModal(true);
+}, []);
+
+// Props an WorldMapIllustrated
+onLootClick={handleLootClick}
+lootDueCount={lootDueCount}
+
+// Modal rendern
+<LootLernkarten
+  isOpen={showLootModal}
+  onClose={() => setShowLootModal(false)}
+  onXPEarned={handleLootXPEarned}
+  onCoinsEarned={handleLootCoinsEarned}
+/>
+```
+
+### Geänderte Dateien:
+
+| Datei | Änderung |
+|-------|----------|
+| `icons/index.ts` | LootIcon Export hinzugefügt |
+| `WorldMapIllustrated.tsx` | LootIcon importiert, Props hinzugefügt, FloatingShip für 'loot' Typ erweitert |
+| `illustrated-map.css` | CSS für `.loot-ship` Position und Styling |
+| `App.tsx` | State, Handler und Modal-Integration |
+
+---
+
+## 📷 OCR Test-Seite für Texterkennung
+
+### Geplantes Feature: Kamera + OCR für Lernkarten-Import
+
+Eine Test-Seite wurde erstellt, um Tesseract.js (clientseitige Texterkennung) zu evaluieren.
+
+**Datei:** `public/ocr-test.html`
+
+**Features:**
+- Kamera-Zugriff (Rückkamera auf iPad/Handy)
+- Bild-Upload (für Laptop-Tests)
+- Sprachen: Deutsch, Englisch, Französisch, Latein, Spanisch
+- Text-Parsing zu Karteikarten (erkennt Trennzeichen automatisch)
+
+**Zum Testen:**
+```bash
+cd components/rpg_schatzkarte/frontend
+npm run dev
+# Dann öffnen: http://localhost:5173/ocr-test.html
+```
+
+**Status:** Test-Phase - Wenn OCR gut funktioniert, wird es in die Lernkarten-App integriert.
+
+---
+
+## TODO: OCR in Lernkarten integrieren
+
+Wenn Tesseract.js gut funktioniert, sollte folgendes hinzugefügt werden:
+
+1. **Kamera-Button** im Import-Bereich der Lernkarten
+2. **Tesseract.js** als npm Dependency hinzufügen
+3. **Foto aufnehmen** → Text erkennen → Karteikarten parsen
+4. **Vorschau** der erkannten Karten vor dem Import
+
+---
+
+# ÄNDERUNGEN (21. Januar 2025)
 
 ## 🖼️ Hintergrundbilder für Insel-Experiences
 

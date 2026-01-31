@@ -45,6 +45,7 @@ export { BaseCampIcon } from './BaseCampIcon';           // Gemütliches Lager/C
 export { GoldenKeyIcon } from './GoldenKeyIcon';        // Bandura - Selbstwirksamkeit
 export { HattieWaageIcon } from './HattieWaageIcon';    // Hattie - Selbsteinschätzung
 export { PolarsternIcon } from './PolarsternIcon';      // Polarstern - Ziele setzen
+export { LootIcon } from './LootIcon';                  // Loot - Lernkarten (Spaced Repetition)
 
 // ============================================
 // SCHATZ-ICONS (Treasure Icons)

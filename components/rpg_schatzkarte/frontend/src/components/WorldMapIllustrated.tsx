@@ -20,6 +20,7 @@ import {
   GoldenKeyIcon,
   HattieWaageIcon,
   PolarsternIcon,
+  LootIcon,
   BaseCampIcon,
   FestungIcon,
   WerkzeugeIcon,
@@ -68,6 +69,9 @@ interface WorldMapIllustratedProps {
   onHattieShipClick?: () => void;
   onPolarsternClick?: () => void;  // NEU: Polarstern
   polarsternGoals?: number;        // Anzahl aktiver Ziele
+  // Loot / Lernkarten Props
+  onLootClick?: () => void;        // NEU: Loot (Lernkarten)
+  lootDueCount?: number;           // Anzahl fälliger Lernkarten
   // Superhelden-Tagebuch Props
   ageGroup?: AgeGroup;
   tagebuchEntries?: TagebuchEintrag[];
@@ -349,9 +353,9 @@ const QuestMarker: React.FC<QuestMarkerProps> = ({
 
 // Schwimmendes Schiff Komponente
 interface FloatingShipProps {
-  type: 'bandura' | 'hattie' | 'polarstern';
+  type: 'bandura' | 'hattie' | 'polarstern' | 'loot';
   onClick?: () => void;
-  badge?: number;  // Anzahl für Badge (z.B. aktive Ziele)
+  badge?: number;  // Anzahl für Badge (z.B. aktive Ziele, fällige Karten)
 }
 
 const FloatingShip: React.FC<FloatingShipProps> = ({ type, onClick, badge }) => {
@@ -370,6 +374,11 @@ const FloatingShip: React.FC<FloatingShipProps> = ({ type, onClick, badge }) => 
       label: 'Polarstern',
       title: 'Dein Polarstern: Setze deine Ziele und Träume',
       duration: 3
+    },
+    loot: {
+      label: 'Lernkarten',
+      title: 'Dein Loot: Lernkarten mit Spaced Repetition',
+      duration: 3.2
     }
   };
 
@@ -398,6 +407,7 @@ const FloatingShip: React.FC<FloatingShipProps> = ({ type, onClick, badge }) => 
         {type === 'bandura' && <GoldenKeyIcon size={56} animated={true} glowing={true} />}
         {type === 'hattie' && <HattieWaageIcon size={56} animated={true} glowing={true} />}
         {type === 'polarstern' && <PolarsternIcon size={64} animated={true} glowing={true} />}
+        {type === 'loot' && <LootIcon size={56} animated={true} glowing={true} />}
       </div>
       <div className="ship-label">{shipConfig.label}</div>
       {badge !== undefined && badge > 0 && (
@@ -529,6 +539,8 @@ export function WorldMapIllustrated({
   onHattieShipClick,
   onPolarsternClick,
   polarsternGoals = 0,
+  onLootClick,
+  lootDueCount = 0,
   ageGroup,
   tagebuchEntries = [],
   onTagebuchToggle,
@@ -697,6 +709,7 @@ export function WorldMapIllustrated({
           <FloatingShip type="bandura" onClick={onBanduraShipClick} />
           <FloatingShip type="hattie" onClick={onHattieShipClick} />
           <FloatingShip type="polarstern" onClick={onPolarsternClick} badge={polarsternGoals} />
+          <FloatingShip type="loot" onClick={onLootClick} badge={lootDueCount} />
 
           {/* Superhelden-Tagebuch Widget - NUR für Grundschule */}
           {ageGroup === 'grundschule' && onTagebuchToggle && (

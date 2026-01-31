@@ -39,9 +39,11 @@ import './styles/bandura-challenge.css';
 import './styles/hattie-challenge.css';
 import './styles/superhelden-tagebuch.css';
 import './styles/brainy.css';
+import './styles/loot-lernkarten.css';
 import { Brainy } from './components/Brainy';
 import { LandingPageV5 } from './components/LandingPageV5';
 import { MemoryGame, RewardModal, MiniGameSelector } from './components/MiniGames';
+import { LootLernkarten } from './components/LootLernkarten';
 import { RunnerGame } from './components/MiniGames/Runner/RunnerGame';
 import { TestPanel } from './components/TestPanel';
 import type { GameResult } from './types/games';
@@ -172,6 +174,10 @@ function RPGSchatzkarteContent({
 
   // Polarstern Modal State
   const [showPolarsternModal, setShowPolarsternModal] = useState(false);
+
+  // Loot Lernkarten Modal State
+  const [showLootModal, setShowLootModal] = useState(false);
+  const [lootDueCount, setLootDueCount] = useState(5); // Demo-Wert für Badge
 
   // Companion Selector State
   const [showCompanionSelector, setShowCompanionSelector] = useState(false);
@@ -447,6 +453,23 @@ function RPGSchatzkarteContent({
     }
     console.log('Polarstern clicked from:', selectedIsland?.id);
   }, [onAction, selectedIsland]);
+
+  // Loot Click Handler - öffnet Lernkarten-Modal
+  const handleLootClick = useCallback(() => {
+    setShowLootModal(true);
+    console.log('Loot (Lernkarten) clicked');
+  }, []);
+
+  // Loot XP/Coins earned handlers
+  const handleLootXPEarned = useCallback((xp: number) => {
+    setPlayerXP(prev => prev + xp);
+    console.log('Loot XP earned:', xp);
+  }, []);
+
+  const handleLootCoinsEarned = useCallback((coins: number) => {
+    setPlayerGold(prev => prev + coins);
+    console.log('Loot coins earned:', coins);
+  }, []);
 
   // Neue Vorhersage anlegen (pending)
   const handleNewPrediction = useCallback((
@@ -925,6 +948,8 @@ function RPGSchatzkarteContent({
         onHattieShipClick={handleHattieShipClick}
         onPolarsternClick={handlePolarsternClick}
         polarsternGoals={0}
+        onLootClick={handleLootClick}
+        lootDueCount={lootDueCount}
         ageGroup={ageGroup}
         tagebuchEntries={tagebuchEntries}
         onTagebuchToggle={handleTagebuchToggle}
@@ -1006,6 +1031,14 @@ function RPGSchatzkarteContent({
           onClose={() => setShowZertifikat(false)}
         />
       )}
+
+      {/* Loot Lernkarten Modal */}
+      <LootLernkarten
+        isOpen={showLootModal}
+        onClose={() => setShowLootModal(false)}
+        onXPEarned={handleLootXPEarned}
+        onCoinsEarned={handleLootCoinsEarned}
+      />
 
       {/* Polarstern Modal - Ziele setzen */}
       {showPolarsternModal && (
@@ -1185,7 +1218,7 @@ function RPGSchatzkarteContent({
       )}
 
       {/* Zurück zur Schatzkarte Button - erscheint wenn ein Modal offen ist */}
-      {(showQuestModal || showBanduraModal || showHattieModal || showTagebuch || showLerntechnikenModal || showZertifikat || showCompanionSelector || showAvatarCreator || showMemoryGame || showRunnerGame || showAvatarShop || showPolarsternModal) && (
+      {(showQuestModal || showBanduraModal || showHattieModal || showTagebuch || showLerntechnikenModal || showZertifikat || showCompanionSelector || showAvatarCreator || showMemoryGame || showRunnerGame || showAvatarShop || showPolarsternModal || showLootModal) && (
         <button
           className="back-to-map-button"
           onClick={() => {
@@ -1203,6 +1236,7 @@ function RPGSchatzkarteContent({
             setShowRunnerGame(false);
             setShowAvatarShop(false);
             setShowPolarsternModal(false);
+            setShowLootModal(false);
           }}
         >
           <span className="back-icon">🗺️</span>
