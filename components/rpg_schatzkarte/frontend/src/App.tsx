@@ -46,6 +46,7 @@ import { MemoryGame, RewardModal, MiniGameSelector } from './components/MiniGame
 import { LootLernkarten } from './components/LootLernkarten';
 import { RunnerGame } from './components/MiniGames/Runner/RunnerGame';
 import { TestPanel } from './components/TestPanel';
+import { SchatzkammerModal } from './components/SchatzkammerModal';
 import type { GameResult } from './types/games';
 import type { GameResult as RunnerGameResult } from './components/MiniGames/Runner/RunnerEngine';
 
@@ -178,6 +179,9 @@ function RPGSchatzkarteContent({
   // Loot Lernkarten Modal State
   const [showLootModal, setShowLootModal] = useState(false);
   const [lootDueCount, setLootDueCount] = useState(5); // Demo-Wert für Badge
+
+  // Schatzkammer Modal State
+  const [showSchatzkammer, setShowSchatzkammer] = useState(false);
 
   // Companion Selector State
   const [showCompanionSelector, setShowCompanionSelector] = useState(false);
@@ -458,6 +462,18 @@ function RPGSchatzkarteContent({
   const handleLootClick = useCallback(() => {
     setShowLootModal(true);
     console.log('Loot (Lernkarten) clicked');
+  }, []);
+
+  // Schatzkammer Click Handler - öffnet Loci-System
+  const handleSchatzkammerClick = useCallback(() => {
+    setShowSchatzkammer(true);
+    console.log('Schatzkammer clicked');
+  }, []);
+
+  // Schatzkammer XP Handler
+  const handleSchatzkammerXPEarned = useCallback((xp: number) => {
+    setPlayerXP(prev => prev + xp);
+    console.log('Schatzkammer XP earned:', xp);
   }, []);
 
   // Loot XP/Coins earned handlers
@@ -950,6 +966,7 @@ function RPGSchatzkarteContent({
         polarsternGoals={0}
         onLootClick={handleLootClick}
         lootDueCount={lootDueCount}
+        onSchatzkammerClick={handleSchatzkammerClick}
         ageGroup={ageGroup}
         tagebuchEntries={tagebuchEntries}
         onTagebuchToggle={handleTagebuchToggle}
@@ -977,6 +994,14 @@ function RPGSchatzkarteContent({
           onOpenBandura={handleBanduraShipClick}
           onOpenHattie={handleHattieShipClick}
           startWerkzeugeWithChallenge={startWerkzeugeWithChallenge}
+          onOpenLernkarten={() => {
+            handleCloseModal();
+            setTimeout(() => setShowLootModal(true), 100);
+          }}
+          onOpenSchatzkammer={() => {
+            handleCloseModal();
+            setTimeout(() => setShowSchatzkammer(true), 100);
+          }}
           onPolarsternClick={handlePolarsternClick}
           onOpenCompanionSelector={() => setShowCompanionSelector(true)}
           selectedCompanion={selectedCompanion}
@@ -1038,6 +1063,13 @@ function RPGSchatzkarteContent({
         onClose={() => setShowLootModal(false)}
         onXPEarned={handleLootXPEarned}
         onCoinsEarned={handleLootCoinsEarned}
+      />
+
+      {/* Schatzkammer Modal - Loci-System */}
+      <SchatzkammerModal
+        isOpen={showSchatzkammer}
+        onClose={() => setShowSchatzkammer(false)}
+        onXPEarned={handleSchatzkammerXPEarned}
       />
 
       {/* Polarstern Modal - Ziele setzen */}
@@ -1218,7 +1250,7 @@ function RPGSchatzkarteContent({
       )}
 
       {/* Zurück zur Schatzkarte Button - erscheint wenn ein Modal offen ist */}
-      {(showQuestModal || showBanduraModal || showHattieModal || showTagebuch || showLerntechnikenModal || showZertifikat || showCompanionSelector || showAvatarCreator || showMemoryGame || showRunnerGame || showAvatarShop || showPolarsternModal || showLootModal) && (
+      {(showQuestModal || showBanduraModal || showHattieModal || showTagebuch || showLerntechnikenModal || showZertifikat || showCompanionSelector || showAvatarCreator || showMemoryGame || showRunnerGame || showAvatarShop || showPolarsternModal || showLootModal || showSchatzkammer) && (
         <button
           className="back-to-map-button"
           onClick={() => {
@@ -1237,6 +1269,7 @@ function RPGSchatzkarteContent({
             setShowAvatarShop(false);
             setShowPolarsternModal(false);
             setShowLootModal(false);
+            setShowSchatzkammer(false);
           }}
         >
           <span className="back-icon">🗺️</span>

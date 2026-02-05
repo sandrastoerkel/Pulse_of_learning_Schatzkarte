@@ -93,6 +93,8 @@ export function QuestModal({
   onOpenBandura,
   onOpenHattie,
   startWerkzeugeWithChallenge = false,
+  onOpenLernkarten,
+  onOpenSchatzkammer,
   onPolarsternClick,
   onOpenCompanionSelector,
   selectedCompanion,
@@ -169,6 +171,8 @@ export function QuestModal({
               onOpenBandura={onOpenBandura}
               onOpenHattie={onOpenHattie}
               startWerkzeugeWithChallenge={startWerkzeugeWithChallenge}
+              onOpenLernkarten={onOpenLernkarten}
+              onOpenSchatzkammer={onOpenSchatzkammer}
               onPolarsternClick={onPolarsternClick}
               onOpenCompanionSelector={onOpenCompanionSelector}
               selectedCompanion={selectedCompanion}

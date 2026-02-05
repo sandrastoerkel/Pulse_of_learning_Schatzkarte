@@ -11,6 +11,7 @@ import { WERKZEUGE_CONTENT, ContentSection, IslandContent } from '../content/wer
 import { WERKZEUGE_QUIZ_QUESTIONS } from '../content/werkzeugeQuizContent';
 import { BattleQuiz } from './BattleQuiz';
 import { PowertechnikenChallenge } from './PowertechnikenChallenge';
+import { PowerTechnikenLernpfad } from './PowerTechnikenLernpfad';
 import { WerkzeugeIcon } from './icons';
 import '../styles/werkzeuge-island.css';
 
@@ -30,6 +31,8 @@ interface WerkzeugeIslandProps {
   onClose: () => void;
   onQuestComplete: (questType: string, xp: number, gold?: number) => void;
   startWithChallenge?: boolean; // Direkt zur Challenge-Phase springen (für Lerntechniken-Widget)
+  onOpenLernkarten?: () => void;
+  onOpenSchatzkammer?: () => void;
 }
 
 // ============================================
@@ -82,6 +85,8 @@ export function WerkzeugeIslandExperience({
   onClose,
   onQuestComplete,
   startWithChallenge = false,
+  onOpenLernkarten,
+  onOpenSchatzkammer,
 }: WerkzeugeIslandProps) {
   // Wenn startWithChallenge true ist, direkt zur Challenge-Phase
   const [currentView, setCurrentView] = useState<'overview' | QuestKey>(
@@ -262,8 +267,20 @@ export function WerkzeugeIslandExperience({
           >
             <VideoPhase
               content={content}
+              ageGroup={ageGroup}
               onComplete={() => completeQuest('video', QUEST_INFO.video.xp)}
               onBack={() => setCurrentView('overview')}
+              onVideoXPEarned={(xp) => {
+                // XP für einzelne Videos im Lernpfad
+                setProgress(prev => ({
+                  ...prev,
+                  totalXP: prev.totalXP + xp,
+                }));
+                setShowXPReward(xp);
+                setTimeout(() => setShowXPReward(null), 2500);
+              }}
+              onOpenLernkarten={onOpenLernkarten}
+              onOpenSchatzkammer={onOpenSchatzkammer}
             />
           </motion.div>
         )}
@@ -413,11 +430,52 @@ function PhaseHeader({ icon, title, color, onBack }: PhaseHeaderProps) {
 
 interface VideoPhaseProps {
   content: IslandContent;
+  ageGroup: AgeGroup;
   onComplete: () => void;
   onBack: () => void;
+  onVideoXPEarned?: (xp: number) => void;
+  onOpenLernkarten?: () => void;
+  onOpenSchatzkammer?: () => void;
 }
 
-function VideoPhase({ content, onComplete, onBack }: VideoPhaseProps) {
+function VideoPhase({ content, ageGroup, onComplete, onBack, onVideoXPEarned, onOpenLernkarten, onOpenSchatzkammer }: VideoPhaseProps) {
+  // State für Lernpfad (Unterstufe)
+  const [completedVideos, setCompletedVideos] = useState<number[]>([]);
+
+  // Für Unterstufe: Lernpfad anzeigen
+  if (ageGroup === 'unterstufe') {
+    return (
+      <div className="phase-container video-phase">
+        <PhaseHeader
+          icon="📜"
+          title="Weisheit erlangen"
+          color={QUEST_INFO.video.color}
+          onBack={onBack}
+        />
+
+        <motion.div
+          className="phase-content"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{ padding: '0' }}
+        >
+          <PowerTechnikenLernpfad
+            completedVideos={completedVideos}
+            onVideoComplete={(videoId, xp) => {
+              setCompletedVideos(prev => [...prev, videoId]);
+              onVideoXPEarned?.(xp);
+            }}
+            onAllVideosComplete={onComplete}
+            onStartChallenge={onComplete}
+            onOpenLernkarten={onOpenLernkarten}
+            onOpenSchatzkammer={onOpenSchatzkammer}
+          />
+        </motion.div>
+      </div>
+    );
+  }
+
+  // Für andere Altersstufen: Standard-Video oder Platzhalter
   return (
     <div className="phase-container video-phase">
       <PhaseHeader

@@ -33,6 +33,8 @@ interface IslandRouterProps {
   onOpenHattie?: () => void;
   // Werkzeuge-spezifisch
   startWerkzeugeWithChallenge?: boolean;
+  onOpenLernkarten?: () => void;
+  onOpenSchatzkammer?: () => void;
   // Starthafen-spezifisch
   onPolarsternClick?: () => void;
   onOpenCompanionSelector?: () => void;
@@ -53,6 +55,8 @@ export function IslandRouter({
   onOpenBandura,
   onOpenHattie,
   startWerkzeugeWithChallenge = false,
+  onOpenLernkarten,
+  onOpenSchatzkammer,
   onPolarsternClick,
   onOpenCompanionSelector,
   selectedCompanion,
@@ -87,6 +91,8 @@ export function IslandRouter({
           onClose={onClose}
           onQuestComplete={onQuestComplete}
           startWithChallenge={startWerkzeugeWithChallenge}
+          onOpenLernkarten={onOpenLernkarten}
+          onOpenSchatzkammer={onOpenSchatzkammer}
         />
       );
 

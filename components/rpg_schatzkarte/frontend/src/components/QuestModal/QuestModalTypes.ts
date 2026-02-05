@@ -39,6 +39,9 @@ export interface QuestModalProps {
   onOpenHattie?: () => void;
   // Direkt zur Challenge der 7 Werkzeuge springen (wenn von Lerntechniken-Widget geöffnet)
   startWerkzeugeWithChallenge?: boolean;
+  // Lernkarten und Schatzkammer öffnen (für Werkzeuge/Lernpfad)
+  onOpenLernkarten?: () => void;
+  onOpenSchatzkammer?: () => void;
   // Polarstern-Widget öffnen (für Starthafen)
   onPolarsternClick?: () => void;
   // Lernbegleiter auswählen (für Starthafen)
