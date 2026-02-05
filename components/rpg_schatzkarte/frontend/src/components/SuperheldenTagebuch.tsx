@@ -6,6 +6,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Confetti from 'react-confetti';
+import { VoiceButton } from './VoiceTextInput';
 
 // ============================================
 // TYPES
@@ -250,14 +251,21 @@ export function SuperheldenTagebuch({
                       <span className="label-icon">✏️</span>
                       Was habe ich heute geschafft?
                     </label>
-                    <motion.textarea
-                      className="form-textarea"
-                      placeholder="z.B. Das 3er-Einmaleins gelernt, einen Aufsatz geschrieben..."
-                      value={wasGeschafft}
-                      onChange={(e) => setWasGeschafft(e.target.value)}
-                      maxLength={200}
-                      whileFocus={{ scale: 1.02, boxShadow: '0 0 15px rgba(255, 215, 0, 0.4)' }}
-                    />
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+                      <motion.textarea
+                        className="form-textarea"
+                        placeholder="z.B. Das 3er-Einmaleins gelernt, einen Aufsatz geschrieben..."
+                        value={wasGeschafft}
+                        onChange={(e) => setWasGeschafft(e.target.value)}
+                        maxLength={200}
+                        whileFocus={{ scale: 1.02, boxShadow: '0 0 15px rgba(255, 215, 0, 0.4)' }}
+                        style={{ flex: 1 }}
+                      />
+                      <VoiceButton
+                        onResult={(text) => setWasGeschafft(prev => prev + (prev && !prev.endsWith(' ') ? ' ' : '') + text)}
+                        size="medium"
+                      />
+                    </div>
                     <span className="char-count">{wasGeschafft.length}/200</span>
                   </div>
 

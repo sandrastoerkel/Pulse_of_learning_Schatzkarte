@@ -404,7 +404,7 @@ Dein Browser unterstützt dieses Video nicht.
   videoExplanation: {
     intro: `<div class="video-intro-container">
 <div class="video-card">
-<iframe class="intro-video youtube-embed" src="https://www.youtube.com/embed/eGKGmNy0xeY" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe class="intro-video youtube-embed" src="https://www.youtube.com/embed/L7YUMoslpJ8" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 <div class="video-label">🎬 Neuroplastizität</div>
 </div>
 </div>`,
@@ -414,7 +414,7 @@ Dein Browser unterstützt dieses Video nicht.
         title: "🎬 VIDEO 2: Die 4 Quellen nach Bandura",
         content: `<div class="video-intro-container">
 <div class="video-card">
-<iframe class="intro-video youtube-embed" src="https://www.youtube.com/embed/5Bh4TM9tf_A" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe class="intro-video youtube-embed" src="https://www.youtube.com/embed/82GAZ7DwxX8" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 <div class="video-label">🎬 Bandura's 4 Quellen</div>
 </div>
 </div>`,
@@ -480,7 +480,7 @@ Aber wenn dein Kumpel, der auch Probleme hatte, es erklärt – das wirkt!
         title: "🎬 VIDEO 3: Die Hattie-Methode",
         content: `<div class="video-intro-container">
 <div class="video-card">
-<iframe class="intro-video youtube-embed" src="https://www.youtube.com/embed/T2RO8mhUh2w" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe class="intro-video youtube-embed" src="https://www.youtube.com/embed/pQn1rjJaerg" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 <div class="video-label">🎬 Die Hattie-Methode</div>
 </div>
 </div>`,

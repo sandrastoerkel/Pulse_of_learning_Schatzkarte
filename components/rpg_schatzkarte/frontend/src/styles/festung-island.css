@@ -539,7 +539,7 @@
 
 /* YouTube Shorts (hochkant 9:16) */
 .festung-island .video-card:has(.youtube-embed) {
-  width: 200px;
+  width: 300px;
   aspect-ratio: 9 / 16;
   background: transparent;
 }

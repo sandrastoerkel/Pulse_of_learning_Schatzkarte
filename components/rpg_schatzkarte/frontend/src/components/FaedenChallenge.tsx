@@ -13,6 +13,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import html2canvas from 'html2canvas';
+import { VoiceButton } from './VoiceTextInput';
 import '../styles/FaedenChallenge.css';
 import { AgeGroup } from '../types';
 
@@ -1183,13 +1184,20 @@ function ExperimentStation({
               <p className="word-hint">💡 {currentWord.hint}</p>
               <div className="association-input-container">
                 <label>Deine Gedanken dazu:</label>
-                <textarea
-                  className="association-input"
-                  placeholder="Was fällt DIR ein? (Nicht das Wort wiederholen!)"
-                  value={associations[currentWord.word] || ''}
-                  onChange={(e) => onSaveAssociation(currentWord.word, e.target.value)}
-                  rows={3}
-                />
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+                  <textarea
+                    className="association-input"
+                    placeholder="Was fällt DIR ein? (Nicht das Wort wiederholen!)"
+                    value={associations[currentWord.word] || ''}
+                    onChange={(e) => onSaveAssociation(currentWord.word, e.target.value)}
+                    rows={3}
+                    style={{ flex: 1 }}
+                  />
+                  <VoiceButton
+                    onResult={(text) => onSaveAssociation(currentWord.word, (associations[currentWord.word] || '') + (associations[currentWord.word] ? ' ' : '') + text)}
+                    size="medium"
+                  />
+                </div>
               </div>
               <motion.button
                 className="next-btn"
@@ -1343,13 +1351,20 @@ function GedankenjagdStation({
               </motion.div>
               <div className="thought-input-container">
                 <label>{currentFact.prompt}</label>
-                <textarea
-                  className="thought-input"
-                  placeholder="Schreib DEINE Gedanken – nicht den Fakt wiederholen!"
-                  value={thoughts[currentFact.id] || ''}
-                  onChange={(e) => onSaveThought(currentFact.id, e.target.value)}
-                  rows={3}
-                />
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+                  <textarea
+                    className="thought-input"
+                    placeholder="Schreib DEINE Gedanken – nicht den Fakt wiederholen!"
+                    value={thoughts[currentFact.id] || ''}
+                    onChange={(e) => onSaveThought(currentFact.id, e.target.value)}
+                    rows={3}
+                    style={{ flex: 1 }}
+                  />
+                  <VoiceButton
+                    onResult={(text) => onSaveThought(currentFact.id, (thoughts[currentFact.id] || '') + (thoughts[currentFact.id] ? ' ' : '') + text)}
+                    size="medium"
+                  />
+                </div>
               </div>
               <motion.button
                 className="next-btn"
@@ -1521,13 +1536,20 @@ function BleistiftStation({
                     <div className="section-text"><p>{section.text}</p></div>
                     <div className="section-note">
                       <div className="pencil-indicator">✏️</div>
-                      <textarea
-                        className="pencil-note-input"
-                        placeholder={section.placeholder}
-                        value={notes[index] || ''}
-                        onChange={(e) => onSaveNote(index, e.target.value)}
-                        rows={2}
-                      />
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', flex: 1 }}>
+                        <textarea
+                          className="pencil-note-input"
+                          placeholder={section.placeholder}
+                          value={notes[index] || ''}
+                          onChange={(e) => onSaveNote(index, e.target.value)}
+                          rows={2}
+                          style={{ flex: 1 }}
+                        />
+                        <VoiceButton
+                          onResult={(text) => onSaveNote(index, (notes[index] || '') + (notes[index] ? ' ' : '') + text)}
+                          size="small"
+                        />
+                      </div>
                     </div>
                   </motion.div>
                 ))}
@@ -1929,14 +1951,22 @@ function MissionStation({
                     </div>
                     <div className="reflection-section">
                       <label>{dayInfo.prompt}</label>
-                      <textarea
-                        className="reflection-input"
-                        placeholder="Schreib hier deine Erfahrung..."
-                        value={reflection}
-                        onChange={(e) => setReflection(e.target.value)}
-                        rows={4}
-                        disabled={isAlreadyComplete}
-                      />
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+                        <textarea
+                          className="reflection-input"
+                          placeholder="Schreib hier deine Erfahrung..."
+                          value={reflection}
+                          onChange={(e) => setReflection(e.target.value)}
+                          rows={4}
+                          disabled={isAlreadyComplete}
+                          style={{ flex: 1 }}
+                        />
+                        <VoiceButton
+                          onResult={(text) => setReflection(prev => prev + (prev && !prev.endsWith(' ') ? ' ' : '') + text)}
+                          size="medium"
+                          disabled={isAlreadyComplete}
+                        />
+                      </div>
                     </div>
                     {isAlreadyComplete ? (
                       <div className="already-complete">

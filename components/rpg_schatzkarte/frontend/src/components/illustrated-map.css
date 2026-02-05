@@ -841,12 +841,59 @@
 }
 
 /* ========================================
+   SCHATZKAMMER WIDGET (Loci-System)
+   ======================================== */
+.schatzkammer-widget-illustrated {
+  position: absolute;
+  left: 12%;
+  top: 3%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  z-index: 20;
+  transition: filter 0.3s ease;
+}
+
+.schatzkammer-widget-illustrated:hover {
+  filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+}
+
+.schatzkammer-widget-illustrated .schatzkammer-widget-icon {
+  font-size: 48px;
+  filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.7))
+          drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+  animation: schatzkammer-float 3s ease-in-out infinite;
+}
+
+@keyframes schatzkammer-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.schatzkammer-widget-illustrated .schatzkammer-widget-label {
+  background: rgba(0, 0, 0, 0.8);
+  color: #f4d03f;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 10px;
+  margin-top: 4px;
+  border: 1px solid var(--map-border-color);
+  white-space: nowrap;
+}
+
+/* ========================================
    COMPANION WIDGET (Lernbegleiter)
    ======================================== */
 .companion-widget-illustrated {
-  position: absolute;
-  top: 16px;
-  right: 16px;
+  position: fixed;
+  bottom: 20px;
+  right: 320px;
   background: linear-gradient(145deg, #9b59b6, #8e44ad);
   border-radius: 28px;
   padding: 10px 16px;
@@ -856,7 +903,7 @@
   cursor: pointer;
   border: 3px solid #FFD700;
   box-shadow: 0 4px 16px rgba(155, 89, 182, 0.5), 0 0 20px rgba(255, 215, 0, 0.3);
-  z-index: 20;
+  z-index: 1000;
   transition: all 0.3s ease;
   animation: companion-glow 2s infinite;
 }
@@ -990,6 +1037,12 @@
     top: 6%;
   }
 
+  .schatzkammer-widget-illustrated {
+    left: 10%;
+    top: 6%;
+    transform: scale(0.85);
+  }
+
   .tagebuch-widget-illustrated,
   .lerntechniken-widget-illustrated {
     transform: scale(0.85);
@@ -1053,6 +1106,16 @@
   }
 
   .lerntechniken-widget-illustrated .lerntechniken-label {
+    display: none;
+  }
+
+  .schatzkammer-widget-illustrated {
+    transform: scale(0.7);
+    left: 6%;
+    top: 8%;
+  }
+
+  .schatzkammer-widget-illustrated .schatzkammer-widget-label {
     display: none;
   }
 

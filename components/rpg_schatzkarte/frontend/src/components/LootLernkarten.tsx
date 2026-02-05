@@ -1,6 +1,52 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from 'framer-motion';
 
+// Tesseract.js wird via CDN geladen
+declare const Tesseract: {
+  recognize: (
+    image: string,
+    lang: string,
+    options?: { logger?: (m: { status: string; progress: number }) => void }
+  ) => Promise<{ data: { text: string } }>;
+};
+
+// Web Speech API Types
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList;
+}
+interface SpeechRecognitionResultList {
+  readonly length: number;
+  item(index: number): SpeechRecognitionResult;
+  [index: number]: SpeechRecognitionResult;
+}
+interface SpeechRecognitionResult {
+  readonly length: number;
+  item(index: number): SpeechRecognitionAlternative;
+  [index: number]: SpeechRecognitionAlternative;
+  readonly isFinal: boolean;
+}
+interface SpeechRecognitionAlternative {
+  readonly transcript: string;
+  readonly confidence: number;
+}
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  onerror: ((event: Event) => void) | null;
+  onend: (() => void) | null;
+  start(): void;
+  stop(): void;
+  abort(): void;
+}
+declare global {
+  interface Window {
+    SpeechRecognition?: new () => SpeechRecognition;
+    webkitSpeechRecognition?: new () => SpeechRecognition;
+  }
+}
+
 // ============================================================
 // SCHATZKARTE LERNKARTEN – Spaced Repetition System
 // ============================================================
@@ -217,6 +263,33 @@ const Icons: Record<string, JSX.Element> = {
   close: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  ),
+  camera: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
+      <circle cx="12" cy="13" r="4" />
+    </svg>
+  ),
+  mic: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" />
+      <path d="M19 10v2a7 7 0 01-14 0v-2" />
+      <line x1="12" y1="19" x2="12" y2="23" /><line x1="8" y1="23" x2="16" y2="23" />
+    </svg>
+  ),
+  micOff: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="1" y1="1" x2="23" y2="23" />
+      <path d="M9 9v3a3 3 0 005.12 2.12M15 9.34V4a3 3 0 00-5.94-.6" />
+      <path d="M17 16.95A7 7 0 015 12v-2m14 0v2a7 7 0 01-.11 1.23" />
+      <line x1="12" y1="19" x2="12" y2="23" /><line x1="8" y1="23" x2="16" y2="23" />
+    </svg>
+  ),
+  upload: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+      <polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" />
     </svg>
   ),
 };
@@ -611,7 +684,7 @@ function DeckDetail({ deck, cards, subject, onBack, onStudy, onAddCard, onAddCar
   const sub = SUBJECTS.find(s => s.id === subject);
   const deckCards = cards.filter(c => c.deckId === deck.id);
   const dueCards = deckCards.filter(isDue);
-  const [view, setView] = useState<"list" | "add" | "import">("list");
+  const [view, setView] = useState<"list" | "add" | "import" | "scan">("list");
   const [front, setFront] = useState("");
   const [back, setBack] = useState("");
   const [importText, setImportText] = useState("");
@@ -619,6 +692,24 @@ function DeckDetail({ deck, cards, subject, onBack, onStudy, onAddCard, onAddCar
   const [showRename, setShowRename] = useState(false);
   const [newDeckName, setNewDeckName] = useState(deck.name);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+
+  // Voice input
+  const voice = useSpeechRecognition();
+  const [activeVoiceField, setActiveVoiceField] = useState<"front" | "back" | null>(null);
+
+  const handleVoiceInput = (field: "front" | "back") => {
+    if (voice.isListening) {
+      voice.stopListening();
+      setActiveVoiceField(null);
+    } else {
+      setActiveVoiceField(field);
+      voice.startListening((text) => {
+        if (field === "front") setFront(prev => prev + text);
+        else setBack(prev => prev + text);
+        setActiveVoiceField(null);
+      });
+    }
+  };
 
   const handleAddCard = () => {
     if (front.trim() && back.trim()) {
@@ -651,10 +742,28 @@ function DeckDetail({ deck, cards, subject, onBack, onStudy, onAddCard, onAddCar
   if (view === "add") {
     return (
       <div className="loot-view">
-        <Header title="Karte erstellen" onBack={() => setView("list")} />
+        <Header title="Karte erstellen" onBack={() => { setView("list"); setActiveVoiceField(null); voice.stopListening(); }} />
         <div className="loot-content-scroll">
+          {/* Voice info banner */}
+          {voice.isSupported && (
+            <div style={{ background: "rgba(167,139,250,0.1)", border: "1px solid rgba(167,139,250,0.3)", borderRadius: 12, padding: 10, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
+              <Icon name="mic" size={16} className="text-purple-400" />
+              <span style={{ color: T.purple, fontSize: 12 }}>Tippe auf das Mikrofon zum Einsprechen</span>
+            </div>
+          )}
           <div className="loot-form-group">
-            <label className="loot-label" style={{ color: T.textMuted }}>Vorderseite (Frage)</label>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+              <label className="loot-label" style={{ color: T.textMuted, margin: 0 }}>Vorderseite (Frage)</label>
+              {voice.isSupported && (
+                <button
+                  onClick={() => handleVoiceInput("front")}
+                  className={`loot-mic-btn ${activeVoiceField === "front" ? "loot-mic-active" : ""}`}
+                  title="Einsprechen"
+                >
+                  <Icon name={activeVoiceField === "front" ? "mic" : "mic"} size={18} />
+                </button>
+              )}
+            </div>
             <textarea
               autoFocus
               value={front}
@@ -662,10 +771,22 @@ function DeckDetail({ deck, cards, subject, onBack, onStudy, onAddCard, onAddCar
               placeholder="z.B. ubiquitous"
               className="loot-textarea"
               rows={3}
+              style={activeVoiceField === "front" ? { borderColor: T.purple, boxShadow: `0 0 0 3px rgba(167,139,250,0.2)` } : {}}
             />
           </div>
           <div className="loot-form-group">
-            <label className="loot-label" style={{ color: T.textMuted }}>Rückseite (Antwort)</label>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+              <label className="loot-label" style={{ color: T.textMuted, margin: 0 }}>Rückseite (Antwort)</label>
+              {voice.isSupported && (
+                <button
+                  onClick={() => handleVoiceInput("back")}
+                  className={`loot-mic-btn ${activeVoiceField === "back" ? "loot-mic-active" : ""}`}
+                  title="Einsprechen"
+                >
+                  <Icon name={activeVoiceField === "back" ? "mic" : "mic"} size={18} />
+                </button>
+              )}
+            </div>
             <textarea
               value={back}
               onChange={e => setBack(e.target.value)}
@@ -673,6 +794,7 @@ function DeckDetail({ deck, cards, subject, onBack, onStudy, onAddCard, onAddCar
               placeholder="z.B. allgegenwärtig"
               className="loot-textarea"
               rows={3}
+              style={activeVoiceField === "back" ? { borderColor: T.purple, boxShadow: `0 0 0 3px rgba(167,139,250,0.2)` } : {}}
             />
           </div>
           <GoldButton onClick={handleAddCard} disabled={!front.trim() || !back.trim()} className="loot-full-width">
@@ -752,6 +874,18 @@ function DeckDetail({ deck, cards, subject, onBack, onStudy, onAddCard, onAddCar
     );
   }
 
+  // ── Scan View (OCR) ──
+  if (view === "scan") {
+    return (
+      <ScanView
+        onBack={() => setView("list")}
+        onImportCards={(pairs) => {
+          onAddCards(pairs);
+        }}
+      />
+    );
+  }
+
   // ── Card List ──
   return (
     <div className="loot-view">
@@ -808,7 +942,10 @@ function DeckDetail({ deck, cards, subject, onBack, onStudy, onAddCard, onAddCar
               <Icon name="plus" size={16} /> Karte
             </GhostButton>
             <GhostButton onClick={() => setView("import")} className="loot-flex-1">
-              <Icon name="text" size={16} /> Importieren
+              <Icon name="text" size={16} /> Text
+            </GhostButton>
+            <GhostButton onClick={() => setView("scan")} className="loot-flex-1">
+              <Icon name="camera" size={16} /> Scan
             </GhostButton>
           </div>
         </div>
@@ -1049,6 +1186,346 @@ function StudySession({ deck, cards, subject, onBack, onReview, coins }: {
       </div>
     </div>
   );
+}
+
+// ─── SCAN VIEW (OCR) ─────────────────────────────────────────
+const OCR_LANGUAGES = [
+  { value: "deu", label: "Deutsch" },
+  { value: "eng", label: "Englisch" },
+  { value: "deu+eng", label: "Deutsch + Englisch" },
+  { value: "fra", label: "Französisch" },
+  { value: "lat", label: "Latein" },
+  { value: "spa", label: "Spanisch" },
+];
+
+function ScanView({ onBack, onImportCards }: {
+  onBack: () => void;
+  onImportCards: (pairs: { front: string; back: string }[]) => void;
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  const [photo, setPhoto] = useState<string | null>(null);
+  const [scanning, setScanning] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [ocrLang, setOcrLang] = useState("deu+eng");
+  const [result, setResult] = useState<string | null>(null);
+  const [parsed, setParsed] = useState<{ front: string; back: string }[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [tesseractLoaded, setTesseractLoaded] = useState(false);
+
+  // Load Tesseract.js from CDN
+  useEffect(() => {
+    if (typeof Tesseract !== "undefined") {
+      setTesseractLoaded(true);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+    script.onload = () => setTesseractLoaded(true);
+    script.onerror = () => setError("Tesseract konnte nicht geladen werden");
+    document.head.appendChild(script);
+  }, []);
+
+  // Cleanup camera on unmount
+  useEffect(() => {
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [stream]);
+
+  // Attach stream to video element when stream changes
+  useEffect(() => {
+    if (stream && videoRef.current) {
+      videoRef.current.srcObject = stream;
+      videoRef.current.play().catch(() => {});
+    }
+  }, [stream]);
+
+  const startCamera = async () => {
+    try {
+      setError(null);
+      const mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment", width: { ideal: 1920 }, height: { ideal: 1080 } }
+      });
+      setStream(mediaStream);
+    } catch {
+      setError("Kamera-Zugriff nicht möglich. Bitte erlaube den Zugriff.");
+    }
+  };
+
+  const capturePhoto = () => {
+    if (!videoRef.current || !canvasRef.current) return;
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext("2d");
+    ctx?.drawImage(video, 0, 0);
+    setPhoto(canvas.toDataURL("image/jpeg", 0.9));
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      setStream(null);
+    }
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      setPhoto(ev.target?.result as string);
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        setStream(null);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const retake = () => {
+    setPhoto(null);
+    setResult(null);
+    setParsed([]);
+    setError(null);
+    startCamera();
+  };
+
+  const runOCR = async () => {
+    if (!photo || !tesseractLoaded) return;
+    setScanning(true);
+    setProgress(0);
+    setError(null);
+    setResult(null);
+    setParsed([]);
+
+    try {
+      const ocrResult = await Tesseract.recognize(photo, ocrLang, {
+        logger: (m) => {
+          if (m.status === "recognizing text") {
+            setProgress(Math.round(m.progress * 100));
+          }
+        }
+      });
+
+      const text = ocrResult.data.text;
+      setResult(text);
+
+      // Parse cards
+      const cards = parseText(text);
+      setParsed(cards);
+    } catch {
+      setError("Texterkennung fehlgeschlagen. Versuche ein deutlicheres Bild.");
+    } finally {
+      setScanning(false);
+      setProgress(0);
+    }
+  };
+
+  const handleImport = () => {
+    if (parsed.length > 0) {
+      onImportCards(parsed);
+      onBack();
+    }
+  };
+
+  return (
+    <div className="loot-view">
+      <Header title="Scannen (OCR)" onBack={onBack} />
+      <div className="loot-content-scroll">
+        {/* Info */}
+        <div className="loot-scan-tips" style={{ background: "rgba(79,195,247,0.1)", border: "1px solid rgba(79,195,247,0.3)", borderRadius: 12, padding: 12, marginBottom: 16 }}>
+          <p style={{ color: T.info, fontSize: 13, margin: 0 }}>
+            <strong>Tipps:</strong> Gute Beleuchtung, Text gerade halten. Format: "Wort - Übersetzung" pro Zeile.
+          </p>
+        </div>
+
+        {/* Language Select */}
+        <div className="loot-form-group">
+          <label className="loot-label" style={{ color: T.textMuted }}>Sprache</label>
+          <select
+            value={ocrLang}
+            onChange={e => setOcrLang(e.target.value)}
+            className="loot-input"
+            style={{ cursor: "pointer" }}
+          >
+            {OCR_LANGUAGES.map(l => (
+              <option key={l.value} value={l.value}>{l.label}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Camera / Photo Preview */}
+        <div className="loot-camera-container" style={{ background: "#000", borderRadius: 16, overflow: "hidden", aspectRatio: "4/3", marginBottom: 16, position: "relative" }}>
+          {!photo && !stream && (
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", gap: 12 }}>
+              <Icon name="camera" size={48} className="text-gray-600" />
+              <p style={{ color: T.textMuted, fontSize: 14 }}>Kamera starten oder Bild hochladen</p>
+            </div>
+          )}
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              display: stream && !photo ? "block" : "none"
+            }}
+          />
+          {photo && (
+            <img src={photo} alt="Aufnahme" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          )}
+          {scanning && (
+            <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.7)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+              <p style={{ color: T.gold, marginBottom: 12 }}>Erkenne Text... {progress}%</p>
+              <div style={{ width: "80%", height: 8, background: "rgba(255,255,255,0.1)", borderRadius: 4, overflow: "hidden" }}>
+                <div style={{ width: `${progress}%`, height: "100%", background: `linear-gradient(90deg, ${T.gold}, ${T.amber})`, transition: "width 0.3s" }} />
+              </div>
+            </div>
+          )}
+        </div>
+        <canvas ref={canvasRef} style={{ display: "none" }} />
+
+        {/* Action Buttons */}
+        <div className="loot-action-row">
+          {!stream && !photo && (
+            <>
+              <GoldButton onClick={startCamera} className="loot-flex-1">
+                <Icon name="camera" size={16} /> Kamera
+              </GoldButton>
+              <GhostButton onClick={() => fileInputRef.current?.click()} className="loot-flex-1">
+                <Icon name="upload" size={16} /> Hochladen
+              </GhostButton>
+            </>
+          )}
+          {stream && !photo && (
+            <GoldButton onClick={capturePhoto} className="loot-full-width">
+              <Icon name="camera" size={16} /> Foto aufnehmen
+            </GoldButton>
+          )}
+          {photo && !scanning && (
+            <>
+              <GhostButton onClick={retake} className="loot-flex-1">
+                Neu aufnehmen
+              </GhostButton>
+              <GoldButton onClick={runOCR} disabled={!tesseractLoaded} className="loot-flex-1">
+                Text erkennen
+              </GoldButton>
+            </>
+          )}
+        </div>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileUpload}
+          style={{ display: "none" }}
+        />
+
+        {/* Error */}
+        {error && (
+          <div style={{ background: "rgba(255,82,82,0.1)", border: "1px solid rgba(255,82,82,0.3)", borderRadius: 12, padding: 12, marginTop: 16, color: T.danger, fontSize: 13 }}>
+            {error}
+          </div>
+        )}
+
+        {/* OCR Result */}
+        {result && (
+          <div style={{ marginTop: 16 }}>
+            <p className="loot-section-title" style={{ color: T.textMuted }}>Erkannter Text</p>
+            <div style={{ background: "rgba(0,0,0,0.3)", borderRadius: 12, padding: 12, maxHeight: 150, overflow: "auto", fontFamily: "monospace", fontSize: 12, color: T.text, whiteSpace: "pre-wrap" }}>
+              {result || "(Kein Text erkannt)"}
+            </div>
+          </div>
+        )}
+
+        {/* Parsed Cards */}
+        {parsed.length > 0 && (
+          <div style={{ marginTop: 16 }}>
+            <p className="loot-parsed-title" style={{ color: T.success }}>
+              ✓ {parsed.length} Karten erkannt
+            </p>
+            <div className="loot-parsed-list">
+              {parsed.map((p, i) => (
+                <div key={i} className="loot-parsed-item" style={{ background: i % 2 === 0 ? "rgba(74,222,128,0.05)" : "transparent" }}>
+                  <span className="loot-card-front" style={{ color: T.text }}>{p.front}</span>
+                  <span className="loot-card-arrow" style={{ color: T.success }}>→</span>
+                  <span className="loot-card-back" style={{ color: T.goldLight }}>{p.back}</span>
+                </div>
+              ))}
+            </div>
+            <GoldButton onClick={handleImport} className="loot-full-width">
+              Alle {parsed.length} Karten hinzufügen
+            </GoldButton>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── VOICE INPUT HOOK ────────────────────────────────────────
+function useSpeechRecognition() {
+  const [isListening, setIsListening] = useState(false);
+  const [transcript, setTranscript] = useState("");
+  const [isSupported, setIsSupported] = useState(false);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+
+  useEffect(() => {
+    const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+    setIsSupported(!!SpeechRecognitionAPI);
+    if (SpeechRecognitionAPI) {
+      recognitionRef.current = new SpeechRecognitionAPI();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = true;
+      recognitionRef.current.lang = "de-DE";
+    }
+  }, []);
+
+  const startListening = useCallback((onResult: (text: string) => void) => {
+    if (!recognitionRef.current) return;
+    setTranscript("");
+    setIsListening(true);
+
+    recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
+      const results = event.results;
+      let finalTranscript = "";
+      for (let i = 0; i < results.length; i++) {
+        if (results[i].isFinal) {
+          finalTranscript += results[i][0].transcript;
+        }
+      }
+      if (finalTranscript) {
+        setTranscript(finalTranscript);
+        onResult(finalTranscript);
+      }
+    };
+
+    recognitionRef.current.onerror = () => {
+      setIsListening(false);
+    };
+
+    recognitionRef.current.onend = () => {
+      setIsListening(false);
+    };
+
+    recognitionRef.current.start();
+  }, []);
+
+  const stopListening = useCallback(() => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+    }
+    setIsListening(false);
+  }, []);
+
+  return { isListening, transcript, isSupported, startListening, stopListening };
 }
 
 // ════════════════════════════════════════════════════════════

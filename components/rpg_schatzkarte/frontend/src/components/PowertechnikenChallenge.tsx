@@ -7,6 +7,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import html2canvas from 'html2canvas';
+import { VoiceButton } from './VoiceTextInput';
 import {
   PowertechnikenChallengeProps,
   PowertechnikenProgress,
@@ -496,12 +497,19 @@ function TechniqueDetailView({
 
               <div className="application-input-box">
                 <label>Bei welcher Lernaufgabe willst du das ausprobieren?</label>
-                <textarea
-                  value={applicationInput}
-                  onChange={(e) => setApplicationInput(e.target.value)}
-                  placeholder="z.B. Mathe-Hausaufgaben, Vokabeln lernen..."
-                  rows={3}
-                />
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+                  <textarea
+                    value={applicationInput}
+                    onChange={(e) => setApplicationInput(e.target.value)}
+                    placeholder="z.B. Mathe-Hausaufgaben, Vokabeln lernen..."
+                    rows={3}
+                    style={{ flex: 1 }}
+                  />
+                  <VoiceButton
+                    onResult={(text) => setApplicationInput(applicationInput + (applicationInput && !applicationInput.endsWith(' ') ? ' ' : '') + text)}
+                    size="medium"
+                  />
+                </div>
               </div>
 
               <button 

@@ -72,6 +72,8 @@ interface WorldMapIllustratedProps {
   // Loot / Lernkarten Props
   onLootClick?: () => void;        // NEU: Loot (Lernkarten)
   lootDueCount?: number;           // Anzahl fälliger Lernkarten
+  // Schatzkammer Props
+  onSchatzkammerClick?: () => void; // Schatzkammer (Loci-System)
   // Superhelden-Tagebuch Props
   ageGroup?: AgeGroup;
   tagebuchEntries?: TagebuchEintrag[];
@@ -541,6 +543,7 @@ export function WorldMapIllustrated({
   polarsternGoals = 0,
   onLootClick,
   lootDueCount = 0,
+  onSchatzkammerClick,
   ageGroup,
   tagebuchEntries = [],
   onTagebuchToggle,
@@ -748,6 +751,19 @@ export function WorldMapIllustrated({
               <div className="lerntechniken-label">
                 {hasCertificate ? 'Zertifikat' : 'Lerntechniken'}
               </div>
+            </motion.div>
+          )}
+
+          {/* Schatzkammer Widget - Loci-System */}
+          {onSchatzkammerClick && (
+            <motion.div
+              className="schatzkammer-widget-illustrated"
+              onClick={onSchatzkammerClick}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <span className="schatzkammer-widget-icon">🏛️</span>
+              <span className="schatzkammer-widget-label">Schatzkammer</span>
             </motion.div>
           )}
 

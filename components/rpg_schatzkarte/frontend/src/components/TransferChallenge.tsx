@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { VoiceButton } from './VoiceTextInput';
 import {
   TransferChallengeProps,
   TransferProgress,
@@ -1492,13 +1493,20 @@ function JournalPhase({ entries, onAddEntry, onBack }: JournalPhaseProps) {
 
               <div className="form-group">
                 <label>{JOURNAL_PROMPTS.howItHelped}</label>
-                <textarea
-                  value={newEntry.howItHelped}
-                  onChange={(e) => setNewEntry(prev => ({ ...prev, howItHelped: e.target.value }))}
-                  placeholder="Erzähl, wie es dir geholfen hat..."
-                  className="form-textarea"
-                  rows={3}
-                />
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+                  <textarea
+                    value={newEntry.howItHelped}
+                    onChange={(e) => setNewEntry(prev => ({ ...prev, howItHelped: e.target.value }))}
+                    placeholder="Erzähl, wie es dir geholfen hat..."
+                    className="form-textarea"
+                    rows={3}
+                    style={{ flex: 1 }}
+                  />
+                  <VoiceButton
+                    onResult={(text) => setNewEntry(prev => ({ ...prev, howItHelped: prev.howItHelped + (prev.howItHelped && !prev.howItHelped.endsWith(' ') ? ' ' : '') + text }))}
+                    size="medium"
+                  />
+                </div>
               </div>
 
               <div className="form-group">
