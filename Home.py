@@ -12,6 +12,7 @@ sys.path.append('.')
 
 from utils.coaching_db import init_database
 from utils.page_config import get_page_path
+from utils.user_system import start_preview_mode
 from components.rpg_schatzkarte import landing_page
 
 # ============================================
@@ -86,7 +87,17 @@ result = landing_page(
 
 # Navigation zur Schatzkarte wenn User klickt
 if result:
-    action = result.get("action", "")
+    action = result.get("action", "") if isinstance(result, dict) else ""
+    # Pfad zur Schatzkarte ermitteln (mit Fallback)
+    schatzkarte_path = get_page_path("schatzkarte")
+    if not schatzkarte_path:
+        # Fallback: Direkter Pfad
+        schatzkarte_path = "pages/1_🗺️_Schatzkarte.py"
+
     if action == "go_to_map":
-        # Zur Schatzkarte navigieren
-        st.switch_page(get_page_path("schatzkarte"))
+        # Zur Schatzkarte navigieren (normaler Login-Flow)
+        st.switch_page(schatzkarte_path)
+    elif action == "start_preview":
+        # Demo-Modus: Preview starten und direkt zur Schatzkarte
+        start_preview_mode("unterstufe")
+        st.switch_page(schatzkarte_path)
