@@ -1,0 +1,1288 @@
+import { useState } from "react";
+
+// ═══════════════════════════════════════════════════════════════
+// SCHATZKARTE LANDING PAGE — ELTERNVERSION
+// ═══════════════════════════════════════════════════════════════
+// Design: Professionell, vertrauenswürdig, evidenzbasiert
+// Aber: Modern, nicht steif, mit klarer visueller Hierarchie
+// Farben: Türkis #1FB6A6, Dunkelblau #1E2A44, Gold #F6C453, Lila #6B5DD3
+// ═══════════════════════════════════════════════════════════════
+
+interface ParentQuestion {
+  id: number;
+  emoji: string;
+  question: string;
+  category: string;
+  answer: {
+    headline: string;
+    text: string;
+    evidence: string;
+  };
+  color: string;
+}
+
+const PARENT_QUESTIONS: ParentQuestion[] = [
+  {
+    id: 1,
+    emoji: "🌈",
+    question: "Wird mein Kind eine unbeschwerte Kindheit haben — trotz Notendruck?",
+    category: "Lebensqualität",
+    answer: {
+      headline: "Ja — wenn man dem Druck die Macht nimmt.",
+      text: "Effektive Lerntechniken führen zu schnellerem Lernen — und schaffen Zeit für Freizeit, Freunde und Spiel. Der Notendruck verliert seinen Schrecken, wenn Ihr Kind erlebt: \"Ich schaffe das.\" Lernen kann in einen Flow-Zustand führen — ähnlich wie beim Sport.",
+      evidence: "Studien zeigen: Selbstwirksamkeit (Bandura) reduziert Lernstress deutlich.",
+    },
+    color: "#1FB6A6",
+  },
+  {
+    id: 2,
+    emoji: "😮‍💨",
+    question: "Wie kann ich den Stress in unserer Familie reduzieren?",
+    category: "Familiendynamik",
+    answer: {
+      headline: "Entspannung entsteht durch Selbstvertrauen und wirksame Strategien.",
+      text: "Wenn Ihr Kind merkt, dass es den Stoff bewältigen kann, löst sich Familienstress oft von selbst. Kein Kampf mehr am Schreibtisch — weil Ihr Kind weiß, wie es anfangen soll und wann es fertig ist. Intrinsische Motivation entsteht durch Erfolgserlebnisse, nicht durch Druck.",
+      evidence: "John Hattie (Visible Learning): Feedback und Selbsteinschätzung gehören zu den wirksamsten Faktoren (Effektstärke >0.6).",
+    },
+    color: "#6B5DD3",
+  },
+  {
+    id: 3,
+    emoji: "🎯",
+    question: "Wird mein Kind eine gute Zukunft haben?",
+    category: "Zukunftsperspektive",
+    answer: {
+      headline: "Eine gute Zukunft braucht mehr als gute Noten.",
+      text: "Entscheidend sind Selbstvertrauen und die Fähigkeit, schnell Neues zu lernen. Beides lässt sich trainieren. Wenn Ihr Kind versteht, wie Lernen funktioniert, kommen bessere Noten als Nebenprodukt — nicht als Hauptziel.",
+      evidence: "OECD-Studien: Lernkompetenz und Selbstwirksamkeit sind stärkere Prädiktoren für Lebenserfolg als einzelne Noten.",
+    },
+    color: "#F6C453",
+  },
+  {
+    id: 4,
+    emoji: "🦋",
+    question: "Wie wird mein Kind eine selbstständige Persönlichkeit?",
+    category: "Persönlichkeitsentwicklung",
+    answer: {
+      headline: "Durch selbstbewusstes, eigenverantwortliches Lernen.",
+      text: "Das bedeutet: eigene Stärken und Schwächen kennen, Techniken zur Weiterentwicklung haben und ermutigt werden, sie zu nutzen. Wer weiß, wie man lernt, traut sich auch Neues zu — im Unterricht, im Leben, im Beruf. Selbstständigkeit beginnt mit dem ersten \"Das hab ich alleine geschafft!\"",
+      evidence: "Growth Mindset (Carol Dweck): Fähigkeiten sind entwickelbar — diese Überzeugung fördert Resilienz und Eigeninitiative.",
+    },
+    color: "#1FB6A6",
+  },
+  {
+    id: 5,
+    emoji: "🤖",
+    question: "Bereitet die Schule mein Kind wirklich auf die Zukunft vor?",
+    category: "Bildungssystem",
+    answer: {
+      headline: "Schulen orientieren sich am Zeitgeist — Kinder brauchen Zukunftskompetenz.",
+      text: "Niemand weiß genau, wie die Zukunft aussieht. Aber klar ist: Kreative, selbstbewusste, neugierige junge Menschen kommen am besten zurecht. Eigenständig lernen, mutig Neues anpacken, die Welt mitgestalten wollen — das lernt man nicht aus Schulbüchern, aber man kann es trainieren.",
+      evidence: "21st Century Skills: Kritisches Denken, Kreativität, Kollaboration und Kommunikation sind zentrale Zukunftskompetenzen.",
+    },
+    color: "#6B5DD3",
+  },
+  {
+    id: 6,
+    emoji: "🤝",
+    question: "Wie kann ICH meinem Kind am besten helfen?",
+    category: "Elternrolle",
+    answer: {
+      headline: "Indem Sie verstehen, was Ihr Kind wirklich braucht.",
+      text: "Gut gemeintes \"Hast du schon gelernt?\" bewirkt oft das Gegenteil. In meinem Eltern-Workshop lernen Sie, wie Sie wirksam Feedback geben, Motivation fördern statt Druck aufbauen — und was es wirklich braucht, damit ein Kind sein Potenzial entfaltet. Ihr Kind braucht Verbündete, keine Kontrolleure.",
+      evidence: "Hattie-Studien: Elterliches Engagement mit Fokus auf Lernprozess (nicht nur Ergebnis) hat hohe positive Effekte.",
+    },
+    color: "#F6C453",
+  },
+];
+
+const CONTACT_EMAIL = "sandra.stoerkel@web.de";
+const WHATSAPP_NUMBER = "60172904521";
+
+interface SparkleProps {
+  size?: number;
+  color?: string;
+}
+
+function Sparkle({ size = 16, color = "#F6C453" }: SparkleProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={color} style={{ flexShrink: 0 }}>
+      <path d="M12 0L14.5 9.5L24 12L14.5 14.5L12 24L9.5 14.5L0 12L9.5 9.5Z" />
+    </svg>
+  );
+}
+
+interface SchatzkarteLandingElternProps {
+  onGuestMode?: () => void;
+}
+
+export default function SchatzkarteLandingEltern({ onGuestMode }: SchatzkarteLandingElternProps) {
+  const [activeQuestion, setActiveQuestion] = useState<number | null>(null);
+  const [answeredQuestions, setAnsweredQuestions] = useState<Set<number>>(new Set());
+  const [formName, setFormName] = useState("");
+  const [formEmail, setFormEmail] = useState("");
+  const [formKlasse, setFormKlasse] = useState("");
+  const [formDone, setFormDone] = useState(false);
+
+  const handleQuestionClick = (id: number) => {
+    setActiveQuestion(activeQuestion === id ? null : id);
+    setAnsweredQuestions(prev => new Set([...prev, id]));
+  };
+
+  const allAnswered = answeredQuestions.size === PARENT_QUESTIONS.length;
+
+  const handleFormSubmit = () => {
+    const subject = encodeURIComponent(`Infogespräch-Anfrage: ${formName}`);
+    const body = encodeURIComponent(
+      `Neue Anfrage über die Schatzkarte-Website:\n\n` +
+      `Name: ${formName}\n` +
+      `E-Mail: ${formEmail}\n` +
+      `Klassenstufe: ${formKlasse || "Nicht angegeben"}\n\n` +
+      `Bitte um Rückruf für ein kostenloses Infogespräch.`
+    );
+    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
+    setFormDone(true);
+  };
+
+  return (
+    <div style={{
+      background: "#F7F9FC",
+      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+      color: "#2B2B2B",
+    }}>
+
+      {/* ══════════════════════════════════════════════ */}
+      {/* HEADER — Professionell, aber modern           */}
+      {/* ══════════════════════════════════════════════ */}
+      <header style={{
+        padding: "24px 24px",
+        background: "#fff",
+        borderBottom: "1px solid #E5E7EB",
+        position: "sticky",
+        top: 0,
+        zIndex: 100,
+        backdropFilter: "blur(10px)",
+      }}>
+        <div style={{
+          maxWidth: 1200,
+          margin: "0 auto",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 20,
+        }}>
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+          }}>
+            <span style={{ fontSize: 32 }}>🗺️</span>
+            <div>
+              <h1 style={{
+                fontFamily: "'Fraunces', serif",
+                fontSize: 24,
+                fontWeight: 800,
+                color: "#1E2A44",
+                margin: 0,
+                lineHeight: 1,
+              }}>
+                Schatzkarte
+              </h1>
+              <p style={{
+                fontSize: 12,
+                color: "#6B7280",
+                margin: "4px 0 0 0",
+              }}>
+                Lerncoaching für Klassen 3–10
+              </p>
+            </div>
+          </div>
+          
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+          }}>
+            <button
+              onClick={() => onGuestMode?.()}
+              style={{
+                padding: "12px 24px",
+                borderRadius: 30,
+                background: "transparent",
+                border: "2px solid #6B5DD3",
+                color: "#6B5DD3",
+                fontSize: 14,
+                fontWeight: 700,
+                cursor: "pointer",
+                transition: "all .2s ease",
+                whiteSpace: "nowrap",
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.background = "#6B5DD3";
+                e.currentTarget.style.color = "#fff";
+                e.currentTarget.style.transform = "translateY(-1px)";
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.background = "transparent";
+                e.currentTarget.style.color = "#6B5DD3";
+                e.currentTarget.style.transform = "translateY(0)";
+              }}
+            >
+              🎮 Demo testen
+            </button>
+            <a
+              href="#kontakt"
+              style={{
+                padding: "12px 24px",
+                borderRadius: 30,
+                background: "#1FB6A6",
+                color: "#fff",
+                fontSize: 14,
+                fontWeight: 700,
+                textDecoration: "none",
+                transition: "all .2s ease",
+                whiteSpace: "nowrap",
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.background = "#18a594";
+                e.currentTarget.style.transform = "translateY(-1px)";
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.background = "#1FB6A6";
+                e.currentTarget.style.transform = "translateY(0)";
+              }}
+            >
+              Infogespräch buchen
+            </a>
+          </div>
+        </div>
+      </header>
+
+      {/* ══════════════════════════════════════════════ */}
+      {/* HERO — Elternfokus                            */}
+      {/* ══════════════════════════════════════════════ */}
+      <section style={{
+        padding: "80px 24px 100px",
+        background: "linear-gradient(135deg, #1E2A44 0%, #2B3A5C 100%)",
+        position: "relative",
+        overflow: "hidden",
+      }}>
+        <div style={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage: "radial-gradient(rgba(31,182,166,.06) 2px, transparent 2px)",
+          backgroundSize: "40px 40px",
+          pointerEvents: "none",
+        }} />
+
+        <div style={{ maxWidth: 1000, margin: "0 auto", position: "relative", zIndex: 2 }}>
+          <div style={{ textAlign: "center", marginBottom: 64 }}>
+            <h2 style={{
+              fontSize: "clamp(36px, 6vw, 64px)",
+              fontWeight: 900,
+              lineHeight: 1.1,
+              color: "#fff",
+              marginBottom: 24,
+            }}>
+              Was braucht Ihr Kind<br />
+              <span style={{
+                background: "linear-gradient(135deg, #1FB6A6 0%, #6B5DD3 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}>
+                wirklich zum Lernen?
+              </span>
+            </h2>
+            <p style={{
+              fontSize: 20,
+              lineHeight: 1.7,
+              color: "#D1D5DB",
+              maxWidth: 700,
+              margin: "0 auto",
+            }}>
+              Sechs Fragen, die sich die meisten Eltern stellen — und evidenzbasierte Antworten, die wirklich weiterhelfen.
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════ */}
+      {/* ELTERN-FRAGEN — Interactive Cards             */}
+      {/* ══════════════════════════════════════════════ */}
+      <section style={{
+        padding: "80px 24px",
+        background: "#F7F9FC",
+      }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 56 }}>
+            <h2 style={{
+              fontSize: "clamp(32px, 5vw, 48px)",
+              fontWeight: 900,
+              color: "#1E2A44",
+              marginBottom: 16,
+            }}>
+              Ihre Fragen — meine Antworten
+            </h2>
+            <p style={{
+              fontSize: 18,
+              color: "#6B7280",
+              lineHeight: 1.6,
+            }}>
+              Klicken Sie auf eine Frage, um die evidenzbasierte Antwort zu sehen.
+            </p>
+          </div>
+
+          {/* Question Cards */}
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+            gap: 20,
+            marginBottom: 48,
+          }}>
+            {PARENT_QUESTIONS.map((q) => (
+              <div
+                key={q.id}
+                onClick={() => handleQuestionClick(q.id)}
+                style={{
+                  background: "#fff",
+                  borderRadius: 16,
+                  padding: 24,
+                  cursor: "pointer",
+                  border: activeQuestion === q.id
+                    ? `2px solid ${q.color}`
+                    : "2px solid #E5E7EB",
+                  boxShadow: activeQuestion === q.id
+                    ? `0 8px 24px ${q.color}30`
+                    : "0 2px 8px rgba(0,0,0,.04)",
+                  transition: "all .3s ease",
+                  transform: activeQuestion === q.id ? "translateY(-4px)" : "translateY(0)",
+                }}
+                onMouseOver={(e) => {
+                  if (activeQuestion !== q.id) {
+                    e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,.08)";
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                  }
+                }}
+                onMouseOut={(e) => {
+                  if (activeQuestion !== q.id) {
+                    e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,.04)";
+                    e.currentTarget.style.transform = "translateY(0)";
+                  }
+                }}
+              >
+                {/* Question Header */}
+                <div style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 16,
+                  marginBottom: activeQuestion === q.id ? 20 : 0,
+                }}>
+                  <div style={{
+                    fontSize: 32,
+                    flexShrink: 0,
+                  }}>
+                    {q.emoji}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{
+                      display: "inline-block",
+                      padding: "4px 12px",
+                      borderRadius: 20,
+                      background: `${q.color}15`,
+                      color: q.color,
+                      fontSize: 12,
+                      fontWeight: 700,
+                      marginBottom: 10,
+                    }}>
+                      {q.category}
+                    </div>
+                    <h3 style={{
+                      fontSize: 18,
+                      fontWeight: 700,
+                      color: "#1E2A44",
+                      lineHeight: 1.4,
+                      margin: 0,
+                    }}>
+                      {q.question}
+                    </h3>
+                  </div>
+                  <div style={{
+                    fontSize: 20,
+                    color: activeQuestion === q.id ? q.color : "#9CA3AF",
+                    transition: "all .3s ease",
+                  }}>
+                    {activeQuestion === q.id ? "▼" : "▶"}
+                  </div>
+                </div>
+
+                {/* Answer */}
+                {activeQuestion === q.id && (
+                  <div style={{
+                    paddingTop: 20,
+                    borderTop: `2px solid ${q.color}30`,
+                    animation: "fadeIn .3s ease",
+                  }}>
+                    <h4 style={{
+                      fontSize: 17,
+                      fontWeight: 800,
+                      color: q.color,
+                      marginBottom: 12,
+                    }}>
+                      {q.answer.headline}
+                    </h4>
+                    <p style={{
+                      fontSize: 15,
+                      color: "#374151",
+                      lineHeight: 1.7,
+                      marginBottom: 16,
+                    }}>
+                      {q.answer.text}
+                    </p>
+                    <div style={{
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: 10,
+                      padding: "14px 16px",
+                      background: "#F7F9FC",
+                      borderRadius: 12,
+                      borderLeft: `3px solid ${q.color}`,
+                    }}>
+                      <div style={{
+                        fontSize: 16,
+                        flexShrink: 0,
+                      }}>
+                        📚
+                      </div>
+                      <div>
+                        <div style={{
+                          fontSize: 12,
+                          fontWeight: 700,
+                          color: "#6B7280",
+                          marginBottom: 4,
+                        }}>
+                          EVIDENZ
+                        </div>
+                        <div style={{
+                          fontSize: 13,
+                          color: "#6B7280",
+                          lineHeight: 1.5,
+                        }}>
+                          {q.answer.evidence}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Progress Indicator */}
+          {answeredQuestions.size > 0 && (
+            <div style={{
+              textAlign: "center",
+              padding: "20px",
+              background: allAnswered ? "#1FB6A615" : "#F7F9FC",
+              borderRadius: 16,
+              border: allAnswered ? "2px solid #1FB6A6" : "2px solid #E5E7EB",
+            }}>
+              <div style={{
+                fontSize: allAnswered ? 32 : 24,
+                marginBottom: 8,
+              }}>
+                {allAnswered ? "🎉" : "👀"}
+              </div>
+              <div style={{
+                fontSize: 16,
+                fontWeight: 700,
+                color: allAnswered ? "#1FB6A6" : "#6B7280",
+              }}>
+                {allAnswered
+                  ? "Super! Sie haben alle Fragen erkundet."
+                  : `${answeredQuestions.size} von ${PARENT_QUESTIONS.length} Fragen erkundet`}
+              </div>
+              {allAnswered && (
+                <p style={{
+                  fontSize: 14,
+                  color: "#6B7280",
+                  marginTop: 8,
+                  marginBottom: 16,
+                }}>
+                  Bereit für ein persönliches Gespräch?
+                </p>
+              )}
+              {allAnswered && (
+                <a
+                  href="#kontakt"
+                  style={{
+                    display: "inline-block",
+                    padding: "14px 28px",
+                    borderRadius: 30,
+                    background: "#1FB6A6",
+                    color: "#fff",
+                    fontSize: 15,
+                    fontWeight: 700,
+                    textDecoration: "none",
+                    transition: "all .2s ease",
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.background = "#18a594";
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.background = "#1FB6A6";
+                    e.currentTarget.style.transform = "translateY(0)";
+                  }}
+                >
+                  Jetzt Infogespräch buchen
+                </a>
+              )}
+            </div>
+          )}
+
+          {/* Meine Überzeugung Box */}
+          <div style={{
+            background: "linear-gradient(135deg, #1E2A44 0%, #2B3A5C 100%)",
+            borderRadius: 24,
+            padding: 40,
+            marginTop: 48,
+          }}>
+            <div style={{
+              display: "inline-block",
+              background: "#1FB6A620",
+              color: "#1FB6A6",
+              padding: "6px 14px",
+              borderRadius: 20,
+              fontSize: 13,
+              fontWeight: 700,
+              marginBottom: 16,
+            }}>
+              Meine Überzeugung
+            </div>
+            <h2 style={{
+              fontFamily: "'Fraunces', serif",
+              fontSize: "clamp(26px, 4vw, 42px)",
+              fontWeight: 800,
+              lineHeight: 1.2,
+              marginBottom: 20,
+              color: "#fff",
+            }}>
+              Die Welt verändert sich rasant.
+            </h2>
+            <p style={{
+              fontSize: 17,
+              color: "#cbd5e1",
+              lineHeight: 1.8,
+              marginBottom: 0,
+              maxWidth: 650,
+            }}>
+              Keiner weiß, wie diese Zukunft genau aussehen wird. Aber wir wissen: Kreative, selbstbewusste, neugierige Teenager kommen am besten zurecht — egal was kommt. Eigenständig lernen, mutig Neues anpacken, die Welt mitgestalten wollen. Das lernt man nicht aus einem Schulbuch — aber man kann es trainieren.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════ */}
+      {/* PARADIGMENWECHSEL — Split Layout              */}
+      {/* ══════════════════════════════════════════════ */}
+      <section style={{
+        padding: "80px 24px",
+        background: "#fff",
+      }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 64 }}>
+            <h2 style={{
+              fontSize: "clamp(32px, 5vw, 48px)",
+              fontWeight: 900,
+              color: "#1E2A44",
+              marginBottom: 16,
+            }}>
+              Ein Paradigmenwechsel im Lernen
+            </h2>
+            <p style={{
+              fontSize: 18,
+              color: "#6B7280",
+              lineHeight: 1.7,
+              maxWidth: 700,
+              margin: "0 auto",
+            }}>
+              Weg vom reinen Stoffpauken — hin zu echtem Verständnis und Selbstwirksamkeit.
+            </p>
+          </div>
+
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+            gap: 32,
+          }}>
+            {/* Links: Traditionell */}
+            <div style={{
+              padding: 40,
+              background: "#F7F9FC",
+              borderRadius: 20,
+              border: "2px solid #E5E7EB",
+            }}>
+              <div style={{
+                fontSize: 48,
+                marginBottom: 20,
+                textAlign: "center",
+                filter: "grayscale(70%)",
+              }}>
+                📚
+              </div>
+              <h3 style={{
+                fontSize: 24,
+                fontWeight: 800,
+                color: "#6B7280",
+                marginBottom: 24,
+                textAlign: "center",
+              }}>
+                Traditionelles Lernen
+              </h3>
+              <ul style={{
+                listStyle: "none",
+                padding: 0,
+                margin: 0,
+                display: "flex",
+                flexDirection: "column",
+                gap: 16,
+              }}>
+                {[
+                  "Fokus auf Stoffmenge",
+                  "Auswendiglernen ohne Kontext",
+                  "Einzelkämpfer am Schreibtisch",
+                  "Lernen als notwendiges Übel",
+                  "Angst vor schlechten Noten",
+                ].map((item, i) => (
+                  <li key={i} style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 12,
+                  }}>
+                    <span style={{
+                      fontSize: 18,
+                      color: "#9CA3AF",
+                      flexShrink: 0,
+                    }}>
+                      ⛔
+                    </span>
+                    <span style={{
+                      fontSize: 16,
+                      color: "#6B7280",
+                      lineHeight: 1.5,
+                    }}>
+                      {item}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Rechts: Schatzkarte */}
+            <div style={{
+              padding: 40,
+              background: "linear-gradient(135deg, rgba(31,182,166,.12) 0%, rgba(107,93,211,.12) 100%)",
+              borderRadius: 20,
+              border: "2px solid #1FB6A6",
+              boxShadow: "0 8px 24px rgba(31,182,166,.15)",
+            }}>
+              <div style={{
+                fontSize: 48,
+                marginBottom: 20,
+                textAlign: "center",
+              }}>
+                🗺️
+              </div>
+              <h3 style={{
+                fontSize: 24,
+                fontWeight: 800,
+                color: "#1E2A44",
+                marginBottom: 24,
+                textAlign: "center",
+              }}>
+                Schatzkarten-Ansatz
+              </h3>
+              <ul style={{
+                listStyle: "none",
+                padding: 0,
+                margin: 0,
+                display: "flex",
+                flexDirection: "column",
+                gap: 16,
+              }}>
+                {[
+                  { icon: "🎯", text: "Fokus auf Aufbau von Selbstbewusstsein" },
+                  { icon: "🧠", text: "Spaß beim gehirngerechten Lernen" },
+                  { icon: "👥", text: "Lernen in der Community" },
+                  { icon: "✨", text: "Lernen als Wachstumschance" },
+                  { icon: "💪", text: "Selbstwirksamkeit durch Erfolg" },
+                ].map((item, i) => (
+                  <li key={i} style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 12,
+                  }}>
+                    <span style={{
+                      fontSize: 18,
+                      flexShrink: 0,
+                    }}>
+                      {item.icon}
+                    </span>
+                    <span style={{
+                      fontSize: 16,
+                      color: "#1E2A44",
+                      fontWeight: 600,
+                      lineHeight: 1.5,
+                    }}>
+                      {item.text}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════ */}
+      {/* WIE ES FUNKTIONIERT — Drei Säulen             */}
+      {/* ══════════════════════════════════════════════ */}
+      <section style={{
+        padding: "80px 24px",
+        background: "#F7F9FC",
+      }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 64 }}>
+            <h2 style={{
+              fontSize: "clamp(32px, 5vw, 48px)",
+              fontWeight: 900,
+              color: "#1E2A44",
+              marginBottom: 16,
+            }}>
+              Die drei Säulen der Schatzkarte
+            </h2>
+            <p style={{
+              fontSize: 18,
+              color: "#6B7280",
+              lineHeight: 1.7,
+            }}>
+              Evidenzbasiert, praxiserprobt, nachhaltig wirksam.
+            </p>
+          </div>
+
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            gap: 28,
+          }}>
+            {[
+              {
+                icon: "🧠",
+                title: "Wirksame Lerntechniken",
+                items: [
+                  "Active Recall",
+                  "Spaced Repetition",
+                  "Feynman-Methode",
+                  "Pomodoro-Technik",
+                ],
+                color: "#1FB6A6",
+                evidence: "Nach Hattie (Visible Learning) gehören diese zu den wirksamsten Strategien (ES > 0.6)",
+              },
+              {
+                icon: "👥",
+                title: "Lernen in Beziehung",
+                items: [
+                  "Peer-Feedback",
+                  "Lerngruppen",
+                  "Coach-Begleitung",
+                  "Eltern-Workshops",
+                ],
+                color: "#6B5DD3",
+                evidence: "Soziales Lernen und konstruktives Feedback verstärken Motivation und Selbstwirksamkeit",
+              },
+              {
+                icon: "🎮",
+                title: "Gamification & App",
+                items: [
+                  "Schätze sammeln",
+                  "Level-System",
+                  "Fortschritt sichtbar",
+                  "Keine Extra-Aufgaben",
+                ],
+                color: "#F6C453",
+                evidence: "Gamification erhöht intrinsische Motivation und macht Lernen zu einer positiven Erfahrung",
+              },
+            ].map((pillar, i) => (
+              <div
+                key={i}
+                style={{
+                  background: "#fff",
+                  borderRadius: 20,
+                  padding: 32,
+                  border: "2px solid #E5E7EB",
+                  transition: "all .3s ease",
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.borderColor = pillar.color;
+                  e.currentTarget.style.boxShadow = `0 8px 24px ${pillar.color}25`;
+                  e.currentTarget.style.transform = "translateY(-4px)";
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.borderColor = "#E5E7EB";
+                  e.currentTarget.style.boxShadow = "none";
+                  e.currentTarget.style.transform = "translateY(0)";
+                }}
+              >
+                <div style={{
+                  fontSize: 56,
+                  marginBottom: 20,
+                  textAlign: "center",
+                }}>
+                  {pillar.icon}
+                </div>
+                <h3 style={{
+                  fontSize: 22,
+                  fontWeight: 800,
+                  color: pillar.color,
+                  marginBottom: 20,
+                  textAlign: "center",
+                }}>
+                  {pillar.title}
+                </h3>
+                <ul style={{
+                  listStyle: "none",
+                  padding: 0,
+                  margin: 0,
+                  marginBottom: 20,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 10,
+                }}>
+                  {pillar.items.map((item, j) => (
+                    <li key={j} style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 10,
+                      fontSize: 15,
+                      color: "#374151",
+                    }}>
+                      <Sparkle size={14} color={pillar.color} />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <div style={{
+                  padding: "12px 16px",
+                  background: `${pillar.color}08`,
+                  borderRadius: 12,
+                  borderLeft: `3px solid ${pillar.color}`,
+                }}>
+                  <div style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: "#6B7280",
+                    marginBottom: 6,
+                  }}>
+                    WISSENSCHAFTLICHER HINTERGRUND
+                  </div>
+                  <div style={{
+                    fontSize: 13,
+                    color: "#6B7280",
+                    lineHeight: 1.5,
+                  }}>
+                    {pillar.evidence}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════ */}
+      {/* VERTRAUEN — Über mich                         */}
+      {/* ══════════════════════════════════════════════ */}
+      <section style={{
+        padding: "80px 24px",
+        background: "#fff",
+      }}>
+        <div style={{ maxWidth: 900, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 48 }}>
+            <div style={{ fontSize: 64, marginBottom: 16 }}>👋</div>
+            <h2 style={{
+              fontSize: "clamp(32px, 5vw, 48px)",
+              fontWeight: 900,
+              color: "#1E2A44",
+              marginBottom: 16,
+            }}>
+              Wer steckt dahinter?
+            </h2>
+          </div>
+
+          <div style={{
+            background: "linear-gradient(135deg, #F7F9FC 0%, #fff 100%)",
+            borderRadius: 24,
+            padding: 40,
+            border: "2px solid #E5E7EB",
+          }}>
+            <h3 style={{
+              fontSize: 24,
+              fontWeight: 800,
+              color: "#1E2A44",
+              marginBottom: 20,
+            }}>
+              Sandra Störkel
+            </h3>
+            <p style={{
+              fontSize: 16,
+              color: "#374151",
+              lineHeight: 1.8,
+              marginBottom: 24,
+            }}>
+              Ich bin Oberstudienrätin mit 20 Jahren Erfahrung am bayerischen Gymnasium. Nach meiner Lehrtätigkeit habe ich ein Data Science Bootcamp absolviert, wo ich mich intensiv mit Selbstwirksamkeitsforschung beschäftigt habe — insbesondere mit der Analyse von PISA-Daten und den Faktoren, die Lernerfolg wirklich beeinflussen.
+            </p>
+            <p style={{
+              fontSize: 16,
+              color: "#374151",
+              lineHeight: 1.8,
+              marginBottom: 28,
+            }}>
+              Als Mutter von zwei Kindern kenne ich die alltäglichen Kämpfe, den Frust und die Sorgen aus eigener Erfahrung. Genau deshalb liegt mir diese Arbeit so am Herzen: Es begeistert mich zutiefst, Kindern Wege zu zeigen, wie sie ihre Potenziale entfalten können. Wenn ich erlebe, wie ein Kind plötzlich Selbstvertrauen gewinnt, wie es merkt „Das schaffe ich!" — und wie sich dadurch nicht nur die Noten, sondern die ganze Einstellung zum Lernen verändert — dann weiß ich, dass es funktioniert.
+            </p>
+
+            {/* Expertise Tags */}
+            <div style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 10,
+            }}>
+              {[
+                "20 Jahre Gymnasium",
+                "Data Science",
+                "PISA-Forschung",
+                "Hattie Visible Learning",
+                "Bandura Self-Efficacy",
+                "EdTech-Entwicklung",
+              ].map((tag, i) => (
+                <div
+                  key={i}
+                  style={{
+                    padding: "8px 16px",
+                    background: "#1FB6A615",
+                    color: "#1FB6A6",
+                    borderRadius: 20,
+                    fontSize: 13,
+                    fontWeight: 700,
+                  }}
+                >
+                  {tag}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════ */}
+      {/* CTA — Kontaktformular                         */}
+      {/* ══════════════════════════════════════════════ */}
+      <section id="kontakt" style={{
+        padding: "100px 24px",
+        background: "linear-gradient(135deg, #1E2A44 0%, #2B3A5C 100%)",
+        position: "relative",
+        overflow: "hidden",
+      }}>
+        <div style={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage: "radial-gradient(rgba(31,182,166,.06) 2px, transparent 2px)",
+          backgroundSize: "40px 40px",
+          pointerEvents: "none",
+        }} />
+
+        <div style={{ maxWidth: 650, margin: "0 auto", position: "relative", zIndex: 2 }}>
+          <div style={{ textAlign: "center", marginBottom: 40 }}>
+            <h2 style={{
+              fontSize: "clamp(32px, 5vw, 48px)",
+              fontWeight: 900,
+              color: "#fff",
+              marginBottom: 16,
+            }}>
+              Bereit für das Gespräch?
+            </h2>
+            <p style={{
+              fontSize: 18,
+              color: "#D1D5DB",
+              lineHeight: 1.7,
+            }}>
+              In einem kostenlosen, unverbindlichen Infogespräch besprechen wir, wie die Schatzkarte Ihrem Kind konkret helfen kann.
+            </p>
+          </div>
+
+          <div style={{
+            background: "#fff",
+            borderRadius: 24,
+            padding: 40,
+            boxShadow: "0 25px 60px rgba(0,0,0,.3)",
+          }}>
+            {formDone ? (
+              <div style={{ textAlign: "center", padding: "32px 0" }}>
+                <div style={{ fontSize: 64, marginBottom: 20 }}>✅</div>
+                <h3 style={{
+                  fontSize: 24,
+                  fontWeight: 800,
+                  color: "#1FB6A6",
+                  marginBottom: 12,
+                }}>
+                  Vielen Dank!
+                </h3>
+                <p style={{
+                  color: "#6B7280",
+                  fontSize: 16,
+                  lineHeight: 1.7,
+                }}>
+                  Ihr E-Mail-Programm sollte sich geöffnet haben. Senden Sie die E-Mail ab und ich melde mich innerhalb von 24 Stunden bei Ihnen.
+                </p>
+              </div>
+            ) : (
+              <>
+                <h3 style={{
+                  textAlign: "center",
+                  fontSize: 22,
+                  fontWeight: 800,
+                  color: "#1E2A44",
+                  marginBottom: 32,
+                }}>
+                  📬 Kostenloses Infogespräch buchen
+                </h3>
+
+                <div style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 16,
+                }}>
+                  <input
+                    type="text"
+                    placeholder="Ihr Name *"
+                    value={formName}
+                    onChange={(e) => setFormName(e.target.value)}
+                    style={{
+                      padding: "16px 20px",
+                      border: "2px solid #E5E7EB",
+                      borderRadius: 12,
+                      fontSize: 16,
+                      outline: "none",
+                    }}
+                    onFocus={(e) => e.currentTarget.style.borderColor = "#1FB6A6"}
+                    onBlur={(e) => e.currentTarget.style.borderColor = "#E5E7EB"}
+                  />
+                  <input
+                    type="email"
+                    placeholder="E-Mail-Adresse *"
+                    value={formEmail}
+                    onChange={(e) => setFormEmail(e.target.value)}
+                    style={{
+                      padding: "16px 20px",
+                      border: "2px solid #E5E7EB",
+                      borderRadius: 12,
+                      fontSize: 16,
+                      outline: "none",
+                    }}
+                    onFocus={(e) => e.currentTarget.style.borderColor = "#1FB6A6"}
+                    onBlur={(e) => e.currentTarget.style.borderColor = "#E5E7EB"}
+                  />
+                  <select
+                    value={formKlasse}
+                    onChange={(e) => setFormKlasse(e.target.value)}
+                    style={{
+                      padding: "16px 20px",
+                      border: "2px solid #E5E7EB",
+                      borderRadius: 12,
+                      fontSize: 16,
+                      background: "#fff",
+                      outline: "none",
+                    }}
+                    onFocus={(e) => e.currentTarget.style.borderColor = "#1FB6A6"}
+                    onBlur={(e) => e.currentTarget.style.borderColor = "#E5E7EB"}
+                  >
+                    <option value="">Klassenstufe Ihres Kindes</option>
+                    <option value="3.–4. Klasse">3.–4. Klasse</option>
+                    <option value="5.–7. Klasse">5.–7. Klasse</option>
+                    <option value="8.–10. Klasse">8.–10. Klasse</option>
+                  </select>
+                </div>
+
+                <button
+                  onClick={handleFormSubmit}
+                  disabled={!formName || !formEmail}
+                  style={{
+                    marginTop: 24,
+                    width: "100%",
+                    padding: "18px",
+                    borderRadius: 50,
+                    fontSize: 17,
+                    fontWeight: 800,
+                    color: "#fff",
+                    border: "none",
+                    cursor: (!formName || !formEmail) ? "not-allowed" : "pointer",
+                    background: (!formName || !formEmail)
+                      ? "#9CA3AF"
+                      : "linear-gradient(135deg, #1FB6A6 0%, #059669 100%)",
+                    boxShadow: (!formName || !formEmail)
+                      ? "none"
+                      : "0 8px 24px rgba(31,182,166,.4)",
+                    transition: "all .3s ease",
+                  }}
+                  onMouseOver={(e) => {
+                    if (formName && formEmail) {
+                      e.currentTarget.style.transform = "translateY(-2px)";
+                      e.currentTarget.style.boxShadow = "0 12px 32px rgba(31,182,166,.5)";
+                    }
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = formName && formEmail
+                      ? "0 8px 24px rgba(31,182,166,.4)"
+                      : "none";
+                  }}
+                >
+                  Jetzt kostenlos Infogespräch buchen
+                </button>
+
+                <div style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: 20,
+                  marginTop: 20,
+                  fontSize: 13,
+                  color: "#9CA3AF",
+                }}>
+                  <span>✓ 100% kostenlos</span>
+                  <span>✓ Unverbindlich</span>
+                  <span>✓ Antwort in 24h</span>
+                </div>
+
+                {/* WhatsApp Alternative */}
+                <div style={{
+                  marginTop: 28,
+                  paddingTop: 24,
+                  borderTop: "1px solid #E5E7EB",
+                  textAlign: "center",
+                }}>
+                  <p style={{
+                    fontSize: 14,
+                    color: "#6B7280",
+                    marginBottom: 14,
+                  }}>
+                    Oder direkt per WhatsApp kontaktieren:
+                  </p>
+                  <a
+                    href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hallo Sandra! Ich interessiere mich für die Schatzkarte und würde gerne mehr erfahren.")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 10,
+                      background: "#25D366",
+                      color: "#fff",
+                      padding: "14px 28px",
+                      borderRadius: 30,
+                      fontSize: 15,
+                      fontWeight: 700,
+                      textDecoration: "none",
+                      boxShadow: "0 4px 14px rgba(37,211,102,.35)",
+                      transition: "all .2s ease",
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.transform = "translateY(-2px)";
+                      e.currentTarget.style.boxShadow = "0 6px 20px rgba(37,211,102,.45)";
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.boxShadow = "0 4px 14px rgba(37,211,102,.35)";
+                    }}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                    </svg>
+                    Per WhatsApp kontaktieren
+                  </a>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════ */}
+      {/* FOOTER                                        */}
+      {/* ══════════════════════════════════════════════ */}
+      <footer style={{
+        padding: "48px 24px",
+        background: "#1E2A44",
+      }}>
+        <div style={{
+          maxWidth: 800,
+          margin: "0 auto",
+          textAlign: "center",
+        }}>
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 12,
+            marginBottom: 16,
+          }}>
+            <span style={{ fontSize: 32 }}>🗺️</span>
+            <span style={{
+              fontFamily: "'Fraunces', serif",
+              fontWeight: 800,
+              fontSize: 22,
+              color: "#1FB6A6",
+            }}>
+              Schatzkarte
+            </span>
+          </div>
+          <p style={{
+            color: "#9CA3AF",
+            fontSize: 14,
+            lineHeight: 1.7,
+            marginBottom: 20,
+          }}>
+            Lerncoaching für Schüler der Klassen 3–10<br />
+            Wissenschaftlich fundiert. Spielerisch. In Beziehung.
+          </p>
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 4,
+            marginBottom: 20,
+          }}>
+            {[...Array(5)].map((_, i) => (
+              <Sparkle key={i} size={14} color="#F6C453" />
+            ))}
+          </div>
+          <p style={{
+            color: "#6B7280",
+            fontSize: 13,
+          }}>
+            © 2025 Sandra Störkel · Impressum · Datenschutz
+          </p>
+        </div>
+      </footer>
+
+      {/* Inline Keyframes */}
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(12px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+export { SchatzkarteLandingEltern };
