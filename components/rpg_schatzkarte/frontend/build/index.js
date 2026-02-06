@@ -1541,19 +1541,20 @@ Bitte um Rückruf für ein kostenloses Infogespräch.`);window.location.href=`ma
           -webkit-backdrop-filter: blur(12px);
         }
 
-        /* ─ Sticky Action Bar (bottom) ─ */
+        /* ─ Sticky Action Bar (bottom) - works in iframe ─ */
         .sticky-action-bar {
           position: fixed;
           bottom: 0;
           left: 0;
           right: 0;
-          z-index: 1000;
+          width: 100%;
+          z-index: 9999;
           padding: 16px 24px;
-          background: rgba(255,255,255,0.95);
+          background: rgba(255,255,255,0.98);
           border-top: 1px solid ${Se.border};
           backdrop-filter: blur(12px);
           -webkit-backdrop-filter: blur(12px);
-          box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+          box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
         }
 
         .sticky-action-bar .bar-content {
