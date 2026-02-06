@@ -21,7 +21,10 @@ from utils.user_system import (
     is_preview_mode,
     render_preview_banner,
     render_user_login,
-    zeige_schatzkarte
+    zeige_schatzkarte,
+    end_preview_mode,
+    logout_user,
+    is_admin
 )
 from utils.page_config import get_page_path
 
@@ -251,7 +254,7 @@ if unlocked_islands:
 # REACT SCHATZKARTE RENDERN
 # ===============================================================
 
-# CSS fuer Vollbild-Schatzkarte
+# CSS fuer Vollbild-Schatzkarte + JavaScript zum Schließen der Sidebar
 st.markdown("""
 <style>
     /* Streamlit-Container maximieren */
@@ -298,7 +301,25 @@ st.markdown("""
     .element-container {
         margin: 0 !important;
     }
+
 </style>
+<script>
+    // Sidebar automatisch einklappen beim Laden der Seite
+    const collapseSidebar = () => {
+        const sidebar = parent.document.querySelector('[data-testid="stSidebar"]');
+        if (sidebar && sidebar.getAttribute('aria-expanded') === 'true') {
+            // Finde den Collapse-Button und klicke ihn
+            const collapseBtn = parent.document.querySelector('[data-testid="stSidebarCollapseButton"]');
+            if (collapseBtn) {
+                collapseBtn.click();
+            }
+        }
+    };
+    // Mehrfach versuchen, da Streamlit manchmal langsam lädt
+    setTimeout(collapseSidebar, 100);
+    setTimeout(collapseSidebar, 300);
+    setTimeout(collapseSidebar, 500);
+</script>
 """, unsafe_allow_html=True)
 
 # Altersstufe aus Session-State holen
@@ -363,7 +384,9 @@ result = rpg_schatzkarte(
     unlocked_islands=unlocked_islands,
     current_island=current_island,
     age_group=age_group,
-    is_admin=True,  # Admin-TestPanel aktivieren
+    is_admin=is_admin(),  # Admin-TestPanel nur für Admins
+    is_preview_mode=is_preview_mode(),  # Für Header-Buttons
+    is_logged_in=is_logged_in() and not is_preview_mode(),  # Eingeloggt aber nicht Preview
     auto_open_island=auto_open_island,  # Automatisch eine Insel öffnen (z.B. nach Polarstern)
     auto_open_phase=auto_open_phase,  # Phase für die Insel (z.B. 'ready' für Base Camp)
     height=900,  # Basis-Hoehe, wird per CSS auf calc(100vh - 60px) ueberschrieben
@@ -386,6 +409,24 @@ if result:
         if source_island:
             st.session_state.polarstern_source_island = source_island
         st.rerun()
+
+    # Header-Button: Login anzeigen
+    if action == "show_login":
+        # Preview-Modus beenden und zur Login-Seite
+        end_preview_mode()
+        st.rerun()
+
+    # Header-Button: Logout
+    if action == "logout":
+        logout_user()
+        st.switch_page("Home.py")
+
+    # Header-Button: Zurück zur Landing Page
+    if action == "go_to_landing":
+        # Preview beenden falls aktiv
+        if is_preview_mode():
+            end_preview_mode()
+        st.switch_page("Home.py")
 
     # Auto-Open wurde verarbeitet - Session State zurücksetzen
     if action == "auto_open_handled":

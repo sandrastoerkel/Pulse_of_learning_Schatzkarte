@@ -1,13 +1,16 @@
 /* ============================================
    ILLUSTRATED MAP CSS
-   Einheitliches Farbschema: Warme Erdtöne
+   Redesigned: Cool UI chrome + Warm map world
+   Requires: design-tokens.css loaded first
    ============================================ */
 
 /* ========================================
-   FARBVARIABLEN - Warmes Schatzkarten-Theme
+   MAP-LAYER VARIABLES (warm, atmospheric)
+   These are ONLY for elements ON the map canvas.
+   UI elements must use --ui-* and --fb-* tokens.
    ======================================== */
 :root {
-  /* Primärfarben - Warm */
+  /* Map world colors (DO NOT use in UI panels/modals/buttons) */
   --map-gold: #c9a227;
   --map-gold-light: #e8c547;
   --map-gold-dark: #8b6914;
@@ -17,28 +20,31 @@
   --map-cream: #f5e6d3;
   --map-parchment: #e8d4b8;
 
-  /* UI Farben */
-  --panel-bg: linear-gradient(180deg, #3d2914 0%, #2a1d0f 100%);
-  --panel-border: #8b5a2b;
-  --text-light: #f5e6d3;
-  --text-muted: #b8a082;
+  /* UI colors → redirected to design tokens */
+  --panel-bg: var(--ui-surface);
+  --panel-border: var(--ui-border);
+  --text-light: var(--ui-text);
+  --text-muted: var(--ui-text-muted);
 
-  /* Status Farben */
-  --status-completed: #4ade80;
-  --status-progress: #fbbf24;
-  --status-available: #60a5fa;
-  --status-locked: #6b7280;
+  /* Status colors → aligned with feedback tokens */
+  --status-completed: var(--fb-success);
+  --status-progress: var(--fb-reward);
+  --status-available: var(--ui-action);
+  --status-locked: var(--ui-text-muted);
 
-  /* Legacy */
+  /* Map-specific (keep warm) */
   --map-border-color: var(--map-gold);
   --map-border-dark: var(--map-brown);
   --map-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-  --legend-bg: rgba(61, 41, 20, 0.95);
-  --legend-text: var(--map-cream);
-  --tooltip-bg: rgba(42, 29, 15, 0.98);
+
+  /* Legacy redirects → tokens */
+  --legend-bg: var(--ui-surface);
+  --legend-text: var(--ui-text);
+  --tooltip-bg: var(--ui-surface);
+
   --marker-size: 55px;
-  --transition-fast: 0.2s ease;
-  --transition-normal: 0.3s ease;
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.2s ease;
 }
 
 /* ========================================
@@ -51,6 +57,8 @@
   padding: 12px;
   min-height: auto;
   max-height: calc(100vh - 180px);
+  background: var(--ui-base);
+  font-family: var(--font-ui);
 }
 
 .world-map-illustrated {
@@ -130,7 +138,8 @@
 }
 
 /* ========================================
-   HERO PANEL (links) - Warmes Theme
+   HERO PANEL (links) - Cool UI Chrome
+   ======================================== */
    ======================================== */
 .hero-panel-illustrated {
   display: flex;
@@ -146,16 +155,16 @@
   align-items: center;
   gap: 12px;
   padding: 12px 14px;
-  background: var(--panel-bg);
-  border-radius: 12px;
-  border: 2px solid var(--map-gold);
+  background: var(--ui-surface);
+  border-radius: var(--radius-md);
+  border: 2px solid var(--ui-border);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .player-avatar-card:hover {
-  border-color: var(--map-gold-light);
-  box-shadow: 0 0 15px rgba(201, 162, 39, 0.3);
+  border-color: var(--ui-action);
+  box-shadow: var(--shadow-action);
 }
 
 .player-avatar-frame {
@@ -163,8 +172,8 @@
   height: 100px;
   border-radius: 50%;
   overflow: hidden;
-  background: linear-gradient(135deg, #4a3728, #2a1d0f);
-  border: 3px solid var(--map-gold);
+  background: var(--ui-base);
+  border: 2px solid var(--ui-action);
   flex-shrink: 0;
 }
 
@@ -181,7 +190,7 @@
 }
 
 .player-avatar-name {
-  color: var(--text-light);
+  color: var(--ui-text);
   font-size: 16px;
   font-weight: 700;
   white-space: nowrap;
@@ -190,9 +199,10 @@
 }
 
 .player-avatar-edit {
-  color: var(--map-gold);
+  color: var(--ui-action);
   font-size: 12px;
-  opacity: 0.8;
+  opacity: 0.7;
+  transition: opacity var(--transition-fast);
 }
 
 .player-avatar-card:hover .player-avatar-edit {
@@ -213,9 +223,9 @@
   align-items: center;
   gap: 6px;
   padding: 10px 12px;
-  background: var(--panel-bg);
-  border-radius: 8px;
-  border: 2px solid var(--panel-border);
+  background: var(--ui-base);
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--ui-border);
 }
 
 .player-stats-row .stat-icon {
@@ -223,51 +233,76 @@
 }
 
 .player-stats-row .stat-value {
-  color: var(--text-light);
+  color: var(--ui-text);
   font-size: 13px;
   font-weight: 600;
 }
 
 .player-stats-row .xp-stat {
-  border-color: #fbbf24;
+  border-left: 3px solid var(--fb-success);
+}
+
+.player-stats-row .xp-stat .stat-value {
+  color: var(--fb-success);
 }
 
 .player-stats-row .gold-stat {
-  border-color: #c9a227;
+  border-left: 3px solid var(--fb-reward);
+}
+
+.player-stats-row .gold-stat .stat-value {
+  color: var(--fb-reward);
 }
 
 .total-progress-illustrated {
-  background: var(--panel-bg);
-  border-radius: 10px;
+  background: var(--ui-surface);
+  border-radius: var(--radius-md);
   padding: 14px;
-  border: 2px solid var(--panel-border);
+  border: 2px solid var(--ui-border);
 }
 
 .total-progress-illustrated .progress-label {
   display: flex;
   justify-content: space-between;
-  color: var(--text-light);
+  color: var(--ui-text);
   font-size: 13px;
   margin-bottom: 8px;
 }
 
 .progress-bar-illustrated {
-  height: 10px;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 5px;
+  height: 8px;
+  background: var(--ui-base);
+  border-radius: 4px;
   overflow: hidden;
-  border: 1px solid var(--map-brown-light);
+  border: none;
+  position: relative;
+}
+
+/* Milestone marks at 25/50/75% */
+.progress-bar-illustrated::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 25%;
+  width: 1px;
+  background: var(--ui-border);
+  z-index: 1;
+  box-shadow: 
+    calc(25vw * 0) 0 0 0 var(--ui-border),
+    calc(50% - 25%) 0 0 0 var(--ui-border);
 }
 
 .progress-fill-illustrated {
   height: 100%;
-  background: linear-gradient(90deg, var(--map-gold-dark), var(--map-gold));
-  border-radius: 5px;
-  box-shadow: 0 0 8px rgba(201, 162, 39, 0.5);
+  background: linear-gradient(90deg, var(--ui-action), var(--fb-success));
+  border-radius: 4px;
+  transition: width 0.6s ease-out;
+  box-shadow: 0 0 6px rgba(14, 165, 233, 0.3);
 }
 
 .progress-detail {
-  color: var(--text-muted);
+  color: var(--ui-text-muted);
   font-size: 11px;
   margin-top: 6px;
   text-align: center;
@@ -307,36 +342,61 @@
   bottom: calc(100% + 10px);
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(26, 35, 126, 0.98);
-  color: #fff;
+  background: var(--ui-surface);
+  color: var(--ui-text);
   padding: 8px 14px;
-  border-radius: 10px;
-  border: 2px solid #FFD700;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--ui-action);
   white-space: nowrap;
-  font-size: 14px;
-  font-weight: 600;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 215, 0, 0.3);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-ui);
+  box-shadow: var(--shadow-md);
   z-index: 9999;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.15s ease;
 }
 
 .quest-marker-illustrated:hover::before {
   opacity: 1;
 }
 
-/* Pulsierender Ring */
+/* Pulsierender Ring — nur opacity-basiert, kein scale */
 .pulse-ring {
   position: absolute;
   width: calc(var(--marker-size) + 20px);
   height: calc(var(--marker-size) + 20px);
   border-radius: 50%;
-  border: 3px solid;
+  border: 2px solid var(--ui-action);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   pointer-events: none;
+  opacity: 0;
+  animation: pulseRingAvailable 3s ease-in-out infinite;
+}
+
+/* Status-specific pulse ring colors */
+.quest-marker-illustrated[data-status="current"] .pulse-ring {
+  border-color: var(--fb-reward);
+  animation: pulseRingCurrent 2s ease-in-out infinite;
+}
+
+.quest-marker-illustrated[data-status="completed"] .pulse-ring,
+.quest-marker-illustrated[data-status="locked"] .pulse-ring {
+  animation: none;
+  opacity: 0;
+}
+
+@keyframes pulseRingAvailable {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes pulseRingCurrent {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
 }
 
 /* Marker-Kreis */
@@ -361,7 +421,7 @@
 }
 
 /* ========================================
-   SVG ICON CONTAINER - Ohne Hintergrundkreis
+   SVG ICON CONTAINER - Map-layer element (keep warm)
    ======================================== */
 .svg-icon-container {
   position: relative;
@@ -373,16 +433,34 @@
 }
 
 .svg-icon-container svg {
-  filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.7))
-          drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
-  transition: transform 0.3s ease, filter 0.3s ease;
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5))
+          drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+  transition: transform 0.2s ease, filter 0.2s ease;
 }
 
 .quest-marker-illustrated:hover .svg-icon-container svg {
-  transform: scale(1.15);
-  filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.9))
-          drop-shadow(0 6px 12px rgba(0, 0, 0, 0.6))
-          brightness(1.1);
+  transform: scale(1.08);
+  filter: drop-shadow(0 0 14px rgba(255, 215, 0, 0.7))
+          drop-shadow(0 6px 12px rgba(0, 0, 0, 0.5))
+          brightness(1.05);
+}
+
+/* Locked SVG icons — desaturated, dimmed */
+.quest-marker-illustrated[data-status="locked"] .svg-icon-container svg {
+  opacity: 0.35;
+  filter: saturate(0.2) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.quest-marker-illustrated[data-status="locked"]:hover .svg-icon-container svg {
+  transform: none;
+  filter: saturate(0.2) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* Completed SVG icons — slightly receded */
+.quest-marker-illustrated[data-status="completed"] .svg-icon-container svg {
+  filter: saturate(0.85) brightness(1.05)
+          drop-shadow(0 0 6px rgba(52, 211, 153, 0.3))
+          drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
 }
 
 /* Completion Star für SVG Icons */
@@ -405,16 +483,21 @@
 
 .progress-ring-bg {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.2);
-  stroke-width: 4;
+  stroke: var(--ui-border);
+  stroke-width: 3;
 }
 
 .progress-ring-fill {
   fill: none;
-  stroke: #ffd700;
-  stroke-width: 4;
+  stroke: var(--ui-action);
+  stroke-width: 3;
   stroke-linecap: round;
   transition: stroke-dasharray 0.5s ease;
+}
+
+/* Completed ring uses success green */
+.quest-marker-illustrated[data-status="completed"] .progress-ring-fill {
+  stroke: var(--fb-success);
 }
 
 /* Completion Star */
@@ -432,14 +515,15 @@
   bottom: -12px;
   left: 50%;
   transform: translateX(-50%);
-  background: linear-gradient(145deg, #f59e0b, #d97706);
-  color: #000;
+  background: var(--ui-surface);
+  color: var(--ui-text);
   font-size: 11px;
   font-weight: 700;
+  font-family: var(--font-ui);
   padding: 3px 10px;
-  border-radius: 12px;
-  border: 2px solid #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--ui-action);
+  box-shadow: var(--shadow-sm);
   white-space: nowrap;
 }
 
@@ -451,14 +535,16 @@
   bottom: calc(100% + 16px);
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(26, 35, 126, 0.98);
-  color: #fff;
-  padding: 12px 16px;
-  border-radius: 12px;
-  border: 3px solid #FFD700;
+  background: var(--ui-surface);
+  color: var(--ui-text);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--ui-border);
+  border-top: 3px solid var(--ui-action);
   white-space: nowrap;
-  font-size: 14px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), 0 0 20px rgba(255, 215, 0, 0.3);
+  font-size: 13px;
+  font-family: var(--font-ui);
+  box-shadow: var(--shadow-md);
   z-index: 9999;
   pointer-events: none;
   min-width: 150px;
@@ -472,24 +558,47 @@
   left: 50%;
   transform: translateX(-50%);
   border: 8px solid transparent;
-  border-top-color: rgba(26, 35, 126, 0.98);
+  border-top-color: var(--ui-surface);
 }
 
 .tooltip-title {
   font-weight: 700;
-  font-size: 15px;
+  font-size: 14px;
   margin-bottom: 4px;
+  color: var(--ui-text);
 }
 
 .tooltip-status {
-  font-size: 13px;
-  opacity: 0.9;
+  font-size: 12px;
+  color: var(--ui-action);
 }
 
 .tooltip-week {
   font-size: 11px;
-  opacity: 0.6;
+  color: var(--ui-text-muted);
   margin-top: 4px;
+}
+
+/* Status-specific tooltip accent bars */
+.marker-tooltip[data-status="completed"] {
+  border-top-color: var(--fb-success);
+}
+.marker-tooltip[data-status="completed"] .tooltip-status {
+  color: var(--fb-success);
+}
+
+.marker-tooltip[data-status="progress"] {
+  border-top-color: var(--fb-reward);
+}
+.marker-tooltip[data-status="progress"] .tooltip-status {
+  color: var(--fb-reward);
+}
+
+.marker-tooltip[data-status="locked"] {
+  border-top-color: var(--ui-border);
+}
+.marker-tooltip[data-status="locked"] .tooltip-status {
+  color: var(--ui-text-muted);
 }
 
 /* ========================================
@@ -540,8 +649,8 @@
 }
 
 .hattie-ship {
-  left: 48%;
-  top: 90%;
+  left: 18%;
+  top: 15%;
 }
 
 /* Polarstern Schiff - OBEN MITTE */
@@ -564,10 +673,10 @@
   right: 5px;
 }
 
-/* Loot Schiff - RECHTS OBEN (gegenüber Polarstern) */
+/* Loot Schiff (Lernkarten) - MITTE RECHTS (2. in der Gruppe) */
 .loot-ship {
-  right: 12%;
-  top: 3%;
+  right: 2%;
+  top: 38%;
 }
 
 .loot-ship .ship-icon-container svg {
@@ -617,6 +726,77 @@
   justify-content: center;
   border: 2px solid #1a237e;
   box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+/* Roter Pfeil zum Startpunkt - zeigt auf Basecamp (28%, 85%) */
+.startpunkt-arrow {
+  position: absolute;
+  left: 28%;
+  top: 68%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 15;
+  pointer-events: none;
+  animation: arrow-bounce 1.5s ease-in-out infinite;
+}
+
+.startpunkt-label {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  box-shadow:
+    0 4px 12px rgba(239, 68, 68, 0.4),
+    0 0 20px rgba(255, 215, 0, 0.3),
+    inset 0 1px 0 rgba(255, 215, 0, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: 2px solid rgba(255, 215, 0, 0.5);
+  animation: golden-shimmer 2s ease-in-out infinite;
+}
+
+.arrow-svg path {
+  stroke: #ef4444;
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+  animation: arrow-glow 2s ease-in-out infinite;
+}
+
+@keyframes arrow-bounce {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(8px);
+  }
+}
+
+@keyframes golden-shimmer {
+  0%, 100% {
+    box-shadow:
+      0 4px 12px rgba(239, 68, 68, 0.4),
+      0 0 20px rgba(255, 215, 0, 0.3),
+      inset 0 1px 0 rgba(255, 215, 0, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 4px 12px rgba(239, 68, 68, 0.4),
+      0 0 30px rgba(255, 215, 0, 0.6),
+      inset 0 1px 0 rgba(255, 215, 0, 0.5);
+  }
+}
+
+@keyframes arrow-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+  }
+  50% {
+    filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.9));
+  }
 }
 
 .ship-body {
@@ -669,19 +849,19 @@
    LEGENDE (im Hero-Panel links)
    ======================================== */
 .map-legend {
-  background: var(--panel-bg);
+  background: var(--ui-surface);
   padding: 12px 14px;
-  border-radius: 10px;
-  border: 2px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  border: 2px solid var(--ui-border);
 }
 
 .legend-title {
-  color: #f4d03f;
+  color: var(--ui-text);
   font-weight: 700;
   font-size: 14px;
   margin-bottom: 10px;
   padding-bottom: 8px;
-  border-bottom: 1px solid rgba(212, 167, 106, 0.5);
+  border-bottom: 1px solid var(--ui-border);
 }
 
 .legend-items {
@@ -694,7 +874,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  color: var(--legend-text);
+  color: var(--ui-text-muted);
   font-size: 13px;
 }
 
@@ -756,35 +936,36 @@
   position: absolute;
   top: -4px;
   right: 10px;
-  background: #e74c3c;
-  color: white;
+  background: var(--ui-action);
+  color: var(--ui-base);
   font-size: 12px;
   font-weight: bold;
   min-width: 20px;
   height: 20px;
-  border-radius: 10px;
+  border-radius: var(--radius-pill);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid #fff;
+  border: 2px solid var(--ui-surface);
 }
 
 .tagebuch-widget-illustrated .widget-label {
-  background: rgba(0, 0, 0, 0.8);
-  color: #ce93d8;
+  background: var(--ui-surface);
+  color: var(--ui-text);
   font-size: 11px;
   font-weight: 600;
+  font-family: var(--font-ui);
   padding: 4px 12px;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   margin-top: 4px;
-  border: 1px solid var(--map-border-color);
+  border: 1px solid var(--ui-border);
 }
 
-/* Lerntechniken Widget - wie Schiffe gestaltet */
+/* Lerntechniken Widget - OBEN RECHTS (1. in der Gruppe) */
 .lerntechniken-widget-illustrated {
   position: absolute;
-  bottom: 16px;
-  right: 16px;
+  top: 15%;
+  right: 2%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -820,39 +1001,41 @@
   position: absolute;
   top: -4px;
   right: 10px;
-  background: #27ae60;
-  color: white;
+  background: var(--ui-action);
+  color: var(--ui-base);
   font-size: 11px;
   font-weight: bold;
   padding: 2px 8px;
-  border-radius: 10px;
-  border: 2px solid #fff;
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--ui-surface);
 }
 
 .lerntechniken-widget-illustrated .lerntechniken-label {
-  background: rgba(0, 0, 0, 0.8);
-  color: #f4d03f;
+  background: var(--ui-surface);
+  color: var(--ui-text);
   font-size: 11px;
   font-weight: 600;
+  font-family: var(--font-ui);
   padding: 4px 12px;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   margin-top: 4px;
-  border: 1px solid var(--map-border-color);
+  border: 1px solid var(--ui-border);
 }
 
 /* ========================================
    SCHATZKAMMER WIDGET (Loci-System)
+   UNTEN RECHTS (3. in der Gruppe)
    ======================================== */
 .schatzkammer-widget-illustrated {
   position: absolute;
-  left: 12%;
-  top: 3%;
+  right: 2%;
+  top: 60%;
   display: flex;
   flex-direction: column;
   align-items: center;
   cursor: pointer;
   z-index: 20;
-  transition: filter 0.3s ease;
+  transition: filter 0.2s ease;
 }
 
 .schatzkammer-widget-illustrated:hover {
@@ -863,58 +1046,47 @@
   font-size: 48px;
   filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.7))
           drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
-  animation: schatzkammer-float 3s ease-in-out infinite;
-}
-
-@keyframes schatzkammer-float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-6px);
-  }
+  /* REMOVED: infinite schatzkammer-float animation */
 }
 
 .schatzkammer-widget-illustrated .schatzkammer-widget-label {
-  background: rgba(0, 0, 0, 0.8);
-  color: #f4d03f;
+  background: var(--ui-surface);
+  color: var(--ui-text);
   font-size: 11px;
   font-weight: 600;
+  font-family: var(--font-ui);
   padding: 4px 12px;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   margin-top: 4px;
-  border: 1px solid var(--map-border-color);
+  border: 1px solid var(--ui-border);
   white-space: nowrap;
 }
 
 /* ========================================
    COMPANION WIDGET (Lernbegleiter)
+   Redesigned: Unified bottom nav style
    ======================================== */
 .companion-widget-illustrated {
   position: fixed;
   bottom: 20px;
   right: 320px;
-  background: linear-gradient(145deg, #9b59b6, #8e44ad);
-  border-radius: 28px;
+  background: var(--ui-surface);
+  border-radius: 14px;
   padding: 10px 16px;
   display: flex;
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  border: 3px solid #FFD700;
-  box-shadow: 0 4px 16px rgba(155, 89, 182, 0.5), 0 0 20px rgba(255, 215, 0, 0.3);
+  border: 1px solid var(--ui-border);
+  box-shadow: var(--shadow-sm);
   z-index: 1000;
-  transition: all 0.3s ease;
-  animation: companion-glow 2s infinite;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
 }
 
-@keyframes companion-glow {
-  0%, 100% {
-    box-shadow: 0 4px 16px rgba(155, 89, 182, 0.5), 0 0 20px rgba(255, 215, 0, 0.3);
-  }
-  50% {
-    box-shadow: 0 4px 20px rgba(155, 89, 182, 0.7), 0 0 30px rgba(255, 215, 0, 0.6);
-  }
+.companion-widget-illustrated:hover {
+  border-color: var(--ui-action);
+  background: var(--ui-surface-hover);
+  box-shadow: var(--shadow-action);
 }
 
 .companion-widget-illustrated .companion-widget-icon {
@@ -926,14 +1098,15 @@
   height: 36px;
   object-fit: contain;
   border-radius: 50%;
+  border: 1px solid var(--ui-action);
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
 .companion-widget-illustrated .companion-widget-label {
-  color: white;
+  color: var(--ui-text);
   font-size: 13px;
   font-weight: 600;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  font-family: var(--font-ui);
 }
 
 /* ========================================
@@ -1023,8 +1196,8 @@
   }
 
   .hattie-ship {
-    left: 40%;
-    top: 88%;
+    left: 20%;
+    top: 15%;
   }
 
   .polarstern-ship {
@@ -1032,19 +1205,25 @@
     top: 6%;
   }
 
-  .loot-ship {
-    right: 10%;
-    top: 6%;
-  }
-
-  .schatzkammer-widget-illustrated {
-    left: 10%;
-    top: 6%;
+  /* Rechte Gruppe: Lerntechniken → Lernkarten → Schatzkammer */
+  .lerntechniken-widget-illustrated {
+    top: 12%;
+    right: 1%;
     transform: scale(0.85);
   }
 
-  .tagebuch-widget-illustrated,
-  .lerntechniken-widget-illustrated {
+  .loot-ship {
+    right: 1%;
+    top: 35%;
+  }
+
+  .schatzkammer-widget-illustrated {
+    right: 1%;
+    top: 55%;
+    transform: scale(0.85);
+  }
+
+  .tagebuch-widget-illustrated {
     transform: scale(0.85);
   }
 }
@@ -1099,20 +1278,26 @@
     display: none;
   }
 
+  /* Rechte Gruppe: Lerntechniken → Lernkarten → Schatzkammer */
   .lerntechniken-widget-illustrated {
     transform: scale(0.7);
-    bottom: 8px;
-    right: 8px;
+    top: 10%;
+    right: 1%;
   }
 
   .lerntechniken-widget-illustrated .lerntechniken-label {
     display: none;
   }
 
+  .loot-ship {
+    right: 1%;
+    top: 32%;
+  }
+
   .schatzkammer-widget-illustrated {
     transform: scale(0.7);
-    left: 6%;
-    top: 8%;
+    right: 1%;
+    top: 52%;
   }
 
   .schatzkammer-widget-illustrated .schatzkammer-widget-label {
@@ -1127,6 +1312,9 @@
 /* ========================================
    ANIMATIONEN
    ======================================== */
+/* Float animation removed from available markers —
+   pulse ring (defined above) is the sole movement signal.
+   Float kept only for map-world decorative elements. */
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-8px); }
@@ -1137,17 +1325,31 @@
   100% { background-position: 200% center; }
 }
 
-/* Floating-Effekt für verfügbare Marker */
-.quest-marker-illustrated[data-status="available"] .marker-circle {
-  animation: float 3s ease-in-out infinite;
+/* REMOVED: float on available markers — replaced by pulse ring */
+/* Old rule was: .quest-marker-illustrated[data-status="available"] .marker-circle { animation: float ... } */
+
+/* Locked markers — no interaction, reduced visibility */
+.quest-marker-illustrated[data-status="locked"] {
+  cursor: not-allowed;
+}
+
+.quest-marker-illustrated[data-status="locked"] .marker-circle {
+  opacity: 0.4;
+  filter: saturate(0.2) brightness(0.7);
+}
+
+.quest-marker-illustrated[data-status="locked"]:hover .marker-circle {
+  transform: none;
+  box-shadow: none;
 }
 
 /* ========================================
    DARK MODE SUPPORT
+   (Base theme IS dark, so minimal adjustments needed)
    ======================================== */
 @media (prefers-color-scheme: dark) {
   .marker-tooltip {
-    background: rgba(20, 20, 30, 0.98);
+    background: var(--ui-surface);
   }
 }
 

@@ -708,6 +708,28 @@ export function WorldMapIllustrated({
             />
           ))}
 
+          {/* Roter Pfeil zum Startpunkt */}
+          <div className="startpunkt-arrow">
+            <div className="startpunkt-label">Startpunkt</div>
+            <svg width="40" height="60" viewBox="0 0 40 60" className="arrow-svg">
+              <defs>
+                <linearGradient id="arrow-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#ef4444" />
+                  <stop offset="50%" stopColor="#fbbf24" />
+                  <stop offset="100%" stopColor="#ef4444" />
+                </linearGradient>
+              </defs>
+              <path
+                d="M20 0 L20 45 M10 35 L20 55 L30 35"
+                stroke="url(#arrow-gradient)"
+                strokeWidth="5"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+
           {/* Schwimmende Schiffe */}
           <FloatingShip type="bandura" onClick={onBanduraShipClick} />
           <FloatingShip type="hattie" onClick={onHattieShipClick} />
