@@ -467,6 +467,9 @@ export default function SchatzkarteLandingEltern({ onGuestMode }: SchatzkarteLan
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <button className="btn-secondary" onClick={() => onGuestMode?.()}>
+              🎮 Demo testen
+            </button>
             <a href="#kontakt" className="btn-primary">
               Infogespräch buchen
             </a>
