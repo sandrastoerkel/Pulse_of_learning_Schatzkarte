@@ -20,13 +20,17 @@ export default function SchatzkarteLandingCombined({ onGuestMode }: SchatzkarteL
   const [showElternVersion, setShowElternVersion] = useState(false);
 
   return (
-    <>
+    <div style={{
+      display: "flex",
+      flexDirection: "column",
+      height: "100vh",
+      overflow: "hidden",
+    }}>
       {/* ══════════════════════════════════════════════ */}
-      {/* TOGGLE BAR — Sticky oben                      */}
+      {/* TOGGLE BAR — Fixed oben                       */}
       {/* ══════════════════════════════════════════════ */}
       <div style={{
-        position: "sticky",
-        top: 0,
+        flexShrink: 0,
         zIndex: 1000,
         background: "#fff",
         borderBottom: "2px solid #E5E7EB",
@@ -149,17 +153,23 @@ export default function SchatzkarteLandingCombined({ onGuestMode }: SchatzkarteL
       </div>
 
       {/* ══════════════════════════════════════════════ */}
-      {/* CONTENT — Je nach Toggle                      */}
+      {/* CONTENT — Je nach Toggle (scrollbar)          */}
       {/* ══════════════════════════════════════════════ */}
-      <div
-        key={showElternVersion ? "eltern" : "jugend"}
-        style={{
-          animation: "fadeInContent .5s ease",
-        }}
-      >
-        {showElternVersion
-          ? <SchatzkarteLandingEltern onGuestMode={onGuestMode} />
-          : <SchatzkarteLandingJugend onGuestMode={onGuestMode} />}
+      <div style={{
+        flex: 1,
+        overflowY: "auto",
+        overflowX: "hidden",
+      }}>
+        <div
+          key={showElternVersion ? "eltern" : "jugend"}
+          style={{
+            animation: "fadeInContent .5s ease",
+          }}
+        >
+          {showElternVersion
+            ? <SchatzkarteLandingEltern onGuestMode={onGuestMode} />
+            : <SchatzkarteLandingJugend onGuestMode={onGuestMode} />}
+        </div>
       </div>
 
       {/* Inline CSS für Animationen */}
@@ -175,7 +185,7 @@ export default function SchatzkarteLandingCombined({ onGuestMode }: SchatzkarteL
           }
         }
       `}</style>
-    </>
+    </div>
   );
 }
 
