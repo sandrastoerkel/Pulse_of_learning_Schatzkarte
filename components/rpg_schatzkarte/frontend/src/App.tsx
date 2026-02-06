@@ -33,6 +33,8 @@ import { AvatarDisplay } from './components/AvatarDisplay';
 import { AvatarShop } from './components/AvatarShop';
 import { CustomAvatar, ShopItem, ItemSlot } from './types';
 import { DEFAULT_AVATAR_VISUALS } from './components/AvatarParts';
+// Design Tokens MUST be imported first
+import './styles/design-tokens.css';
 import './styles/rpg-theme.css';
 import './styles/avatar.css';
 import './styles/bandura-challenge.css';
@@ -85,7 +87,7 @@ const DEFAULT_ISLANDS: Island[] = [
   { id: 'wohlfuehl_dorf', name: 'Dich in der Schule wohlfühlen', icon: '🏠', color: '#a5d6a7', week: 12, treasures: [{ name: 'Mein Platz', icon: '🏡', xp: 50 }] },
   { id: 'schutz_burg', name: 'Wenn andere dich fertig machen', icon: '🛡', color: '#f48fb1', week: 13, treasures: [{ name: 'Grenzen-Schild', icon: '🛡', xp: 50 }] },
   // Finale
-  { id: 'meister_berg', name: 'Berg der Meisterschaft', icon: '⛰️', color: '#ffd700', week: 14, treasures: [{ name: 'Meister-Krone', icon: '👑', xp: 500 }] }
+  { id: 'meister_berg', name: 'Berg der Meisterschaft', icon: '⛰️', color: 'var(--fb-reward)', week: 14, treasures: [{ name: 'Meister-Krone', icon: '👑', xp: 500 }] }
 ];
 
 // Demo-Fortschritt
@@ -111,6 +113,8 @@ function RPGSchatzkarteContent({
   currentIsland,
   ageGroup: initialAgeGroup,
   isAdmin = false,
+  isPreviewMode = false,
+  isLoggedIn = false,
   onAction,
   onProgressChange,
   onUnlockedIslandsChange,
@@ -124,6 +128,8 @@ function RPGSchatzkarteContent({
   currentIsland: string | null;
   ageGroup: AgeGroup;
   isAdmin?: boolean;
+  isPreviewMode?: boolean;
+  isLoggedIn?: boolean;
   onAction?: (action: SchatzkartAction) => void;
   onProgressChange?: (progress: UserProgress) => void;
   onUnlockedIslandsChange?: (islands: string[]) => void;
@@ -235,10 +241,14 @@ function RPGSchatzkarteContent({
 
 
   // Zeige Avatar Creator automatisch beim ersten Besuch (kein Avatar vorhanden)
+  // NICHT im Preview-Modus - dort soll man direkt die Karte sehen
   useEffect(() => {
+    // Im Preview-Modus keinen Avatar-Creator öffnen
+    if (isPreviewMode) return;
+
     // Prüfe ob Avatar existiert
     const hasAvatar = customAvatar !== null;
-    console.log('Avatar Check:', { hasAvatar, customAvatar, showAvatarCreator });
+    console.log('Avatar Check:', { hasAvatar, customAvatar, showAvatarCreator, isPreviewMode });
 
     if (!hasAvatar && !showAvatarCreator) {
       // Kleiner Delay für bessere UX
@@ -248,7 +258,7 @@ function RPGSchatzkarteContent({
       }, 800);
       return () => clearTimeout(timer);
     }
-  }, [customAvatar, showAvatarCreator]);
+  }, [customAvatar, showAvatarCreator, isPreviewMode]);
 
   // Sync ageGroup wenn sich die initialAgeGroup ändert (z.B. User wechselt Altersstufe)
   useEffect(() => {
@@ -940,14 +950,60 @@ function RPGSchatzkarteContent({
     setShowRewardModal(true);
   }, []);
 
+  // Handler für Header-Buttons
+  const handleLogin = useCallback(() => {
+    if (onAction) {
+      onAction({ action: 'show_login' });
+    }
+  }, [onAction]);
+
+  const handleLogout = useCallback(() => {
+    if (onAction) {
+      onAction({ action: 'logout' });
+    }
+  }, [onAction]);
+
+  const handleBackToLanding = useCallback(() => {
+    if (onAction) {
+      onAction({ action: 'go_to_landing' });
+    }
+  }, [onAction]);
+
   return (
     <div className="rpg-schatzkarte">
       <header className="app-header">
-        <h1 className="app-title">
-          <span className="title-icon">🗺️</span>
-          Lern-Abenteuer Weltkarte
-          <span className="title-decoration">⚔️</span>
-        </h1>
+        <div className="header-content">
+          <h1 className="app-title">
+            <span className="title-icon">🗺️</span>
+            Lern-Abenteuer Weltkarte
+            <span className="title-decoration">⚔️</span>
+          </h1>
+
+          {/* Header Buttons - Login/Logout/Landing */}
+          <div className="header-buttons">
+            {/* Zurück zur Landing Page */}
+            <button className="header-btn header-btn--landing" onClick={handleBackToLanding}>
+              <span className="header-btn__icon">🏠</span>
+              <span className="header-btn__text">Startseite</span>
+            </button>
+
+            {/* Preview-Modus: Login-Button zeigen */}
+            {isPreviewMode && !isLoggedIn && (
+              <button className="header-btn header-btn--login" onClick={handleLogin}>
+                <span className="header-btn__icon">👤</span>
+                <span className="header-btn__text">Login</span>
+              </button>
+            )}
+
+            {/* Eingeloggt: Logout-Button zeigen */}
+            {isLoggedIn && (
+              <button className="header-btn header-btn--logout" onClick={handleLogout}>
+                <span className="header-btn__icon">🚪</span>
+                <span className="header-btn__text">Logout</span>
+              </button>
+            )}
+          </div>
+        </div>
         <p className="app-subtitle">
           Erkunde die Welt des Wissens und werde zum Lern-Meister!
         </p>
@@ -1423,6 +1479,9 @@ function RPGSchatzkarteStreamlit({ args }: ComponentProps) {
   const ageGroup: AgeGroup = args?.ageGroup || 'grundschule';
   // Admin-Modus: wird von Streamlit übergeben (z.B. für Pädagogen/Admins)
   const isAdmin: boolean = args?.isAdmin || args?.ageGroup === 'paedagoge' || false;
+  // Preview/Login Status für Header-Buttons
+  const isPreviewMode: boolean = args?.isPreviewMode || false;
+  const isLoggedIn: boolean = args?.isLoggedIn || false;
   // Auto-Open: Öffnet automatisch eine Insel (z.B. nach Rückkehr von Polarstern)
   const autoOpenIsland: string | null = args?.autoOpenIsland || null;
   const autoOpenPhase: string | null = args?.autoOpenPhase || null;
@@ -1430,28 +1489,14 @@ function RPGSchatzkarteStreamlit({ args }: ComponentProps) {
 
   // Streamlit-Höhe setzen - WICHTIG: muss immer aufgerufen werden
   useEffect(() => {
-    // Landing Page braucht mehr Höhe (mit neuem 3-Bausteine-Konzept)
-    const height = view === 'landing' ? 5500 : 700;
-    Streamlit.setFrameHeight(height);
-
-    // Regelmäßig Höhe aktualisieren für Landing Page
-    if (view === 'landing') {
-      const interval = setInterval(() => {
-        // Dynamisch die echte Höhe ermitteln
-        const body = document.body;
-        const html = document.documentElement;
-        const contentHeight = Math.max(
-          body.scrollHeight,
-          body.offsetHeight,
-          html.clientHeight,
-          html.scrollHeight,
-          html.offsetHeight
-        );
-        // Mindestens 5500, aber mehr wenn nötig
-        Streamlit.setFrameHeight(Math.max(5500, contentHeight + 100));
-      }, 500);
-      return () => clearInterval(interval);
-    }
+    // Kleiner Delay um sicherzustellen, dass Streamlit die Komponente registriert hat
+    const timer = setTimeout(() => {
+      // Landing Page: Neue Combined-Version mit Jugend/Eltern Toggle (~6500px)
+      // Map: Kleinere Höhe für die Schatzkarte
+      const height = view === 'landing' ? 6500 : 700;
+      Streamlit.setFrameHeight(height);
+    }, 100);
+    return () => clearTimeout(timer);
   }, [view]);
 
   const handleAction = useCallback((action: SchatzkartAction) => {
@@ -1464,6 +1509,9 @@ function RPGSchatzkarteStreamlit({ args }: ComponentProps) {
       <LandingPageV5
         onClose={() => {
           Streamlit.setComponentValue({ action: 'go_to_map' });
+        }}
+        onGuestMode={() => {
+          Streamlit.setComponentValue({ action: 'start_preview' });
         }}
       />
     );
@@ -1484,6 +1532,8 @@ function RPGSchatzkarteStreamlit({ args }: ComponentProps) {
         currentIsland={currentIsland}
         ageGroup={ageGroup}
         isAdmin={isAdmin}
+        isPreviewMode={isPreviewMode}
+        isLoggedIn={isLoggedIn}
         onAction={handleAction}
         autoOpenIsland={autoOpenIsland}
         autoOpenPhase={autoOpenPhase}
@@ -1545,6 +1595,14 @@ function RPGSchatzkarteDev() {
         currentIsland="werkzeuge"
         ageGroup={ageGroup}
         isAdmin={true}  // Im Dev-Modus immer Admin
+        isPreviewMode={true}  // Zeige Header-Buttons
+        isLoggedIn={false}
+        onAction={(action) => {
+          console.log('Dev Action:', action);
+          if (action.action === 'go_to_landing') {
+            setShowLanding(true);
+          }
+        }}
       />
     </div>
   );

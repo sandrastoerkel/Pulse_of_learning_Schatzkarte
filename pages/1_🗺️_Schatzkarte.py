@@ -302,12 +302,22 @@ st.markdown("""
         margin: 0 !important;
     }
 
+    /* Sidebar sofort einklappen/verstecken */
+    [data-testid="stSidebar"] {
+        transform: translateX(-100%) !important;
+        transition: none !important;
+    }
+    [data-testid="stSidebar"][aria-expanded="true"] {
+        transform: translateX(-100%) !important;
+    }
+
 </style>
 <script>
     // Sidebar automatisch einklappen beim Laden der Seite
     const collapseSidebar = () => {
         const sidebar = parent.document.querySelector('[data-testid="stSidebar"]');
-        if (sidebar && sidebar.getAttribute('aria-expanded') === 'true') {
+        if (sidebar) {
+            sidebar.setAttribute('aria-expanded', 'false');
             // Finde den Collapse-Button und klicke ihn
             const collapseBtn = parent.document.querySelector('[data-testid="stSidebarCollapseButton"]');
             if (collapseBtn) {
@@ -390,30 +400,21 @@ except Exception:
     preview_mode = False
     logged_in = False
 
-try:
-    result = rpg_schatzkarte(
-        islands=islands,
-        user_progress=user_data.get("progress", {}),
-        hero_data=hero_data,
-        unlocked_islands=unlocked_islands,
-        current_island=current_island,
-        age_group=age_group,
-        is_admin=bool(admin_status),  # Admin-TestPanel nur für Admins
-        is_preview_mode=bool(preview_mode),  # Für Header-Buttons
-        is_logged_in=bool(logged_in and not preview_mode),  # Eingeloggt aber nicht Preview
-        auto_open_island=auto_open_island,  # Automatisch eine Insel öffnen (z.B. nach Polarstern)
-        auto_open_phase=auto_open_phase,  # Phase für die Insel (z.B. 'ready' für Base Camp)
-        height=900,  # Basis-Hoehe, wird per CSS auf calc(100vh - 60px) ueberschrieben
-        key="rpg_schatzkarte"
-    )
-except TypeError as e:
-    st.error(f"Fehler beim Laden der Schatzkarte: {e}")
-    st.write("Debug Info:")
-    st.write(f"- islands type: {type(islands)}, len: {len(islands) if islands else 0}")
-    st.write(f"- hero_data type: {type(hero_data)}")
-    st.write(f"- unlocked_islands: {unlocked_islands}")
-    st.write(f"- age_group: {age_group}")
-    result = None
+result = rpg_schatzkarte(
+    islands=islands,
+    user_progress=user_data.get("progress", {}),
+    hero_data=hero_data,
+    unlocked_islands=unlocked_islands,
+    current_island=current_island,
+    age_group=age_group,
+    is_admin=bool(admin_status),  # Admin-TestPanel nur für Admins
+    is_preview_mode=bool(preview_mode),  # Für Header-Buttons
+    is_logged_in=bool(logged_in and not preview_mode),  # Eingeloggt aber nicht Preview
+    auto_open_island=auto_open_island,  # Automatisch eine Insel öffnen (z.B. nach Polarstern)
+    auto_open_phase=auto_open_phase,  # Phase für die Insel (z.B. 'ready' für Base Camp)
+    height=900,  # Basis-Hoehe, wird per CSS auf calc(100vh - 60px) ueberschrieben
+    key="rpg_schatzkarte"
+)
 
 # ===============================================================
 # AKTIONEN VERARBEITEN (mit Duplikat-Schutz)
