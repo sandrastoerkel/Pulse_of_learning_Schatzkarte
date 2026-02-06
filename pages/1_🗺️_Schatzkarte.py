@@ -377,6 +377,12 @@ st.markdown(f"""
 auto_open_island = st.session_state.get("auto_open_island")
 auto_open_phase = st.session_state.get("auto_open_phase")
 
+# Admin-Status sicher ermitteln
+try:
+    admin_status = is_admin()
+except Exception:
+    admin_status = False
+
 result = rpg_schatzkarte(
     islands=islands,
     user_progress=user_data.get("progress", {}),
@@ -384,7 +390,7 @@ result = rpg_schatzkarte(
     unlocked_islands=unlocked_islands,
     current_island=current_island,
     age_group=age_group,
-    is_admin=is_admin(),  # Admin-TestPanel nur für Admins
+    is_admin=admin_status,  # Admin-TestPanel nur für Admins
     is_preview_mode=is_preview_mode(),  # Für Header-Buttons
     is_logged_in=is_logged_in() and not is_preview_mode(),  # Eingeloggt aber nicht Preview
     auto_open_island=auto_open_island,  # Automatisch eine Insel öffnen (z.B. nach Polarstern)
