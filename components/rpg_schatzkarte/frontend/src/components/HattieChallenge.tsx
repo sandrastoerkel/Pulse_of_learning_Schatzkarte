@@ -76,7 +76,7 @@ const XP_CONFIG = {
 };
 
 // Konfetti-Farben
-const CONFETTI_COLORS = ['#667eea', '#764ba2', '#f093fb', '#FFD700', '#00ff88', '#4CAF50', '#4ecdc4'];
+const CONFETTI_COLORS = ['#667eea', '#764ba2', '#f093fb', 'var(--fb-reward)', '#00ff88', '#4CAF50', '#4ecdc4'];
 
 // ============================================
 // ANIMATION VARIANTS

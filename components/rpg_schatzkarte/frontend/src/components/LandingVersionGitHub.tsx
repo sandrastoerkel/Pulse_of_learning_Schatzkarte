@@ -15,7 +15,7 @@ const SelbstvertrauenIllustration = ({ size = 160 }: { size?: number }) => (
     <defs>
       <linearGradient id="sv-goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#FFE55C" />
-        <stop offset="50%" stopColor="#FFD700" />
+        <stop offset="50%" stopColor="var(--fb-reward)" />
         <stop offset="100%" stopColor="#B8860B" />
       </linearGradient>
       <linearGradient id="sv-shieldGradient" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -123,7 +123,7 @@ const GehirnIllustration = ({ size = 160 }: { size?: number }) => (
     <g transform="translate(32, 4)">
       <ellipse cx="0" cy="0" rx="6" ry="4" fill="url(#gh-goldGradient)"><animate attributeName="opacity" values="0.7;1;0.7" dur="1.5s" repeatCount="indefinite" /></ellipse>
       <rect x="-2" y="3" width="4" height="3" fill="url(#gh-goldGradient)" rx="0.5" />
-      <g stroke="#FFD700" strokeWidth="1" strokeLinecap="round" opacity="0.6">
+      <g stroke="var(--fb-reward)" strokeWidth="1" strokeLinecap="round" opacity="0.6">
         <line x1="0" y1="-6" x2="0" y2="-9"><animate attributeName="opacity" values="0.4;1;0.4" dur="1s" repeatCount="indefinite" /></line>
         <line x1="5" y1="-4" x2="8" y2="-6"><animate attributeName="opacity" values="0.4;1;0.4" dur="1s" repeatCount="indefinite" begin="0.2s" /></line>
         <line x1="-5" y1="-4" x2="-8" y2="-6"><animate attributeName="opacity" values="0.4;1;0.4" dur="1s" repeatCount="indefinite" begin="0.4s" /></line>
@@ -142,7 +142,7 @@ const FlowIllustration = ({ size = 160 }: { size?: number }) => (
     <defs>
       <linearGradient id="fl-goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#FFE55C" />
-        <stop offset="50%" stopColor="#FFD700" />
+        <stop offset="50%" stopColor="var(--fb-reward)" />
         <stop offset="100%" stopColor="#B8860B" />
       </linearGradient>
       <radialGradient id="fl-starCore" cx="50%" cy="50%" r="50%">

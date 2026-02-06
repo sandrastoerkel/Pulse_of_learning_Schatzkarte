@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { GOLD, DARK } from '../../constants';
+import { UI, FEEDBACK, GOLD, DARK } from '../../constants';
 
 // =============================================================================
 // TYPES
@@ -46,9 +46,9 @@ export const WizardTower: React.FC<WizardTowerProps> = ({ scale = 1 }) => {
         </linearGradient>
 
         <linearGradient id="wt-gold-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor={GOLD.light} />
-          <stop offset="50%" stopColor={GOLD.primary} />
-          <stop offset="100%" stopColor={GOLD.dark} />
+          <stop offset="0%" stopColor={UI.actionHover} />
+          <stop offset="50%" stopColor={UI.action} />
+          <stop offset="100%" stopColor={UI.border} />
         </linearGradient>
 
         <linearGradient id="wt-window-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -57,8 +57,8 @@ export const WizardTower: React.FC<WizardTowerProps> = ({ scale = 1 }) => {
         </linearGradient>
 
         <radialGradient id="wt-candle-glow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#FFD700" stopOpacity="0.6" />
-          <stop offset="50%" stopColor="#FFA500" stopOpacity="0.3" />
+          <stop offset="0%" stopColor="var(--fb-reward)" stopOpacity="0.6" />
+          <stop offset="50%" stopColor="var(--fb-reward)" stopOpacity="0.3" />
           <stop offset="100%" stopColor="#FF8C00" stopOpacity="0" />
         </radialGradient>
 
@@ -110,13 +110,13 @@ export const WizardTower: React.FC<WizardTowerProps> = ({ scale = 1 }) => {
         <path
           d="M0 120 L0 40 Q0 0 40 0 L80 0 Q120 0 120 40 L120 120 Z"
           fill="url(#wt-window-gradient)"
-          stroke={GOLD.dark}
+          stroke={UI.border}
           strokeWidth="3"
         />
         {/* Window bars */}
-        <line x1="40" y1="0" x2="40" y2="120" stroke={GOLD.dark} strokeWidth="2" />
-        <line x1="80" y1="0" x2="80" y2="120" stroke={GOLD.dark} strokeWidth="2" />
-        <line x1="0" y1="60" x2="120" y2="60" stroke={GOLD.dark} strokeWidth="2" />
+        <line x1="40" y1="0" x2="40" y2="120" stroke={UI.border} strokeWidth="2" />
+        <line x1="80" y1="0" x2="80" y2="120" stroke={UI.border} strokeWidth="2" />
+        <line x1="0" y1="60" x2="120" y2="60" stroke={UI.border} strokeWidth="2" />
         {/* Stars through window */}
         <circle cx="30" cy="30" r="2" fill="#fff" opacity="0.8" />
         <circle cx="90" cy="45" r="1.5" fill="#fff" opacity="0.6" />
@@ -150,7 +150,7 @@ export const WizardTower: React.FC<WizardTowerProps> = ({ scale = 1 }) => {
 
       {/* Magic mirror frame */}
       <g transform="translate(190, 50)">
-        <ellipse cx="50" cy="60" rx="45" ry="55" fill={GOLD.dark} />
+        <ellipse cx="50" cy="60" rx="45" ry="55" fill={UI.border} />
         <ellipse cx="50" cy="60" rx="38" ry="48" fill="#1a2a4a" />
         {/* Mirror shimmer */}
         <ellipse cx="50" cy="60" rx="35" ry="45" fill="url(#wt-window-gradient)" opacity="0.8" />
@@ -165,11 +165,11 @@ export const WizardTower: React.FC<WizardTowerProps> = ({ scale = 1 }) => {
       <g transform="translate(420, 420)">
         <ellipse cx="100" cy="80" rx="120" ry="30" fill="#1a0a0a" opacity="0.5" />
         <rect x="0" y="0" width="200" height="80" fill="#3a2a1a" rx="4" />
-        <rect x="5" y="0" width="190" height="5" fill={GOLD.dark} />
+        <rect x="5" y="0" width="190" height="5" fill={UI.border} />
         {/* Table items */}
         <circle cx="50" cy="40" r="15" fill="#4a3a2a" /> {/* Plate */}
         <rect x="130" y="25" width="40" height="50" fill="#2a1a1a" rx="2" /> {/* Book */}
-        <rect x="135" y="30" width="30" height="3" fill={GOLD.dark} opacity="0.5" />
+        <rect x="135" y="30" width="30" height="3" fill={UI.border} opacity="0.5" />
       </g>
 
       {/* Cauldron */}
@@ -207,8 +207,8 @@ export const WizardTower: React.FC<WizardTowerProps> = ({ scale = 1 }) => {
         <rect x="0" y="60" width="8" height="80" fill="#4a3a2a" />
         <rect x="50" y="70" width="8" height="70" fill="#4a3a2a" />
         <rect x="-5" y="30" width="70" height="35" fill="#5a4a3a" rx="4" transform="rotate(-15 30 45)" />
-        <circle cx="0" cy="40" r="12" fill="#3a3a4a" stroke={GOLD.dark} strokeWidth="2" transform="rotate(-15 30 45)" />
-        <circle cx="65" cy="55" r="8" fill="#2a2a3a" stroke={GOLD.dark} strokeWidth="1" transform="rotate(-15 30 45)" />
+        <circle cx="0" cy="40" r="12" fill="#3a3a4a" stroke={UI.border} strokeWidth="2" transform="rotate(-15 30 45)" />
+        <circle cx="65" cy="55" r="8" fill="#2a2a3a" stroke={UI.border} strokeWidth="1" transform="rotate(-15 30 45)" />
       </g>
 
       {/* Armor stand */}
@@ -218,10 +218,10 @@ export const WizardTower: React.FC<WizardTowerProps> = ({ scale = 1 }) => {
         {/* Helmet */}
         <ellipse cx="40" cy="20" rx="25" ry="20" fill="#5a5a6a" />
         <rect x="15" y="25" width="50" height="8" fill="#4a4a5a" />
-        <rect x="30" y="10" width="20" height="5" fill={GOLD.dark} />
+        <rect x="30" y="10" width="20" height="5" fill={UI.border} />
         {/* Chest plate */}
         <path d="M20 45 Q15 60 20 90 L60 90 Q65 60 60 45 Q40 35 20 45" fill="#5a5a6a" />
-        <line x1="40" y1="50" x2="40" y2="85" stroke={GOLD.dark} strokeWidth="2" />
+        <line x1="40" y1="50" x2="40" y2="85" stroke={UI.border} strokeWidth="2" />
       </g>
 
       {/* Floating candles with glow */}
@@ -235,7 +235,7 @@ export const WizardTower: React.FC<WizardTowerProps> = ({ scale = 1 }) => {
         <g key={i} transform={`translate(${pos.x}, ${pos.y})`}>
           <circle cx="0" cy="0" r="30" fill="url(#wt-candle-glow)" />
           <rect x="-3" y="0" width="6" height="25" fill="#f5f5dc" />
-          <ellipse cx="0" cy="-5" rx="4" ry="8" fill="#FFD700" filter="url(#wt-glow)" />
+          <ellipse cx="0" cy="-5" rx="4" ry="8" fill="var(--fb-reward)" filter="url(#wt-glow)" />
         </g>
       ))}
 
@@ -265,10 +265,10 @@ export const WizardTower: React.FC<WizardTowerProps> = ({ scale = 1 }) => {
         { x: 120, y: 450 },
       ].map((pos, i) => (
         <g key={i} transform={`translate(${pos.x}, ${pos.y})`} opacity="0.6">
-          <line x1="-8" y1="0" x2="8" y2="0" stroke={GOLD.primary} strokeWidth="2" />
-          <line x1="0" y1="-8" x2="0" y2="8" stroke={GOLD.primary} strokeWidth="2" />
-          <line x1="-5" y1="-5" x2="5" y2="5" stroke={GOLD.primary} strokeWidth="1" />
-          <line x1="5" y1="-5" x2="-5" y2="5" stroke={GOLD.primary} strokeWidth="1" />
+          <line x1="-8" y1="0" x2="8" y2="0" stroke={UI.action} strokeWidth="2" />
+          <line x1="0" y1="-8" x2="0" y2="8" stroke={UI.action} strokeWidth="2" />
+          <line x1="-5" y1="-5" x2="5" y2="5" stroke={UI.action} strokeWidth="1" />
+          <line x1="5" y1="-5" x2="-5" y2="5" stroke={UI.action} strokeWidth="1" />
         </g>
       ))}
 
@@ -281,7 +281,7 @@ export const WizardTower: React.FC<WizardTowerProps> = ({ scale = 1 }) => {
       ].map((pos, i) => (
         <g key={i} transform={`translate(${pos.x}, ${pos.y})`}>
           <circle cx="0" cy="0" r="25" fill="url(#wt-candle-glow)" opacity="0.7" />
-          <path d="M-8 10 L8 10 L5 -5 L-5 -5 Z" fill={GOLD.dark} />
+          <path d="M-8 10 L8 10 L5 -5 L-5 -5 Z" fill={UI.border} />
           <ellipse cx="0" cy="-12" rx="5" ry="10" fill="#FF6B00" filter="url(#wt-glow)" />
         </g>
       ))}
@@ -302,9 +302,9 @@ export const WizardTower: React.FC<WizardTowerProps> = ({ scale = 1 }) => {
 
       {/* Magical runes on floor */}
       <g transform="translate(400, 520)" opacity="0.3">
-        <circle cx="100" cy="30" r="60" stroke={GOLD.primary} strokeWidth="1" fill="none" />
-        <circle cx="100" cy="30" r="50" stroke={GOLD.primary} strokeWidth="1" fill="none" />
-        <polygon points="100,0 120,45 80,15 120,15 80,45" stroke={GOLD.primary} strokeWidth="1" fill="none" transform="translate(0, 10)" />
+        <circle cx="100" cy="30" r="60" stroke={UI.action} strokeWidth="1" fill="none" />
+        <circle cx="100" cy="30" r="50" stroke={UI.action} strokeWidth="1" fill="none" />
+        <polygon points="100,0 120,45 80,15 120,15 80,45" stroke={UI.action} strokeWidth="1" fill="none" transform="translate(0, 10)" />
       </g>
     </svg>
   );

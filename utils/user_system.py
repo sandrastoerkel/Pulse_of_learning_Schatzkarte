@@ -309,10 +309,17 @@ def login_user(display_name: str, age_group: str = None, avatar_style: str = Non
     st.session_state.current_user_id = user['user_id']
     st.session_state.current_user_name = user['display_name']
     st.session_state.current_user_age_group = user.get('age_group', 'grundschule')
+
+    # Admin/Coach-Status für Quick-Login-Liste merken
+    user_role = user.get('role', 'student')
+    if user_role in ['coach', 'admin', 'paedagoge', 'pädagoge']:
+        st.session_state.show_admin_user_list = True
+
     return user
 
 def logout_user():
     """Loggt den aktuellen Benutzer aus."""
+    # Admin-Status NICHT löschen, damit Quick-Login-Liste sichtbar bleibt
     keys_to_delete = ["current_user_id", "current_user_name", "current_user_age_group",
                       "registration_step", "registration_name", "registration_age"]
     for key in keys_to_delete:
@@ -415,7 +422,11 @@ def render_login_form():
                     st.error("Bitte gib mindestens 2 Buchstaben ein.")
 
         with col2:
-            if existing_users:
+            # Quick-Login Liste nur für Admins/Coaches sichtbar
+            # Prüfe ob der letzte User (vor Logout) Admin/Coach war
+            show_user_list = st.session_state.get("show_admin_user_list", False)
+
+            if existing_users and show_user_list:
                 st.markdown("**🔄 Zurückkehrende Schüler:**")
                 for user in existing_users[:5]:
                     display = user.get('display_name', 'Unbekannt')

@@ -7,7 +7,7 @@
 
 import React, { useCallback } from 'react';
 import type { Room, RoomStats, TemplateId, ColorTag } from '../../types';
-import { GOLD, DARK, KEYFRAMES } from '../../constants';
+import { UI, FEEDBACK, KEYFRAMES } from '../../constants';
 import { RoomCard } from './RoomCard';
 import { CreateRoomModal } from './CreateRoomModal';
 
@@ -55,14 +55,14 @@ export interface ChamberOverviewProps {
 const styles = {
   container: {
     minHeight: '100vh',
-    background: `linear-gradient(180deg, ${DARK.deepest} 0%, ${DARK.base} 100%)`,
+    background: `linear-gradient(180deg, ${UI.base} 0%, ${UI.base} 100%)`,
     padding: '0',
   } as React.CSSProperties,
 
   header: {
-    background: `linear-gradient(180deg, ${DARK.elevated} 0%, transparent 100%)`,
+    background: `linear-gradient(180deg, ${UI.surface} 0%, transparent 100%)`,
     padding: '32px 24px 48px',
-    borderBottom: '1px solid rgba(255, 215, 0, 0.1)',
+    borderBottom: `1px solid ${UI.border}`,
   } as React.CSSProperties,
 
   headerContent: {
@@ -94,26 +94,23 @@ const styles = {
   } as React.CSSProperties,
 
   titleText: {
-    background: GOLD.gradient,
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    backgroundClip: 'text',
+    color: UI.action,
   } as React.CSSProperties,
 
   createButton: {
     padding: '14px 28px',
-    background: GOLD.gradient,
+    background: UI.action,
     border: 'none',
     borderRadius: '12px',
     fontSize: '16px',
     fontWeight: 600,
-    color: DARK.deepest,
+    color: '#fff',
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
     gap: '10px',
     transition: 'all 0.3s ease',
-    boxShadow: '0 4px 16px rgba(255, 215, 0, 0.3)',
+    boxShadow: '0 4px 16px rgba(14, 165, 233, 0.3)',
   } as React.CSSProperties,
 
   statsRow: {
@@ -133,7 +130,7 @@ const styles = {
   statValue: {
     fontSize: '28px',
     fontWeight: 700,
-    color: GOLD.primary,
+    color: UI.action,
     display: 'block',
     marginBottom: '4px',
   } as React.CSSProperties,
@@ -146,8 +143,8 @@ const styles = {
   } as React.CSSProperties,
 
   xpBadge: {
-    background: `linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 165, 0, 0.2) 100%)`,
-    border: `1px solid ${GOLD.dark}`,
+    background: FEEDBACK.rewardSubtle,
+    border: `1px solid ${UI.border}`,
     borderRadius: '12px',
     padding: '16px 24px',
     display: 'flex',
@@ -162,7 +159,7 @@ const styles = {
   xpValue: {
     fontSize: '24px',
     fontWeight: 700,
-    color: GOLD.primary,
+    color: UI.action,
   } as React.CSSProperties,
 
   xpLabel: {
@@ -212,18 +209,18 @@ const styles = {
 
   emptyButton: {
     padding: '16px 32px',
-    background: GOLD.gradient,
+    background: UI.action,
     border: 'none',
     borderRadius: '12px',
     fontSize: '16px',
     fontWeight: 600,
-    color: DARK.deepest,
+    color: '#fff',
     cursor: 'pointer',
     display: 'inline-flex',
     alignItems: 'center',
     gap: '10px',
     transition: 'all 0.3s ease',
-    boxShadow: '0 4px 16px rgba(255, 215, 0, 0.3)',
+    boxShadow: '0 4px 16px rgba(14, 165, 233, 0.3)',
   } as React.CSSProperties,
 
   reviewBanner: {
@@ -264,8 +261,8 @@ const styles = {
   loadingSpinner: {
     width: '48px',
     height: '48px',
-    border: `3px solid ${DARK.surface}`,
-    borderTopColor: GOLD.primary,
+    border: `3px solid ${UI.surfaceHover}`,
+    borderTopColor: UI.action,
     borderRadius: '50%',
     animation: 'spin 1s linear infinite',
   } as React.CSSProperties,

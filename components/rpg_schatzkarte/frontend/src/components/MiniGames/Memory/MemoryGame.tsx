@@ -455,7 +455,7 @@ const MemoryGame: React.FC<MemoryGameProps> = ({
                     ease: 'easeOut'
                   }}
                   style={{
-                    background: ['#FFD700', '#9b59b6', '#4ade80', '#3498db'][i % 4],
+                    background: ['var(--fb-reward)', '#9b59b6', '#4ade80', '#3498db'][i % 4],
                     width: 10 + Math.random() * 10,
                     height: 10 + Math.random() * 10
                   }}

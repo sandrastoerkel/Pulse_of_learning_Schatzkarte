@@ -1,50 +1,87 @@
 /**
  * Theme & Styling Konstanten
  * 
- * Zentrale Definition aller Farben, Animationen und Konfigurationswerte
- * für konsistentes Schatzkarte-Design.
+ * Redesigned: Synced with design-tokens.css
+ * Three-layer token system: UI (chrome), Feedback (rewards), Map (world)
  */
 
 import type { RecallStatus, ColorTag, StatusColors, XpConfig } from '../types';
 
 // =============================================================================
-// FARBEN
+// FARBEN — Synced with design-tokens.css
 // =============================================================================
 
 /**
- * Primäre Gold-Palette (Schatzkarte-Branding)
+ * UI Chrome Palette (petrol/dark blue)
+ * Maps to --ui-* CSS custom properties
  */
-export const GOLD = {
-  light: '#FFE066',
-  primary: '#FFD700',
-  dark: '#FFA500',
-  darker: '#CC8400',
-  gradient: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
-  gradientReverse: 'linear-gradient(135deg, #FFA500 0%, #FFD700 100%)',
-  glow: '0 0 20px rgba(255, 215, 0, 0.5)',
-  glowStrong: '0 0 30px rgba(255, 215, 0, 0.7)',
+export const UI = {
+  base: '#0c1a2a',
+  surface: '#163045',
+  surfaceHover: '#1c3a55',
+  border: '#1e3a52',
+  text: '#e2e8f0',
+  textMuted: '#8899aa',
+  textDisabled: '#556677',
+  action: '#0ea5e9',
+  actionHover: '#38bdf8',
+  actionActive: '#0284c7',
+  actionSubtle: 'rgba(14, 165, 233, 0.12)',
 } as const;
 
 /**
- * Dunkle Hintergrund-Palette
+ * Feedback & Reward Palette
+ * Maps to --fb-* CSS custom properties
+ * IMPORTANT: These colors are EARNED, not decorative
+ */
+export const FEEDBACK = {
+  success: '#34d399',       // emerald — correct, completed
+  successSubtle: 'rgba(52, 211, 153, 0.1)',
+  reward: '#f59e0b',        // amber — gold earned, XP
+  rewardSubtle: 'rgba(245, 158, 11, 0.1)',
+  epic: '#a855f7',          // purple — rarest achievements
+  epicSubtle: 'rgba(168, 85, 247, 0.12)',
+  error: '#ef4444',         // red — wrong, danger
+  errorSubtle: 'rgba(239, 68, 68, 0.1)',
+} as const;
+
+/**
+ * @deprecated Use UI and FEEDBACK instead.
+ * Kept for backward compatibility during migration.
+ */
+export const GOLD = {
+  light: FEEDBACK.reward,
+  primary: FEEDBACK.reward,
+  dark: FEEDBACK.reward,
+  darker: '#CC8400',
+  gradient: `linear-gradient(135deg, ${FEEDBACK.reward} 0%, ${UI.action} 100%)`,
+  gradientReverse: `linear-gradient(135deg, ${UI.action} 0%, ${FEEDBACK.reward} 100%)`,
+  glow: `0 0 12px rgba(14, 165, 233, 0.3)`,
+  glowStrong: `0 0 20px rgba(14, 165, 233, 0.5)`,
+} as const;
+
+/**
+ * @deprecated Use UI instead.
+ * Kept for backward compatibility during migration.
  */
 export const DARK = {
-  deepest: '#0a0a14',
-  deep: '#12121e',
-  base: '#1a1a2e',
-  elevated: '#2a2a4e',
-  surface: '#3a3a5e',
-  border: '#4a4a6e',
+  deepest: UI.base,
+  deep: UI.base,
+  base: UI.base,
+  elevated: UI.surface,
+  surface: UI.surfaceHover,
+  border: UI.border,
 } as const;
 
 /**
  * Status-Farben für Recall-Ergebnisse
+ * Synced with --fb-* tokens
  */
 export const STATUS_COLORS: StatusColors = {
-  mastered: '#22c55e',      // Grün
-  almost: '#f59e0b',        // Orange/Gold
-  needsPractice: '#ef4444', // Rot
-  neutral: '#6b7280',       // Grau
+  mastered: FEEDBACK.success,       // --fb-success
+  almost: FEEDBACK.reward,          // --fb-reward
+  needsPractice: FEEDBACK.error,    // --fb-error
+  neutral: UI.textMuted,            // --ui-text-muted
 } as const;
 
 /**
@@ -52,9 +89,9 @@ export const STATUS_COLORS: StatusColors = {
  */
 export const COLOR_TAGS: Record<ColorTag, { bg: string; border: string; text: string }> = {
   gold: {
-    bg: 'rgba(255, 215, 0, 0.15)',
-    border: '#FFD700',
-    text: '#FFD700',
+    bg: FEEDBACK.rewardSubtle,
+    border: FEEDBACK.reward,
+    text: FEEDBACK.reward,
   },
   ruby: {
     bg: 'rgba(220, 38, 38, 0.15)',
@@ -174,59 +211,36 @@ export function needsReview(
 }
 
 // =============================================================================
-// ANIMATIONEN
+// ANIMATIONEN — Redesigned: no infinite decorative loops
 // =============================================================================
 
 /**
  * CSS Keyframe-Namen
+ * REMOVED: pulse, float, glow (were infinite decorative loops)
+ * KEPT: triggered transitions only
  */
 export const ANIMATIONS = {
   shimmer: 'shimmer',
-  pulse: 'pulse',
-  float: 'float',
-  glow: 'glow',
   fadeIn: 'fadeIn',
   slideUp: 'slideUp',
   scaleIn: 'scaleIn',
-  flame: 'flame',
 } as const;
 
 /**
  * Animation Durations (in ms)
+ * Synced with --transition-* tokens
  */
 export const ANIMATION_DURATIONS = {
-  fast: 150,
-  normal: 300,
-  slow: 500,
-  shimmer: 2000,
-  pulse: 1500,
-  float: 3000,
+  fast: 150,       // --transition-fast
+  normal: 300,     // --transition-base
+  slow: 500,       // --transition-slow
 } as const;
 
 /**
  * CSS Keyframes für Inline-Styles
+ * Only triggered transitions — no infinite loops
  */
 export const KEYFRAMES = `
-  @keyframes shimmer {
-    0% { background-position: -200% center; }
-    100% { background-position: 200% center; }
-  }
-  
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.7; transform: scale(1.05); }
-  }
-  
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-  }
-  
-  @keyframes glow {
-    0%, 100% { filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.5)); }
-    50% { filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8)); }
-  }
-  
   @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -242,11 +256,9 @@ export const KEYFRAMES = `
     to { opacity: 1; transform: scale(1); }
   }
   
-  @keyframes flame {
-    0%, 100% { transform: scaleY(1) scaleX(1); }
-    25% { transform: scaleY(1.1) scaleX(0.95); }
-    50% { transform: scaleY(0.95) scaleX(1.05); }
-    75% { transform: scaleY(1.05) scaleX(0.98); }
+  @keyframes shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
   }
 `;
 

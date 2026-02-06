@@ -57,10 +57,10 @@ const T = {
   deepNavy: "#060D1A",
   card: "#12203A",
   cardHover: "#1A2E52",
-  gold: "#FFD700",
+  gold: "var(--fb-reward)",
   goldDark: "#B8960F",
   goldLight: "#FFE44D",
-  amber: "#FFA500",
+  amber: "var(--fb-reward)",
   parchment: "#F5E6C8",
   parchmentDark: "#D4BC8A",
   success: "#4ADE80",
@@ -251,7 +251,7 @@ const Icons: Record<string, JSX.Element> = {
   ),
   coin: (
     <svg viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="10" fill="#FFD700" stroke="#B8960F" strokeWidth="1.5" />
+      <circle cx="12" cy="12" r="10" fill="var(--fb-reward)" stroke="#B8960F" strokeWidth="1.5" />
       <text x="12" y="16" textAnchor="middle" fill="#7A5C00" fontSize="12" fontWeight="bold">$</text>
     </svg>
   ),

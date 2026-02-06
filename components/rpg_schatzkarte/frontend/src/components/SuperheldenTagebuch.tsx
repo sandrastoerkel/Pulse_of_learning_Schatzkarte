@@ -44,7 +44,7 @@ const SCHWIERIGKEITS_OPTIONEN = [
   { value: 'schwer' as const, label: 'Schwer', emoji: '💪', color: '#9C27B0' }
 ];
 
-const KONFETTI_FARBEN = ['#FFD700', '#9C27B0', '#4169E1', '#FF6B6B', '#4CAF50', '#FF9800'];
+const KONFETTI_FARBEN = ['var(--fb-reward)', '#9C27B0', '#4169E1', '#FF6B6B', '#4CAF50', '#FF9800'];
 
 // ============================================
 // ANIMATION VARIANTS
@@ -258,7 +258,7 @@ export function SuperheldenTagebuch({
                         value={wasGeschafft}
                         onChange={(e) => setWasGeschafft(e.target.value)}
                         maxLength={200}
-                        whileFocus={{ scale: 1.02, boxShadow: '0 0 15px rgba(255, 215, 0, 0.4)' }}
+                        whileFocus={{ scale: 1.02, boxShadow: '0 0 15px rgba(14, 165, 233, 0.4)' }}
                         style={{ flex: 1 }}
                       />
                       <VoiceButton
@@ -403,7 +403,7 @@ export function TagebuchStartButton({ onClick }: { onClick: () => void }) {
     <motion.button
       className="tagebuch-start-btn"
       onClick={onClick}
-      whileHover={{ scale: 1.05, boxShadow: '0 5px 25px rgba(255, 215, 0, 0.5)' }}
+      whileHover={{ scale: 1.05, boxShadow: '0 5px 25px rgba(14, 165, 233, 0.5)' }}
       whileTap={{ scale: 0.95 }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}

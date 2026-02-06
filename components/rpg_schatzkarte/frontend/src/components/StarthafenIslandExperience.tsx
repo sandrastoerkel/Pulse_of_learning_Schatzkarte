@@ -55,7 +55,7 @@ const FEATURE_CARDS: FeatureCard[] = [
     icon: '⭐',
     title: 'Der Polarstern',
     description: 'Dein Kompass der Reise',
-    color: '#FFD700',
+    color: 'var(--fb-reward)',
     details: [
       '⭐ Setze deine persönlichen Ziele',
       '🎯 Verfolge deinen Fortschritt',
@@ -439,11 +439,11 @@ export function StarthafenIslandExperience({
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.3 }}
               onClick={openPolarstern}
-              whileHover={{ scale: 1.05, boxShadow: '0 8px 32px rgba(255, 215, 0, 0.5)' }}
+              whileHover={{ scale: 1.05, boxShadow: '0 8px 32px rgba(14, 165, 233, 0.5)' }}
               whileTap={{ scale: 0.95 }}
               style={{
                 background: 'linear-gradient(135deg, #1a237e 0%, #4a148c 100%)',
-                border: '3px solid #FFD700',
+                border: '3px solid var(--ui-action)',
                 borderRadius: '20px',
                 padding: '1.5rem',
                 cursor: 'pointer',
@@ -467,7 +467,7 @@ export function StarthafenIslandExperience({
               </motion.span>
               <div style={{ flex: 1 }}>
                 <h3 style={{
-                  color: '#FFD700',
+                  color: 'var(--fb-reward)',
                   margin: '0 0 0.3rem 0',
                   fontSize: '1.3rem',
                   fontWeight: 700
@@ -492,7 +492,7 @@ export function StarthafenIslandExperience({
               <motion.span
                 style={{
                   fontSize: '1.5rem',
-                  background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
+                  background: 'var(--ui-action)',
                   padding: '0.5rem 1rem',
                   borderRadius: '30px',
                   color: '#1a237e',

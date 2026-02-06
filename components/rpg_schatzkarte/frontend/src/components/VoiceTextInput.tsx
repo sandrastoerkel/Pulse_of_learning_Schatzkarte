@@ -121,7 +121,7 @@ const colors = {
   textMuted: "#7A8BA0",
   inputBg: "rgba(255, 255, 255, 0.06)",
   inputBorder: "rgba(255, 255, 255, 0.1)",
-  inputFocusBorder: "rgba(255, 215, 0, 0.4)",
+  inputFocusBorder: "rgba(14, 165, 233, 0.4)",
 };
 
 // ─── STYLES ────────────────────────────────────────────────────

@@ -1,0 +1,118 @@
+/* ============================================================
+   SCHATZKARTE DESIGN TOKENS — Single Source of Truth
+   ============================================================
+   Version 1.0 · February 2026
+
+   RULES:
+   1. ALL UI components must reference these tokens
+   2. No hardcoded hex values in component CSS
+   3. Map-layer elements (icons, backgrounds, paths) keep their own colors
+   4. This file must be imported BEFORE all other stylesheets
+
+   THREE LAYERS:
+   - --ui-*    → Interface chrome (panels, buttons, text, modals)
+   - --fb-*    → Feedback & rewards (success, error, achievements)
+   - --map-*   → Map world only (DO NOT use in UI components)
+   ============================================================ */
+
+:root {
+  /* ── UI Foundation ─────────────────────────────────────────
+     Dark petrol base. Cool, modern, game-HUD aesthetic.
+     These replace ALL brown/wood/parchment backgrounds.
+     ──────────────────────────────────────────────────────── */
+  --ui-base:          #0c1a2a;   /* Darkest background, recessed areas    */
+  --ui-surface:       #163045;   /* Panels, cards, elevated elements      */
+  --ui-surface-hover: #1a3550;   /* Surface on hover/focus                */
+  --ui-border:        #1e3a52;   /* Borders, dividers, separators         */
+  --ui-border-hover:  #245a80;   /* Border on hover/focus                 */
+
+  /* ── Text ──────────────────────────────────────────────────
+     Cool white/gray. Replaces cream, parchment, tan.
+     ──────────────────────────────────────────────────────── */
+  --ui-text:          #e2e8f0;   /* Primary text on dark backgrounds      */
+  --ui-text-muted:    #8899aa;   /* Labels, hints, secondary info         */
+  --ui-text-disabled: #556677;   /* Disabled/locked text                  */
+
+  /* ── Interaction ───────────────────────────────────────────
+     Cyan action color. The "click me" signal.
+     ──────────────────────────────────────────────────────── */
+  --ui-action:        #0ea5e9;   /* Buttons, links, active states, CTAs   */
+  --ui-action-hover:  #38bdf8;   /* Hover state for action elements       */
+  --ui-action-active: #0284c7;   /* Active/pressed state                  */
+  --ui-action-subtle: rgba(14, 165, 233, 0.15); /* Subtle action bg      */
+
+  /* ── Feedback: Success ─────────────────────────────────────
+     Emerald green. Quick wins, correct answers, completions.
+     Appears as FLASH, never as permanent state.
+     ──────────────────────────────────────────────────────── */
+  --fb-success:       #34d399;   /* Correct answer, XP gain flash         */
+  --fb-success-subtle: rgba(52, 211, 153, 0.15); /* Success bg flash     */
+
+  /* ── Feedback: Reward ──────────────────────────────────────
+     Amber gold. EARNED achievements only.
+     NEVER as persistent UI color (labels, borders, text).
+     ──────────────────────────────────────────────────────── */
+  --fb-reward:        #f59e0b;   /* Treasure, achievements, gold amounts  */
+  --fb-reward-subtle: rgba(245, 158, 11, 0.15);  /* Reward bg flash      */
+
+  /* ── Feedback: Epic ────────────────────────────────────────
+     Luminous purple. Rarest color in the system.
+     Only for level-up, certificates, combo ×5.
+     ──────────────────────────────────────────────────────── */
+  --fb-epic:          #a855f7;   /* Level-up, master achievements         */
+  --fb-epic-subtle:   rgba(168, 85, 247, 0.15);  /* Epic bg flash        */
+
+  /* ── Feedback: Error ───────────────────────────────────────
+     Red. Wrong answers, HP loss, warnings.
+     ──────────────────────────────────────────────────────── */
+  --fb-error:         #ef4444;   /* Wrong answer, HP bar, warnings        */
+  --fb-error-subtle:  rgba(239, 68, 68, 0.15);   /* Error bg flash       */
+
+  /* ── Map Layer (reference only) ────────────────────────────
+     These exist for map-canvas elements ONLY.
+     DO NOT reference these in UI component CSS.
+     ──────────────────────────────────────────────────────── */
+  --map-gold:         #c9a227;
+  --map-gold-light:   #e8c94a;
+  --map-gold-dark:    #8b6914;
+  --map-brown:        #8b5a2b;
+  --map-brown-light:  #a67c52;
+  --map-parchment:    #f5e6d3;
+  --map-border-color: #c9a227;
+
+  /* ── Typography ────────────────────────────────────────────
+     Single sans-serif stack for all UI text.
+     Cinzel is ONLY allowed on map labels.
+     ──────────────────────────────────────────────────────── */
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+             Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --font-map: 'Cinzel', Georgia, serif;
+
+  /* ── Spacing (reference) ───────────────────────────────────── */
+  --radius-sm:  8px;
+  --radius-md:  12px;
+  --radius-lg:  16px;
+  --radius-pill: 100px;
+
+  /* ── Shadows ───────────────────────────────────────────────── */
+  --shadow-sm:  0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md:  0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg:  0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-action: 0 0 12px rgba(14, 165, 233, 0.15);
+  --shadow-reward: 0 0 16px rgba(245, 158, 11, 0.25);
+  --shadow-epic:   0 0 20px rgba(168, 85, 247, 0.25);
+}
+
+/* ── Reduced Motion ──────────────────────────────────────────
+   Disable all decorative animations for users who prefer it.
+   Functional transitions (button hover) remain.
+   ──────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -20,7 +20,7 @@ const SelbstvertrauenIcon = ({ size = 80 }) => (
     <defs>
       <linearGradient id="shieldGold" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#FFE55C" />
-        <stop offset="50%" stopColor="#FFD700" />
+        <stop offset="50%" stopColor="var(--fb-reward)" />
         <stop offset="100%" stopColor="#B8860B" />
       </linearGradient>
       <linearGradient id="shieldGreen" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -105,7 +105,7 @@ const FlowIcon = ({ size = 80 }) => (
   </svg>
 );
 
-export default function LandingVersionErgebnis({ onClose }: { onClose?: () => void }) {
+export default function LandingVersionErgebnis({ onClose, onGuestMode }: { onClose?: () => void; onGuestMode?: () => void }) {
   const [formSubmitted, setFormSubmitted] = useState(false);
 
   return (
@@ -194,7 +194,7 @@ export default function LandingVersionErgebnis({ onClose }: { onClose?: () => vo
                   Kostenlose Infostunde buchen
                 </button>
                 <button
-                  onClick={() => onClose?.()}
+                  onClick={() => onGuestMode ? onGuestMode() : onClose?.()}
                   style={{
                     background: 'transparent',
                     color: '#16a34a',

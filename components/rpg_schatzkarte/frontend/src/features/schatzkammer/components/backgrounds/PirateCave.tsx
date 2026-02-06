@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { GOLD } from '../../constants';
+import { UI, FEEDBACK, GOLD } from '../../constants';
 
 // =============================================================================
 // TYPES
@@ -51,9 +51,9 @@ export const PirateCave: React.FC<PirateCaveProps> = ({ scale = 1 }) => {
         </linearGradient>
 
         <linearGradient id="pc-gold-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor={GOLD.light} />
-          <stop offset="50%" stopColor={GOLD.primary} />
-          <stop offset="100%" stopColor={GOLD.dark} />
+          <stop offset="0%" stopColor={UI.actionHover} />
+          <stop offset="50%" stopColor={UI.action} />
+          <stop offset="100%" stopColor={UI.border} />
         </linearGradient>
 
         <linearGradient id="pc-wood-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -166,7 +166,7 @@ export const PirateCave: React.FC<PirateCaveProps> = ({ scale = 1 }) => {
         <polygon points="75,32 80,22 85,32 80,37" fill="#00ff80" filter="url(#pc-glow)" />
         <polygon points="55,15 60,5 65,15 60,20" fill="#4040ff" filter="url(#pc-glow)" />
         {/* Crown */}
-        <path d="M50 8 L45 -5 L50 0 L55 -8 L60 0 L65 -5 L60 8 Z" fill={GOLD.primary} stroke={GOLD.dark} strokeWidth="1" />
+        <path d="M50 8 L45 -5 L50 0 L55 -8 L60 0 L65 -5 L60 8 Z" fill={UI.action} stroke={UI.border} strokeWidth="1" />
       </g>
 
       {/* Ship wheel */}
@@ -260,7 +260,7 @@ export const PirateCave: React.FC<PirateCaveProps> = ({ scale = 1 }) => {
         <circle cx="25" cy="25" r="35" fill="url(#pc-torch-glow)" />
         <rect x="20" y="0" width="10" height="5" fill="#5a4a3a" />
         <rect x="15" y="5" width="20" height="35" fill="#3a3a3a" rx="2" />
-        <rect x="18" y="10" width="14" height="25" fill="#FFD700" opacity="0.6" />
+        <rect x="18" y="10" width="14" height="25" fill="var(--fb-reward)" opacity="0.6" />
         <ellipse cx="25" cy="20" rx="5" ry="8" fill="#FF6B00" filter="url(#pc-glow)" />
       </g>
 
@@ -301,15 +301,15 @@ export const PirateCave: React.FC<PirateCaveProps> = ({ scale = 1 }) => {
         <ellipse cx="50" cy="70" rx="55" ry="15" fill="#1a1510" opacity="0.4" />
         <rect x="0" y="20" width="100" height="50" fill="#5a4030" rx="3" />
         <path d="M0 20 Q50 0 100 20" fill="#6a5040" />
-        <rect x="40" y="35" width="20" height="15" fill={GOLD.primary} rx="2" />
-        <circle cx="50" cy="42" r="4" fill={GOLD.dark} />
+        <rect x="40" y="35" width="20" height="15" fill={UI.action} rx="2" />
+        <circle cx="50" cy="42" r="4" fill={UI.border} />
         {/* Metal bands */}
         <rect x="0" y="25" width="100" height="5" fill="#3a3a3a" />
         <rect x="0" y="55" width="100" height="5" fill="#3a3a3a" />
         {/* Gold spilling out */}
-        <ellipse cx="50" cy="22" rx="30" ry="8" fill={GOLD.primary} />
-        <ellipse cx="40" cy="18" rx="5" ry="3" fill={GOLD.light} />
-        <ellipse cx="60" cy="19" rx="5" ry="3" fill={GOLD.light} />
+        <ellipse cx="50" cy="22" rx="30" ry="8" fill={UI.action} />
+        <ellipse cx="40" cy="18" rx="5" ry="3" fill={UI.actionHover} />
+        <ellipse cx="60" cy="19" rx="5" ry="3" fill={UI.actionHover} />
         <polygon points="50,10 55,5 60,10 55,15" fill="#ff0040" filter="url(#pc-glow)" />
       </g>
 
@@ -322,7 +322,7 @@ export const PirateCave: React.FC<PirateCaveProps> = ({ scale = 1 }) => {
           <circle cx="0" cy="0" r="40" fill="url(#pc-torch-glow)" />
           <rect x="-5" y="10" width="10" height="40" fill="#4a3020" />
           <ellipse cx="0" cy="5" rx="8" ry="15" fill="#FF6B00" filter="url(#pc-glow)" />
-          <ellipse cx="0" cy="-5" rx="5" ry="10" fill="#FFD700" opacity="0.8" />
+          <ellipse cx="0" cy="-5" rx="5" ry="10" fill="var(--fb-reward)" opacity="0.8" />
         </g>
       ))}
 

@@ -532,12 +532,12 @@ export class RunnerEngine {
 
         // Epic Milestone-Effekte!
         this.triggerScreenShake(6);
-        this.flashColor = '#FFD700';
+        this.flashColor = 'var(--fb-reward)';
         this.flashAlpha = 0.3;
 
         // Konfetti-Explosion
         for (let i = 0; i < 30; i++) {
-          const colors = ['#FFD700', '#FF6B6B', '#4ADE80', '#60A5FA', '#A855F7'];
+          const colors = ['var(--fb-reward)', '#FF6B6B', '#4ADE80', '#60A5FA', '#A855F7'];
           this.particles.push({
             x: this.width / 2 + (Math.random() - 0.5) * 200,
             y: this.height / 2,
@@ -558,7 +558,7 @@ export class RunnerEngine {
           this.width / 2,
           this.height / 2 - 50,
           `${milestone}m - x${multiplier}!`,
-          '#FFD700'
+          'var(--fb-reward)'
         );
       }
     }
@@ -937,7 +937,7 @@ export class RunnerEngine {
       } else {
         this.coinsCollected++;
         this.soundManager.play('coin');
-        this.addScorePopup(collectible.x, collectible.y, `+${goldValue}`, '#FFD700');
+        this.addScorePopup(collectible.x, collectible.y, `+${goldValue}`, 'var(--fb-reward)');
       }
     }
 
@@ -1241,7 +1241,7 @@ export class RunnerEngine {
 
     // Bei hohem Combo extra Effekte
     if (this.combo >= 5 && this.combo % 5 === 0) {
-      this.flashColor = '#FFD700';
+      this.flashColor = 'var(--fb-reward)';
       this.flashAlpha = 0.2;
       this.soundManager.play('milestone');
     }
@@ -1495,7 +1495,7 @@ export class RunnerEngine {
       // Sonne
       const sunY = baseY + Math.sin(this.timeOfDay * Math.PI) * 30;
       this.ctx.save();
-      this.ctx.shadowColor = '#FFD700';
+      this.ctx.shadowColor = 'var(--fb-reward)';
       this.ctx.shadowBlur = 30;
       this.ctx.font = '50px serif';
       this.ctx.fillText('☀️', x, sunY);
@@ -1756,7 +1756,7 @@ export class RunnerEngine {
     // Trail-Effekt bei hoher Geschwindigkeit oder Double-XP
     if (this.speed > 10 || this.activeEffects.has('doubleXP')) {
       if (this.frameCount % 3 === 0) {
-        const color = this.activeEffects.has('doubleXP') ? '#A855F7' : '#FFD700';
+        const color = this.activeEffects.has('doubleXP') ? '#A855F7' : 'var(--fb-reward)';
         this.spawnTrailParticle(color);
       }
     }
@@ -1889,7 +1889,7 @@ export class RunnerEngine {
     this.ctx.textBaseline = 'middle';
 
     // Farbe basierend auf Combo-Höhe
-    let color = '#FFD700';
+    let color = 'var(--fb-reward)';
     if (this.combo >= 10) color = '#FF6B6B';
     else if (this.combo >= 5) color = '#A855F7';
 

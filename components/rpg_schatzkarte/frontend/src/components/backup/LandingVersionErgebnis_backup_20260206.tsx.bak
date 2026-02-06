@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { LehrerinIcon } from './LehrerinIcon';
+import { DataScienceIcon } from './DataScienceIcon';
+import { FamilieIcon } from './FamilieIcon';
 
 // =============================================
 // VERSION A: POLISHED ORIGINAL
@@ -17,7 +20,7 @@ const SelbstvertrauenIcon = ({ size = 80 }) => (
     <defs>
       <linearGradient id="shieldGold" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#FFE55C" />
-        <stop offset="50%" stopColor="var(--fb-reward)" />
+        <stop offset="50%" stopColor="#FFD700" />
         <stop offset="100%" stopColor="#B8860B" />
       </linearGradient>
       <linearGradient id="shieldGreen" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -102,7 +105,7 @@ const FlowIcon = ({ size = 80 }) => (
   </svg>
 );
 
-export default function VersionAPolishedOriginal({ onClose }: { onClose?: () => void }) {
+export default function LandingVersionErgebnis({ onClose, onGuestMode }: { onClose?: () => void; onGuestMode?: () => void }) {
   const [formSubmitted, setFormSubmitted] = useState(false);
 
   return (
@@ -131,168 +134,125 @@ export default function VersionAPolishedOriginal({ onClose }: { onClose?: () => 
           margin: '0 auto',
           padding: '16px 32px',
           display: 'flex',
-          justifyContent: 'space-between',
+          justifyContent: 'center',
           alignItems: 'center'
         }}>
           <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: '1.4rem' }}>
             <span style={{ color: '#059669' }}>Pulse</span> of Learning
           </div>
-          <button style={{
-            background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-            color: '#fff',
-            padding: '12px 28px',
-            borderRadius: '50px',
-            border: 'none',
-            fontWeight: 600,
-            fontSize: '0.95rem',
-            cursor: 'pointer',
-            boxShadow: '0 4px 14px rgba(5, 150, 105, 0.35)',
-            transition: 'all 0.3s ease'
-          }}>
-            Kostenlos starten
-          </button>
         </div>
       </nav>
 
       {/* HERO */}
       <section style={{
-        paddingTop: '140px',
-        paddingBottom: '100px',
-        background: 'linear-gradient(180deg, #fff 0%, #f0fdf4 100%)',
         position: 'relative',
-        overflow: 'hidden'
+        paddingTop: '100px',
+        paddingBottom: '80px',
+        background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)'
       }}>
-        {/* Decorative circles */}
-        <div style={{
-          position: 'absolute',
-          top: '80px',
-          right: '5%',
-          width: '400px',
-          height: '400px',
-          background: 'radial-gradient(circle, rgba(34, 197, 94, 0.15) 0%, transparent 70%)',
-          borderRadius: '50%',
-          pointerEvents: 'none'
-        }} />
-        <div style={{
-          position: 'absolute',
-          bottom: '50px',
-          left: '10%',
-          width: '300px',
-          height: '300px',
-          background: 'radial-gradient(circle, rgba(251, 191, 36, 0.12) 0%, transparent 70%)',
-          borderRadius: '50%',
-          pointerEvents: 'none'
-        }} />
+        {/* Decorative blobs */}
+        <div style={{ position: 'absolute', top: '80px', right: '40px', width: '288px', height: '288px', background: '#bbf7d0', borderRadius: '50%', filter: 'blur(64px)', opacity: 0.3, pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: '80px', left: '40px', width: '384px', height: '384px', background: '#fef3c7', borderRadius: '50%', filter: 'blur(64px)', opacity: 0.3, pointerEvents: 'none' }} />
 
-        <div style={{
-          maxWidth: '900px',
-          margin: '0 auto',
-          padding: '0 32px',
-          textAlign: 'center',
-          position: 'relative',
-          zIndex: 10
-        }}>
-          {/* Badge */}
-          <span style={{
-            display: 'inline-block',
-            background: '#dcfce7',
-            color: '#047857',
-            fontWeight: 600,
-            padding: '10px 24px',
-            borderRadius: '50px',
-            fontSize: '0.9rem',
-            marginBottom: '32px',
-            border: '1px solid #a7f3d0'
-          }}>
-            🎓 Wissenschaftlich fundiertes Lerncoaching
-          </span>
+        {/* Content */}
+        <div style={{ position: 'relative', zIndex: 10, maxWidth: '1100px', margin: '0 auto', padding: '0 24px' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '40px', alignItems: 'center' }}>
 
-          {/* Headline */}
-          <h1 style={{
-            fontFamily: "'Playfair Display', serif",
-            fontSize: 'clamp(2.5rem, 5vw, 3.5rem)',
-            fontWeight: 800,
-            color: '#111827',
-            lineHeight: 1.15,
-            marginBottom: '28px'
-          }}>
-            Dein Kind kann mehr –<br/>
-            wenn es weiß, <span style={{ 
-              color: '#059669',
-              textDecoration: 'underline',
-              textDecorationColor: '#fbbf24',
-              textDecorationThickness: '4px',
-              textUnderlineOffset: '6px'
-            }}>wie man lernt</span>
-          </h1>
+            {/* Text Content */}
+            <div style={{ flex: '1 1 450px' }}>
+              <p style={{ color: '#16a34a', fontWeight: 600, marginBottom: '16px', fontSize: '18px' }}>
+                🎓 Wissenschaftlich fundiertes Lerncoaching
+              </p>
+              <h1 style={{
+                fontSize: '48px',
+                fontWeight: 800,
+                color: '#111827',
+                marginBottom: '24px',
+                lineHeight: 1.15,
+                margin: '0 0 24px 0'
+              }}>
+                Dein Kind kann mehr –<br/>
+                wenn es weiß, <span style={{ color: '#16a34a' }}>wie man lernt</span>
+              </h1>
+              <p style={{ fontSize: '20px', color: '#4b5563', marginBottom: '32px', lineHeight: 1.6 }}>
+                In 12 Wochen entwickelt dein Kind die Lernstrategien der Überflieger – basierend auf der Forschung von John Hattie & Albert Bandura.
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' }}>
+                <button
+                  onClick={() => document.getElementById('cta-section')?.scrollIntoView({ behavior: 'smooth' })}
+                  style={{
+                    background: '#16a34a',
+                    color: 'white',
+                    padding: '16px 32px',
+                    borderRadius: '9999px',
+                    fontWeight: 700,
+                    fontSize: '18px',
+                    boxShadow: '0 10px 25px rgba(22, 163, 74, 0.3)',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}>
+                  Kostenlose Infostunde buchen
+                </button>
+                <button
+                  onClick={() => onGuestMode ? onGuestMode() : onClose?.()}
+                  style={{
+                    background: 'transparent',
+                    color: '#16a34a',
+                    padding: '16px 32px',
+                    borderRadius: '9999px',
+                    fontWeight: 700,
+                    fontSize: '18px',
+                    border: '2px solid #16a34a',
+                    cursor: 'pointer'
+                  }}>
+                  🗺️ Demo ansehen
+                </button>
+              </div>
 
-          {/* Subtitle */}
-          <p style={{
-            fontSize: '1.25rem',
-            color: '#4b5563',
-            maxWidth: '600px',
-            margin: '0 auto 40px auto',
-            lineHeight: 1.7
-          }}>
-            In 8 Wochen entwickelt dein Kind die Lernstrategien der Überflieger – 
-            basierend auf der Forschung von John Hattie & Albert Bandura.
-          </p>
-
-          {/* CTAs */}
-          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '60px' }}>
-            <button style={{
-              background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-              color: '#fff',
-              padding: '18px 40px',
-              borderRadius: '50px',
-              border: 'none',
-              fontWeight: 700,
-              fontSize: '1.1rem',
-              cursor: 'pointer',
-              boxShadow: '0 8px 30px rgba(5, 150, 105, 0.4)',
-              transition: 'transform 0.2s ease, box-shadow 0.2s ease'
-            }}>
-              🚀 Kostenlose Infostunde buchen
-            </button>
-            <button style={{
-              background: '#fff',
-              color: '#059669',
-              padding: '18px 40px',
-              borderRadius: '50px',
-              border: '2px solid #059669',
-              fontWeight: 600,
-              fontSize: '1.1rem',
-              cursor: 'pointer'
-            }}>
-              🗺️ Demo ansehen
-            </button>
-          </div>
-
-          {/* Credentials Bar */}
-          <div style={{
-            display: 'inline-flex',
-            flexWrap: 'wrap',
-            gap: '32px',
-            justifyContent: 'center',
-            background: '#fff',
-            padding: '24px 40px',
-            borderRadius: '20px',
-            boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
-            border: '1px solid #e5e7eb'
-          }}>
-            {[
-              { icon: '👩‍🏫', label: '20+ Jahre', sub: 'Lehrerin am Gymnasium' },
-              { icon: '📊', label: 'Data Science', sub: 'Zertifiziert' },
-              { icon: '👨‍👩‍👧‍👦', label: '2 Kinder', sub: 'Im Schulsystem' }
-            ].map((item, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <span style={{ fontSize: '2rem' }}>{item.icon}</span>
-                <div style={{ textAlign: 'left' }}>
-                  <div style={{ fontWeight: 700, color: '#111827', fontSize: '1rem' }}>{item.label}</div>
-                  <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>{item.sub}</div>
+              {/* Stats */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px', marginTop: '40px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <LehrerinIcon size={48} />
+                  <div>
+                    <div style={{ fontSize: '18px', fontWeight: 700, color: '#111827' }}>20+ Jahre</div>
+                    <div style={{ fontSize: '14px', color: '#6b7280' }}>Lehrerin</div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <DataScienceIcon size={48} />
+                  <div>
+                    <div style={{ fontSize: '20px', fontWeight: 700, color: '#111827' }}>Data Science</div>
+                    <div style={{ fontSize: '14px', color: '#6b7280' }}>zertifiziert</div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <FamilieIcon size={48} />
+                  <div>
+                    <div style={{ fontSize: '20px', fontWeight: 700, color: '#111827' }}>2 Kinder</div>
+                    <div style={{ fontSize: '14px', color: '#6b7280' }}>im Schulsystem</div>
+                  </div>
                 </div>
               </div>
-            ))}
+            </div>
+
+            {/* Portrait */}
+            <div style={{ flex: '0 0 auto', position: 'relative' }}>
+              <div style={{
+                width: '300px',
+                height: '300px',
+                borderRadius: '24px',
+                boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
+                border: '4px solid white',
+                overflow: 'hidden',
+                background: '#d1d5db'
+              }}>
+                <img
+                  src="images/sandra-hero.jpg"
+                  alt="Sandra Störkel - Lerncoach"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -621,7 +581,7 @@ export default function VersionAPolishedOriginal({ onClose }: { onClose?: () => 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
             {[
               { text: '"Endlich versteht meine Tochter, wie sie effektiv lernen kann. Der Stress vor Klassenarbeiten ist deutlich weniger geworden!"', author: 'Mutter von Lisa, 12 Jahre' },
-              { text: '"Mein Sohn hat zum ersten Mal Spaß am Lernen. Die Schatzkarte ist genial – er will gar nicht mehr aufhören!"', author: 'Vater von Max, 10 Jahre' }
+              { text: '"Mein Sohn hat zum ersten Mal Spaß am Lernen. Die Schatzkarte ist genial!"', author: 'Vater von Max, 10 Jahre' }
             ].map((t, i) => (
               <div key={i} style={{
                 background: '#f9fafb',
@@ -670,7 +630,7 @@ export default function VersionAPolishedOriginal({ onClose }: { onClose?: () => 
       </section>
 
       {/* CTA SECTION */}
-      <section style={{
+      <section id="cta-section" style={{
         padding: '100px 32px',
         background: 'linear-gradient(135deg, #059669 0%, #047857 100%)'
       }}>

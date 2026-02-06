@@ -24,6 +24,8 @@ export {
 
 // Theme & Styling
 export {
+  UI,
+  FEEDBACK,
   GOLD,
   DARK,
   STATUS_COLORS,

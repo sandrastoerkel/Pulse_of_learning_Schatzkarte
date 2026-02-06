@@ -248,7 +248,7 @@ export const SHOP_ITEMS: ShopItem[] = [
     slot: 'frame',
     price: 150,
     rarity: 'rare',
-    visualData: { borderColor: '#FFD700' }
+    visualData: { borderColor: 'var(--fb-reward)' }
   },
   {
     id: 'diamond-frame',

@@ -7,7 +7,7 @@
 
 import React, { useCallback } from 'react';
 import type { Room, RoomStats } from '../../types';
-import { ROOM_TEMPLATES, COLOR_TAGS, GOLD, DARK } from '../../constants';
+import { ROOM_TEMPLATES, COLOR_TAGS, UI, FEEDBACK } from '../../constants';
 
 // =============================================================================
 // TYPES
@@ -40,7 +40,7 @@ const styles = {
   } as React.CSSProperties,
 
   modal: {
-    background: `linear-gradient(145deg, ${DARK.elevated} 0%, ${DARK.base} 100%)`,
+    background: `linear-gradient(145deg, ${UI.surface} 0%, ${UI.base} 100%)`,
     borderRadius: '20px',
     border: '2px solid rgba(239, 68, 68, 0.5)',
     boxShadow: '0 24px 48px rgba(0, 0, 0, 0.5), 0 0 40px rgba(239, 68, 68, 0.2)',

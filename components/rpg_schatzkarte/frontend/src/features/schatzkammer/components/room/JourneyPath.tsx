@@ -7,7 +7,7 @@
 
 import React, { useMemo } from 'react';
 import type { Station, Slot } from '../../types';
-import { GOLD } from '../../constants';
+import { UI, FEEDBACK, GOLD } from '../../constants';
 
 // =============================================================================
 // TYPES
@@ -186,8 +186,8 @@ export const JourneyPath: React.FC<JourneyPathProps> = ({
           
           {/* Gradient for completed path */}
           <linearGradient id="pathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor={GOLD.primary} stopOpacity="0.8" />
-            <stop offset="100%" stopColor={GOLD.dark} stopOpacity="0.6" />
+            <stop offset="0%" stopColor={UI.action} stopOpacity="0.8" />
+            <stop offset="100%" stopColor={UI.border} stopOpacity="0.6" />
           </linearGradient>
         </defs>
 
@@ -205,7 +205,7 @@ export const JourneyPath: React.FC<JourneyPathProps> = ({
         <path
           d={mainPath}
           fill="none"
-          stroke={GOLD.primary}
+          stroke={UI.action}
           strokeWidth={2.5 * scale}
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -220,7 +220,7 @@ export const JourneyPath: React.FC<JourneyPathProps> = ({
             key={index}
             d={arrow.path}
             fill="none"
-            stroke={arrow.isPast ? GOLD.dark : GOLD.primary}
+            stroke={arrow.isPast ? UI.border : UI.action}
             strokeWidth={2 * scale}
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -241,7 +241,7 @@ export const JourneyPath: React.FC<JourneyPathProps> = ({
                   cx={point.x}
                   cy={point.y}
                   r={12 * scale}
-                  fill={GOLD.primary}
+                  fill={UI.action}
                   opacity={0.3}
                 >
                   <animate
@@ -264,8 +264,8 @@ export const JourneyPath: React.FC<JourneyPathProps> = ({
                 cx={point.x}
                 cy={point.y}
                 r={isCurrent ? 6 * scale : 4 * scale}
-                fill={isCurrent ? GOLD.primary : isPast ? GOLD.dark : GOLD.light}
-                stroke={isCurrent ? '#fff' : GOLD.primary}
+                fill={isCurrent ? UI.action : isPast ? UI.border : UI.actionHover}
+                stroke={isCurrent ? '#fff' : UI.action}
                 strokeWidth={isCurrent ? 2 * scale : 1 * scale}
                 opacity={isPast ? 0.6 : 1}
               />

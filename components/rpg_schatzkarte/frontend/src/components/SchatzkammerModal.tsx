@@ -126,7 +126,7 @@ const styles = {
     width: '48px',
     height: '48px',
     background: 'rgba(255, 255, 255, 0.1)',
-    border: '2px solid rgba(255, 215, 0, 0.3)',
+    border: '2px solid rgba(14, 165, 233, 0.3)',
     borderRadius: '50%',
     color: '#fff',
     fontSize: '24px',

@@ -66,8 +66,8 @@ const PlayIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
     <defs>
       <linearGradient id="playGold" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#FFD700" />
-        <stop offset="100%" stopColor="#FFA500" />
+        <stop offset="0%" stopColor="var(--fb-reward)" />
+        <stop offset="100%" stopColor="var(--fb-reward)" />
       </linearGradient>
     </defs>
     <path d="M8 5v14l11-7L8 5z" fill="url(#playGold)" />
@@ -89,8 +89,8 @@ const CheckIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
     <defs>
       <linearGradient id="checkGold" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#FFD700" />
-        <stop offset="100%" stopColor="#FFA500" />
+        <stop offset="0%" stopColor="var(--fb-reward)" />
+        <stop offset="100%" stopColor="var(--fb-reward)" />
       </linearGradient>
     </defs>
     <path
@@ -107,9 +107,9 @@ const TrophyIcon = () => (
   <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
     <defs>
       <linearGradient id="trophyGold" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#FFD700" />
+        <stop offset="0%" stopColor="var(--fb-reward)" />
         <stop offset="50%" stopColor="#FFEC8B" />
-        <stop offset="100%" stopColor="#FFA500" />
+        <stop offset="100%" stopColor="var(--fb-reward)" />
       </linearGradient>
     </defs>
     <path
@@ -230,7 +230,7 @@ export const PowerTechnikenLernpfad: React.FC<PowerTechnikenLernpfadProps> = ({
                     style={{
                       ...styles.connector,
                       background: completed || (unlocked && isCompleted(video.id - 1))
-                        ? 'linear-gradient(180deg, #FFD700, #FFA500)'
+                        ? 'var(--ui-action)'
                         : '#3D3D3D',
                     }}
                     initial={{ scaleY: 0 }}
@@ -247,7 +247,7 @@ export const PowerTechnikenLernpfad: React.FC<PowerTechnikenLernpfadProps> = ({
                   opacity: unlocked ? 1 : 0.6,
                   cursor: unlocked ? 'pointer' : 'not-allowed',
                   border: completed
-                    ? '2px solid #FFD700'
+                    ? '2px solid var(--ui-action)'
                     : unlocked
                       ? '2px solid #4A4A4A'
                       : '2px solid #2D2D2D',
@@ -255,7 +255,7 @@ export const PowerTechnikenLernpfad: React.FC<PowerTechnikenLernpfadProps> = ({
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: unlocked ? 1 : 0.6, x: 0 }}
                 transition={{ delay: index * 0.15 }}
-                whileHover={unlocked ? { scale: 1.02, borderColor: '#FFD700' } : {}}
+                whileHover={unlocked ? { scale: 1.02, borderColor: 'var(--fb-reward)' } : {}}
                 whileTap={unlocked ? { scale: 0.98 } : {}}
                 onClick={() => handleVideoClick(video)}
               >
@@ -263,7 +263,7 @@ export const PowerTechnikenLernpfad: React.FC<PowerTechnikenLernpfadProps> = ({
                 <div style={{
                   ...styles.videoNumber,
                   background: completed
-                    ? 'linear-gradient(135deg, #FFD700, #FFA500)'
+                    ? 'var(--ui-action)'
                     : unlocked
                       ? 'linear-gradient(135deg, #4A4A4A, #3D3D3D)'
                       : '#2D2D2D',
@@ -303,7 +303,7 @@ export const PowerTechnikenLernpfad: React.FC<PowerTechnikenLernpfadProps> = ({
             style={{
               ...styles.connector,
               background: allCompleted
-                ? 'linear-gradient(180deg, #FFD700, #FFA500)'
+                ? 'var(--ui-action)'
                 : '#3D3D3D',
             }}
           />
@@ -315,7 +315,7 @@ export const PowerTechnikenLernpfad: React.FC<PowerTechnikenLernpfadProps> = ({
             opacity: allCompleted ? 1 : 0.5,
             cursor: allCompleted ? 'pointer' : 'not-allowed',
             border: allCompleted
-              ? '2px solid #FFD700'
+              ? '2px solid var(--ui-action)'
               : '2px dashed #4A4A4A',
           }}
           initial={{ opacity: 0, y: 20 }}
@@ -501,7 +501,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   title: {
     fontSize: '24px',
     fontWeight: 'bold',
-    background: 'linear-gradient(135deg, #FFD700, #FFA500)',
+    background: 'var(--ui-action)',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
     backgroundClip: 'text',
@@ -529,7 +529,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontSize: '13px',
   },
   xpLabel: {
-    color: '#FFD700',
+    color: 'var(--fb-reward)',
     fontSize: '13px',
     fontWeight: 'bold',
   },
@@ -541,7 +541,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   progressBarFill: {
     height: '100%',
-    background: 'linear-gradient(90deg, #FFD700, #FFA500)',
+    background: 'var(--ui-action)',
     borderRadius: '3px',
   },
   pathContainer: {
@@ -607,7 +607,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   videoXP: {
     fontSize: '11px',
-    color: '#FFD700',
+    color: 'var(--fb-reward)',
     fontWeight: 'bold',
   },
   playButton: {
@@ -618,7 +618,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    border: '2px solid #FFD700',
+    border: '2px solid var(--ui-action)',
   },
   challengeCard: {
     display: 'flex',
@@ -644,7 +644,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   challengeTitle: {
     fontSize: '16px',
     fontWeight: 'bold',
-    color: '#FFD700',
+    color: 'var(--fb-reward)',
     margin: '0 0 4px 0',
   },
   challengeSubtitle: {
@@ -654,7 +654,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   challengeArrow: {
     fontSize: '20px',
-    color: '#FFD700',
+    color: 'var(--fb-reward)',
   },
   modalOverlay: {
     position: 'fixed',
@@ -738,7 +738,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     padding: '12px',
     borderRadius: '10px',
     border: 'none',
-    background: 'linear-gradient(135deg, #FFD700, #FFA500)',
+    background: 'var(--ui-action)',
     color: '#000',
     fontSize: '14px',
     fontWeight: 'bold',
@@ -768,7 +768,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   unlockText: {
     fontSize: '20px',
     fontWeight: 'bold',
-    color: '#FFD700',
+    color: 'var(--fb-reward)',
   },
   // Werkzeuge-Section Styles
   toolsSection: {
@@ -813,7 +813,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   toolTitle: {
     fontSize: '14px',
     fontWeight: 'bold',
-    color: '#FFD700',
+    color: 'var(--fb-reward)',
     margin: '0 0 4px 0',
   },
   toolDescription: {
@@ -823,7 +823,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   toolArrow: {
     fontSize: '18px',
-    color: '#FFD700',
+    color: 'var(--fb-reward)',
     flexShrink: 0,
   },
 };

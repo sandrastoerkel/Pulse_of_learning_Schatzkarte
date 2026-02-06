@@ -1724,7 +1724,7 @@ function CertificatePreview({ progress, onBack, totalXP }: CertificatePreviewPro
 // ============================================
 
 function ConfettiEffect() {
-  const colors = ['#ffd700', '#ff6b6b', '#4ecdc4', '#9b59b6', '#3498db', '#2ecc71'];
+  const colors = ['var(--fb-reward)', '#ff6b6b', '#4ecdc4', '#9b59b6', '#3498db', '#2ecc71'];
   const confettiPieces = Array.from({ length: 50 }, (_, i) => ({
     id: i,
     left: Math.random() * 100,

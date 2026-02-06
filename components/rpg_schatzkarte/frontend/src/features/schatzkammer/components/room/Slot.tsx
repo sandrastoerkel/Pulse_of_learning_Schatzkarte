@@ -7,7 +7,7 @@
 
 import React from 'react';
 import type { Slot as SlotType, Station, RecallStatus, RoomMode } from '../../types';
-import { STATUS_COLORS, GOLD, DARK } from '../../constants';
+import { STATUS_COLORS, UI, FEEDBACK } from '../../constants';
 
 // =============================================================================
 // TYPES
@@ -61,9 +61,9 @@ const createStyles = (scale: number) => ({
   emptySlot: (isSelected: boolean, mode: RoomMode): React.CSSProperties => ({
     width: '100%',
     height: '100%',
-    border: `2px dashed ${mode === 'edit' ? 'rgba(255, 215, 0, 0.4)' : 'rgba(255, 255, 255, 0.15)'}`,
+    border: `2px dashed ${mode === 'edit' ? UI.action : 'rgba(255, 255, 255, 0.15)'}`,
     borderRadius: '12px',
-    background: mode === 'edit' ? 'rgba(255, 215, 0, 0.05)' : 'transparent',
+    background: mode === 'edit' ? UI.actionSubtle : 'transparent',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -73,7 +73,7 @@ const createStyles = (scale: number) => ({
 
   addIcon: {
     fontSize: '24px',
-    color: GOLD.primary,
+    color: UI.action,
     opacity: 0.6,
   } as React.CSSProperties,
 
@@ -85,13 +85,13 @@ const createStyles = (scale: number) => ({
   ): React.CSSProperties => ({
     width: '100%',
     height: '100%',
-    background: `linear-gradient(145deg, ${DARK.elevated} 0%, ${DARK.base} 100%)`,
+    background: `linear-gradient(145deg, ${UI.surface} 0%, ${UI.base} 100%)`,
     borderRadius: '12px',
-    border: `2px solid ${isSelected || isHighlighted ? GOLD.primary : statusColor}`,
-    boxShadow: isHighlighted 
-      ? `0 0 20px rgba(255, 215, 0, 0.5), 0 0 40px rgba(255, 215, 0, 0.3)`
+    border: `2px solid ${isSelected || isHighlighted ? UI.action : statusColor}`,
+    boxShadow: isHighlighted
+      ? `0 0 20px rgba(14, 165, 233, 0.5), 0 0 40px rgba(14, 165, 233, 0.3)`
       : isSelected
-        ? `0 0 15px rgba(255, 215, 0, 0.3)`
+        ? `0 0 15px rgba(14, 165, 233, 0.3)`
         : `0 4px 12px rgba(0, 0, 0, 0.3)`,
     display: 'flex',
     flexDirection: 'column',
@@ -147,16 +147,16 @@ const createStyles = (scale: number) => ({
     width: '24px',
     height: '24px',
     borderRadius: '50%',
-    background: isHighlighted ? GOLD.gradient : DARK.surface,
-    border: `2px solid ${isHighlighted ? GOLD.primary : GOLD.dark}`,
+    background: isHighlighted ? UI.action : UI.surfaceHover,
+    border: `2px solid ${isHighlighted ? UI.action : UI.border}`,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     fontSize: '12px',
     fontWeight: 700,
-    color: isHighlighted ? DARK.deepest : GOLD.primary,
-    boxShadow: isHighlighted 
-      ? '0 0 10px rgba(255, 215, 0, 0.5)' 
+    color: isHighlighted ? UI.base : UI.action,
+    boxShadow: isHighlighted
+      ? '0 0 10px rgba(14, 165, 233, 0.5)'
       : '0 2px 4px rgba(0, 0, 0, 0.3)',
     zIndex: 10,
   }),
@@ -177,7 +177,7 @@ const createStyles = (scale: number) => ({
     inset: '-4px',
     borderRadius: '16px',
     background: 'transparent',
-    boxShadow: '0 0 30px rgba(255, 215, 0, 0.4)',
+    boxShadow: '0 0 30px rgba(14, 165, 233, 0.4)',
     pointerEvents: 'none',
     animation: 'glow 2s ease-in-out infinite',
   } as React.CSSProperties,

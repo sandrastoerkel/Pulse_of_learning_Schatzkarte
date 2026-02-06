@@ -15,8 +15,8 @@ import {
   STATUS_COLORS,
   STATUS_LABELS,
   STATUS_EMOJIS,
-  GOLD,
-  DARK
+  UI,
+  FEEDBACK
 } from '../../constants';
 import { formatRelativeDate } from '../../utils';
 import { VoiceTextInput } from '../../../../components/VoiceTextInput';
@@ -60,10 +60,10 @@ const styles = {
   } as React.CSSProperties,
 
   modal: {
-    background: `linear-gradient(145deg, ${DARK.elevated} 0%, ${DARK.base} 100%)`,
+    background: `linear-gradient(145deg, ${UI.surface} 0%, ${UI.base} 100%)`,
     borderRadius: '20px',
-    border: `2px solid ${GOLD.dark}`,
-    boxShadow: `0 24px 48px rgba(0, 0, 0, 0.5), ${GOLD.glow}`,
+    border: `2px solid ${UI.action}`,
+    boxShadow: `0 24px 48px rgba(0, 0, 0, 0.5), 0 0 12px rgba(14, 165, 233, 0.3)`,
     width: '100%',
     maxWidth: '500px',
     maxHeight: '90vh',
@@ -84,8 +84,8 @@ const styles = {
     width: '56px',
     height: '56px',
     borderRadius: '14px',
-    background: 'rgba(255, 215, 0, 0.1)',
-    border: `1px solid ${GOLD.dark}`,
+    background: 'rgba(14, 165, 233, 0.1)',
+    border: `1px solid ${UI.action}`,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -141,7 +141,7 @@ const styles = {
     display: 'block',
     fontSize: '12px',
     fontWeight: 600,
-    color: GOLD.primary,
+    color: UI.action,
     textTransform: 'uppercase',
     letterSpacing: '1px',
     marginBottom: '8px',
@@ -248,8 +248,8 @@ const styles = {
 
   button: (variant: 'primary' | 'secondary' | 'danger'): React.CSSProperties => ({
     padding: '12px 24px',
-    background: variant === 'primary' 
-      ? GOLD.gradient 
+    background: variant === 'primary'
+      ? UI.action
       : variant === 'danger'
         ? 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)'
         : 'rgba(255, 255, 255, 0.05)',
@@ -257,7 +257,7 @@ const styles = {
     borderRadius: '10px',
     fontSize: '14px',
     fontWeight: 600,
-    color: variant === 'primary' ? DARK.deepest : variant === 'danger' ? '#fff' : 'rgba(255, 255, 255, 0.8)',
+    color: variant === 'primary' ? '#fff' : variant === 'danger' ? '#fff' : 'rgba(255, 255, 255, 0.8)',
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
@@ -287,24 +287,24 @@ const styles = {
     color: 'rgba(255, 255, 255, 0.6)',
     marginBottom: '32px',
     padding: '16px',
-    background: 'rgba(255, 215, 0, 0.1)',
+    background: 'rgba(14, 165, 233, 0.1)',
     borderRadius: '12px',
-    border: `1px solid ${GOLD.dark}`,
+    border: `1px solid ${UI.action}`,
   } as React.CSSProperties,
 
   revealButton: {
     padding: '16px 40px',
-    background: GOLD.gradient,
+    background: UI.action,
     border: 'none',
     borderRadius: '12px',
     fontSize: '16px',
     fontWeight: 600,
-    color: DARK.deepest,
+    color: '#fff',
     cursor: 'pointer',
     display: 'inline-flex',
     alignItems: 'center',
     gap: '10px',
-    boxShadow: '0 4px 16px rgba(255, 215, 0, 0.3)',
+    boxShadow: '0 4px 16px rgba(14, 165, 233, 0.3)',
   } as React.CSSProperties,
 
   journeyContent: {

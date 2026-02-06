@@ -7,7 +7,7 @@
 
 import React from 'react';
 import type { Room, RoomStats, ColorTag } from '../../types';
-import { ROOM_TEMPLATES, COLOR_TAGS, GOLD, DARK } from '../../constants';
+import { ROOM_TEMPLATES, COLOR_TAGS, UI } from '../../constants';
 import { formatRelativeDate, truncate } from '../../utils';
 
 // =============================================================================
@@ -31,14 +31,14 @@ export interface RoomCardProps {
 const styles = {
   card: (colorTag: ColorTag, isSelected: boolean): React.CSSProperties => ({
     position: 'relative',
-    background: `linear-gradient(145deg, ${DARK.elevated} 0%, ${DARK.base} 100%)`,
+    background: `linear-gradient(145deg, ${UI.surface} 0%, ${UI.base} 100%)`,
     borderRadius: '16px',
-    border: `2px solid ${isSelected ? GOLD.primary : COLOR_TAGS[colorTag].border}`,
+    border: `2px solid ${isSelected ? UI.action : COLOR_TAGS[colorTag].border}`,
     padding: '20px',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
-    boxShadow: isSelected 
-      ? `0 8px 32px rgba(255, 215, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)`
+    boxShadow: isSelected
+      ? `0 8px 32px rgba(14, 165, 233, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)`
       : `0 4px 16px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05)`,
     overflow: 'hidden',
   }),
@@ -119,7 +119,7 @@ const styles = {
   statValue: {
     fontSize: '20px',
     fontWeight: 700,
-    color: GOLD.primary,
+    color: UI.action,
     display: 'block',
   } as React.CSSProperties,
 
@@ -151,12 +151,12 @@ const styles = {
   primaryButton: {
     flex: 1,
     padding: '12px 16px',
-    background: GOLD.gradient,
+    background: UI.action,
     border: 'none',
     borderRadius: '10px',
     fontSize: '14px',
     fontWeight: 600,
-    color: DARK.deepest,
+    color: '#fff',
     cursor: 'pointer',
     transition: 'all 0.2s ease',
     display: 'flex',

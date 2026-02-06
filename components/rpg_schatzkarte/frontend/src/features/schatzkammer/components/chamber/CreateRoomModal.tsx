@@ -7,14 +7,14 @@
 
 import React, { useState, useCallback } from 'react';
 import type { TemplateId, ColorTag } from '../../types';
-import { 
-  ROOM_TEMPLATES, 
-  TEMPLATE_IDS, 
+import {
+  ROOM_TEMPLATES,
+  TEMPLATE_IDS,
   DEFAULT_TEMPLATE,
   COLOR_TAGS,
   COLOR_TAG_OPTIONS,
-  GOLD, 
-  DARK 
+  UI,
+  FEEDBACK,
 } from '../../constants';
 
 // =============================================================================
@@ -60,10 +60,10 @@ const styles = {
   } as React.CSSProperties,
 
   modal: {
-    background: `linear-gradient(145deg, ${DARK.elevated} 0%, ${DARK.base} 100%)`,
+    background: `linear-gradient(145deg, ${UI.surface} 0%, ${UI.base} 100%)`,
     borderRadius: '20px',
-    border: `2px solid ${GOLD.dark}`,
-    boxShadow: `0 24px 48px rgba(0, 0, 0, 0.5), ${GOLD.glow}`,
+    border: `2px solid ${UI.border}`,
+    boxShadow: '0 24px 48px rgba(0, 0, 0, 0.5), 0 0 12px rgba(14, 165, 233, 0.3)',
     width: '100%',
     maxWidth: '600px',
     maxHeight: '90vh',
@@ -108,7 +108,7 @@ const styles = {
   sectionTitle: {
     fontSize: '14px',
     fontWeight: 600,
-    color: GOLD.primary,
+    color: UI.action,
     textTransform: 'uppercase',
     letterSpacing: '1px',
     marginBottom: '12px',
@@ -122,10 +122,10 @@ const styles = {
 
   templateCard: (isSelected: boolean): React.CSSProperties => ({
     padding: '16px 12px',
-    background: isSelected 
-      ? 'rgba(255, 215, 0, 0.15)' 
+    background: isSelected
+      ? UI.actionSubtle
       : 'rgba(255, 255, 255, 0.03)',
-    border: `2px solid ${isSelected ? GOLD.primary : 'rgba(255, 255, 255, 0.1)'}`,
+    border: `2px solid ${isSelected ? UI.action : 'rgba(255, 255, 255, 0.1)'}`,
     borderRadius: '12px',
     cursor: 'pointer',
     transition: 'all 0.2s ease',
@@ -152,7 +152,7 @@ const styles = {
 
   templateSlots: {
     fontSize: '11px',
-    color: GOLD.light,
+    color: UI.action,
     marginTop: '4px',
   } as React.CSSProperties,
 
@@ -236,12 +236,12 @@ const styles = {
 
   createButton: (isValid: boolean): React.CSSProperties => ({
     padding: '12px 32px',
-    background: isValid ? GOLD.gradient : 'rgba(255, 255, 255, 0.1)',
+    background: isValid ? UI.action : 'rgba(255, 255, 255, 0.1)',
     border: 'none',
     borderRadius: '10px',
     fontSize: '15px',
     fontWeight: 600,
-    color: isValid ? DARK.deepest : 'rgba(255, 255, 255, 0.4)',
+    color: isValid ? '#fff' : 'rgba(255, 255, 255, 0.4)',
     cursor: isValid ? 'pointer' : 'not-allowed',
     transition: 'all 0.2s ease',
     display: 'flex',

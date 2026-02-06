@@ -65,7 +65,7 @@ const Confetti: React.FC<{ active: boolean }> = ({ active }) => {
   
   useEffect(() => {
     if (active) {
-      const colors = ['#FFD700', '#4ade80', '#3498db', '#9b59b6', '#ef4444', '#f59e0b'];
+      const colors = ['var(--fb-reward)', '#4ade80', '#3498db', '#9b59b6', '#ef4444', '#f59e0b'];
       const newPieces: ConfettiPiece[] = [];
       
       for (let i = 0; i < 50; i++) {

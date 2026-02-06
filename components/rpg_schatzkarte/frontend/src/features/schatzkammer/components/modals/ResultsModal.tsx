@@ -10,13 +10,13 @@
 
 import React, { useMemo } from 'react';
 import type { JourneyResult } from '../../types';
-import { 
-  STATUS_COLORS, 
+import {
+  STATUS_COLORS,
   STATUS_LABELS,
   getResultEmoji,
   getResultMessage,
-  GOLD, 
-  DARK,
+  UI,
+  FEEDBACK,
   KEYFRAMES,
 } from '../../constants';
 
@@ -50,10 +50,10 @@ const styles = {
   } as React.CSSProperties,
 
   modal: {
-    background: `linear-gradient(145deg, ${DARK.elevated} 0%, ${DARK.base} 100%)`,
+    background: `linear-gradient(145deg, ${UI.surface} 0%, ${UI.base} 100%)`,
     borderRadius: '24px',
-    border: `2px solid ${GOLD.dark}`,
-    boxShadow: `0 24px 48px rgba(0, 0, 0, 0.5), ${GOLD.glowStrong}`,
+    border: `2px solid ${UI.border}`,
+    boxShadow: '0 24px 48px rgba(0, 0, 0, 0.5), 0 0 20px rgba(14, 165, 233, 0.5)',
     width: '100%',
     maxWidth: '420px',
     overflow: 'hidden',
@@ -79,15 +79,15 @@ const styles = {
     width: '100px',
     height: '100px',
     borderRadius: '50%',
-    background: 'rgba(255, 215, 0, 0.1)',
-    border: `3px solid ${GOLD.primary}`,
+    background: UI.actionSubtle,
+    border: `3px solid ${UI.action}`,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     margin: '0 auto 24px',
     fontSize: '50px',
     animation: 'scaleIn 0.5s ease',
-    boxShadow: GOLD.glow,
+    boxShadow: '0 0 12px rgba(14, 165, 233, 0.3)',
   } as React.CSSProperties,
 
   title: {
@@ -137,8 +137,8 @@ const styles = {
 
   xpSection: {
     padding: '20px',
-    background: `linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 165, 0, 0.1) 100%)`,
-    border: `1px solid ${GOLD.dark}`,
+    background: FEEDBACK.rewardSubtle,
+    border: `1px solid ${UI.border}`,
     borderRadius: '16px',
     marginBottom: '32px',
   } as React.CSSProperties,
@@ -154,7 +154,7 @@ const styles = {
   xpValue: {
     fontSize: '40px',
     fontWeight: 700,
-    color: GOLD.primary,
+    color: FEEDBACK.reward,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -214,12 +214,12 @@ const styles = {
   button: (variant: 'primary' | 'secondary'): React.CSSProperties => ({
     flex: 1,
     padding: '14px 20px',
-    background: variant === 'primary' ? GOLD.gradient : 'rgba(255, 255, 255, 0.05)',
+    background: variant === 'primary' ? UI.action : 'rgba(255, 255, 255, 0.05)',
     border: variant === 'secondary' ? '1px solid rgba(255, 255, 255, 0.15)' : 'none',
     borderRadius: '12px',
     fontSize: '15px',
     fontWeight: 600,
-    color: variant === 'primary' ? DARK.deepest : 'rgba(255, 255, 255, 0.8)',
+    color: variant === 'primary' ? '#fff' : 'rgba(255, 255, 255, 0.8)',
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
@@ -262,7 +262,7 @@ const ConfettiPiece: React.FC<{ delay: number; left: number; color: string }> = 
 const Confetti: React.FC<{ show: boolean }> = ({ show }) => {
   if (!show) return null;
 
-  const colors = [GOLD.primary, GOLD.light, '#22c55e', '#3b82f6', '#a78bfa'];
+  const colors = [UI.action, FEEDBACK.reward, '#22c55e', '#3b82f6', '#a78bfa'];
   const pieces = Array.from({ length: 30 }, (_, i) => ({
     id: i,
     delay: Math.random() * 2,
@@ -336,8 +336,8 @@ export const ResultsModal: React.FC<ResultsModalProps> = ({
           to { transform: scale(1); opacity: 1; }
         }
         @keyframes glow {
-          0%, 100% { filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6)); }
-          50% { filter: drop-shadow(0 0 16px rgba(255, 215, 0, 0.9)); }
+          0%, 100% { filter: drop-shadow(0 0 8px rgba(14, 165, 233, 0.6)); }
+          50% { filter: drop-shadow(0 0 16px rgba(14, 165, 233, 0.9)); }
         }
       `}</style>
 

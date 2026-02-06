@@ -14,10 +14,10 @@ import type {
   RoomStats,
   TemplateId,
 } from '../../types';
-import { 
-  getTemplateSlots, 
-  ROOM_VIEWPORT, 
-  DARK, 
+import {
+  getTemplateSlots,
+  ROOM_VIEWPORT,
+  UI,
   KEYFRAMES,
   needsReview,
 } from '../../constants';
@@ -60,7 +60,7 @@ export interface LociRoomProps {
 const styles = {
   container: {
     minHeight: '100vh',
-    background: `linear-gradient(180deg, ${DARK.deepest} 0%, ${DARK.base} 100%)`,
+    background: `linear-gradient(180deg, ${UI.base} 0%, ${UI.base} 100%)`,
     display: 'flex',
     flexDirection: 'column',
   } as React.CSSProperties,
@@ -81,7 +81,7 @@ const styles = {
     aspectRatio: `${ROOM_VIEWPORT.width} / ${ROOM_VIEWPORT.height}`,
     borderRadius: '20px',
     overflow: 'hidden',
-    boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), inset 0 0 0 2px rgba(255, 215, 0, 0.2)',
+    boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), inset 0 0 0 2px rgba(14, 165, 233, 0.2)',
   } as React.CSSProperties,
 
   roomInner: {
@@ -92,7 +92,7 @@ const styles = {
   backgroundPlaceholder: {
     position: 'absolute',
     inset: 0,
-    background: `linear-gradient(145deg, ${DARK.elevated} 0%, ${DARK.base} 100%)`,
+    background: `linear-gradient(145deg, ${UI.surface} 0%, ${UI.base} 100%)`,
   } as React.CSSProperties,
 
   slotsContainer: {
@@ -155,7 +155,7 @@ const DefaultBackground: React.FC<{ scale: number }> = ({ scale }) => (
           <path
             d={`M ${40 * scale} 0 L 0 0 0 ${40 * scale}`}
             fill="none"
-            stroke="rgba(255, 215, 0, 0.3)"
+            stroke="rgba(14, 165, 233, 0.3)"
             strokeWidth="1"
           />
         </pattern>
@@ -266,8 +266,8 @@ export const LociRoom: React.FC<LociRoomProps> = ({
           50% { opacity: 0.5; }
         }
         @keyframes glow {
-          0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
-          50% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.6); }
+          0%, 100% { box-shadow: 0 0 20px rgba(14, 165, 233, 0.4); }
+          50% { box-shadow: 0 0 40px rgba(14, 165, 233, 0.6); }
         }
       `}</style>
 

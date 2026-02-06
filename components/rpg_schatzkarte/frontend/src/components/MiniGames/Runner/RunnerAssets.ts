@@ -217,7 +217,7 @@ export const COLLECTIBLE_DEFINITIONS: Record<CollectibleType, CollectibleDefinit
   coin: {
     type: 'coin',
     emoji: '🪙',
-    color: '#FFD700',
+    color: 'var(--fb-reward)',
     glowColor: 'rgba(255, 215, 0, 0.5)',
     size: 32,
     value: { gold: 10 },

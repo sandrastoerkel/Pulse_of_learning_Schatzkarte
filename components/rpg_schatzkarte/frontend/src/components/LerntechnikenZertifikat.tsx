@@ -288,7 +288,7 @@ interface ConfettiProps {
 
 function CertificateConfetti({ onComplete }: ConfettiProps) {
   const colors = [
-    '#ffd700', // Gold
+    'var(--fb-reward)', // Gold
     '#ffb347', // Orange
     '#ff6961', // Rot
     '#77dd77', // Grün

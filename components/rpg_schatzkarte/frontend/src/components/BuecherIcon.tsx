@@ -33,9 +33,9 @@ export const BuecherIcon = ({
         {/* Gold-Gradient für Hauptelemente */}
         <linearGradient id={`${id}-goldGradient`} x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#FFE55C" />
-          <stop offset="25%" stopColor="#FFD700" />
+          <stop offset="25%" stopColor="var(--fb-reward)" />
           <stop offset="50%" stopColor="#FFC125" />
-          <stop offset="75%" stopColor="#FFD700" />
+          <stop offset="75%" stopColor="var(--fb-reward)" />
           <stop offset="100%" stopColor="#B8860B" />
         </linearGradient>
         
@@ -59,8 +59,8 @@ export const BuecherIcon = ({
         
         {/* Wissens-Glow */}
         <radialGradient id={`${id}-knowledgeGlow`} cx="50%" cy="30%" r="60%">
-          <stop offset="0%" stopColor="#FFD700" stopOpacity="0.6" />
-          <stop offset="100%" stopColor="#FFD700" stopOpacity="0" />
+          <stop offset="0%" stopColor="var(--fb-reward)" stopOpacity="0.6" />
+          <stop offset="100%" stopColor="var(--fb-reward)" stopOpacity="0" />
         </radialGradient>
         
         {/* Glüh-Effekt */}
@@ -114,7 +114,7 @@ export const BuecherIcon = ({
           cy="32"
           r="30"
           fill="none"
-          stroke="#FFD700"
+          stroke="var(--fb-reward)"
           strokeWidth="1"
           opacity="0.3"
         >

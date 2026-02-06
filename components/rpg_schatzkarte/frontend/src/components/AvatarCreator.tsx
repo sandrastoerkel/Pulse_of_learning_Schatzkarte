@@ -98,7 +98,7 @@ export const AvatarCreator: React.FC<AvatarCreatorProps> = ({
 
   // Confetti effect
   const spawnConfetti = () => {
-    const colors = ['#FFD700', '#9B59B6', '#E74C3C', '#3498DB', '#2ECC71', '#FF69B4'];
+    const colors = ['var(--fb-reward)', '#9B59B6', '#E74C3C', '#3498DB', '#2ECC71', '#FF69B4'];
     const newConfetti = Array.from({ length: 50 }, (_, i) => ({
       id: Date.now() + i,
       style: {

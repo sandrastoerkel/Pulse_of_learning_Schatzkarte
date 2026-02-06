@@ -7,7 +7,7 @@
 
 import React, { useCallback } from 'react';
 import type { Station } from '../../types';
-import { GOLD, DARK } from '../../constants';
+import { UI, FEEDBACK } from '../../constants';
 
 // =============================================================================
 // TYPES
@@ -39,10 +39,10 @@ const styles = {
   } as React.CSSProperties,
 
   panel: {
-    background: `linear-gradient(145deg, ${DARK.elevated} 0%, ${DARK.base} 100%)`,
+    background: `linear-gradient(145deg, ${UI.surface} 0%, ${UI.base} 100%)`,
     borderRadius: '20px',
-    border: `2px solid ${GOLD.dark}`,
-    boxShadow: `0 20px 40px rgba(0, 0, 0, 0.5), ${GOLD.glow}`,
+    border: `2px solid ${UI.action}`,
+    boxShadow: `0 20px 40px rgba(0, 0, 0, 0.5), 0 0 12px rgba(14, 165, 233, 0.3)`,
     width: '100%',
     maxWidth: '380px',
     maxHeight: '80vh',
@@ -127,13 +127,13 @@ const styles = {
     width: '28px',
     height: '28px',
     borderRadius: '50%',
-    background: `linear-gradient(135deg, ${GOLD.primary} 0%, ${GOLD.dark} 100%)`,
+    background: UI.action,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     fontSize: '13px',
     fontWeight: 700,
-    color: DARK.deepest,
+    color: '#fff',
     flexShrink: 0,
   } as React.CSSProperties,
 
@@ -190,12 +190,12 @@ const styles = {
   doneButton: {
     width: '100%',
     padding: '12px',
-    background: GOLD.gradient,
+    background: UI.action,
     border: 'none',
     borderRadius: '10px',
     fontSize: '14px',
     fontWeight: 600,
-    color: DARK.deepest,
+    color: '#fff',
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',

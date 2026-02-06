@@ -64,7 +64,7 @@ export const AvatarDisplay: React.FC<AvatarDisplayProps> = ({
             inset: -4,
             border: '3px solid gold',
             borderRadius: '50%',
-            boxShadow: '0 0 15px rgba(255, 215, 0, 0.5)',
+            boxShadow: '0 0 15px rgba(14, 165, 233, 0.5)',
           }}
         />
       )}

@@ -13,8 +13,8 @@ import {
   ARTIFACT_TYPES,
   ARTIFACT_ICON_SUGGESTIONS,
   DEFAULT_ARTIFACT_TYPE,
-  GOLD,
-  DARK
+  UI,
+  FEEDBACK
 } from '../../constants';
 import { VoiceTextInput } from '../../../../components/VoiceTextInput';
 
@@ -49,10 +49,10 @@ const styles = {
   } as React.CSSProperties,
 
   modal: {
-    background: `linear-gradient(145deg, ${DARK.elevated} 0%, ${DARK.base} 100%)`,
+    background: `linear-gradient(145deg, ${UI.surface} 0%, ${UI.base} 100%)`,
     borderRadius: '20px',
-    border: `2px solid ${GOLD.dark}`,
-    boxShadow: `0 24px 48px rgba(0, 0, 0, 0.5), ${GOLD.glow}`,
+    border: `2px solid ${UI.action}`,
+    boxShadow: `0 24px 48px rgba(0, 0, 0, 0.5), 0 0 12px rgba(14, 165, 233, 0.3)`,
     width: '100%',
     maxWidth: '520px',
     maxHeight: '90vh',
@@ -112,7 +112,7 @@ const styles = {
     width: '8px',
     height: '8px',
     borderRadius: '50%',
-    background: isActive || isComplete ? GOLD.primary : 'rgba(255, 255, 255, 0.2)',
+    background: isActive || isComplete ? UI.action : 'rgba(255, 255, 255, 0.2)',
     transition: 'all 0.2s ease',
   }),
 
@@ -131,8 +131,8 @@ const styles = {
 
   typeCard: (isSelected: boolean): React.CSSProperties => ({
     padding: '16px',
-    background: isSelected ? 'rgba(255, 215, 0, 0.1)' : 'rgba(255, 255, 255, 0.03)',
-    border: `2px solid ${isSelected ? GOLD.primary : 'rgba(255, 255, 255, 0.1)'}`,
+    background: isSelected ? 'rgba(14, 165, 233, 0.1)' : 'rgba(255, 255, 255, 0.03)',
+    border: `2px solid ${isSelected ? UI.action : 'rgba(255, 255, 255, 0.1)'}`,
     borderRadius: '14px',
     cursor: 'pointer',
     transition: 'all 0.2s ease',
@@ -166,7 +166,7 @@ const styles = {
     display: 'block',
     fontSize: '12px',
     fontWeight: 600,
-    color: GOLD.primary,
+    color: UI.action,
     textTransform: 'uppercase',
     letterSpacing: '1px',
     marginBottom: '8px',
@@ -228,8 +228,8 @@ const styles = {
   iconSuggestion: (isSelected: boolean): React.CSSProperties => ({
     width: '40px',
     height: '40px',
-    background: isSelected ? 'rgba(255, 215, 0, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-    border: `1px solid ${isSelected ? GOLD.primary : 'rgba(255, 255, 255, 0.1)'}`,
+    background: isSelected ? 'rgba(14, 165, 233, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+    border: `1px solid ${isSelected ? UI.action : 'rgba(255, 255, 255, 0.1)'}`,
     borderRadius: '8px',
     fontSize: '20px',
     cursor: 'pointer',
@@ -244,8 +244,8 @@ const styles = {
     alignItems: 'center',
     gap: '12px',
     padding: '12px 16px',
-    background: 'rgba(255, 215, 0, 0.1)',
-    border: `1px solid ${GOLD.dark}`,
+    background: 'rgba(14, 165, 233, 0.1)',
+    border: `1px solid ${UI.action}`,
     borderRadius: '12px',
     marginBottom: '20px',
   } as React.CSSProperties,
@@ -289,15 +289,15 @@ const styles = {
 
   button: (variant: 'primary' | 'secondary', disabled?: boolean): React.CSSProperties => ({
     padding: '12px 24px',
-    background: variant === 'primary' 
-      ? disabled ? 'rgba(255, 255, 255, 0.1)' : GOLD.gradient
+    background: variant === 'primary'
+      ? disabled ? 'rgba(255, 255, 255, 0.1)' : UI.action
       : 'transparent',
     border: variant === 'secondary' ? '1px solid rgba(255, 255, 255, 0.2)' : 'none',
     borderRadius: '10px',
     fontSize: '14px',
     fontWeight: 600,
-    color: variant === 'primary' 
-      ? disabled ? 'rgba(255, 255, 255, 0.4)' : DARK.deepest
+    color: variant === 'primary'
+      ? disabled ? 'rgba(255, 255, 255, 0.4)' : '#fff'
       : 'rgba(255, 255, 255, 0.8)',
     cursor: disabled ? 'not-allowed' : 'pointer',
     display: 'flex',

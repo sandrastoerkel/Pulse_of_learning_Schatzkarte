@@ -11,7 +11,7 @@
 
 import React from 'react';
 import type { Room, RoomMode, RoomStats } from '../../types';
-import { ROOM_TEMPLATES, GOLD, DARK, COLOR_TAGS } from '../../constants';
+import { ROOM_TEMPLATES, UI, COLOR_TAGS } from '../../constants';
 
 // =============================================================================
 // TYPES
@@ -40,7 +40,7 @@ export interface RoomHeaderProps {
 
 const styles = {
   header: {
-    background: `linear-gradient(180deg, ${DARK.elevated} 0%, transparent 100%)`,
+    background: `linear-gradient(180deg, ${UI.surface} 0%, transparent 100%)`,
     padding: '16px 24px',
     display: 'flex',
     alignItems: 'center',
@@ -115,12 +115,12 @@ const styles = {
 
   modeButton: (isActive: boolean): React.CSSProperties => ({
     padding: '8px 16px',
-    background: isActive ? 'rgba(255, 215, 0, 0.15)' : 'transparent',
+    background: isActive ? UI.actionSubtle : 'transparent',
     border: 'none',
     borderRadius: '8px',
     fontSize: '13px',
     fontWeight: isActive ? 600 : 400,
-    color: isActive ? GOLD.primary : 'rgba(255, 255, 255, 0.6)',
+    color: isActive ? UI.action : 'rgba(255, 255, 255, 0.6)',
     cursor: 'pointer',
     transition: 'all 0.2s ease',
     display: 'flex',
@@ -130,18 +130,18 @@ const styles = {
 
   journeyButton: (hasStations: boolean): React.CSSProperties => ({
     padding: '10px 20px',
-    background: hasStations ? GOLD.gradient : 'rgba(255, 255, 255, 0.1)',
+    background: hasStations ? UI.action : 'rgba(255, 255, 255, 0.1)',
     border: 'none',
     borderRadius: '10px',
     fontSize: '14px',
     fontWeight: 600,
-    color: hasStations ? DARK.deepest : 'rgba(255, 255, 255, 0.4)',
+    color: hasStations ? '#fff' : 'rgba(255, 255, 255, 0.4)',
     cursor: hasStations ? 'pointer' : 'not-allowed',
     display: 'flex',
     alignItems: 'center',
     gap: '8px',
     transition: 'all 0.2s ease',
-    boxShadow: hasStations ? '0 4px 12px rgba(255, 215, 0, 0.3)' : 'none',
+    boxShadow: hasStations ? '0 4px 12px rgba(14, 165, 233, 0.3)' : 'none',
   }),
 
   reviewBadge: {
@@ -212,7 +212,7 @@ const styles = {
   progressFill: (percent: number): React.CSSProperties => ({
     width: `${percent}%`,
     height: '100%',
-    background: GOLD.gradient,
+    background: UI.action,
     borderRadius: '4px',
     transition: 'width 0.3s ease',
   }),
@@ -220,7 +220,7 @@ const styles = {
   progressText: {
     fontSize: '14px',
     fontWeight: 600,
-    color: GOLD.primary,
+    color: UI.action,
     minWidth: '80px',
     textAlign: 'right',
   } as React.CSSProperties,

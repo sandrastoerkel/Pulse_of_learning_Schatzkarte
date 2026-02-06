@@ -935,7 +935,7 @@ export class RunnerAvatarRenderer {
     // Verschiedene Hut-Typen basierend auf ID
     if (hatId.includes('crown')) {
       // Krone
-      ctx.fillStyle = '#FFD700';
+      ctx.fillStyle = 'var(--fb-reward)';
       ctx.beginPath();
       ctx.moveTo(centerX - 15, hatY + 10);
       ctx.lineTo(centerX - 15, hatY - 5);
@@ -961,7 +961,7 @@ export class RunnerAvatarRenderer {
       ctx.closePath();
       ctx.fill();
       // Sterne
-      ctx.fillStyle = '#FFD700';
+      ctx.fillStyle = 'var(--fb-reward)';
       ctx.font = '8px serif';
       ctx.fillText('✦', centerX - 5, hatY - 8);
       ctx.fillText('✦', centerX + 3, hatY);
@@ -1052,7 +1052,7 @@ export class RunnerAvatarRenderer {
   ): void {
     if (accessoryId.includes('earring')) {
       // Ohrringe
-      ctx.fillStyle = '#FFD700';
+      ctx.fillStyle = 'var(--fb-reward)';
       ctx.beginPath();
       ctx.arc(centerX - headSize - 5, headY + 5, 3, 0, Math.PI * 2);
       ctx.fill();
@@ -1061,7 +1061,7 @@ export class RunnerAvatarRenderer {
       ctx.fill();
     } else if (accessoryId.includes('necklace')) {
       // Halskette (wird am Körper gezeichnet)
-      ctx.strokeStyle = '#FFD700';
+      ctx.strokeStyle = 'var(--fb-reward)';
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.arc(centerX, headY + headSize + 10, 12, 0.3, Math.PI - 0.3);

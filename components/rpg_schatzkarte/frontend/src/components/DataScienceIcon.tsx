@@ -33,9 +33,9 @@ export const DataScienceIcon = ({
         {/* Gold-Gradient für Hauptelemente */}
         <linearGradient id={`${id}-goldGradient`} x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#FFE55C" />
-          <stop offset="25%" stopColor="#FFD700" />
+          <stop offset="25%" stopColor="var(--fb-reward)" />
           <stop offset="50%" stopColor="#FFC125" />
-          <stop offset="75%" stopColor="#FFD700" />
+          <stop offset="75%" stopColor="var(--fb-reward)" />
           <stop offset="100%" stopColor="#B8860B" />
         </linearGradient>
 
@@ -118,7 +118,7 @@ export const DataScienceIcon = ({
           cy="32"
           r="30"
           fill="none"
-          stroke="#FFD700"
+          stroke="var(--fb-reward)"
           strokeWidth="1"
           opacity="0.3"
         >
