@@ -946,9 +946,17 @@ export default function SchatzkarteLandingEltern({ onGuestMode }: SchatzkarteLan
               fontSize: 16,
               color: "#374151",
               lineHeight: 1.8,
+              marginBottom: 24,
+            }}>
+              Aus Neugier und Abenteuerlust bin ich mit meiner Familie für drei Jahre nach Malaysia gezogen. Dabei habe ich selbst erlebt, wie großartig es ist, die gewohnte Brille abzusetzen, Neues kennenzulernen — und zu spüren, wie sehr sich der eigene Horizont weitet, wenn man es einfach wagt.
+            </p>
+            <p style={{
+              fontSize: 16,
+              color: "#374151",
+              lineHeight: 1.8,
               marginBottom: 28,
             }}>
-              Als Mutter von zwei Kindern kenne ich die alltäglichen Kämpfe, den Frust und die Sorgen aus eigener Erfahrung. Genau deshalb liegt mir diese Arbeit so am Herzen: Es begeistert mich zutiefst, Kindern Wege zu zeigen, wie sie ihre Potenziale entfalten können. Wenn ich erlebe, wie ein Kind plötzlich Selbstvertrauen gewinnt, wie es merkt „Das schaffe ich!" — und wie sich dadurch nicht nur die Noten, sondern die ganze Einstellung zum Lernen verändert — dann weiß ich, dass es funktioniert.
+              Als Mutter von zwei Kindern kenne ich die alltäglichen Kämpfe, den Frust und die Sorgen aus eigener Erfahrung. Genau deshalb liegt mir diese Arbeit so am Herzen: Es begeistert mich zutiefst, Kindern Wege zu zeigen, wie sie ihre Potenziale entfalten können. Wenn ich erlebe, wie ein Kind plötzlich Selbstvertrauen gewinnt, wie es merkt „Das schaffe ich!" — und wie dadurch nicht nur die Noten besser werden, sondern sich die ganze Persönlichkeit entfaltet und der Familienalltag sich entspannt — dann weiß ich, dass es funktioniert.
             </p>
 
             {/* Expertise Tags */}
