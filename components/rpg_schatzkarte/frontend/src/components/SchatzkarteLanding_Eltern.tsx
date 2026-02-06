@@ -235,7 +235,21 @@ export default function SchatzkarteLandingEltern({ onGuestMode }: SchatzkarteLan
   };
 
   return (
-    <div style={{ background: THEME.bg, fontFamily: THEME.fontUI, color: THEME.text, paddingBottom: 100 }}>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100vh',
+      overflow: 'hidden',
+      background: THEME.bg,
+      fontFamily: THEME.fontUI,
+      color: THEME.text
+    }}>
+      {/* Scrollbarer Inhalt */}
+      <div style={{
+        flex: 1,
+        overflowY: 'auto',
+        overflowX: 'hidden'
+      }}>
 
       {/* ═══ CSS Hover/Focus States (statt inline JS-Handler) ═══ */}
       <style>{`
@@ -348,23 +362,16 @@ export default function SchatzkarteLandingEltern({ onGuestMode }: SchatzkarteLan
           -webkit-backdrop-filter: blur(12px);
         }
 
-        /* ─ Sticky Action Bar (bottom) - works in iframe ─ */
-        .sticky-action-bar {
-          position: fixed;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          width: 100%;
-          z-index: 9999;
+        /* ─ Action Bar (Flex-Item am unteren Rand) ─ */
+        .action-bar-fixed {
+          flex-shrink: 0;
           padding: 16px 24px;
           background: rgba(255,255,255,0.98);
           border-top: 1px solid ${THEME.border};
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
           box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
         }
 
-        .sticky-action-bar .bar-content {
+        .action-bar-fixed .bar-content {
           max-width: 600px;
           margin: 0 auto;
           display: flex;
@@ -418,7 +425,7 @@ export default function SchatzkarteLandingEltern({ onGuestMode }: SchatzkarteLan
         .btn-whatsapp-big:focus-visible { outline: 2px solid ${THEME.whatsapp}; outline-offset: 2px; }
 
         @media (max-width: 500px) {
-          .sticky-action-bar .bar-content {
+          .action-bar-fixed .bar-content {
             flex-direction: column;
           }
           .btn-demo-big, .btn-whatsapp-big {
@@ -459,10 +466,11 @@ export default function SchatzkarteLandingEltern({ onGuestMode }: SchatzkarteLan
             </div>
           </div>
 
-          {/* Header-CTA nur auf Desktop, da Sticky Bar immer sichtbar */}
-          <a href="#kontakt" className="btn-primary" style={{ display: 'none' }}>
-            Infogespräch buchen
-          </a>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <a href="#kontakt" className="btn-primary">
+              Infogespräch buchen
+            </a>
+          </div>
         </div>
       </header>
 
@@ -1094,11 +1102,12 @@ export default function SchatzkarteLandingEltern({ onGuestMode }: SchatzkarteLan
           </p>
         </div>
       </footer>
+      </div>{/* Ende scrollbarer Inhalt */}
 
       {/* ══════════════════════════════════════════════ */}
-      {/* STICKY ACTION BAR (immer sichtbar)            */}
+      {/* ACTION BAR (immer sichtbar am unteren Rand)   */}
       {/* ══════════════════════════════════════════════ */}
-      <div className="sticky-action-bar">
+      <div className="action-bar-fixed">
         <div className="bar-content">
           <button className="btn-demo-big" onClick={() => onGuestMode?.()}>
             <span>🎮</span>

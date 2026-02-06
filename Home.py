@@ -40,14 +40,14 @@ st.markdown("""
     footer {visibility: hidden;}
     header {visibility: hidden;}
 
-    /* Full-width iframe for landing page */
+    /* Full-width iframe for landing page - 100vh für sticky elements */
     .stCustomComponentV1 {
         width: 100% !important;
+        height: 100vh !important;
     }
     .stCustomComponentV1 > iframe {
         width: 100% !important;
-        height: 4000px !important;
-        min-height: 100vh !important;
+        height: 100vh !important;
         border: none !important;
     }
 
@@ -79,9 +79,9 @@ st.markdown("""
 # LANDING PAGE COMPONENT
 # ============================================
 
-# React Landing Page rendern
+# React Landing Page rendern (100vh für sticky action bar)
 result = landing_page(
-    height=4000,
+    height=800,  # Wird per CSS auf 100vh überschrieben
     key="landing_page"
 )
 
