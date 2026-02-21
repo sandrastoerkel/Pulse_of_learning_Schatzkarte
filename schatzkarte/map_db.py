@@ -2,26 +2,11 @@
 """Datenbank fuer Schatzkarte."""
 import sqlite3
 from datetime import datetime
-from pathlib import Path
 from typing import List, Tuple
 
 # Import der XP-Funktion aus gamification_db
 from utils.gamification_db import update_user_stats, get_or_create_user
-
-def get_db_path() -> Path:
-    """Gibt den Pfad zur SQLite-Datenbank zurueck."""
-    # Fuer Streamlit Cloud: tmp-Verzeichnis, sonst lokaler Ordner
-    if Path("/tmp").exists() and Path("/tmp").is_dir():
-        db_dir = Path("/tmp")
-    else:
-        db_dir = Path(__file__).parent.parent / "data"
-        db_dir.mkdir(exist_ok=True)
-    return db_dir / "hattie_gamification.db"
-
-def get_connection():
-    conn = sqlite3.connect(get_db_path())
-    conn.row_factory = sqlite3.Row
-    return conn
+from utils.database import get_connection
 
 def init_map_tables():
     """Erstellt die Schatzkarten-Tabellen."""

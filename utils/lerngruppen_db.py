@@ -15,22 +15,10 @@ import sqlite3
 import secrets
 import hashlib
 from datetime import datetime, timedelta
-from pathlib import Path
 from typing import Dict, List, Optional, Any
 import json
 
-# ============================================
-# DATABASE PATH (gleich wie gamification_db.py)
-# ============================================
-
-def get_db_path() -> Path:
-    """Gibt den Pfad zur SQLite-Datenbank zurück."""
-    if Path("/tmp").exists() and Path("/tmp").is_dir():
-        db_dir = Path("/tmp")
-    else:
-        db_dir = Path(__file__).parent.parent / "data"
-        db_dir.mkdir(exist_ok=True)
-    return db_dir / "hattie_gamification.db"
+from utils.database import get_connection
 
 # ============================================
 # TABELLEN INITIALISIERUNG
@@ -38,7 +26,7 @@ def get_db_path() -> Path:
 
 def init_lerngruppen_tables():
     """Initialisiert die Lerngruppen-Tabellen."""
-    conn = sqlite3.connect(get_db_path())
+    conn = get_connection()
     c = conn.cursor()
     
     # Lerngruppen-Tabelle
@@ -130,7 +118,7 @@ def create_group(name: str, coach_id: str, start_date: str = None) -> Optional[s
         group_id oder None bei Fehler
     """
     init_lerngruppen_tables()
-    conn = sqlite3.connect(get_db_path())
+    conn = get_connection()
     c = conn.cursor()
     
     # Generiere eindeutige Group-ID
@@ -153,8 +141,7 @@ def create_group(name: str, coach_id: str, start_date: str = None) -> Optional[s
 
 def get_group(group_id: str) -> Optional[Dict]:
     """Holt eine Gruppe anhand der ID."""
-    conn = sqlite3.connect(get_db_path())
-    conn.row_factory = sqlite3.Row
+    conn = get_connection()
     c = conn.cursor()
     
     c.execute("SELECT * FROM learning_groups WHERE group_id = ?", (group_id,))
@@ -167,8 +154,7 @@ def get_group(group_id: str) -> Optional[Dict]:
 def get_coach_groups(coach_id: str) -> List[Dict]:
     """Holt alle Gruppen eines Coaches."""
     init_lerngruppen_tables()
-    conn = sqlite3.connect(get_db_path())
-    conn.row_factory = sqlite3.Row
+    conn = get_connection()
     c = conn.cursor()
     
     c.execute('''
@@ -196,7 +182,7 @@ def update_group(group_id: str, **kwargs) -> bool:
     if not updates:
         return False
     
-    conn = sqlite3.connect(get_db_path())
+    conn = get_connection()
     c = conn.cursor()
     
     set_clause = ", ".join([f"{k} = ?" for k in updates.keys()])
@@ -219,7 +205,7 @@ def delete_group(group_id: str, soft_delete: bool = True) -> bool:
     if soft_delete:
         return update_group(group_id, is_active=0)
     
-    conn = sqlite3.connect(get_db_path())
+    conn = get_connection()
     c = conn.cursor()
     
     try:
@@ -246,7 +232,7 @@ def add_member(group_id: str, user_id: str) -> bool:
     Fügt ein Mitglied zur Gruppe hinzu.
     Ein User kann nur in EINER Gruppe sein (UNIQUE constraint).
     """
-    conn = sqlite3.connect(get_db_path())
+    conn = get_connection()
     c = conn.cursor()
     
     try:
@@ -269,7 +255,7 @@ def add_member(group_id: str, user_id: str) -> bool:
 
 def remove_member(group_id: str, user_id: str) -> bool:
     """Entfernt ein Mitglied aus der Gruppe."""
-    conn = sqlite3.connect(get_db_path())
+    conn = get_connection()
     c = conn.cursor()
     
     try:
@@ -288,8 +274,7 @@ def remove_member(group_id: str, user_id: str) -> bool:
 
 def get_group_members(group_id: str) -> List[Dict]:
     """Holt alle Mitglieder einer Gruppe mit User-Details."""
-    conn = sqlite3.connect(get_db_path())
-    conn.row_factory = sqlite3.Row
+    conn = get_connection()
     c = conn.cursor()
     
     c.execute('''
@@ -307,8 +292,7 @@ def get_group_members(group_id: str) -> List[Dict]:
 
 def get_user_group(user_id: str) -> Optional[Dict]:
     """Holt die Gruppe eines Users (falls vorhanden)."""
-    conn = sqlite3.connect(get_db_path())
-    conn.row_factory = sqlite3.Row
+    conn = get_connection()
     c = conn.cursor()
     
     c.execute('''
@@ -338,7 +322,7 @@ def create_invitation(group_id: str, email: str = None, expires_days: int = 7) -
     Returns:
         Token-String oder None
     """
-    conn = sqlite3.connect(get_db_path())
+    conn = get_connection()
     c = conn.cursor()
     
     token = secrets.token_urlsafe(16)
@@ -360,8 +344,7 @@ def create_invitation(group_id: str, email: str = None, expires_days: int = 7) -
 
 def get_invitation(token: str) -> Optional[Dict]:
     """Holt Einladungs-Details anhand des Tokens."""
-    conn = sqlite3.connect(get_db_path())
-    conn.row_factory = sqlite3.Row
+    conn = get_connection()
     c = conn.cursor()
     
     c.execute('''
@@ -413,7 +396,7 @@ def use_invitation(token: str, user_id: str) -> Dict[str, Any]:
         return {"success": False, "message": "Fehler beim Beitreten", "group_id": None}
     
     # Markiere Einladung als verwendet
-    conn = sqlite3.connect(get_db_path())
+    conn = get_connection()
     c = conn.cursor()
     c.execute('''
         UPDATE group_invitations 
@@ -432,8 +415,7 @@ def use_invitation(token: str, user_id: str) -> Dict[str, Any]:
 
 def get_group_invitations(group_id: str, include_used: bool = False) -> List[Dict]:
     """Holt alle Einladungen einer Gruppe."""
-    conn = sqlite3.connect(get_db_path())
-    conn.row_factory = sqlite3.Row
+    conn = get_connection()
     c = conn.cursor()
     
     if include_used:
@@ -485,7 +467,7 @@ def activate_weekly_island(group_id: str, week_number: int, island_id: str, note
         print(f"Invalid island_id: {island_id}")
         return False
     
-    conn = sqlite3.connect(get_db_path())
+    conn = get_connection()
     c = conn.cursor()
     
     try:
@@ -514,8 +496,7 @@ def activate_weekly_island(group_id: str, week_number: int, island_id: str, note
 
 def get_activated_islands(group_id: str) -> List[Dict]:
     """Holt alle aktivierten Inseln einer Gruppe."""
-    conn = sqlite3.connect(get_db_path())
-    conn.row_factory = sqlite3.Row
+    conn = get_connection()
     c = conn.cursor()
     
     c.execute('''
@@ -542,7 +523,7 @@ def get_available_islands(group_id: str) -> List[str]:
 
 def get_current_island(group_id: str, week_number: int) -> Optional[str]:
     """Holt die aktivierte Insel für eine bestimmte Woche."""
-    conn = sqlite3.connect(get_db_path())
+    conn = get_connection()
     c = conn.cursor()
     
     c.execute('''
@@ -622,7 +603,7 @@ def get_group_progress(group_id: str) -> Dict[str, Any]:
 
 def init_meeting_tables():
     """Initialisiert die Meeting-Tabellen."""
-    conn = sqlite3.connect(get_db_path())
+    conn = get_connection()
     c = conn.cursor()
 
     # Scheduled Meetings Tabelle
@@ -704,7 +685,7 @@ def schedule_meeting(
         Meeting-Dict oder None bei Fehler
     """
     init_meeting_tables()
-    conn = sqlite3.connect(get_db_path())
+    conn = get_connection()
     c = conn.cursor()
 
     # Berechne nächsten Termin
@@ -771,8 +752,7 @@ def calculate_next_meeting_date(day_of_week: int, time_of_day: str) -> datetime:
 def get_next_meeting(group_id: str) -> Optional[Dict]:
     """Holt das nächste geplante Meeting einer Gruppe."""
     init_meeting_tables()
-    conn = sqlite3.connect(get_db_path())
-    conn.row_factory = sqlite3.Row
+    conn = get_connection()
     c = conn.cursor()
 
     now = datetime.now().isoformat()
@@ -793,8 +773,7 @@ def get_next_meeting(group_id: str) -> Optional[Dict]:
 def get_group_meetings(group_id: str, include_past: bool = False) -> List[Dict]:
     """Holt alle Meetings einer Gruppe."""
     init_meeting_tables()
-    conn = sqlite3.connect(get_db_path())
-    conn.row_factory = sqlite3.Row
+    conn = get_connection()
     c = conn.cursor()
 
     if include_past:
@@ -935,7 +914,7 @@ def get_jitsi_interface_config() -> Dict:
 
 def record_meeting_join(meeting_id: str, user_id: str, display_name: str, role: str = 'kind') -> bool:
     """Registriert den Beitritt eines Teilnehmers."""
-    conn = sqlite3.connect(get_db_path())
+    conn = get_connection()
     c = conn.cursor()
 
     try:
@@ -954,7 +933,7 @@ def record_meeting_join(meeting_id: str, user_id: str, display_name: str, role: 
 
 def record_meeting_leave(meeting_id: str, user_id: str) -> bool:
     """Registriert das Verlassen eines Teilnehmers."""
-    conn = sqlite3.connect(get_db_path())
+    conn = get_connection()
     c = conn.cursor()
 
     try:
@@ -974,7 +953,7 @@ def record_meeting_leave(meeting_id: str, user_id: str) -> bool:
 
 def cancel_meeting(meeting_id: str) -> bool:
     """Storniert ein Meeting."""
-    conn = sqlite3.connect(get_db_path())
+    conn = get_connection()
     c = conn.cursor()
 
     try:

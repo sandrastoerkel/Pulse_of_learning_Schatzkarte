@@ -191,8 +191,8 @@ def render_learnstrat_altersstufen(color: str):
             user = get_current_user()
             if user:
                 # DB Connection für die Challenges
-                from utils.gamification_db import get_db_path
-                conn = sqlite3.connect(get_db_path())
+                from utils.database import get_connection
+                conn = get_connection()
 
                 # XP Callback definieren
                 def award_xp_callback(user_id, xp, reason):

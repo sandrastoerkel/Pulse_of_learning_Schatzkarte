@@ -13,9 +13,10 @@ Features:
 
 import sqlite3
 from datetime import datetime, timedelta
-from pathlib import Path
 from typing import Dict, List, Optional, Any
 import json
+
+from utils.database import get_connection
 
 # ============================================
 # KONFIGURATION
@@ -42,26 +43,12 @@ LEVELS = {
 }
 
 # ============================================
-# DATABASE PATH
-# ============================================
-
-def get_db_path() -> Path:
-    """Gibt den Pfad zur SQLite-Datenbank zurück."""
-    # Für Streamlit Cloud: tmp-Verzeichnis, sonst lokaler Ordner
-    if Path("/tmp").exists() and Path("/tmp").is_dir():
-        db_dir = Path("/tmp")
-    else:
-        db_dir = Path(__file__).parent.parent / "data"
-        db_dir.mkdir(exist_ok=True)
-    return db_dir / "hattie_gamification.db"
-
-# ============================================
 # DATABASE INITIALIZATION
 # ============================================
 
 def init_database() -> None:
     """Initialisiert die SQLite-Datenbank mit allen Tabellen."""
-    conn = sqlite3.connect(get_db_path())
+    conn = get_connection()
     c = conn.cursor()
     
     # Users-Tabelle
@@ -137,8 +124,7 @@ def init_database() -> None:
 def get_or_create_user(user_id: str, username: str = "Lernender") -> Dict[str, Any]:
     """Holt oder erstellt einen User."""
     init_database()
-    conn = sqlite3.connect(get_db_path())
-    conn.row_factory = sqlite3.Row
+    conn = get_connection()
     c = conn.cursor()
     
     c.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
@@ -159,8 +145,7 @@ def get_or_create_user(user_id: str, username: str = "Lernender") -> Dict[str, A
 
 def update_user_stats(user_id: str, xp_delta: int, streak: int) -> Dict[str, Any]:
     """Aktualisiert XP und Streak eines Users."""
-    conn = sqlite3.connect(get_db_path())
-    conn.row_factory = sqlite3.Row
+    conn = get_connection()
     c = conn.cursor()
     
     c.execute("SELECT xp_total, longest_streak FROM users WHERE user_id = ?", (user_id,))
@@ -204,7 +189,7 @@ def create_challenge(user_id: str, subject: str, prediction: int,
                      task_description: str = "") -> int:
     """Erstellt eine neue Challenge (Phase 1: Vorhersage)."""
     init_database()
-    conn = sqlite3.connect(get_db_path())
+    conn = get_connection()
     c = conn.cursor()
     
     today = datetime.now().date().isoformat()
@@ -223,8 +208,7 @@ def create_challenge(user_id: str, subject: str, prediction: int,
 def complete_challenge(challenge_id: int, actual_result: int,
                        reflection: str = "") -> Dict[str, Any]:
     """Schließt eine Challenge ab und berechnet XP (Phase 2: Ergebnis)."""
-    conn = sqlite3.connect(get_db_path())
-    conn.row_factory = sqlite3.Row
+    conn = get_connection()
     c = conn.cursor()
 
     # Challenge holen
@@ -366,8 +350,7 @@ def calculate_streak(user_id: str, cursor) -> int:
 
 def get_user_challenges(user_id: str, limit: int = 20) -> List[Dict]:
     """Holt die letzten Challenges eines Users."""
-    conn = sqlite3.connect(get_db_path())
-    conn.row_factory = sqlite3.Row
+    conn = get_connection()
     c = conn.cursor()
     
     c.execute('''
@@ -384,8 +367,7 @@ def get_user_challenges(user_id: str, limit: int = 20) -> List[Dict]:
 
 def get_open_challenges(user_id: str) -> List[Dict]:
     """Holt offene (nicht abgeschlossene) Challenges."""
-    conn = sqlite3.connect(get_db_path())
-    conn.row_factory = sqlite3.Row
+    conn = get_connection()
     c = conn.cursor()
     
     c.execute('''
@@ -406,8 +388,7 @@ def get_open_challenges(user_id: str) -> List[Dict]:
 def get_user_stats(user_id: str) -> Dict[str, Any]:
     """Holt umfassende Statistiken eines Users."""
     init_database()
-    conn = sqlite3.connect(get_db_path())
-    conn.row_factory = sqlite3.Row
+    conn = get_connection()
     c = conn.cursor()
     
     # Basis-User-Daten
@@ -456,8 +437,7 @@ def get_user_stats(user_id: str) -> Dict[str, Any]:
 
 def get_activity_heatmap(user_id: str, days: int = 90) -> List[Dict]:
     """Holt Activity-Daten für Heatmap (GitHub-Style)."""
-    conn = sqlite3.connect(get_db_path())
-    conn.row_factory = sqlite3.Row
+    conn = get_connection()
     c = conn.cursor()
     
     start_date = (datetime.now() - timedelta(days=days)).date().isoformat()
@@ -481,8 +461,7 @@ def get_activity_heatmap(user_id: str, days: int = 90) -> List[Dict]:
 
 def get_user_badges(user_id: str) -> List[Dict]:
     """Holt alle verdienten Badges eines Users."""
-    conn = sqlite3.connect(get_db_path())
-    conn.row_factory = sqlite3.Row
+    conn = get_connection()
     c = conn.cursor()
     
     c.execute('''
@@ -498,7 +477,7 @@ def get_user_badges(user_id: str) -> List[Dict]:
 
 def award_badge(user_id: str, badge_id: str) -> bool:
     """Vergibt ein Badge an einen User."""
-    conn = sqlite3.connect(get_db_path())
+    conn = get_connection()
     c = conn.cursor()
     
     try:

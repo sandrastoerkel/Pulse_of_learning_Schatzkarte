@@ -250,9 +250,9 @@ elif factor == "EXT_MOTIV":
     if HAS_GAMIFICATION and is_logged_in():
         user = get_current_user()
         if user:
-            from utils.gamification_db import get_db_path, update_user_stats, get_or_create_user
-            import sqlite3
-            conn = sqlite3.connect(get_db_path())
+            from utils.gamification_db import update_user_stats, get_or_create_user
+            from utils.database import get_connection
+            conn = get_connection()
 
             user_data = {
                 "user_id": user.get("user_id", "anonymous"),

@@ -22,6 +22,8 @@ import sqlite3
 from typing import Dict, List, Any, Optional
 import json
 
+from utils.database import get_connection
+
 # ============================================
 # INSPIRIERENDE BILDER FÜR JEDE QUELLE
 # ============================================
@@ -214,19 +216,9 @@ BANDURA_BADGES = {
 # DATABASE FUNCTIONS
 # ============================================
 
-def get_db_path():
-    """Gibt den Pfad zur SQLite-Datenbank zurück."""
-    from pathlib import Path
-    if Path("/tmp").exists() and Path("/tmp").is_dir():
-        db_dir = Path("/tmp")
-    else:
-        db_dir = Path(__file__).parent.parent / "data"
-        db_dir.mkdir(exist_ok=True)
-    return db_dir / "hattie_gamification.db"
-
 def init_bandura_tables():
     """Initialisiert die Bandura-spezifischen Tabellen."""
-    conn = sqlite3.connect(get_db_path())
+    conn = get_connection()
     c = conn.cursor()
 
     # Bandura Entries Tabelle
@@ -253,8 +245,7 @@ def init_bandura_tables():
 def create_bandura_entry(user_id: str, source_type: str, description: str) -> Dict[str, Any]:
     """Erstellt einen neuen Bandura-Eintrag."""
     init_bandura_tables()
-    conn = sqlite3.connect(get_db_path())
-    conn.row_factory = sqlite3.Row
+    conn = get_connection()
     c = conn.cursor()
 
     today = datetime.now().date().isoformat()
@@ -400,8 +391,7 @@ def calculate_bandura_streak(user_id: str, cursor) -> int:
 def get_bandura_stats(user_id: str) -> Dict[str, Any]:
     """Holt Bandura-spezifische Statistiken."""
     init_bandura_tables()
-    conn = sqlite3.connect(get_db_path())
-    conn.row_factory = sqlite3.Row
+    conn = get_connection()
     c = conn.cursor()
 
     stats = {}
@@ -467,8 +457,7 @@ def get_bandura_stats(user_id: str) -> Dict[str, Any]:
 
 def get_bandura_entries(user_id: str, limit: int = 10) -> List[Dict]:
     """Holt die letzten Bandura-Einträge."""
-    conn = sqlite3.connect(get_db_path())
-    conn.row_factory = sqlite3.Row
+    conn = get_connection()
     c = conn.cursor()
 
     c.execute('''
@@ -840,8 +829,7 @@ def render_history_tab(user_id: str):
 
 def get_all_entries_by_source(user_id: str) -> Dict[str, List[Dict]]:
     """Holt alle Einträge gruppiert nach Quelle."""
-    conn = sqlite3.connect(get_db_path())
-    conn.row_factory = sqlite3.Row
+    conn = get_connection()
     c = conn.cursor()
 
     result = {source: [] for source in BANDURA_SOURCES.keys()}

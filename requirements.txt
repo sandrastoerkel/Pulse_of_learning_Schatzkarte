@@ -9,5 +9,8 @@ plotly>=5.17.0
 # Database
 # sqlite3 is included in Python standard library
 
+# Cloud Database (Turso - SQLite-compatible)
+libsql-experimental>=0.0.34
+
 # Optional (for extended features)
 openpyxl>=3.1.0  # Excel export functionality

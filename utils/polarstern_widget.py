@@ -23,8 +23,9 @@ Beim Abschließen:
 import streamlit as st
 import sqlite3
 from datetime import datetime
-from pathlib import Path
 from typing import Dict, List, Optional, Any
+
+from utils.database import get_connection
 
 # ============================================
 # INSPIRIERENDE BILDER NACH ALTERSSTUFE
@@ -203,23 +204,6 @@ XP_REWARDS = {
 # ============================================
 # DATABASE FUNCTIONS
 # ============================================
-
-def get_db_path() -> Path:
-    """Gibt den Pfad zur SQLite-Datenbank zurück."""
-    if Path("/tmp").exists() and Path("/tmp").is_dir():
-        db_dir = Path("/tmp")
-    else:
-        db_dir = Path(__file__).parent / "data"
-        db_dir.mkdir(exist_ok=True)
-    return db_dir / "polarstern.db"
-
-
-def get_connection():
-    """Erstellt eine Datenbankverbindung."""
-    conn = sqlite3.connect(get_db_path())
-    conn.row_factory = sqlite3.Row
-    return conn
-
 
 def init_tables():
     """Erstellt die Polarstern-Tabellen mit Reflexions-Feld."""

@@ -20,9 +20,10 @@ import streamlit as st
 import sqlite3
 from datetime import datetime
 from typing import Dict, Optional, Any, List
-from pathlib import Path
 import hashlib
 import json
+
+from utils.database import get_connection
 
 # ============================================
 # AVATAR KONFIGURATION (DiceBear)
@@ -111,18 +112,9 @@ def get_unlocked_options(user: Dict, category: str) -> List[str]:
 # DATABASE
 # ============================================
 
-def get_db_path() -> Path:
-    """Gibt den Pfad zur SQLite-Datenbank zurück."""
-    if Path("/tmp").exists() and Path("/tmp").is_dir():
-        db_dir = Path("/tmp")
-    else:
-        db_dir = Path(__file__).parent.parent / "data"
-        db_dir.mkdir(exist_ok=True)
-    return db_dir / "hattie_gamification.db"
-
 def init_user_tables():
     """Initialisiert die Benutzer-Tabellen."""
-    conn = sqlite3.connect(get_db_path())
+    conn = get_connection()
     c = conn.cursor()
 
     # Erweiterte Users-Tabelle (falls noch nicht vorhanden, erweitern)
@@ -163,14 +155,48 @@ def init_user_tables():
     if 'role' not in columns:
         c.execute("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'student'")
 
+    if 'password_hash' not in columns:
+        c.execute("ALTER TABLE users ADD COLUMN password_hash TEXT")
+
     conn.commit()
     conn.close()
 
-def get_or_create_user_by_name(display_name: str, age_group: str = None, avatar_style: str = None) -> Dict[str, Any]:
+def hash_password(password: str) -> str:
+    """Erzeugt einen SHA-256 Hash des Passworts."""
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def is_name_taken(name: str) -> bool:
+    """Prüft ob ein Benutzername (lowercase) bereits in der DB existiert."""
+    init_user_tables()
+    conn = get_connection()
+    c = conn.cursor()
+    clean_name = name.strip().lower()
+    user_id = hashlib.md5(clean_name.encode()).hexdigest()[:16]
+    c.execute("SELECT 1 FROM users WHERE user_id = ?", (user_id,))
+    exists = c.fetchone() is not None
+    conn.close()
+    return exists
+
+def verify_password(user_id: str, password: str) -> bool:
+    """Vergleicht ein Passwort mit dem gespeicherten Hash in der DB."""
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute("SELECT password_hash FROM users WHERE user_id = ?", (user_id,))
+    result = c.fetchone()
+    conn.close()
+    if not result or not result[0]:
+        return False
+    return result[0] == hash_password(password)
+
+def get_user_id_for_name(name: str) -> Optional[str]:
+    """Gibt die user_id für einen Namen zurück (oder None)."""
+    clean_name = name.strip().lower()
+    return hashlib.md5(clean_name.encode()).hexdigest()[:16]
+
+def get_or_create_user_by_name(display_name: str, age_group: str = None, avatar_style: str = None, password: str = None) -> Dict[str, Any]:
     """Holt oder erstellt einen User basierend auf dem Display-Namen."""
     init_user_tables()
-    conn = sqlite3.connect(get_db_path())
-    conn.row_factory = sqlite3.Row
+    conn = get_connection()
     c = conn.cursor()
 
     # Generiere user_id aus dem Namen (lowercase, keine Sonderzeichen)
@@ -195,11 +221,13 @@ def get_or_create_user_by_name(display_name: str, age_group: str = None, avatar_
 
         avatar_settings = json.dumps({"style": style, "background": "b6e3f4"})
 
+        pw_hash = hash_password(password) if password else None
+
         c.execute('''
             INSERT INTO users (user_id, username, display_name, created_at, last_login,
-                             xp_total, level, age_group, avatar_settings)
-            VALUES (?, ?, ?, ?, ?, 0, 1, ?, ?)
-        ''', (user_id, clean_name, display_name.strip(), now, now, age, avatar_settings))
+                             xp_total, level, age_group, avatar_settings, password_hash)
+            VALUES (?, ?, ?, ?, ?, 0, 1, ?, ?, ?)
+        ''', (user_id, clean_name, display_name.strip(), now, now, age, avatar_settings, pw_hash))
         conn.commit()
         c.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
         user = c.fetchone()
@@ -221,7 +249,7 @@ def get_or_create_user_by_name(display_name: str, age_group: str = None, avatar_
 
 def update_user_avatar(user_id: str, avatar_settings: Dict) -> bool:
     """Aktualisiert die Avatar-Einstellungen eines Users."""
-    conn = sqlite3.connect(get_db_path())
+    conn = get_connection()
     c = conn.cursor()
 
     try:
@@ -238,7 +266,7 @@ def update_user_avatar(user_id: str, avatar_settings: Dict) -> bool:
 
 def update_user_age_group(user_id: str, age_group: str) -> bool:
     """Aktualisiert die Altersstufe eines Users."""
-    conn = sqlite3.connect(get_db_path())
+    conn = get_connection()
     c = conn.cursor()
 
     try:
@@ -255,8 +283,7 @@ def update_user_age_group(user_id: str, age_group: str) -> bool:
 
 def get_user_by_id(user_id: str) -> Optional[Dict[str, Any]]:
     """Holt einen User anhand der ID."""
-    conn = sqlite3.connect(get_db_path())
-    conn.row_factory = sqlite3.Row
+    conn = get_connection()
     c = conn.cursor()
 
     c.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
@@ -268,8 +295,7 @@ def get_user_by_id(user_id: str) -> Optional[Dict[str, Any]]:
 def get_all_users() -> list:
     """Holt alle registrierten Benutzer."""
     init_user_tables()
-    conn = sqlite3.connect(get_db_path())
-    conn.row_factory = sqlite3.Row
+    conn = get_connection()
     c = conn.cursor()
 
     c.execute('''
@@ -303,9 +329,9 @@ def get_current_user_id() -> Optional[str]:
         return None
     return st.session_state.current_user_id
 
-def login_user(display_name: str, age_group: str = None, avatar_style: str = None) -> Dict[str, Any]:
+def login_user(display_name: str, age_group: str = None, avatar_style: str = None, password: str = None) -> Dict[str, Any]:
     """Loggt einen Benutzer ein (erstellt ihn falls nötig)."""
-    user = get_or_create_user_by_name(display_name, age_group, avatar_style)
+    user = get_or_create_user_by_name(display_name, age_group, avatar_style, password=password)
     st.session_state.current_user_id = user['user_id']
     st.session_state.current_user_name = user['display_name']
     st.session_state.current_user_age_group = user.get('age_group', 'grundschule')
@@ -321,7 +347,8 @@ def logout_user():
     """Loggt den aktuellen Benutzer aus."""
     # Admin-Status NICHT löschen, damit Quick-Login-Liste sichtbar bleibt
     keys_to_delete = ["current_user_id", "current_user_name", "current_user_age_group",
-                      "registration_step", "registration_name", "registration_age"]
+                      "registration_step", "registration_name", "registration_age",
+                      "registration_password"]
     for key in keys_to_delete:
         if key in st.session_state:
             del st.session_state[key]
@@ -370,13 +397,11 @@ def render_user_info_bar():
             render_logged_in_view(user, show_stats=True)
 
 def render_login_form():
-    """Rendert das mehrstufige Login-Formular mit Altersstufe und Avatar-Auswahl."""
+    """Rendert das Login-Formular mit zwei Tabs: Neu anmelden und Einloggen."""
 
     # Initialisiere Registration-State
     if "registration_step" not in st.session_state:
         st.session_state.registration_step = 1
-
-    existing_users = get_all_users()
 
     # Header
     st.markdown("""
@@ -399,80 +424,148 @@ def render_login_form():
         st.caption("Teste alle Funktionen ohne Anmeldung. Altersstufe jederzeit wechselbar.")
     st.markdown("---")
 
-    # === SCHRITT 1: Name eingeben ===
-    if st.session_state.registration_step == 1:
-        col1, col2 = st.columns([2, 1])
+    # === Zwei Tabs: Neu anmelden / Einloggen ===
+    tab_register, tab_login = st.tabs(["📝 Neu anmelden", "🔑 Einloggen"])
 
-        with col1:
-            st.markdown("### Schritt 1: Wie heißt du?")
+    # ==========================================
+    # TAB 1: Neu anmelden (Registrierung)
+    # ==========================================
+    with tab_register:
+        # === SCHRITT 1: Name + Passwort ===
+        if st.session_state.registration_step == 1:
+            col1, col2 = st.columns([2, 1])
 
-            name_input = st.text_input(
-                "Dein Name:",
-                placeholder="z.B. Max, Lisa, ...",
-                help="Gib deinen Vornamen ein.",
-                key="name_input_step1"
-            )
+            with col1:
+                st.markdown("### Schritt 1: Name & Passwort wählen")
 
-            if st.button("➡️ Weiter", use_container_width=True, type="primary"):
-                if name_input and len(name_input.strip()) >= 2:
-                    st.session_state.registration_name = name_input.strip()
-                    st.session_state.registration_step = 2
-                    st.rerun()
-                else:
-                    st.error("Bitte gib mindestens 2 Buchstaben ein.")
+                name_input = st.text_input(
+                    "Dein Name:",
+                    placeholder="z.B. Max, Lisa, ...",
+                    help="Gib deinen Vornamen ein (mindestens 2 Buchstaben).",
+                    key="name_input_step1"
+                )
 
-        with col2:
-            # Quick-Login Liste nur für Admins/Coaches sichtbar
-            # Prüfe ob der letzte User (vor Logout) Admin/Coach war
-            show_user_list = st.session_state.get("show_admin_user_list", False)
+                pw_input = st.text_input(
+                    "Passwort:",
+                    type="password",
+                    placeholder="Mindestens 4 Zeichen",
+                    help="Wähle ein Passwort, das du dir merken kannst.",
+                    key="pw_input_step1"
+                )
 
-            if existing_users and show_user_list:
-                st.markdown("**🔄 Zurückkehrende Schüler:**")
-                for user in existing_users[:5]:
-                    display = user.get('display_name', 'Unbekannt')
-                    level = user.get('level', 1)
+                pw_confirm = st.text_input(
+                    "Passwort bestätigen:",
+                    type="password",
+                    placeholder="Passwort nochmal eingeben",
+                    key="pw_confirm_step1"
+                )
 
-                    if st.button(f"👤 {display} (Lvl {level})", key=f"quick_login_{user['user_id']}",
-                               use_container_width=True):
-                        login_user(display)
+                if st.button("➡️ Weiter", use_container_width=True, type="primary", key="register_next"):
+                    name = name_input.strip() if name_input else ""
+                    if len(name) < 2:
+                        st.error("Bitte gib mindestens 2 Buchstaben ein.")
+                    elif is_name_taken(name):
+                        st.error(f"Der Name **{name}** ist bereits vergeben. Bitte wähle einen anderen Namen oder logge dich im Tab 'Einloggen' ein.")
+                    elif not pw_input or len(pw_input) < 4:
+                        st.error("Das Passwort muss mindestens 4 Zeichen lang sein.")
+                    elif pw_input != pw_confirm:
+                        st.error("Die Passwörter stimmen nicht überein.")
+                    else:
+                        st.session_state.registration_name = name
+                        st.session_state.registration_password = pw_input
+                        st.session_state.registration_step = 2
                         st.rerun()
 
-    # === SCHRITT 2: Altersstufe wählen ===
-    elif st.session_state.registration_step == 2:
-        st.markdown(f"### Schritt 2: Hallo {st.session_state.registration_name}! In welcher Stufe bist du?")
+            with col2:
+                # Quick-Login Liste nur für Admins/Coaches sichtbar
+                show_user_list = st.session_state.get("show_admin_user_list", False)
 
-        col1, col2, col3, col4 = st.columns(4)
+                if show_user_list:
+                    existing_users = get_all_users()
+                    if existing_users:
+                        st.markdown("**🔄 Zurückkehrende Schüler:**")
+                        for user in existing_users[:5]:
+                            display = user.get('display_name', 'Unbekannt')
+                            level = user.get('level', 1)
 
-        age_buttons = [
-            ("grundschule", "🎒", "Grundschule", "Klasse 1-4", col1),
-            ("unterstufe", "📚", "Unterstufe", "Klasse 5-7", col2),
-            ("mittelstufe", "🎯", "Mittelstufe", "Klasse 8-10", col3),
-            ("oberstufe", "🎓", "Oberstufe", "Klasse 11-13", col4),
-        ]
+                            if st.button(f"👤 {display} (Lvl {level})", key=f"quick_login_{user['user_id']}",
+                                       use_container_width=True):
+                                login_user(display)
+                                st.rerun()
 
-        for age_key, icon, label, desc, col in age_buttons:
-            with col:
-                st.markdown(f"""
-                <div style="text-align: center; padding: 10px; background: #f8f9fa;
-                            border-radius: 10px; margin-bottom: 10px;">
-                    <div style="font-size: 2em;">{icon}</div>
-                    <div style="font-weight: bold;">{label}</div>
-                    <div style="font-size: 0.8em; color: #666;">{desc}</div>
-                </div>
-                """, unsafe_allow_html=True)
+        # === SCHRITT 2: Altersstufe wählen ===
+        elif st.session_state.registration_step == 2:
+            st.markdown(f"### Schritt 2: Hallo {st.session_state.registration_name}! In welcher Stufe bist du?")
 
-                if st.button(f"Wählen", key=f"age_{age_key}", use_container_width=True):
-                    # Direkt einloggen ohne Avatar-Auswahl
-                    name = st.session_state.registration_name
-                    user = login_user(name, age_key)
-                    st.balloons()
-                    st.success(f"🎉 Willkommen, {name}!")
+            col1, col2, col3, col4 = st.columns(4)
+
+            age_buttons = [
+                ("grundschule", "🎒", "Grundschule", "Klasse 1-4", col1),
+                ("unterstufe", "📚", "Unterstufe", "Klasse 5-7", col2),
+                ("mittelstufe", "🎯", "Mittelstufe", "Klasse 8-10", col3),
+                ("oberstufe", "🎓", "Oberstufe", "Klasse 11-13", col4),
+            ]
+
+            for age_key, icon, label, desc, col in age_buttons:
+                with col:
+                    st.markdown(f"""
+                    <div style="text-align: center; padding: 10px; background: #f8f9fa;
+                                border-radius: 10px; margin-bottom: 10px;">
+                        <div style="font-size: 2em;">{icon}</div>
+                        <div style="font-weight: bold;">{label}</div>
+                        <div style="font-size: 0.8em; color: #666;">{desc}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                    if st.button(f"Wählen", key=f"age_{age_key}", use_container_width=True):
+                        name = st.session_state.registration_name
+                        pw = st.session_state.get("registration_password")
+                        user = login_user(name, age_key, password=pw)
+                        st.balloons()
+                        st.success(f"🎉 Willkommen, {name}!")
+                        st.rerun()
+
+            st.markdown("")
+            if st.button("⬅️ Zurück", key="back_to_step1"):
+                st.session_state.registration_step = 1
+                st.rerun()
+
+    # ==========================================
+    # TAB 2: Einloggen (Rückkehr)
+    # ==========================================
+    with tab_login:
+        st.markdown("### Willkommen zurück!")
+        st.markdown("Gib deinen Namen und dein Passwort ein.")
+
+        login_name = st.text_input(
+            "Dein Name:",
+            placeholder="z.B. Max, Lisa, ...",
+            key="login_name_input"
+        )
+
+        login_pw = st.text_input(
+            "Passwort:",
+            type="password",
+            placeholder="Dein Passwort",
+            key="login_pw_input"
+        )
+
+        if st.button("🔑 Einloggen", use_container_width=True, type="primary", key="login_submit"):
+            name = login_name.strip() if login_name else ""
+            if len(name) < 2:
+                st.error("Bitte gib deinen Namen ein.")
+            elif not login_pw:
+                st.error("Bitte gib dein Passwort ein.")
+            else:
+                user_id = get_user_id_for_name(name)
+                if not is_name_taken(name):
+                    st.error(f"Der Name **{name}** ist nicht registriert. Bitte melde dich zuerst im Tab 'Neu anmelden' an.")
+                elif not verify_password(user_id, login_pw):
+                    st.error("Falsches Passwort. Bitte versuche es erneut.")
+                else:
+                    user = login_user(name)
+                    st.success(f"🎉 Willkommen zurück, {user['display_name']}!")
                     st.rerun()
-
-        st.markdown("")
-        if st.button("⬅️ Zurück", key="back_to_step1"):
-            st.session_state.registration_step = 1
-            st.rerun()
 
 def render_logged_in_view(user: Dict, show_stats: bool = True):
     """Rendert die Ansicht für eingeloggte Benutzer - kompakt ohne Avatar."""
@@ -624,7 +717,7 @@ def reset_preview_data():
     if not user_id:
         return
 
-    conn = sqlite3.connect(get_db_path())
+    conn = get_connection()
     c = conn.cursor()
 
     # User-Daten zurücksetzen (nur Spalten die existieren)
@@ -794,7 +887,7 @@ ROLE_ADMIN = 'admin'
 def get_user_role(user_id: str) -> str:
     """Gibt die Rolle eines Users zurueck."""
     init_user_tables()  # Stellt sicher dass role-Spalte existiert
-    conn = sqlite3.connect(get_db_path())
+    conn = get_connection()
     c = conn.cursor()
 
     try:
@@ -814,7 +907,7 @@ def set_user_role(user_id: str, role: str) -> bool:
         return False
 
     init_user_tables()  # Stellt sicher dass role-Spalte existiert
-    conn = sqlite3.connect(get_db_path())
+    conn = get_connection()
     c = conn.cursor()
 
     try:
@@ -852,8 +945,7 @@ def is_admin(user_id: str = None) -> bool:
 
 def get_all_coaches() -> list:
     """Gibt alle Coaches zurueck."""
-    conn = sqlite3.connect(get_db_path())
-    conn.row_factory = sqlite3.Row
+    conn = get_connection()
     c = conn.cursor()
 
     c.execute("""
@@ -870,8 +962,7 @@ def get_all_coaches() -> list:
 
 def get_all_students_list() -> list:
     """Gibt alle Schueler zurueck (role = student oder NULL)."""
-    conn = sqlite3.connect(get_db_path())
-    conn.row_factory = sqlite3.Row
+    conn = get_connection()
     c = conn.cursor()
 
     c.execute("""
