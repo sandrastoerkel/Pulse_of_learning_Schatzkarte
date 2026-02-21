@@ -8,6 +8,7 @@ from schatzkarte.map_data import ISLANDS
 from schatzkarte.map_db import (
     get_collected_treasures,
     get_island_progress,
+    get_all_island_progress,
     complete_island_action,
     save_treasure_collected
 )
@@ -110,10 +111,11 @@ def load_user_data():
     # Gesammelte Schaetze
     collected_treasures = get_collected_treasures(user_id)
 
-    # Fortschritt pro Insel laden
+    # Fortschritt fuer ALLE Inseln in einer Query laden
+    all_progress = get_all_island_progress(user_id)
     user_progress = {}
     for island_id in ISLANDS.keys():
-        progress = get_island_progress(user_id, island_id)
+        progress = all_progress.get(island_id)
         if progress:
             user_progress[island_id] = {
                 "video_watched": progress.get("video_watched", False),

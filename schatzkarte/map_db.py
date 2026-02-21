@@ -120,6 +120,25 @@ def get_island_progress(user_id: str, island_id: str) -> dict:
     }
 
 
+def get_all_island_progress(user_id: str) -> dict:
+    """Holt den Fortschritt eines Users fuer ALLE Inseln in einer Query."""
+    result = get_db().table("island_progress") \
+        .select("*") \
+        .eq("user_id", user_id) \
+        .execute()
+
+    progress_map = {}
+    for row in result.data:
+        progress_map[row["island_id"]] = {
+            "video_watched": bool(row.get("video_watched")),
+            "explanation_read": bool(row.get("explanation_read")),
+            "quiz_passed": bool(row.get("quiz_passed")),
+            "quiz_score": row.get("quiz_score"),
+            "challenge_completed": bool(row.get("challenge_completed")),
+        }
+    return progress_map
+
+
 def complete_island_action(user_id: str, island_id: str, action: str, extra_data: dict = None) -> int:
     """Markiert eine Aktion als abgeschlossen und vergibt XP."""
     # Prüfe ob bereits erledigt
