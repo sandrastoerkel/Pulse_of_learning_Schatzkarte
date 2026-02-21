@@ -1,9 +1,103 @@
 # Pulse of Learning - Schatzkarte
-## Dokumentation Stand 31. Januar 2025
+## Dokumentation Stand 21. Februar 2026
 
 ---
 
-# HEUTIGE ÄNDERUNGEN (31. Januar 2025)
+# ÄNDERUNGEN (21. Februar 2026)
+
+## Datenbank-Migration: SQLite → Supabase (PostgreSQL)
+
+### Warum?
+Die App lief auf Streamlit Cloud mit SQLite unter `/tmp`. Bei jedem App-Neustart gingen alle Daten verloren. Fuer den 12-Wochen-Test mit Kindern muessen die Daten dauerhaft gespeichert werden.
+
+### Was wurde gemacht?
+
+**Neues zentrales Datenbankmodul:** `utils/database.py`
+```python
+from utils.database import get_db
+
+# Supabase Query Builder statt SQL
+result = get_db().table("users").select("*").eq("user_id", uid).execute()
+users = result.data  # Liste von Dicts
+```
+
+**Alle 12 Datenbank-Module migriert:**
+
+| Datei | Aenderung |
+|-------|-----------|
+| `utils/database.py` | NEU: Zentrales Supabase-Verbindungsmodul (session-basierter Client) |
+| `utils/user_system.py` | SQLite → Supabase Query Builder |
+| `utils/gamification_db.py` | SQLite → Supabase Query Builder |
+| `schatzkarte/map_db.py` | SQLite → Supabase + Batch-Query `get_all_island_progress()` |
+| `utils/lerngruppen_db.py` | SQLite → Supabase (26 Funktionen, SQL JOINs → separate Queries) |
+| `utils/bandura_sources_widget.py` | SQLite → Supabase |
+| `utils/polarstern_widget.py` | SQLite → Supabase |
+| `utils/coaching_db.py` | SQLite → Supabase (10 Funktionen) |
+| `utils/motivation_challenges/motivation_db.py` | SQLite → Supabase (20 Funktionen, `conn`-Parameter beibehalten aber ignoriert) |
+| `utils/learnstrat_challenges/transfer_widget.py` | SQLite → Supabase |
+| `utils/learnstrat_challenges/birkenbihl_widget.py` | SQLite → Supabase |
+| `utils/learnstrat_challenges/powertechniken_widget.py` | SQLite → Supabase |
+
+**Inline-DB-Code in Pages bereinigt:**
+- `pages/1_Schatzkarte.py` — Reset-Button auf Supabase umgestellt
+- `pages/2_Ressourcen.py` — `get_connection()` entfernt
+- `utils/ressourcen/learnstrat_content.py` — `sqlite3` Import entfernt
+- `utils/ressourcen/motivation_content.py` — `sqlite3` Import entfernt
+
+**Cleanup:**
+- Alle `init_*_tables()` Aufrufe entfernt (Tabellen existieren in Supabase)
+- Alle `import sqlite3` entfernt (ausser PISA-Daten, die bleiben lokal)
+- Alle `conn.commit()` / `conn.close()` entfernt
+- `.streamlit/secrets.toml.example` auf Supabase-Format aktualisiert
+
+### Supabase-Konfiguration
+
+**Credentials (in Streamlit Cloud Secrets und lokal in `.streamlit/secrets.toml`):**
+```
+SUPABASE_URL = "https://djkjjqabwxzclgvulpzu.supabase.co"
+SUPABASE_KEY = "sb_publishable_..."
+```
+
+**Tabellen in Supabase (alle vorhanden):**
+- `users` (vorexistierend, Spalten hinzugefuegt: user_id, username, display_name, xp_total, level, role, etc.)
+- `polarstern_goals` (vorexistierend, Spalten hinzugefuegt: category, achievement_reflection)
+- `completed_challenges`, `user_badges`, `activity_log` (vorexistierend, user_id von BIGINT auf TEXT geaendert)
+- `challenges`, `bandura_entries`, `learning_groups`, `group_members`
+- `group_invitations`, `group_weekly_islands`, `scheduled_meetings`, `meeting_participants`
+- `user_treasures`, `island_progress`, `students`, `assessments`, `development_plans`
+- `progress_logs`, `assessment_requests`, `user_learning_preferences`, `learnstrat_progress`
+- `motivation_challenges`, `motivation_sdt_progress`, `motivation_streaks`
+- `motivation_activity_log`, `motivation_badges`, `motivation_certificates`
+
+**PISA-Daten bleiben lokal:** `data/pisa_2022_germany.db` (read-only, kein Supabase)
+
+### Wichtige Supabase-Patterns
+```python
+# SELECT
+result = get_db().table("users").select("*").eq("user_id", uid).execute()
+if result.data:
+    user = result.data[0]
+
+# INSERT
+result = get_db().table("users").insert({...}).execute()
+new_id = result.data[0]["id"]
+
+# UPDATE
+get_db().table("users").update({"xp_total": 100}).eq("user_id", uid).execute()
+
+# DELETE
+get_db().table("users").delete().eq("user_id", uid).execute()
+
+# Kein conn.commit() oder conn.close() noetig!
+```
+
+### Performance-Optimierung
+- `get_all_island_progress(user_id)`: Laedt Fortschritt aller 15 Inseln in 1 Query statt 15
+- Supabase-Client wird pro Session erstellt (`st.session_state`), nicht global gecacht
+
+---
+
+# ÄNDERUNGEN (31. Januar 2025)
 
 ## 🃏 Loot / Lernkarten - Neues freischwebendes Element!
 
@@ -1307,11 +1401,10 @@ npm run build
 # Dann in __init__.py: _RELEASE = True setzen
 ```
 
-## Datenbank zurücksetzen
-```bash
-rm data/hattie_gamification.db
-# App neu starten - Tabellen werden automatisch erstellt
-```
+## Datenbank
+Die App nutzt **Supabase** (PostgreSQL Cloud-DB). Keine lokalen SQLite-Dateien mehr (ausser PISA).
+- Supabase Dashboard: https://djkjjqabwxzclgvulpzu.supabase.co
+- Credentials in `.streamlit/secrets.toml` (lokal) und Streamlit Cloud Secrets
 
 ---
 
@@ -1351,13 +1444,14 @@ Pulse_of_learning_Schatzkarte/
 │   ├── map_ships.py            # (Legacy)
 │   └── map_styles.py           # (Legacy)
 ├── utils/
+│   ├── database.py             # Zentrales Supabase-Verbindungsmodul
 │   ├── user_system.py          # Login, Rollen, Preview
 │   ├── gamification_db.py      # XP, Level, Streaks
 │   ├── lerngruppen_db.py       # Coach-Gruppen
-│   ├── coaching_db.py          # Schüler-Management
-│   └── ressourcen/             # Content für Ressourcen-Seite
+│   ├── coaching_db.py          # Schueler-Management
+│   └── ressourcen/             # Content fuer Ressourcen-Seite
 └── data/
-    └── *.db                    # SQLite-Datenbanken
+    └── pisa_2022_germany.db    # PISA-Daten (read-only, bleibt lokal)
 ```
 
 ---
@@ -1445,7 +1539,10 @@ components/rpg_schatzkarte/frontend/
 
 | Datum | Was | Details |
 |-------|-----|---------|
-| **21.01.2025** | **🖼️ Hintergrundbilder** | 4 Inseln mit immersiven Hintergründen: Starthafen, Festung, Werkzeuge, Fäden |
+| **21.02.2026** | **Supabase-Migration** | Komplette DB-Migration von SQLite zu Supabase (PostgreSQL). 12 Module, 23 Dateien. Persistente Cloud-Datenbank fuer 12-Wochen-Test. |
+| 21.02.2026 | Performance-Optimierung | Batch-Query fuer Insel-Fortschritt (1 statt 15 Queries), Session-basierter Supabase-Client |
+| 21.02.2026 | Supabase Schema-Fixes | user_id BIGINT→TEXT in vorexistierenden Tabellen, fehlende Spalten (category, achievement_reflection, role) |
+| **21.01.2025** | **Hintergrundbilder** | 4 Inseln mit immersiven Hintergründen: Starthafen, Festung, Werkzeuge, Fäden |
 | 21.01.2025 | Glaseffekt-Design | Transparente Container mit backdrop-filter blur für modernen Look |
 | 21.01.2025 | PowertechnikenChallenge | Komplett auf neues Design umgestellt mit werkzeuge-bg.jpg |
 | **16.01.2025** | **🎨 15 Custom SVG Icons** | Alle 15 Insel-Icons + 3 Schiff-Icons + Lerntechniken-Icon komplett |
@@ -1607,7 +1704,7 @@ Alle 14 Inseln haben jetzt das animierte Design-System. Die nächsten Aufgaben s
 - **"Component nicht gefunden"?** → `cd components/rpg_schatzkarte/frontend && npm run build`
 - **Fehler in React?** → Console im Browser prüfen (F12)
 - **Import-Fehler?** → Prüfe ob `components/__init__.py` existiert
-- **DB-Fehler?** → `rm data/hattie_gamification.db` und neu starten
+- **DB-Fehler?** → Supabase Dashboard pruefen (SQL Editor), Spalten/Tabellen vorhanden?
 - **CSS lädt nicht?** → Import in Experience.tsx prüfen
 
 ---
@@ -1624,5 +1721,6 @@ Alle 14 Inseln haben jetzt das animierte Design-System. Die nächsten Aufgaben s
 
 ---
 
-**Letzte Bearbeitung:** 16. Januar 2025
-**Nächster Meilenstein:** Quiz-Content für fehlende Stufen erstellen (Festung MS, Werkzeuge US/MS, Fäden alle)
+**Letzte Bearbeitung:** 21. Februar 2026
+**Letzter Meilenstein:** Supabase-Migration abgeschlossen (persistente Cloud-Datenbank)
+**Naechster Meilenstein:** Quiz-Content fuer fehlende Stufen erstellen (Festung MS, Werkzeuge US/MS, Faeden alle)
