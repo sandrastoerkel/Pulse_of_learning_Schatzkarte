@@ -251,8 +251,6 @@ elif factor == "EXT_MOTIV":
         user = get_current_user()
         if user:
             from utils.gamification_db import update_user_stats, get_or_create_user
-            from utils.database import get_connection
-            conn = get_connection()
 
             user_data = {
                 "user_id": user.get("user_id", "anonymous"),
@@ -266,8 +264,7 @@ elif factor == "EXT_MOTIV":
                 current_streak = u.get("current_streak", 0)
                 update_user_stats(user_id, xp, current_streak)
 
-            render_motivation_altersstufen(color, conn=conn, user_data=user_data, xp_callback=award_xp_callback)
-            conn.close()
+            render_motivation_altersstufen(color, conn=None, user_data=user_data, xp_callback=award_xp_callback)
         else:
             render_motivation_altersstufen(color)
     else:

@@ -6,7 +6,6 @@ Ausgelagert aus pages/1_📚_Ressourcen.py für bessere Organisation.
 """
 
 import streamlit as st
-import sqlite3
 
 # ============================================
 # TRY TO IMPORT GAMIFICATION WIDGET (optional)
@@ -190,9 +189,8 @@ def render_learnstrat_altersstufen(color: str):
             # User ist eingeloggt - zeige die Challenges
             user = get_current_user()
             if user:
-                # DB Connection für die Challenges
-                from utils.database import get_connection
-                conn = get_connection()
+                # DB Connection (Supabase - conn wird für Rückwärtskompatibilität als None übergeben)
+                conn = None
 
                 # XP Callback definieren
                 def award_xp_callback(user_id, xp, reason):
@@ -278,8 +276,6 @@ def render_learnstrat_altersstufen(color: str):
                         conn=conn,
                         xp_callback=award_xp_callback
                     )
-
-                conn.close()
             else:
                 st.warning("Fehler beim Laden des Benutzerprofils.")
         elif HAS_LEARNSTRAT and HAS_GAMIFICATION and not is_logged_in():

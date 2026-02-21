@@ -7,10 +7,10 @@ pandas>=2.0.0
 plotly>=5.17.0
 
 # Database
-# sqlite3 is included in Python standard library
+# sqlite3 is included in Python standard library (für lokale PISA-Daten)
 
-# Cloud Database (Turso - SQLite-compatible)
-libsql-experimental>=0.0.34
+# Cloud Database (Supabase - PostgreSQL)
+supabase>=2.0.0
 
 # Optional (for extended features)
 openpyxl>=3.1.0  # Excel export functionality

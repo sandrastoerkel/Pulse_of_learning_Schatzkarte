@@ -21,11 +21,10 @@ Beim Abschließen:
 """
 
 import streamlit as st
-import sqlite3
 from datetime import datetime
 from typing import Dict, List, Optional, Any
 
-from utils.database import get_connection
+from utils.database import get_db
 
 # ============================================
 # INSPIRIERENDE BILDER NACH ALTERSSTUFE
@@ -206,37 +205,8 @@ XP_REWARDS = {
 # ============================================
 
 def init_tables():
-    """Erstellt die Polarstern-Tabellen mit Reflexions-Feld."""
-    conn = get_connection()
-    c = conn.cursor()
-
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS polarstern_goals (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id TEXT NOT NULL,
-            category TEXT DEFAULT 'other',
-            goal_title TEXT NOT NULL,
-            current_state TEXT NOT NULL,
-            strategy TEXT NOT NULL,
-            achievement_reflection TEXT,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            is_active BOOLEAN DEFAULT 1,
-            is_achieved BOOLEAN DEFAULT 0,
-            achieved_at DATETIME,
-            xp_earned INTEGER DEFAULT 0
-        )
-    """)
-
-    # Migration: Spalte hinzufügen falls nicht vorhanden
-    try:
-        c.execute("ALTER TABLE polarstern_goals ADD COLUMN achievement_reflection TEXT")
-    except sqlite3.OperationalError:
-        pass  # Spalte existiert bereits
-
-    c.execute('CREATE INDEX IF NOT EXISTS idx_polarstern_user ON polarstern_goals(user_id)')
-    conn.commit()
-    conn.close()
+    """Keine Initialisierung nötig — Tabellen existieren in Supabase."""
+    pass
 
 
 # ============================================
@@ -264,36 +234,31 @@ def auto_categorize(text: str) -> str:
 
 def create_goal(user_id: str, goal_title: str, current_state: str, strategy: str) -> int:
     """Erstellt ein neues Ziel mit automatischer Kategorisierung."""
-    init_tables()
     combined_text = f"{goal_title} {current_state} {strategy}"
     category = auto_categorize(combined_text)
 
-    conn = get_connection()
-    c = conn.cursor()
-    c.execute("""
-        INSERT INTO polarstern_goals
-        (user_id, category, goal_title, current_state, strategy, xp_earned)
-        VALUES (?, ?, ?, ?, ?, ?)
-    """, (user_id, category, goal_title, current_state, strategy, XP_REWARDS['goal_created']))
+    result = get_db().table("polarstern_goals").insert({
+        "user_id": user_id,
+        "category": category,
+        "goal_title": goal_title,
+        "current_state": current_state,
+        "strategy": strategy,
+        "xp_earned": XP_REWARDS['goal_created']
+    }).execute()
 
-    goal_id = c.lastrowid
-    conn.commit()
-    conn.close()
-    return goal_id
+    return result.data[0]["id"]
 
 
 def update_goal(goal_id: int, goal_title: str = None, current_state: str = None,
                 strategy: str = None) -> bool:
     """Aktualisiert ein Ziel mit Re-Kategorisierung."""
-    conn = get_connection()
-    c = conn.cursor()
-    c.execute("SELECT * FROM polarstern_goals WHERE id = ?", (goal_id,))
-    goal = c.fetchone()
+    db = get_db()
+    result = db.table("polarstern_goals").select("*").eq("id", goal_id).execute()
 
-    if not goal:
-        conn.close()
+    if not result.data:
         return False
 
+    goal = result.data[0]
     new_title = goal_title if goal_title else goal['goal_title']
     new_state = current_state if current_state else goal['current_state']
     new_strategy = strategy if strategy else goal['strategy']
@@ -301,108 +266,88 @@ def update_goal(goal_id: int, goal_title: str = None, current_state: str = None,
     combined_text = f"{new_title} {new_state} {new_strategy}"
     new_category = auto_categorize(combined_text)
 
-    c.execute("""
-        UPDATE polarstern_goals
-        SET goal_title = ?, current_state = ?, strategy = ?, category = ?, updated_at = ?
-        WHERE id = ?
-    """, (new_title, new_state, new_strategy, new_category, datetime.now().isoformat(), goal_id))
+    db.table("polarstern_goals").update({
+        "goal_title": new_title,
+        "current_state": new_state,
+        "strategy": new_strategy,
+        "category": new_category,
+        "updated_at": datetime.now().isoformat()
+    }).eq("id", goal_id).execute()
 
-    conn.commit()
-    conn.close()
     return True
 
 
 def mark_goal_achieved(goal_id: int, reflection: str = "") -> Dict[str, Any]:
     """Markiert ein Ziel als erreicht MIT Reflexion."""
-    conn = get_connection()
-    c = conn.cursor()
+    db = get_db()
+    result = db.table("polarstern_goals").select("*").eq("id", goal_id).execute()
 
-    c.execute("SELECT * FROM polarstern_goals WHERE id = ?", (goal_id,))
-    goal = c.fetchone()
-
-    if not goal or goal['is_achieved']:
-        conn.close()
+    if not result.data or result.data[0].get('is_achieved'):
         return {"success": False}
 
-    c.execute("""
-        UPDATE polarstern_goals
-        SET is_achieved = 1, is_active = 0, achieved_at = ?,
-            achievement_reflection = ?, xp_earned = xp_earned + ?
-        WHERE id = ?
-    """, (datetime.now().isoformat(), reflection, XP_REWARDS['goal_achieved'], goal_id))
+    goal = result.data[0]
+    new_xp = (goal.get('xp_earned') or 0) + XP_REWARDS['goal_achieved']
 
-    conn.commit()
-    conn.close()
+    db.table("polarstern_goals").update({
+        "is_achieved": True,
+        "is_active": False,
+        "achieved_at": datetime.now().isoformat(),
+        "achievement_reflection": reflection,
+        "xp_earned": new_xp
+    }).eq("id", goal_id).execute()
+
     return {"success": True, "xp_earned": XP_REWARDS['goal_achieved']}
 
 
 def delete_goal(goal_id: int) -> bool:
     """Löscht ein Ziel."""
-    conn = get_connection()
-    c = conn.cursor()
-    c.execute("DELETE FROM polarstern_goals WHERE id = ?", (goal_id,))
-    success = c.rowcount > 0
-    conn.commit()
-    conn.close()
-    return success
+    result = get_db().table("polarstern_goals").delete().eq("id", goal_id).execute()
+    return len(result.data) > 0
 
 
 def get_user_goals(user_id: str) -> List[Dict]:
     """Holt alle aktiven Ziele eines Users."""
-    init_tables()
-    conn = get_connection()
-    c = conn.cursor()
-    c.execute("""
-        SELECT * FROM polarstern_goals
-        WHERE user_id = ? AND is_active = 1 AND is_achieved = 0
-        ORDER BY category, created_at DESC
-    """, (user_id,))
-    goals = [dict(row) for row in c.fetchall()]
-    conn.close()
-    return goals
+    result = get_db().table("polarstern_goals") \
+        .select("*") \
+        .eq("user_id", user_id) \
+        .eq("is_active", True) \
+        .eq("is_achieved", False) \
+        .order("category") \
+        .order("created_at", desc=True) \
+        .execute()
+    return result.data
 
 
 def get_achieved_goals(user_id: str) -> List[Dict]:
     """Holt alle erreichten Ziele eines Users."""
-    init_tables()
-    conn = get_connection()
-    c = conn.cursor()
-    c.execute("""
-        SELECT * FROM polarstern_goals
-        WHERE user_id = ? AND is_achieved = 1
-        ORDER BY achieved_at DESC
-    """, (user_id,))
-    goals = [dict(row) for row in c.fetchall()]
-    conn.close()
-    return goals
+    result = get_db().table("polarstern_goals") \
+        .select("*") \
+        .eq("user_id", user_id) \
+        .eq("is_achieved", True) \
+        .order("achieved_at", desc=True) \
+        .execute()
+    return result.data
 
 
 def get_goal_by_id(goal_id: int) -> Optional[Dict]:
     """Holt ein einzelnes Ziel nach ID."""
-    conn = get_connection()
-    c = conn.cursor()
-    c.execute("SELECT * FROM polarstern_goals WHERE id = ?", (goal_id,))
-    row = c.fetchone()
-    conn.close()
-    return dict(row) if row else None
+    result = get_db().table("polarstern_goals").select("*").eq("id", goal_id).execute()
+    return result.data[0] if result.data else None
 
 
 def get_goal_stats(user_id: str) -> Dict[str, Any]:
     """Holt Statistiken zu den Zielen eines Users."""
-    init_tables()
-    conn = get_connection()
-    c = conn.cursor()
+    db = get_db()
+    all_goals = db.table("polarstern_goals") \
+        .select("is_active, is_achieved, xp_earned") \
+        .eq("user_id", user_id) \
+        .execute()
 
-    c.execute("SELECT COUNT(*) FROM polarstern_goals WHERE user_id = ? AND is_active = 1 AND is_achieved = 0", (user_id,))
-    active = c.fetchone()[0]
+    goals = all_goals.data
+    active = sum(1 for g in goals if g.get("is_active") and not g.get("is_achieved"))
+    achieved = sum(1 for g in goals if g.get("is_achieved"))
+    total_xp = sum(g.get("xp_earned") or 0 for g in goals)
 
-    c.execute("SELECT COUNT(*) FROM polarstern_goals WHERE user_id = ? AND is_achieved = 1", (user_id,))
-    achieved = c.fetchone()[0]
-
-    c.execute("SELECT SUM(xp_earned) FROM polarstern_goals WHERE user_id = ?", (user_id,))
-    total_xp = c.fetchone()[0] or 0
-
-    conn.close()
     return {'active': active, 'achieved': achieved, 'total_xp': total_xp}
 
 

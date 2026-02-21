@@ -29,7 +29,7 @@ try:
         get_current_island, get_group_week, get_group_progress,
         FLEXIBLE_ISLANDS,
         # Meeting-Funktionen
-        init_meeting_tables, schedule_meeting, get_next_meeting, get_group_meetings,
+        schedule_meeting, get_next_meeting, get_group_meetings,
         get_meeting_access, cancel_meeting, record_meeting_join, record_meeting_leave
     )
     from schatzkarte.map_data import ISLANDS
@@ -83,9 +83,6 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     
-    # Meeting-Tabellen initialisieren
-    init_meeting_tables()
-
     # Tabs für verschiedene Bereiche
     tab1, tab2, tab3, tab4 = st.tabs(["📋 Meine Gruppen", "➕ Neue Gruppe", "📹 Video-Treffen", "🔗 Einladung prüfen"])
 

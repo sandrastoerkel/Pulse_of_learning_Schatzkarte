@@ -10,8 +10,7 @@ Zugang nur mit Admin-Passwort.
 import streamlit as st
 from utils.user_system import (
     get_all_users, get_user_role, set_user_role,
-    ROLE_STUDENT, ROLE_COACH, ROLE_ADMIN,
-    init_user_tables
+    ROLE_STUDENT, ROLE_COACH, ROLE_ADMIN
 )
 
 # ============================================
@@ -80,9 +79,6 @@ def render_user_roles():
     """Zeigt und verwaltet Benutzer-Rollen."""
 
     st.markdown("### 👥 Benutzer-Rollen verwalten")
-
-    # Tabellen initialisieren (stellt sicher dass role-Spalte existiert)
-    init_user_tables()
 
     # Alle User laden
     users = get_all_users()

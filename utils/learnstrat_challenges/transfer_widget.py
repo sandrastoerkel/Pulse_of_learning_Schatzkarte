@@ -17,6 +17,8 @@ import streamlit as st
 from datetime import datetime
 from typing import Dict, List, Optional, Any
 
+from utils.database import get_db
+
 # Lokale Imports
 from .transfer_content import (
     TRANSFER_XP,
@@ -55,63 +57,58 @@ STATE_KEYS = {
 
 def save_transfer_progress(conn, user_id: str, phase_id: str, xp: int, response: str = ""):
     """Speichert den Fortschritt für eine Transfer-Phase."""
-    c = conn.cursor()
-    
-    # Prüfen ob schon vorhanden
-    c.execute('''
-        SELECT id FROM learnstrat_progress 
-        WHERE user_id = ? AND challenge_id = 'transfer' AND technique_id = ?
-    ''', (user_id, phase_id))
-    
-    existing = c.fetchone()
-    
-    if existing:
-        c.execute('''
-            UPDATE learnstrat_progress 
-            SET xp_earned = ?, reflection = ?, completed = 1, completed_at = ?
-            WHERE id = ?
-        ''', (xp, response, datetime.now().isoformat(), existing[0]))
+    db = get_db()
+
+    existing = db.table("learnstrat_progress") \
+        .select("id") \
+        .eq("user_id", user_id) \
+        .eq("challenge_id", "transfer") \
+        .eq("technique_id", phase_id) \
+        .execute()
+
+    if existing.data:
+        db.table("learnstrat_progress").update({
+            "xp_earned": xp,
+            "reflection": response,
+            "completed": True,
+            "completed_at": datetime.now().isoformat()
+        }).eq("id", existing.data[0]["id"]).execute()
     else:
-        c.execute('''
-            INSERT INTO learnstrat_progress 
-            (user_id, challenge_id, technique_id, xp_earned, reflection, completed, completed_at)
-            VALUES (?, 'transfer', ?, ?, ?, 1, ?)
-        ''', (user_id, phase_id, xp, response, datetime.now().isoformat()))
-    
-    conn.commit()
+        db.table("learnstrat_progress").insert({
+            "user_id": user_id,
+            "challenge_id": "transfer",
+            "technique_id": phase_id,
+            "xp_earned": xp,
+            "reflection": response,
+            "completed": True,
+            "completed_at": datetime.now().isoformat()
+        }).execute()
 
 def get_transfer_progress(conn, user_id: str) -> List[Dict]:
     """Holt den Transfer-Fortschritt eines Users."""
-    c = conn.cursor()
+    result = get_db().table("learnstrat_progress") \
+        .select("technique_id, xp_earned, reflection, completed_at") \
+        .eq("user_id", user_id) \
+        .eq("challenge_id", "transfer") \
+        .eq("completed", True) \
+        .order("completed_at") \
+        .execute()
 
-    c.execute('''
-        SELECT technique_id, xp_earned, reflection, completed_at
-        FROM learnstrat_progress
-        WHERE user_id = ? AND challenge_id = 'transfer' AND completed = 1
-        ORDER BY completed_at
-    ''', (user_id,))
-
-    results = []
-    for row in c.fetchall():
-        results.append({
-            "phase_id": row[0],
-            "xp_earned": row[1],
-            "response": row[2],
-            "completed_at": row[3],
-        })
-
-    return results
+    return [{
+        "phase_id": row["technique_id"],
+        "xp_earned": row["xp_earned"],
+        "response": row["reflection"],
+        "completed_at": row["completed_at"],
+    } for row in result.data]
 
 def reset_transfer_phase(conn, user_id: str, phase_id: str):
     """Setzt eine Transfer-Phase zurück (löscht den Fortschritt)."""
-    c = conn.cursor()
-
-    c.execute('''
-        DELETE FROM learnstrat_progress
-        WHERE user_id = ? AND challenge_id = 'transfer' AND technique_id = ?
-    ''', (user_id, phase_id))
-
-    conn.commit()
+    get_db().table("learnstrat_progress") \
+        .delete() \
+        .eq("user_id", user_id) \
+        .eq("challenge_id", "transfer") \
+        .eq("technique_id", phase_id) \
+        .execute()
 
 # ============================================
 # UI COMPONENTS

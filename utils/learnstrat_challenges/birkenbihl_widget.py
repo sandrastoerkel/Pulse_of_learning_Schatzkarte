@@ -20,6 +20,8 @@ from datetime import datetime
 from typing import Dict, List, Optional, Any
 import time
 
+from utils.database import get_db
+
 # Lokale Imports
 from .birkenbihl_content import (
     BIRKENBIHL_XP,
@@ -53,51 +55,49 @@ STATE_KEYS = {
 
 def save_birkenbihl_progress(conn, user_id: str, phase_id: str, xp: int, response: str = ""):
     """Speichert den Fortschritt für eine Birkenbihl-Phase."""
-    c = conn.cursor()
-    
-    c.execute('''
-        SELECT id FROM learnstrat_progress 
-        WHERE user_id = ? AND challenge_id = 'birkenbihl' AND technique_id = ?
-    ''', (user_id, phase_id))
-    
-    existing = c.fetchone()
-    
-    if existing:
-        c.execute('''
-            UPDATE learnstrat_progress 
-            SET xp_earned = ?, reflection = ?, completed = 1, completed_at = ?
-            WHERE id = ?
-        ''', (xp, response, datetime.now().isoformat(), existing[0]))
+    db = get_db()
+
+    existing = db.table("learnstrat_progress") \
+        .select("id") \
+        .eq("user_id", user_id) \
+        .eq("challenge_id", "birkenbihl") \
+        .eq("technique_id", phase_id) \
+        .execute()
+
+    if existing.data:
+        db.table("learnstrat_progress").update({
+            "xp_earned": xp,
+            "reflection": response,
+            "completed": True,
+            "completed_at": datetime.now().isoformat()
+        }).eq("id", existing.data[0]["id"]).execute()
     else:
-        c.execute('''
-            INSERT INTO learnstrat_progress 
-            (user_id, challenge_id, technique_id, xp_earned, reflection, completed, completed_at)
-            VALUES (?, 'birkenbihl', ?, ?, ?, 1, ?)
-        ''', (user_id, phase_id, xp, response, datetime.now().isoformat()))
-    
-    conn.commit()
+        db.table("learnstrat_progress").insert({
+            "user_id": user_id,
+            "challenge_id": "birkenbihl",
+            "technique_id": phase_id,
+            "xp_earned": xp,
+            "reflection": response,
+            "completed": True,
+            "completed_at": datetime.now().isoformat()
+        }).execute()
 
 def get_birkenbihl_progress(conn, user_id: str) -> List[Dict]:
     """Holt den Birkenbihl-Fortschritt eines Users."""
-    c = conn.cursor()
-    
-    c.execute('''
-        SELECT technique_id, xp_earned, reflection, completed_at
-        FROM learnstrat_progress
-        WHERE user_id = ? AND challenge_id = 'birkenbihl' AND completed = 1
-        ORDER BY completed_at
-    ''', (user_id,))
-    
-    results = []
-    for row in c.fetchall():
-        results.append({
-            "phase_id": row[0],
-            "xp_earned": row[1],
-            "response": row[2],
-            "completed_at": row[3],
-        })
-    
-    return results
+    result = get_db().table("learnstrat_progress") \
+        .select("technique_id, xp_earned, reflection, completed_at") \
+        .eq("user_id", user_id) \
+        .eq("challenge_id", "birkenbihl") \
+        .eq("completed", True) \
+        .order("completed_at") \
+        .execute()
+
+    return [{
+        "phase_id": row["technique_id"],
+        "xp_earned": row["xp_earned"],
+        "response": row["reflection"],
+        "completed_at": row["completed_at"],
+    } for row in result.data]
 
 # ============================================
 # UI COMPONENTS

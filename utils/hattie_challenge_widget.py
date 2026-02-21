@@ -18,7 +18,7 @@ from typing import Optional
 # Lokale Imports
 try:
     from utils.gamification_db import (
-        init_database, get_or_create_user, create_challenge, 
+        get_or_create_user, create_challenge,
         complete_challenge, get_user_stats, get_user_challenges,
         get_open_challenges, check_and_award_badges, get_user_badges,
         get_activity_heatmap
@@ -84,7 +84,6 @@ def render_hattie_challenge_widget(compact: bool = False, color: str = "#667eea"
         """)
         return
     
-    init_database()
     init_widget_state()
     user_id = get_user_id()
     

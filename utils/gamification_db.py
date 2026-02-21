@@ -2,8 +2,7 @@
 🗄️ Gamification Database Module
 ================================
 
-SQLite-basierte Datenbankschicht für das Hattie-Challenge Gamification System.
-Inspiriert von GitHub Habit-Tracker Apps (MIT-lizenziert).
+Supabase-basierte Datenbankschicht für das Hattie-Challenge Gamification System.
 
 Features:
 - User-Management mit XP und Levels
@@ -11,12 +10,11 @@ Features:
 - Badge-System nach Bandura's 4 Quellen
 """
 
-import sqlite3
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
 import json
 
-from utils.database import get_connection
+from utils.database import get_db
 
 # ============================================
 # KONFIGURATION
@@ -27,7 +25,7 @@ XP_CONFIG = {
     "prediction_exact": 25,         # Bonus: Exakte Vorhersage
     "exceeded_expectation": 50,     # Bonus: Erwartung übertroffen
     "streak_bonus_3": 1.2,          # 20% Bonus ab 3er Streak
-    "streak_bonus_7": 1.5,          # 50% Bonus ab 7er Streak  
+    "streak_bonus_7": 1.5,          # 50% Bonus ab 7er Streak
     "streak_bonus_30": 2.0,         # 100% Bonus ab 30er Streak
 }
 
@@ -47,75 +45,8 @@ LEVELS = {
 # ============================================
 
 def init_database() -> None:
-    """Initialisiert die SQLite-Datenbank mit allen Tabellen."""
-    conn = get_connection()
-    c = conn.cursor()
-    
-    # Users-Tabelle
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            user_id TEXT PRIMARY KEY,
-            username TEXT DEFAULT 'Lernender',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            xp_total INTEGER DEFAULT 0,
-            level INTEGER DEFAULT 1,
-            current_streak INTEGER DEFAULT 0,
-            longest_streak INTEGER DEFAULT 0,
-            last_activity_date DATE,
-            settings TEXT DEFAULT '{}'
-        )
-    ''')
-    
-    # Challenges-Tabelle
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS challenges (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            challenge_date DATE NOT NULL,
-            subject TEXT NOT NULL,
-            task_description TEXT,
-            prediction INTEGER NOT NULL,
-            actual_result INTEGER,
-            outcome TEXT,
-            xp_earned INTEGER DEFAULT 0,
-            reflection TEXT,
-            completed BOOLEAN DEFAULT FALSE,
-            FOREIGN KEY (user_id) REFERENCES users(user_id)
-        )
-    ''')
-    
-    # User-Badges-Tabelle
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS user_badges (
-            user_id TEXT NOT NULL,
-            badge_id TEXT NOT NULL,
-            earned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (user_id, badge_id),
-            FOREIGN KEY (user_id) REFERENCES users(user_id)
-        )
-    ''')
-    
-    # Activity-Log für Contribution-Graph
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS activity_log (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id TEXT NOT NULL,
-            activity_date DATE NOT NULL,
-            activity_type TEXT NOT NULL,
-            xp_earned INTEGER DEFAULT 0,
-            details TEXT,
-            FOREIGN KEY (user_id) REFERENCES users(user_id)
-        )
-    ''')
-    
-    # Indizes für Performance
-    c.execute('CREATE INDEX IF NOT EXISTS idx_challenges_user ON challenges(user_id)')
-    c.execute('CREATE INDEX IF NOT EXISTS idx_challenges_date ON challenges(challenge_date)')
-    c.execute('CREATE INDEX IF NOT EXISTS idx_activity_user_date ON activity_log(user_id, activity_date)')
-    
-    conn.commit()
-    conn.close()
+    """Keine Initialisierung nötig — Tabellen existieren in Supabase."""
+    pass
 
 # ============================================
 # USER MANAGEMENT
@@ -123,52 +54,42 @@ def init_database() -> None:
 
 def get_or_create_user(user_id: str, username: str = "Lernender") -> Dict[str, Any]:
     """Holt oder erstellt einen User."""
-    init_database()
-    conn = get_connection()
-    c = conn.cursor()
-    
-    c.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
-    user = c.fetchone()
-    
-    if not user:
-        c.execute('''
-            INSERT INTO users (user_id, username, xp_total, level, current_streak, longest_streak)
-            VALUES (?, ?, 0, 1, 0, 0)
-        ''', (user_id, username))
-        conn.commit()
-        c.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
-        user = c.fetchone()
-    
-    result = dict(user)
-    conn.close()
-    return result
+    db = get_db()
+    result = db.table("users").select("*").eq("user_id", user_id).execute()
+
+    if not result.data:
+        insert_result = db.table("users").insert({
+            "user_id": user_id,
+            "username": username,
+            "xp_total": 0,
+            "level": 1,
+            "current_streak": 0,
+            "longest_streak": 0
+        }).execute()
+        return insert_result.data[0]
+
+    return result.data[0]
 
 def update_user_stats(user_id: str, xp_delta: int, streak: int) -> Dict[str, Any]:
     """Aktualisiert XP und Streak eines Users."""
-    conn = get_connection()
-    c = conn.cursor()
-    
-    c.execute("SELECT xp_total, longest_streak FROM users WHERE user_id = ?", (user_id,))
-    current = c.fetchone()
-    
-    new_xp = (current['xp_total'] or 0) + xp_delta
+    db = get_db()
+    result = db.table("users").select("xp_total, longest_streak").eq("user_id", user_id).execute()
+    current = result.data[0]
+
+    new_xp = (current.get('xp_total') or 0) + xp_delta
     new_level = calculate_level(new_xp)
-    longest = max(current['longest_streak'] or 0, streak)
+    longest = max(current.get('longest_streak') or 0, streak)
     today = datetime.now().date().isoformat()
-    
-    c.execute('''
-        UPDATE users 
-        SET xp_total = ?, level = ?, current_streak = ?, longest_streak = ?, last_activity_date = ?
-        WHERE user_id = ?
-    ''', (new_xp, new_level, streak, longest, today, user_id))
-    
-    conn.commit()
-    
-    c.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
-    result = dict(c.fetchone())
-    conn.close()
-    
-    return result
+
+    update_result = db.table("users").update({
+        "xp_total": new_xp,
+        "level": new_level,
+        "current_streak": streak,
+        "longest_streak": longest,
+        "last_activity_date": today
+    }).eq("user_id", user_id).execute()
+
+    return update_result.data[0]
 
 def calculate_level(xp: int) -> int:
     """Berechnet das Level basierend auf XP."""
@@ -185,56 +106,47 @@ def get_level_info(level: int) -> Dict[str, Any]:
 # CHALLENGE MANAGEMENT
 # ============================================
 
-def create_challenge(user_id: str, subject: str, prediction: int, 
+def create_challenge(user_id: str, subject: str, prediction: int,
                      task_description: str = "") -> int:
     """Erstellt eine neue Challenge (Phase 1: Vorhersage)."""
-    init_database()
-    conn = get_connection()
-    c = conn.cursor()
-    
+    db = get_db()
     today = datetime.now().date().isoformat()
-    
-    c.execute('''
-        INSERT INTO challenges (user_id, challenge_date, subject, task_description, prediction, completed)
-        VALUES (?, ?, ?, ?, ?, FALSE)
-    ''', (user_id, today, subject, task_description, prediction))
-    
-    challenge_id = c.lastrowid
-    conn.commit()
-    conn.close()
-    
-    return challenge_id
+
+    result = db.table("challenges").insert({
+        "user_id": user_id,
+        "challenge_date": today,
+        "subject": subject,
+        "task_description": task_description,
+        "prediction": prediction,
+        "completed": False
+    }).execute()
+
+    return result.data[0]["id"]
 
 def complete_challenge(challenge_id: int, actual_result: int,
                        reflection: str = "") -> Dict[str, Any]:
     """Schließt eine Challenge ab und berechnet XP (Phase 2: Ergebnis)."""
-    conn = get_connection()
-    c = conn.cursor()
+    db = get_db()
 
     # Challenge holen
-    c.execute("SELECT * FROM challenges WHERE id = ?", (challenge_id,))
-    challenge = c.fetchone()
-
-    if not challenge:
-        conn.close()
+    result = db.table("challenges").select("*").eq("id", challenge_id).execute()
+    if not result.data:
         return {"error": "Challenge nicht gefunden"}
 
+    challenge = result.data[0]
+
     if challenge['completed']:
-        conn.close()
         return {"error": "Challenge bereits abgeschlossen"}
 
     user_id = challenge['user_id']
     prediction = challenge['prediction']
 
     # Typ aus task_description extrahieren (für Note-Umkehrung)
-    task_desc = challenge['task_description'] or ''
+    task_desc = challenge.get('task_description') or ''
     is_note_type = task_desc.startswith("[note]")
 
     # Outcome bestimmen
-    # Bei Noten: niedrigere Zahl = besser (Note 1 > Note 2)
-    # Bei Prozent/Punkten: höhere Zahl = besser
     if is_note_type:
-        # Bei Noten: actual < prediction bedeutet "übertroffen"
         if actual_result < prediction:
             outcome = "exceeded"
             base_xp = XP_CONFIG["challenge_completed"] + XP_CONFIG["exceeded_expectation"]
@@ -245,7 +157,6 @@ def complete_challenge(challenge_id: int, actual_result: int,
             outcome = "below"
             base_xp = XP_CONFIG["challenge_completed"]
     else:
-        # Bei Prozent/Punkten: actual > prediction bedeutet "übertroffen"
         if actual_result > prediction:
             outcome = "exceeded"
             base_xp = XP_CONFIG["challenge_completed"] + XP_CONFIG["exceeded_expectation"]
@@ -255,10 +166,10 @@ def complete_challenge(challenge_id: int, actual_result: int,
         else:
             outcome = "below"
             base_xp = XP_CONFIG["challenge_completed"]
-    
+
     # Streak berechnen
-    new_streak = calculate_streak(user_id, c)
-    
+    new_streak = calculate_streak(user_id)
+
     # Streak-Bonus anwenden
     if new_streak >= 30:
         xp_earned = int(base_xp * XP_CONFIG["streak_bonus_30"])
@@ -268,36 +179,37 @@ def complete_challenge(challenge_id: int, actual_result: int,
         xp_earned = int(base_xp * XP_CONFIG["streak_bonus_3"])
     else:
         xp_earned = base_xp
-    
+
     # Challenge updaten
-    c.execute('''
-        UPDATE challenges 
-        SET actual_result = ?, outcome = ?, xp_earned = ?, reflection = ?, completed = TRUE
-        WHERE id = ?
-    ''', (actual_result, outcome, xp_earned, reflection, challenge_id))
-    
+    db.table("challenges").update({
+        "actual_result": actual_result,
+        "outcome": outcome,
+        "xp_earned": xp_earned,
+        "reflection": reflection,
+        "completed": True
+    }).eq("id", challenge_id).execute()
+
     # Activity Log
     today = datetime.now().date().isoformat()
-    c.execute('''
-        INSERT INTO activity_log (user_id, activity_date, activity_type, xp_earned, details)
-        VALUES (?, ?, 'challenge_completed', ?, ?)
-    ''', (user_id, today, xp_earned, json.dumps({
-        "subject": challenge['subject'],
-        "outcome": outcome,
-        "prediction": prediction,
-        "actual": actual_result
-    })))
-    
-    conn.commit()
-    
+    db.table("activity_log").insert({
+        "user_id": user_id,
+        "activity_date": today,
+        "activity_type": "challenge_completed",
+        "xp_earned": xp_earned,
+        "details": json.dumps({
+            "subject": challenge['subject'],
+            "outcome": outcome,
+            "prediction": prediction,
+            "actual": actual_result
+        })
+    }).execute()
+
     # User-Stats updaten
     user = update_user_stats(user_id, xp_earned, new_streak)
-    
+
     # Alte XP für Level-Up Check
     old_level = calculate_level(user['xp_total'] - xp_earned)
-    
-    conn.close()
-    
+
     return {
         "challenge_id": challenge_id,
         "outcome": outcome,
@@ -311,75 +223,53 @@ def complete_challenge(challenge_id: int, actual_result: int,
         "streak_bonus": new_streak >= 3
     }
 
-def calculate_streak(user_id: str, cursor) -> int:
+def calculate_streak(user_id: str) -> int:
     """Berechnet den aktuellen Streak eines Users."""
+    db = get_db()
     today = datetime.now().date()
     yesterday = (today - timedelta(days=1)).isoformat()
     today_str = today.isoformat()
-    
-    # Prüfe ob heute schon eine Challenge war
-    cursor.execute('''
-        SELECT COUNT(*) FROM challenges 
-        WHERE user_id = ? AND challenge_date = ? AND completed = TRUE
-    ''', (user_id, today_str))
-    today_count = cursor.fetchone()[0]
-    
+
     # Hole aktuellen Streak
-    cursor.execute("SELECT current_streak, last_activity_date FROM users WHERE user_id = ?", (user_id,))
-    user_data = cursor.fetchone()
-    
-    if not user_data:
+    result = db.table("users").select("current_streak, last_activity_date").eq("user_id", user_id).execute()
+
+    if not result.data:
         return 1
-    
-    current_streak = user_data['current_streak'] or 0
-    last_activity = user_data['last_activity_date']
-    
+
+    user_data = result.data[0]
+    current_streak = user_data.get('current_streak') or 0
+    last_activity = user_data.get('last_activity_date')
+
     if not last_activity:
         return 1
-    
+
     # Streak-Logik
     if last_activity == today_str:
-        # Heute schon aktiv - Streak bleibt
         return current_streak
     elif last_activity == yesterday:
-        # Gestern aktiv - Streak erhöht sich
         return current_streak + 1
     else:
-        # Streak unterbrochen
         return 1
 
 def get_user_challenges(user_id: str, limit: int = 20) -> List[Dict]:
     """Holt die letzten Challenges eines Users."""
-    conn = get_connection()
-    c = conn.cursor()
-    
-    c.execute('''
-        SELECT * FROM challenges 
-        WHERE user_id = ? 
-        ORDER BY created_at DESC 
-        LIMIT ?
-    ''', (user_id, limit))
-    
-    challenges = [dict(row) for row in c.fetchall()]
-    conn.close()
-    
-    return challenges
+    result = get_db().table("challenges") \
+        .select("*") \
+        .eq("user_id", user_id) \
+        .order("created_at", desc=True) \
+        .limit(limit) \
+        .execute()
+    return result.data
 
 def get_open_challenges(user_id: str) -> List[Dict]:
     """Holt offene (nicht abgeschlossene) Challenges."""
-    conn = get_connection()
-    c = conn.cursor()
-    
-    c.execute('''
-        SELECT * FROM challenges 
-        WHERE user_id = ? AND completed = FALSE
-        ORDER BY created_at DESC
-    ''', (user_id,))
-    
-    challenges = [dict(row) for row in c.fetchall()]
-    conn.close()
-    
-    return challenges
+    result = get_db().table("challenges") \
+        .select("*") \
+        .eq("user_id", user_id) \
+        .eq("completed", False) \
+        .order("created_at", desc=True) \
+        .execute()
+    return result.data
 
 # ============================================
 # STATISTICS
@@ -387,73 +277,73 @@ def get_open_challenges(user_id: str) -> List[Dict]:
 
 def get_user_stats(user_id: str) -> Dict[str, Any]:
     """Holt umfassende Statistiken eines Users."""
-    init_database()
-    conn = get_connection()
-    c = conn.cursor()
-    
+    db = get_db()
+
     # Basis-User-Daten
-    user = get_or_create_user(user_id)
-    stats = dict(user)
-    
-    # Challenge-Statistiken
-    c.execute("SELECT COUNT(*) FROM challenges WHERE user_id = ? AND completed = TRUE", (user_id,))
-    stats["total_challenges"] = c.fetchone()[0]
-    
-    c.execute("SELECT COUNT(*) FROM challenges WHERE user_id = ? AND outcome = 'exceeded'", (user_id,))
-    stats["times_exceeded"] = c.fetchone()[0]
-    
-    c.execute("SELECT COUNT(*) FROM challenges WHERE user_id = ? AND outcome = 'exact'", (user_id,))
-    stats["exact_predictions"] = c.fetchone()[0]
-    
-    c.execute("SELECT COUNT(*) FROM challenges WHERE user_id = ? AND outcome = 'below'", (user_id,))
-    stats["times_below"] = c.fetchone()[0]
-    
-    c.execute("SELECT COUNT(DISTINCT subject) FROM challenges WHERE user_id = ?", (user_id,))
-    stats["unique_subjects"] = c.fetchone()[0]
-    
-    c.execute("SELECT SUM(xp_earned) FROM challenges WHERE user_id = ?", (user_id,))
-    stats["total_xp_from_challenges"] = c.fetchone()[0] or 0
-    
+    stats = get_or_create_user(user_id)
+
+    # Alle abgeschlossenen Challenges holen
+    completed = db.table("challenges") \
+        .select("subject, outcome, xp_earned") \
+        .eq("user_id", user_id) \
+        .eq("completed", True) \
+        .execute()
+
+    challenges = completed.data
+
+    stats["total_challenges"] = len(challenges)
+    stats["times_exceeded"] = sum(1 for c in challenges if c.get("outcome") == "exceeded")
+    stats["exact_predictions"] = sum(1 for c in challenges if c.get("outcome") == "exact")
+    stats["times_below"] = sum(1 for c in challenges if c.get("outcome") == "below")
+    stats["unique_subjects"] = len(set(c.get("subject", "") for c in challenges))
+    stats["total_xp_from_challenges"] = sum(c.get("xp_earned") or 0 for c in challenges)
+
     # Erfolgsquote berechnen
     if stats["total_challenges"] > 0:
         success = stats["times_exceeded"] + stats["exact_predictions"]
         stats["success_rate"] = round((success / stats["total_challenges"]) * 100, 1)
     else:
         stats["success_rate"] = 0
-    
+
     # Fächer-Breakdown
-    c.execute('''
-        SELECT subject, COUNT(*) as count, 
-               SUM(CASE WHEN outcome = 'exceeded' THEN 1 ELSE 0 END) as exceeded,
-               SUM(CASE WHEN outcome = 'exact' THEN 1 ELSE 0 END) as exact
-        FROM challenges 
-        WHERE user_id = ? AND completed = TRUE
-        GROUP BY subject
-    ''', (user_id,))
-    stats["subjects_breakdown"] = [dict(row) for row in c.fetchall()]
-    
-    conn.close()
+    subjects = {}
+    for c in challenges:
+        subj = c.get("subject", "")
+        if subj not in subjects:
+            subjects[subj] = {"subject": subj, "count": 0, "exceeded": 0, "exact": 0}
+        subjects[subj]["count"] += 1
+        if c.get("outcome") == "exceeded":
+            subjects[subj]["exceeded"] += 1
+        elif c.get("outcome") == "exact":
+            subjects[subj]["exact"] += 1
+
+    stats["subjects_breakdown"] = list(subjects.values())
+
     return stats
 
 def get_activity_heatmap(user_id: str, days: int = 90) -> List[Dict]:
     """Holt Activity-Daten für Heatmap (GitHub-Style)."""
-    conn = get_connection()
-    c = conn.cursor()
-    
+    db = get_db()
     start_date = (datetime.now() - timedelta(days=days)).date().isoformat()
-    
-    c.execute('''
-        SELECT challenge_date, COUNT(*) as count, SUM(xp_earned) as xp
-        FROM challenges 
-        WHERE user_id = ? AND challenge_date >= ? AND completed = TRUE
-        GROUP BY challenge_date
-        ORDER BY challenge_date
-    ''', (user_id, start_date))
-    
-    activity = [dict(row) for row in c.fetchall()]
-    conn.close()
-    
-    return activity
+
+    result = db.table("challenges") \
+        .select("challenge_date, xp_earned") \
+        .eq("user_id", user_id) \
+        .gte("challenge_date", start_date) \
+        .eq("completed", True) \
+        .order("challenge_date") \
+        .execute()
+
+    # Gruppierung nach Datum in Python
+    dates = {}
+    for row in result.data:
+        d = row["challenge_date"]
+        if d not in dates:
+            dates[d] = {"challenge_date": d, "count": 0, "xp": 0}
+        dates[d]["count"] += 1
+        dates[d]["xp"] += row.get("xp_earned") or 0
+
+    return list(dates.values())
 
 # ============================================
 # BADGE SYSTEM
@@ -461,49 +351,45 @@ def get_activity_heatmap(user_id: str, days: int = 90) -> List[Dict]:
 
 def get_user_badges(user_id: str) -> List[Dict]:
     """Holt alle verdienten Badges eines Users."""
-    conn = get_connection()
-    c = conn.cursor()
-    
-    c.execute('''
-        SELECT badge_id, earned_at FROM user_badges 
-        WHERE user_id = ?
-        ORDER BY earned_at DESC
-    ''', (user_id,))
-    
-    badges = [dict(row) for row in c.fetchall()]
-    conn.close()
-    
-    return badges
+    result = get_db().table("user_badges") \
+        .select("badge_id, earned_at") \
+        .eq("user_id", user_id) \
+        .order("earned_at", desc=True) \
+        .execute()
+    return result.data
 
 def award_badge(user_id: str, badge_id: str) -> bool:
     """Vergibt ein Badge an einen User."""
-    conn = get_connection()
-    c = conn.cursor()
-    
+    db = get_db()
+    # Prüfe ob Badge bereits vergeben
+    existing = db.table("user_badges") \
+        .select("user_id") \
+        .eq("user_id", user_id) \
+        .eq("badge_id", badge_id) \
+        .execute()
+    if existing.data:
+        return False
+
     try:
-        c.execute('''
-            INSERT OR IGNORE INTO user_badges (user_id, badge_id)
-            VALUES (?, ?)
-        ''', (user_id, badge_id))
-        conn.commit()
-        success = c.rowcount > 0
-    except sqlite3.Error:
-        success = False
-    
-    conn.close()
-    return success
+        db.table("user_badges").insert({
+            "user_id": user_id,
+            "badge_id": badge_id
+        }).execute()
+        return True
+    except Exception:
+        return False
 
 def check_and_award_badges(user_id: str, badges_config: Dict) -> List[str]:
     """Prüft und vergibt neue Badges basierend auf Stats."""
     stats = get_user_stats(user_id)
     existing = [b['badge_id'] for b in get_user_badges(user_id)]
     new_badges = []
-    
+
     for badge_id, badge_info in badges_config.items():
         if badge_id not in existing:
             condition_fn = badge_info.get("condition")
             if condition_fn and condition_fn(stats):
                 if award_badge(user_id, badge_id):
                     new_badges.append(badge_id)
-    
+
     return new_badges

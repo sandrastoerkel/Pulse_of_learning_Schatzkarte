@@ -14,7 +14,6 @@ Stil: MaiThink X (Mai Thi Nguyen-Kim) - wissenschaftlich fundiert, aber cool erk
 """
 
 import streamlit as st
-import sqlite3
 from typing import Optional, Callable
 
 # ============================================
@@ -51,30 +50,18 @@ except ImportError:
 
 def render_motivation_altersstufen(
     color: str,
-    conn: Optional[sqlite3.Connection] = None,
+    conn=None,
     user_data: Optional[dict] = None,
     xp_callback: Optional[Callable] = None
 ):
     """
     Rendert die Motivations-Ressource mit Challenges + Theorie-Tabs.
-    
+
     Args:
         color: Farbe für das Styling (z.B. "#22c55e")
-        conn: SQLite Connection für Gamification (optional für Widget)
+        conn: Wird ignoriert (Supabase nutzt get_db() direkt)
         user_data: Dict mit user_id, display_name, age_group (optional für Widget)
         xp_callback: Callback für XP-Vergabe (optional)
-    
-    Beispiel-Aufruf:
-        render_motivation_altersstufen(
-            color="#22c55e",
-            conn=st.session_state.get("db_connection"),
-            user_data={
-                "user_id": st.session_state.get("user_id", "guest"),
-                "display_name": st.session_state.get("display_name", "Gast"),
-                "age_group": st.session_state.get("age_group", "unterstufe"),
-            },
-            xp_callback=add_user_xp  # Optional
-        )
     """
 
     # Session State für Tab-Auswahl (Default: Theorie zuerst)
@@ -151,34 +138,22 @@ def render_motivation_altersstufen(
 # ============================================
 
 def _render_challenges_tab(
-    conn: Optional[sqlite3.Connection],
+    conn,
     user_data: Optional[dict],
     xp_callback: Optional[Callable]
 ):
     """Rendert den Challenges-Tab mit interaktivem Widget oder Fallback."""
-    
+
     st.header("🎮 Motivations-Challenges")
-    
-    # ─────────────────────────────────────────
-    # PRÜFUNG: Widget verfügbar + User eingeloggt?
-    # ─────────────────────────────────────────
-    
+
     widget_ready = (
-        WIDGET_AVAILABLE and 
-        conn is not None and 
+        WIDGET_AVAILABLE and
         user_data is not None and
         user_data.get("user_id")
     )
-    
+
     if widget_ready:
-        # ═══════════════════════════════════════
-        # INTERAKTIVES WIDGET RENDERN
-        # ═══════════════════════════════════════
-        
-        # Tabellen initialisieren (idempotent)
-        init_motivation_tables(conn)
-        
-        # Widget aufrufen
+        # Widget aufrufen (conn wird für Rückwärtskompatibilität durchgereicht)
         render_motivation_challenge(
             user_data=user_data,
             conn=conn,

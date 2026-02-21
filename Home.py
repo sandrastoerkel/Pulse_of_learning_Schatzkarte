@@ -10,7 +10,6 @@ import sys
 
 sys.path.append('.')
 
-from utils.coaching_db import init_database
 from utils.page_config import get_page_path
 from utils.user_system import start_preview_mode
 from components.rpg_schatzkarte import landing_page
@@ -25,9 +24,6 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed"
 )
-
-# Initialize database
-init_database()
 
 # ============================================
 # CUSTOM CSS - Streamlit UI ausblenden

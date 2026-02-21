@@ -6,7 +6,6 @@ Die interaktive Lern-Weltkarte im RPG-Stil!
 import streamlit as st
 from schatzkarte.map_data import ISLANDS
 from schatzkarte.map_db import (
-    init_map_tables,
     get_collected_treasures,
     get_island_progress,
     complete_island_action,
@@ -45,9 +44,6 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed"  # Sidebar eingeklappt für mehr Platz
 )
-
-# Tabellen initialisieren
-init_map_tables()
 
 # ===============================================================
 # USER-AUTHENTIFIZIERUNG
@@ -510,13 +506,10 @@ with st.sidebar:
             with col2:
                 if st.button("🗑️ Reset", type="secondary"):
                     # Fortschritt aus Datenbank loeschen
-                    from schatzkarte.map_db import get_connection
-                    conn = get_connection()
-                    c = conn.cursor()
-                    c.execute("DELETE FROM island_progress WHERE user_id=?", (user_id,))
-                    c.execute("DELETE FROM user_treasures WHERE user_id=?", (user_id,))
-                    conn.commit()
-                    conn.close()
+                    from utils.database import get_db
+                    _db = get_db()
+                    _db.table("island_progress").delete().eq("user_id", user_id).execute()
+                    _db.table("user_treasures").delete().eq("user_id", user_id).execute()
                     # Session-State zuruecksetzen
                     st.session_state["last_schatzkarte_action"] = ""
                     st.toast("🗑️ Fortschritt zurückgesetzt!", icon="✅")

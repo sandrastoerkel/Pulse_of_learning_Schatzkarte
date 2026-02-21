@@ -18,11 +18,10 @@ Verwendung:
 
 import streamlit as st
 from datetime import datetime, timedelta
-import sqlite3
 from typing import Dict, List, Any, Optional
 import json
 
-from utils.database import get_connection
+from utils.database import get_db
 
 # ============================================
 # INSPIRIERENDE BILDER FÜR JEDE QUELLE
@@ -217,116 +216,92 @@ BANDURA_BADGES = {
 # ============================================
 
 def init_bandura_tables():
-    """Initialisiert die Bandura-spezifischen Tabellen."""
-    conn = get_connection()
-    c = conn.cursor()
-
-    # Bandura Entries Tabelle
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS bandura_entries (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            entry_date DATE NOT NULL,
-            source_type TEXT NOT NULL,
-            description TEXT NOT NULL,
-            xp_earned INTEGER DEFAULT 0,
-            FOREIGN KEY (user_id) REFERENCES users(user_id)
-        )
-    ''')
-
-    # Index für Performance
-    c.execute('CREATE INDEX IF NOT EXISTS idx_bandura_user_date ON bandura_entries(user_id, entry_date)')
-    c.execute('CREATE INDEX IF NOT EXISTS idx_bandura_source ON bandura_entries(source_type)')
-
-    conn.commit()
-    conn.close()
+    """Keine Initialisierung nötig — Tabellen existieren in Supabase."""
+    pass
 
 def create_bandura_entry(user_id: str, source_type: str, description: str) -> Dict[str, Any]:
     """Erstellt einen neuen Bandura-Eintrag."""
-    init_bandura_tables()
-    conn = get_connection()
-    c = conn.cursor()
-
+    db = get_db()
     today = datetime.now().date().isoformat()
 
     # Basis-XP berechnen
     source_info = BANDURA_SOURCES.get(source_type, {})
     base_xp = source_info.get("xp", XP_CONFIG["base_entry"])
 
-    # Bonus für ausführliche Reflexion
     if len(description) > 50:
         base_xp += XP_CONFIG["detailed_reflection"]
 
     # Eintrag erstellen
-    c.execute('''
-        INSERT INTO bandura_entries (user_id, entry_date, source_type, description, xp_earned)
-        VALUES (?, ?, ?, ?, ?)
-    ''', (user_id, today, source_type, description, base_xp))
-
-    entry_id = c.lastrowid
+    insert_result = db.table("bandura_entries").insert({
+        "user_id": user_id,
+        "entry_date": today,
+        "source_type": source_type,
+        "description": description,
+        "xp_earned": base_xp
+    }).execute()
+    entry_id = insert_result.data[0]["id"]
 
     # Prüfen ob alle 4 Quellen heute genutzt wurden
-    c.execute('''
-        SELECT DISTINCT source_type FROM bandura_entries
-        WHERE user_id = ? AND entry_date = ?
-    ''', (user_id, today))
-
-    sources_today = [row[0] for row in c.fetchall()]
+    sources_result = db.table("bandura_entries") \
+        .select("source_type") \
+        .eq("user_id", user_id) \
+        .eq("entry_date", today) \
+        .execute()
+    sources_today = list(set(r["source_type"] for r in sources_result.data))
     all_four_bonus = 0
 
     if len(sources_today) == 4:
-        # Prüfe ob heute schon der Bonus vergeben wurde
-        c.execute('''
-            SELECT COUNT(*) FROM activity_log
-            WHERE user_id = ? AND activity_date = ? AND activity_type = 'bandura_all_four'
-        ''', (user_id, today))
+        bonus_check = db.table("activity_log") \
+            .select("id", count="exact") \
+            .eq("user_id", user_id) \
+            .eq("activity_date", today) \
+            .eq("activity_type", "bandura_all_four") \
+            .execute()
 
-        if c.fetchone()[0] == 0:
+        if bonus_check.count == 0:
             all_four_bonus = XP_CONFIG["all_four_today"]
-            c.execute('''
-                INSERT INTO activity_log (user_id, activity_date, activity_type, xp_earned, details)
-                VALUES (?, ?, 'bandura_all_four', ?, ?)
-            ''', (user_id, today, all_four_bonus, json.dumps({"sources": sources_today})))
+            db.table("activity_log").insert({
+                "user_id": user_id,
+                "activity_date": today,
+                "activity_type": "bandura_all_four",
+                "xp_earned": all_four_bonus,
+                "details": json.dumps({"sources": sources_today})
+            }).execute()
 
     total_xp = base_xp + all_four_bonus
 
-    # Activity Log für diesen Eintrag
-    c.execute('''
-        INSERT INTO activity_log (user_id, activity_date, activity_type, xp_earned, details)
-        VALUES (?, ?, ?, ?, ?)
-    ''', (user_id, today, f'bandura_{source_type}', base_xp, json.dumps({
-        "description": description[:100],
-        "source": source_type
-    })))
-
-    conn.commit()
+    # Activity Log
+    db.table("activity_log").insert({
+        "user_id": user_id,
+        "activity_date": today,
+        "activity_type": f"bandura_{source_type}",
+        "xp_earned": base_xp,
+        "details": json.dumps({"description": description[:100], "source": source_type})
+    }).execute()
 
     # Streak berechnen
-    streak = calculate_bandura_streak(user_id, c)
+    streak = calculate_bandura_streak(user_id)
 
     # User XP updaten
-    c.execute("SELECT xp_total, level FROM users WHERE user_id = ?", (user_id,))
-    user_row = c.fetchone()
+    user_result = db.table("users").select("xp_total, level").eq("user_id", user_id).execute()
 
-    if user_row:
-        new_xp = (user_row['xp_total'] or 0) + total_xp
+    if user_result.data:
+        user_row = user_result.data[0]
+        new_xp = (user_row.get('xp_total') or 0) + total_xp
         new_level = calculate_level(new_xp)
-        old_level = user_row['level'] or 1
+        old_level = user_row.get('level') or 1
 
-        c.execute('''
-            UPDATE users SET xp_total = ?, level = ?, last_activity_date = ?
-            WHERE user_id = ?
-        ''', (new_xp, new_level, today, user_id))
+        db.table("users").update({
+            "xp_total": new_xp,
+            "level": new_level,
+            "last_activity_date": today
+        }).eq("user_id", user_id).execute()
 
         level_up = new_level > old_level
     else:
         new_xp = total_xp
         new_level = 1
         level_up = False
-
-    conn.commit()
-    conn.close()
 
     return {
         "entry_id": entry_id,
@@ -352,35 +327,32 @@ def calculate_level(xp: int) -> int:
             return level
     return 1
 
-def calculate_bandura_streak(user_id: str, cursor) -> int:
+def calculate_bandura_streak(user_id: str) -> int:
     """Berechnet den aktuellen Bandura-Streak."""
     today = datetime.now().date()
 
-    # Hole alle Tage mit Einträgen (absteigend sortiert)
-    cursor.execute('''
-        SELECT DISTINCT entry_date FROM bandura_entries
-        WHERE user_id = ?
-        ORDER BY entry_date DESC
-    ''', (user_id,))
+    result = get_db().table("bandura_entries") \
+        .select("entry_date") \
+        .eq("user_id", user_id) \
+        .order("entry_date", desc=True) \
+        .execute()
 
-    dates = [row[0] for row in cursor.fetchall()]
+    # Distinct dates
+    dates = list(dict.fromkeys(r["entry_date"] for r in result.data))
 
     if not dates:
         return 0
 
-    # Prüfe ob heute oder gestern dabei ist
     today_str = today.isoformat()
     yesterday_str = (today - timedelta(days=1)).isoformat()
 
     if dates[0] != today_str and dates[0] != yesterday_str:
         return 0 if dates[0] != today_str else 1
 
-    # Zähle aufeinanderfolgende Tage
     streak = 1
     for i in range(len(dates) - 1):
         current = datetime.fromisoformat(dates[i]).date()
         previous = datetime.fromisoformat(dates[i + 1]).date()
-
         if (current - previous).days == 1:
             streak += 1
         else:
@@ -390,53 +362,41 @@ def calculate_bandura_streak(user_id: str, cursor) -> int:
 
 def get_bandura_stats(user_id: str) -> Dict[str, Any]:
     """Holt Bandura-spezifische Statistiken."""
-    init_bandura_tables()
-    conn = get_connection()
-    c = conn.cursor()
+    db = get_db()
 
+    # Alle Einträge holen
+    all_entries = db.table("bandura_entries") \
+        .select("entry_date, source_type") \
+        .eq("user_id", user_id) \
+        .order("entry_date") \
+        .execute()
+
+    entries = all_entries.data
     stats = {}
 
-    # Gesamt-Einträge
-    c.execute("SELECT COUNT(*) FROM bandura_entries WHERE user_id = ?", (user_id,))
-    stats["bandura_total"] = c.fetchone()[0]
+    stats["bandura_total"] = len(entries)
 
-    # Einträge pro Quelle
     for source in BANDURA_SOURCES.keys():
-        c.execute('''
-            SELECT COUNT(*) FROM bandura_entries
-            WHERE user_id = ? AND source_type = ?
-        ''', (user_id, source))
-        stats[f"bandura_{source}"] = c.fetchone()[0]
+        stats[f"bandura_{source}"] = sum(1 for e in entries if e["source_type"] == source)
 
     # Tage mit allen 4 Quellen
-    c.execute('''
-        SELECT entry_date, COUNT(DISTINCT source_type) as source_count
-        FROM bandura_entries
-        WHERE user_id = ?
-        GROUP BY entry_date
-        HAVING source_count = 4
-    ''', (user_id,))
-    stats["bandura_all_four_days"] = len(c.fetchall())
+    dates_sources = {}
+    for e in entries:
+        d = e["entry_date"]
+        if d not in dates_sources:
+            dates_sources[d] = set()
+        dates_sources[d].add(e["source_type"])
+    stats["bandura_all_four_days"] = sum(1 for sources in dates_sources.values() if len(sources) == 4)
 
     # Heutiger Status
     today = datetime.now().date().isoformat()
-    c.execute('''
-        SELECT source_type FROM bandura_entries
-        WHERE user_id = ? AND entry_date = ?
-    ''', (user_id, today))
-    stats["sources_today"] = [row[0] for row in c.fetchall()]
+    stats["sources_today"] = list(set(e["source_type"] for e in entries if e["entry_date"] == today))
 
     # Streak
-    stats["bandura_streak"] = calculate_bandura_streak(user_id, c)
+    stats["bandura_streak"] = calculate_bandura_streak(user_id)
 
-    # Längster Streak - Python-basierte Berechnung
-    c.execute('''
-        SELECT DISTINCT entry_date FROM bandura_entries
-        WHERE user_id = ?
-        ORDER BY entry_date
-    ''', (user_id,))
-    all_dates = [row[0] for row in c.fetchall()]
-
+    # Längster Streak
+    all_dates = sorted(set(e["entry_date"] for e in entries))
     longest_streak = 0
     if all_dates:
         current_streak = 1
@@ -452,25 +412,17 @@ def get_bandura_stats(user_id: str) -> Dict[str, Any]:
 
     stats["bandura_longest_streak"] = max(longest_streak, stats["bandura_streak"])
 
-    conn.close()
     return stats
 
 def get_bandura_entries(user_id: str, limit: int = 10) -> List[Dict]:
     """Holt die letzten Bandura-Einträge."""
-    conn = get_connection()
-    c = conn.cursor()
-
-    c.execute('''
-        SELECT * FROM bandura_entries
-        WHERE user_id = ?
-        ORDER BY created_at DESC
-        LIMIT ?
-    ''', (user_id, limit))
-
-    entries = [dict(row) for row in c.fetchall()]
-    conn.close()
-
-    return entries
+    result = get_db().table("bandura_entries") \
+        .select("*") \
+        .eq("user_id", user_id) \
+        .order("created_at", desc=True) \
+        .limit(limit) \
+        .execute()
+    return result.data
 
 def check_and_award_bandura_badges(user_id: str) -> List[str]:
     """Prüft und vergibt Bandura-Badges."""
@@ -532,11 +484,8 @@ def render_bandura_sources_widget(compact: bool = False, color: str = "#9C27B0")
         color: Primärfarbe für das Widget
     """
     from utils.hattie_challenge_widget import get_user_id, init_widget_state
-    from utils.gamification_db import init_database, get_or_create_user
+    from utils.gamification_db import get_or_create_user
     from utils.gamification_ui import render_level_card, render_new_badge_celebration
-
-    init_database()
-    init_bandura_tables()
 
     user_id = get_user_id()
     user = get_or_create_user(user_id)
@@ -829,24 +778,19 @@ def render_history_tab(user_id: str):
 
 def get_all_entries_by_source(user_id: str) -> Dict[str, List[Dict]]:
     """Holt alle Einträge gruppiert nach Quelle."""
-    conn = get_connection()
-    c = conn.cursor()
+    entries = get_db().table("bandura_entries") \
+        .select("*") \
+        .eq("user_id", user_id) \
+        .order("entry_date", desc=True) \
+        .execute()
 
     result = {source: [] for source in BANDURA_SOURCES.keys()}
 
-    c.execute('''
-        SELECT * FROM bandura_entries
-        WHERE user_id = ?
-        ORDER BY entry_date DESC
-    ''', (user_id,))
-
-    for row in c.fetchall():
-        entry = dict(row)
+    for entry in entries.data:
         source = entry.get("source_type", "mastery")
         if source in result:
             result[source].append(entry)
 
-    conn.close()
     return result
 
 def render_portfolio_tab(user_id: str, bandura_stats: Dict):

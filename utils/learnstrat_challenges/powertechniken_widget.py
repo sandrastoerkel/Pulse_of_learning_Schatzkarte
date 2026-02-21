@@ -20,6 +20,8 @@ from datetime import datetime
 from typing import Dict, List, Optional, Any
 import json
 
+from utils.database import get_db
+
 # Lokale Imports
 from .challenge_content import (
     POWERTECHNIKEN,
@@ -61,156 +63,113 @@ STATE_KEYS = {
 # ============================================
 
 def init_learnstrat_tables(conn):
-    """Initialisiert die Lernstrategie-Tabellen."""
-    c = conn.cursor()
-    
-    # User Learning Preferences (Top 3)
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS user_learning_preferences (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id TEXT NOT NULL,
-            technique_1 TEXT,
-            technique_2 TEXT,
-            technique_3 TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    
-    # Lernstrategie-Progress
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS learnstrat_progress (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id TEXT NOT NULL,
-            challenge_id TEXT NOT NULL,
-            technique_id TEXT,
-            completed BOOLEAN DEFAULT 0,
-            rating INTEGER,
-            reflection TEXT,
-            application TEXT,
-            xp_earned INTEGER DEFAULT 0,
-            completed_at TIMESTAMP
-        )
-    ''')
-
-    # Migration: application Spalte hinzufügen falls nicht vorhanden
-    try:
-        c.execute('ALTER TABLE learnstrat_progress ADD COLUMN application TEXT')
-    except:
-        pass  # Spalte existiert bereits
-    
-    # Index für schnelle Abfragen
-    c.execute('CREATE INDEX IF NOT EXISTS idx_learnstrat_user ON learnstrat_progress(user_id)')
-    c.execute('CREATE INDEX IF NOT EXISTS idx_learnstrat_challenge ON learnstrat_progress(challenge_id)')
-    
-    conn.commit()
+    """Keine Initialisierung nötig — Tabellen existieren in Supabase."""
+    pass
 
 def save_technique_progress(conn, user_id: str, technique_id: str, rating: int, xp: int, application: str = ""):
     """Speichert den Fortschritt für eine Technik inkl. konkretem Anwendungsszenario."""
-    c = conn.cursor()
+    db = get_db()
 
-    # Prüfen ob schon vorhanden
-    c.execute('''
-        SELECT id FROM learnstrat_progress
-        WHERE user_id = ? AND challenge_id = 'powertechniken' AND technique_id = ?
-    ''', (user_id, technique_id))
+    existing = db.table("learnstrat_progress") \
+        .select("id") \
+        .eq("user_id", user_id) \
+        .eq("challenge_id", "powertechniken") \
+        .eq("technique_id", technique_id) \
+        .execute()
 
-    existing = c.fetchone()
-
-    if existing:
-        c.execute('''
-            UPDATE learnstrat_progress
-            SET rating = ?, xp_earned = ?, application = ?, completed = 1, completed_at = ?
-            WHERE id = ?
-        ''', (rating, xp, application, datetime.now().isoformat(), existing[0]))
+    if existing.data:
+        db.table("learnstrat_progress").update({
+            "rating": rating,
+            "xp_earned": xp,
+            "application": application,
+            "completed": True,
+            "completed_at": datetime.now().isoformat()
+        }).eq("id", existing.data[0]["id"]).execute()
     else:
-        c.execute('''
-            INSERT INTO learnstrat_progress
-            (user_id, challenge_id, technique_id, rating, xp_earned, application, completed, completed_at)
-            VALUES (?, 'powertechniken', ?, ?, ?, ?, 1, ?)
-        ''', (user_id, technique_id, rating, xp, application, datetime.now().isoformat()))
-
-    conn.commit()
+        db.table("learnstrat_progress").insert({
+            "user_id": user_id,
+            "challenge_id": "powertechniken",
+            "technique_id": technique_id,
+            "rating": rating,
+            "xp_earned": xp,
+            "application": application,
+            "completed": True,
+            "completed_at": datetime.now().isoformat()
+        }).execute()
 
 def save_top3_preferences(conn, user_id: str, top3: List[str]):
     """Speichert die Top 3 Lerntechniken des Users."""
-    c = conn.cursor()
-    
-    # Prüfen ob schon vorhanden
-    c.execute('SELECT id FROM user_learning_preferences WHERE user_id = ?', (user_id,))
-    existing = c.fetchone()
-    
+    db = get_db()
+
+    existing = db.table("user_learning_preferences") \
+        .select("id") \
+        .eq("user_id", user_id) \
+        .execute()
+
     tech1 = top3[0] if len(top3) > 0 else None
     tech2 = top3[1] if len(top3) > 1 else None
     tech3 = top3[2] if len(top3) > 2 else None
-    
-    if existing:
-        c.execute('''
-            UPDATE user_learning_preferences 
-            SET technique_1 = ?, technique_2 = ?, technique_3 = ?, updated_at = ?
-            WHERE id = ?
-        ''', (tech1, tech2, tech3, datetime.now().isoformat(), existing[0]))
+
+    if existing.data:
+        db.table("user_learning_preferences").update({
+            "technique_1": tech1,
+            "technique_2": tech2,
+            "technique_3": tech3,
+            "updated_at": datetime.now().isoformat()
+        }).eq("id", existing.data[0]["id"]).execute()
     else:
-        c.execute('''
-            INSERT INTO user_learning_preferences 
-            (user_id, technique_1, technique_2, technique_3)
-            VALUES (?, ?, ?, ?)
-        ''', (user_id, tech1, tech2, tech3))
-    
-    conn.commit()
+        db.table("user_learning_preferences").insert({
+            "user_id": user_id,
+            "technique_1": tech1,
+            "technique_2": tech2,
+            "technique_3": tech3
+        }).execute()
 
 def get_user_learnstrat_progress(conn, user_id: str, challenge_id: str = "powertechniken") -> List[Dict]:
     """Holt den Lernstrategie-Fortschritt eines Users inkl. Anwendungsszenarien."""
-    c = conn.cursor()
-    c.row_factory = lambda cursor, row: {
-        "technique_id": row[0],
-        "rating": row[1],
-        "xp_earned": row[2],
-        "completed_at": row[3],
-        "application": row[4] if len(row) > 4 else ""
-    }
+    result = get_db().table("learnstrat_progress") \
+        .select("technique_id, rating, xp_earned, completed_at, application") \
+        .eq("user_id", user_id) \
+        .eq("challenge_id", challenge_id) \
+        .eq("completed", True) \
+        .order("completed_at") \
+        .execute()
 
-    c.execute('''
-        SELECT technique_id, rating, xp_earned, completed_at, application
-        FROM learnstrat_progress
-        WHERE user_id = ? AND challenge_id = ? AND completed = 1
-        ORDER BY completed_at
-    ''', (user_id, challenge_id))
-
-    return c.fetchall()
+    return [{
+        "technique_id": row["technique_id"],
+        "rating": row["rating"],
+        "xp_earned": row["xp_earned"],
+        "completed_at": row["completed_at"],
+        "application": row.get("application", "")
+    } for row in result.data]
 
 def get_user_top3(conn, user_id: str) -> Optional[List[str]]:
     """Holt die Top 3 Lerntechniken eines Users."""
-    c = conn.cursor()
-    c.execute('''
-        SELECT technique_1, technique_2, technique_3
-        FROM user_learning_preferences
-        WHERE user_id = ?
-    ''', (user_id,))
+    result = get_db().table("user_learning_preferences") \
+        .select("technique_1, technique_2, technique_3") \
+        .eq("user_id", user_id) \
+        .execute()
 
-    row = c.fetchone()
-    if row:
-        return [t for t in row if t]
+    if result.data:
+        row = result.data[0]
+        return [t for t in [row["technique_1"], row["technique_2"], row["technique_3"]] if t]
     return None
 
 
 def reset_powertechniken_progress(conn, user_id: str):
     """Löscht den kompletten Powertechniken-Fortschritt eines Users für Neustart."""
-    c = conn.cursor()
+    db = get_db()
 
-    # Lösche Technik-Progress
-    c.execute('''
-        DELETE FROM learnstrat_progress
-        WHERE user_id = ? AND challenge_id = 'powertechniken'
-    ''', (user_id,))
+    db.table("learnstrat_progress") \
+        .delete() \
+        .eq("user_id", user_id) \
+        .eq("challenge_id", "powertechniken") \
+        .execute()
 
-    # Lösche Top 3 Auswahl
-    c.execute('''
-        DELETE FROM user_learning_preferences
-        WHERE user_id = ?
-    ''', (user_id,))
-
-    conn.commit()
+    db.table("user_learning_preferences") \
+        .delete() \
+        .eq("user_id", user_id) \
+        .execute()
 
 # ============================================
 # UI COMPONENTS

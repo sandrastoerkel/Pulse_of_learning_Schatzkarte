@@ -17,13 +17,12 @@ Verwendung:
 """
 
 import streamlit as st
-import sqlite3
 from datetime import datetime
 from typing import Dict, Optional, Any, List
 import hashlib
 import json
 
-from utils.database import get_connection
+from utils.database import get_db
 
 # ============================================
 # AVATAR KONFIGURATION (DiceBear)
@@ -112,81 +111,23 @@ def get_unlocked_options(user: Dict, category: str) -> List[str]:
 # DATABASE
 # ============================================
 
-def init_user_tables():
-    """Initialisiert die Benutzer-Tabellen."""
-    conn = get_connection()
-    c = conn.cursor()
-
-    # Erweiterte Users-Tabelle (falls noch nicht vorhanden, erweitern)
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            user_id TEXT PRIMARY KEY,
-            username TEXT DEFAULT 'Lernender',
-            display_name TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            last_login TIMESTAMP,
-            xp_total INTEGER DEFAULT 0,
-            level INTEGER DEFAULT 1,
-            current_streak INTEGER DEFAULT 0,
-            longest_streak INTEGER DEFAULT 0,
-            last_activity_date DATE,
-            settings TEXT DEFAULT '{}',
-            age_group TEXT DEFAULT 'unterstufe',
-            avatar_settings TEXT DEFAULT '{}'
-        )
-    ''')
-
-    # Prüfe ob Spalten existieren, wenn nicht hinzufügen
-    c.execute("PRAGMA table_info(users)")
-    columns = [col[1] for col in c.fetchall()]
-
-    if 'display_name' not in columns:
-        c.execute('ALTER TABLE users ADD COLUMN display_name TEXT')
-
-    if 'last_login' not in columns:
-        c.execute('ALTER TABLE users ADD COLUMN last_login TIMESTAMP')
-
-    if 'age_group' not in columns:
-        c.execute("ALTER TABLE users ADD COLUMN age_group TEXT DEFAULT 'unterstufe'")
-
-    if 'avatar_settings' not in columns:
-        c.execute("ALTER TABLE users ADD COLUMN avatar_settings TEXT DEFAULT '{}'")
-
-    if 'role' not in columns:
-        c.execute("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'student'")
-
-    if 'password_hash' not in columns:
-        c.execute("ALTER TABLE users ADD COLUMN password_hash TEXT")
-
-    conn.commit()
-    conn.close()
-
 def hash_password(password: str) -> str:
     """Erzeugt einen SHA-256 Hash des Passworts."""
     return hashlib.sha256(password.encode()).hexdigest()
 
 def is_name_taken(name: str) -> bool:
     """Prüft ob ein Benutzername (lowercase) bereits in der DB existiert."""
-    init_user_tables()
-    conn = get_connection()
-    c = conn.cursor()
     clean_name = name.strip().lower()
     user_id = hashlib.md5(clean_name.encode()).hexdigest()[:16]
-    c.execute("SELECT 1 FROM users WHERE user_id = ?", (user_id,))
-    exists = c.fetchone() is not None
-    conn.close()
-    return exists
+    result = get_db().table("users").select("user_id").eq("user_id", user_id).execute()
+    return len(result.data) > 0
 
 def verify_password(user_id: str, password: str) -> bool:
     """Vergleicht ein Passwort mit dem gespeicherten Hash in der DB."""
-    conn = get_connection()
-    c = conn.cursor()
-    c.execute("SELECT password_hash FROM users WHERE user_id = ?", (user_id,))
-    result = c.fetchone()
-    conn.close()
-    if not result or not result[0]:
+    result = get_db().table("users").select("password_hash").eq("user_id", user_id).execute()
+    if not result.data or not result.data[0].get("password_hash"):
         return False
-    return result[0] == hash_password(password)
+    return result.data[0]["password_hash"] == hash_password(password)
 
 def get_user_id_for_name(name: str) -> Optional[str]:
     """Gibt die user_id für einen Namen zurück (oder None)."""
@@ -195,119 +136,75 @@ def get_user_id_for_name(name: str) -> Optional[str]:
 
 def get_or_create_user_by_name(display_name: str, age_group: str = None, avatar_style: str = None, password: str = None) -> Dict[str, Any]:
     """Holt oder erstellt einen User basierend auf dem Display-Namen."""
-    init_user_tables()
-    conn = get_connection()
-    c = conn.cursor()
-
-    # Generiere user_id aus dem Namen (lowercase, keine Sonderzeichen)
+    db = get_db()
     clean_name = display_name.strip().lower()
     user_id = hashlib.md5(clean_name.encode()).hexdigest()[:16]
 
-    # Prüfe ob User existiert
-    c.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
-    user = c.fetchone()
-
+    result = db.table("users").select("*").eq("user_id", user_id).execute()
     now = datetime.now().isoformat()
 
-    if not user:
-        # Neuer User - mit Altersstufe und Avatar
+    if not result.data:
         age = age_group or "unterstufe"
-
-        # Default Avatar-Style basierend auf Altersstufe
         if avatar_style:
             style = avatar_style
         else:
             style = AVATAR_STYLES_BY_AGE.get(age, {}).get('styles', ['adventurer'])[0]
 
         avatar_settings = json.dumps({"style": style, "background": "b6e3f4"})
-
         pw_hash = hash_password(password) if password else None
 
-        c.execute('''
-            INSERT INTO users (user_id, username, display_name, created_at, last_login,
-                             xp_total, level, age_group, avatar_settings, password_hash)
-            VALUES (?, ?, ?, ?, ?, 0, 1, ?, ?, ?)
-        ''', (user_id, clean_name, display_name.strip(), now, now, age, avatar_settings, pw_hash))
-        conn.commit()
-        c.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
-        user = c.fetchone()
+        insert_result = db.table("users").insert({
+            "user_id": user_id,
+            "username": clean_name,
+            "display_name": display_name.strip(),
+            "created_at": now,
+            "last_login": now,
+            "xp_total": 0,
+            "level": 1,
+            "age_group": age,
+            "avatar_settings": avatar_settings,
+            "password_hash": pw_hash
+        }).execute()
+        return insert_result.data[0]
     else:
-        # Update last_login (und ggf. age_group wenn angegeben)
+        update_data = {"last_login": now, "display_name": display_name.strip()}
         if age_group:
-            c.execute("UPDATE users SET last_login = ?, display_name = ?, age_group = ? WHERE user_id = ?",
-                      (now, display_name.strip(), age_group, user_id))
-        else:
-            c.execute("UPDATE users SET last_login = ?, display_name = ? WHERE user_id = ?",
-                      (now, display_name.strip(), user_id))
-        conn.commit()
-        c.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
-        user = c.fetchone()
+            update_data["age_group"] = age_group
 
-    result = dict(user)
-    conn.close()
-    return result
+        update_result = db.table("users").update(update_data).eq("user_id", user_id).execute()
+        return update_result.data[0]
 
 def update_user_avatar(user_id: str, avatar_settings: Dict) -> bool:
     """Aktualisiert die Avatar-Einstellungen eines Users."""
-    conn = get_connection()
-    c = conn.cursor()
-
     try:
-        c.execute("UPDATE users SET avatar_settings = ? WHERE user_id = ?",
-                  (json.dumps(avatar_settings), user_id))
-        conn.commit()
-        success = True
+        get_db().table("users").update({"avatar_settings": json.dumps(avatar_settings)}).eq("user_id", user_id).execute()
+        return True
     except Exception as e:
         print(f"Error updating avatar: {e}")
-        success = False
-
-    conn.close()
-    return success
+        return False
 
 def update_user_age_group(user_id: str, age_group: str) -> bool:
     """Aktualisiert die Altersstufe eines Users."""
-    conn = get_connection()
-    c = conn.cursor()
-
     try:
-        c.execute("UPDATE users SET age_group = ? WHERE user_id = ?",
-                  (age_group, user_id))
-        conn.commit()
-        success = True
+        get_db().table("users").update({"age_group": age_group}).eq("user_id", user_id).execute()
+        return True
     except Exception as e:
         print(f"Error updating age group: {e}")
-        success = False
-
-    conn.close()
-    return success
+        return False
 
 def get_user_by_id(user_id: str) -> Optional[Dict[str, Any]]:
     """Holt einen User anhand der ID."""
-    conn = get_connection()
-    c = conn.cursor()
-
-    c.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
-    user = c.fetchone()
-
-    conn.close()
-    return dict(user) if user else None
+    result = get_db().table("users").select("*").eq("user_id", user_id).execute()
+    return result.data[0] if result.data else None
 
 def get_all_users() -> list:
     """Holt alle registrierten Benutzer."""
-    init_user_tables()
-    conn = get_connection()
-    c = conn.cursor()
-
-    c.execute('''
-        SELECT user_id, display_name, xp_total, level, last_login
-        FROM users
-        WHERE display_name IS NOT NULL
-        ORDER BY last_login DESC
-    ''')
-
-    users = [dict(row) for row in c.fetchall()]
-    conn.close()
-    return users
+    result = get_db().table("users") \
+        .select("user_id, display_name, xp_total, level, last_login") \
+        .not_.is_("display_name", "null") \
+        .order("last_login", desc=True) \
+        .execute()
+    return result.data
 
 # ============================================
 # SESSION STATE MANAGEMENT
@@ -365,8 +262,6 @@ def render_user_login(show_stats: bool = True, show_info_bar: bool = True):
         show_stats: Wenn True, zeigt XP und Level an
         show_info_bar: Wenn True, zeigt die User-Info-Bar an (kann separat mit render_user_info_bar gezeigt werden)
     """
-    init_user_tables()
-
     # Preview-Modus hat Vorrang
     if is_preview_mode():
         render_preview_banner()
@@ -717,29 +612,10 @@ def reset_preview_data():
     if not user_id:
         return
 
-    conn = get_connection()
-    c = conn.cursor()
-
-    # User-Daten zurücksetzen (nur Spalten die existieren)
-    try:
-        c.execute("UPDATE users SET xp_total = 0, current_streak = 0, longest_streak = 0 WHERE user_id = ?", (user_id,))
-    except sqlite3.OperationalError:
-        pass  # Spalten existieren möglicherweise nicht
-
-    # Challenges löschen
-    try:
-        c.execute("DELETE FROM challenges WHERE user_id = ?", (user_id,))
-    except sqlite3.OperationalError:
-        pass
-
-    # Badges löschen
-    try:
-        c.execute("DELETE FROM user_badges WHERE user_id = ?", (user_id,))
-    except sqlite3.OperationalError:
-        pass
-
-    conn.commit()
-    conn.close()
+    db = get_db()
+    db.table("users").update({"xp_total": 0, "current_streak": 0, "longest_streak": 0}).eq("user_id", user_id).execute()
+    db.table("challenges").delete().eq("user_id", user_id).execute()
+    db.table("user_badges").delete().eq("user_id", user_id).execute()
 
 
 def change_preview_age_group(age_group: str):
@@ -886,40 +762,22 @@ ROLE_ADMIN = 'admin'
 
 def get_user_role(user_id: str) -> str:
     """Gibt die Rolle eines Users zurueck."""
-    init_user_tables()  # Stellt sicher dass role-Spalte existiert
-    conn = get_connection()
-    c = conn.cursor()
-
-    try:
-        c.execute("SELECT role FROM users WHERE user_id = ?", (user_id,))
-        result = c.fetchone()
-        conn.close()
-        return result[0] if result and result[0] else ROLE_STUDENT
-    except sqlite3.OperationalError:
-        # Falls Spalte trotzdem nicht existiert
-        conn.close()
-        return ROLE_STUDENT
+    result = get_db().table("users").select("role").eq("user_id", user_id).execute()
+    if result.data and result.data[0].get("role"):
+        return result.data[0]["role"]
+    return ROLE_STUDENT
 
 
 def set_user_role(user_id: str, role: str) -> bool:
     """Setzt die Rolle eines Users."""
     if role not in [ROLE_STUDENT, ROLE_COACH, ROLE_ADMIN]:
         return False
-
-    init_user_tables()  # Stellt sicher dass role-Spalte existiert
-    conn = get_connection()
-    c = conn.cursor()
-
     try:
-        c.execute("UPDATE users SET role = ? WHERE user_id = ?", (role, user_id))
-        conn.commit()
-        success = c.rowcount > 0
+        get_db().table("users").update({"role": role}).eq("user_id", user_id).execute()
+        return True
     except Exception as e:
         print(f"Error setting role: {e}")
-        success = False
-
-    conn.close()
-    return success
+        return False
 
 
 def is_coach(user_id: str = None) -> bool:
@@ -945,34 +803,20 @@ def is_admin(user_id: str = None) -> bool:
 
 def get_all_coaches() -> list:
     """Gibt alle Coaches zurueck."""
-    conn = get_connection()
-    c = conn.cursor()
-
-    c.execute("""
-        SELECT user_id, display_name, last_login
-        FROM users
-        WHERE role IN ('coach', 'admin')
-        ORDER BY display_name
-    """)
-
-    coaches = [dict(row) for row in c.fetchall()]
-    conn.close()
-    return coaches
+    result = get_db().table("users") \
+        .select("user_id, display_name, last_login") \
+        .in_("role", ["coach", "admin"]) \
+        .order("display_name") \
+        .execute()
+    return result.data
 
 
 def get_all_students_list() -> list:
     """Gibt alle Schueler zurueck (role = student oder NULL)."""
-    conn = get_connection()
-    c = conn.cursor()
-
-    c.execute("""
-        SELECT user_id, display_name, age_group, level, xp_total, last_login
-        FROM users
-        WHERE role IS NULL OR role = 'student'
-        ORDER BY display_name
-    """)
-
-    students = [dict(row) for row in c.fetchall()]
-    conn.close()
-    return students
+    result = get_db().table("users") \
+        .select("user_id, display_name, age_group, level, xp_total, last_login") \
+        .or_("role.is.null,role.eq.student") \
+        .order("display_name") \
+        .execute()
+    return result.data
 
