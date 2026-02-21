@@ -28,20 +28,28 @@ def get_connection():
 
     row_factory ist auf sqlite3.Row gesetzt (Dict-artiger Zugriff auf Spalten).
     """
+    # Versuche Turso Cloud-DB
     try:
         import streamlit as st
-        turso_url = st.secrets.get("TURSO_DATABASE_URL", "")
-        turso_token = st.secrets.get("TURSO_AUTH_TOKEN", "")
+        try:
+            turso_url = st.secrets["TURSO_DATABASE_URL"]
+            turso_token = st.secrets["TURSO_AUTH_TOKEN"]
+        except (KeyError, FileNotFoundError):
+            turso_url = ""
+            turso_token = ""
 
         if turso_url and turso_token:
             import libsql_experimental as libsql
-            conn = libsql.connect(database=turso_url, auth_token=turso_token)
-            conn.row_factory = sqlite3.Row
+            print(f"[database.py] Connecting to Turso: {turso_url[:50]}...")
+            conn = libsql.connect(turso_url, auth_token=turso_token)
+            print("[database.py] Turso connection established!")
             return conn
-    except (ImportError, FileNotFoundError, KeyError, AttributeError):
-        pass
+    except Exception as e:
+        print(f"[database.py] Turso connection FAILED: {type(e).__name__}: {e}")
 
     # Fallback: lokale SQLite-Datei
-    conn = sqlite3.connect(str(_get_local_db_path()))
+    db_path = _get_local_db_path()
+    print(f"[database.py] Using local SQLite: {db_path}")
+    conn = sqlite3.connect(str(db_path))
     conn.row_factory = sqlite3.Row
     return conn
