@@ -155,6 +155,7 @@ def get_or_create_user_by_name(display_name: str, age_group: str = None, avatar_
 
         insert_result = db.table("users").insert({
             "user_id": user_id,
+            "name": clean_name,
             "username": clean_name,
             "display_name": display_name.strip(),
             "created_at": now,
