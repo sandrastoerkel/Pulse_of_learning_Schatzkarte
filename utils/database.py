@@ -9,6 +9,49 @@ import sqlite3
 from pathlib import Path
 
 
+class DictRow:
+    """
+    Row-Klasse die sowohl Dict-Zugriff (row['col']) als auch
+    numerischen Index (row[0]) unterstützt — wie sqlite3.Row,
+    aber kompatibel mit libsql_experimental.
+    """
+    __slots__ = ('_fields', '_values', '_dict')
+
+    def __init__(self, cursor, row):
+        self._fields = [column[0] for column in cursor.description]
+        self._values = tuple(row)
+        self._dict = dict(zip(self._fields, self._values))
+
+    def __getitem__(self, key):
+        if isinstance(key, (int, slice)):
+            return self._values[key]
+        return self._dict[key]
+
+    def __contains__(self, key):
+        return key in self._dict
+
+    def __iter__(self):
+        return iter(self._values)
+
+    def __len__(self):
+        return len(self._values)
+
+    def __repr__(self):
+        return f"DictRow({self._dict})"
+
+    def keys(self):
+        return self._fields
+
+    def values(self):
+        return self._values
+
+    def items(self):
+        return self._dict.items()
+
+    def get(self, key, default=None):
+        return self._dict.get(key, default)
+
+
 def _get_local_db_path() -> Path:
     """Gibt den Pfad zur lokalen SQLite-Datenbank zurück (Fallback)."""
     if Path("/tmp").exists() and Path("/tmp").is_dir():
@@ -26,7 +69,7 @@ def get_connection():
     - Mit TURSO_DATABASE_URL und TURSO_AUTH_TOKEN in Streamlit Secrets → Turso Cloud-DB
     - Ohne Credentials → lokale SQLite-Datei
 
-    row_factory ist auf sqlite3.Row gesetzt (Dict-artiger Zugriff auf Spalten).
+    row_factory gibt DictRow zurück (Dict-Zugriff + Index-Zugriff).
     """
     # Versuche Turso Cloud-DB
     try:
@@ -40,16 +83,14 @@ def get_connection():
 
         if turso_url and turso_token:
             import libsql_experimental as libsql
-            print(f"[database.py] Connecting to Turso: {turso_url[:50]}...")
             conn = libsql.connect(turso_url, auth_token=turso_token)
-            print("[database.py] Turso connection established!")
+            conn.row_factory = DictRow
             return conn
     except Exception as e:
         print(f"[database.py] Turso connection FAILED: {type(e).__name__}: {e}")
 
     # Fallback: lokale SQLite-Datei
     db_path = _get_local_db_path()
-    print(f"[database.py] Using local SQLite: {db_path}")
     conn = sqlite3.connect(str(db_path))
-    conn.row_factory = sqlite3.Row
+    conn.row_factory = DictRow
     return conn
