@@ -40,8 +40,17 @@ st.set_page_config(
     page_title="🎒 Meine Lernreise",
     page_icon="🎒",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
+
+# Nur Schatzkarte + Meine Lernreise in der Sidebar zeigen
+st.markdown("""
+<style>
+[data-testid="stSidebarNavItems"] li:nth-child(n+2):nth-child(-n+8) {
+    display: none !important;
+}
+</style>
+""", unsafe_allow_html=True)
 
 DAYS_OF_WEEK = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"]
 
@@ -362,10 +371,28 @@ def _render_next_meeting_countdown(group_id: str):
     """, unsafe_allow_html=True)
 
 
+def _build_jitsi_url(room_name: str) -> str:
+    """Baut die Jitsi-URL mit kindgerechter Config via URL-Fragment."""
+    config = (
+        "#config.startWithAudioMuted=true"
+        "&config.startWithVideoMuted=false"
+        "&config.prejoinPageEnabled=true"
+        "&config.disableDeepLinking=true"
+        "&config.defaultLanguage=%22de%22"
+        "&interfaceConfig.SHOW_JITSI_WATERMARK=false"
+        "&interfaceConfig.SHOW_BRAND_WATERMARK=false"
+        "&interfaceConfig.SHOW_POWERED_BY=false"
+        "&interfaceConfig.MOBILE_APP_PROMO=false"
+        "&interfaceConfig.TOOLBAR_ALWAYS_VISIBLE=true"
+    )
+    return f"https://meet.jit.si/{room_name}{config}"
+
+
 def _render_action_buttons(group_id: str, user_id: str):
-    """Schatzkarte-Button (immer aktiv) + Video-Treffen-Button (ausgegraut/aktiv)."""
+    """Schatzkarte-Button (immer aktiv) + Video-Treffen-Button (neuer Tab / ausgegraut)."""
     access = get_meeting_access(group_id, user_id, 'kind')
     meeting_active = access.get("canJoin", False)
+    room_name = access.get("roomName")
 
     col_a, col_b = st.columns(2)
 
@@ -374,30 +401,39 @@ def _render_action_buttons(group_id: str, user_id: str):
             st.switch_page("pages/1_🗺️_Schatzkarte.py")
 
     with col_b:
-        if meeting_active:
-            # Meeting laeuft — Button aktiv und bunt
-            st.markdown("""
-            <div style="background: linear-gradient(135deg, #16a34a, #22c55e);
-                        color: white; padding: 10px; border-radius: 8px;
-                        text-align: center; font-weight: bold; margin-bottom: 5px;
-                        animation: pulse 2s infinite;">
-                Treffen laeuft jetzt!
-            </div>
+        if meeting_active and room_name:
+            jitsi_url = _build_jitsi_url(room_name)
+            # Goldener Button als Link — oeffnet Jitsi in neuem Tab
+            st.markdown(f"""
+            <a href="{jitsi_url}" target="_blank" rel="noopener noreferrer"
+               style="display: block; text-align: center; padding: 14px 20px;
+                      background: linear-gradient(135deg, #FFD700, #FFA500);
+                      color: #1a1a2e; font-size: 18px; font-weight: bold;
+                      border-radius: 12px; text-decoration: none;
+                      box-shadow: 0 4px 15px rgba(255, 165, 0, 0.4);
+                      transition: transform 0.2s, box-shadow 0.2s;">
+                Video-Treffen beitreten
+            </a>
+            <p style="text-align: center; font-size: 0.85em; color: #6b7280; margin-top: 8px;">
+                Oeffnet sich in einem neuen Tab.<br>
+                Du kannst zwischen den Tabs hin- und herwechseln!
+            </p>
             <style>
-            @keyframes pulse {
-                0%, 100% { opacity: 1; }
-                50% { opacity: 0.7; }
-            }
+            @keyframes glow {{
+                0%, 100% {{ box-shadow: 0 4px 15px rgba(255, 165, 0, 0.4); }}
+                50% {{ box-shadow: 0 4px 25px rgba(255, 165, 0, 0.7); }}
+            }}
             </style>
             """, unsafe_allow_html=True)
-            if st.button("Zum Video-Treffen", type="primary", use_container_width=True, key="video_btn"):
-                st.switch_page("pages/7_👥_Lerngruppen.py")
         else:
             # Kein Meeting — Button ausgegraut
-            st.button(
-                "Zum Video-Treffen", use_container_width=True,
-                disabled=True, key="video_btn"
-            )
+            st.markdown("""
+            <div style="display: block; text-align: center; padding: 14px 20px;
+                        background: #e5e7eb; color: #9ca3af; font-size: 18px;
+                        font-weight: bold; border-radius: 12px; cursor: not-allowed;">
+                Video-Treffen beitreten
+            </div>
+            """, unsafe_allow_html=True)
             reason = access.get("timeStatus", {}).get("reason", "")
             if reason == "too_early":
                 minutes = access["timeStatus"].get("minutesUntilStart", "?")
