@@ -387,6 +387,19 @@ def get_group_invitations(group_id: str, include_used: bool = False) -> List[Dic
     return query.execute().data
 
 
+def delete_invitation(token: str) -> bool:
+    """Loescht eine Einladung anhand des Tokens."""
+    try:
+        result = get_db().table("group_invitations") \
+            .delete() \
+            .eq("token", token) \
+            .execute()
+        return len(result.data) > 0
+    except Exception as e:
+        print(f"Error deleting invitation: {e}")
+        return False
+
+
 def send_invitation_email(to_email: str, group_name: str, invite_url: str) -> bool:
     """Sendet eine Einladungs-Email via Web.de SMTP. Returns True bei Erfolg."""
     try:

@@ -28,7 +28,7 @@ try:
         create_group, get_group, get_coach_groups, update_group, delete_group,
         add_member, remove_member, get_group_members, get_user_group,
         create_invitation, get_invitation_url, get_group_invitations,
-        send_invitation_email,
+        delete_invitation, send_invitation_email,
         activate_weekly_island, get_activated_islands, get_available_islands,
         get_current_island, get_group_week, get_group_progress,
         FLEXIBLE_ISLANDS,
@@ -417,10 +417,16 @@ Viel Spaß beim Lernen! 🎉
     invitations = get_group_invitations(group_id, include_used=True)
     if invitations:
         st.markdown("**📜 Bisherige Einladungen:**")
-        for inv in invitations[:5]:
+        for inv in invitations[:10]:
             status = "✅ Verwendet" if inv.get('used_at') else "⏳ Offen"
             email_str = inv.get('email', 'Keine Email')
-            st.markdown(f"- {email_str} · {status}")
+            col_info, col_del = st.columns([4, 1])
+            with col_info:
+                st.markdown(f"{email_str} · {status}")
+            with col_del:
+                if st.button("🗑️", key=f"del_inv_{inv['token']}", help="Einladung löschen"):
+                    delete_invitation(inv['token'])
+                    st.rerun()
 
 
 # ============================================
