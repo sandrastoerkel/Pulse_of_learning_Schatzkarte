@@ -1788,6 +1788,93 @@ Alle 14 Inseln haben jetzt das animierte Design-System. Die nächsten Aufgaben s
 
 ---
 
-**Letzte Bearbeitung:** 21. Februar 2026
-**Letzter Meilenstein:** Supabase-Migration abgeschlossen (persistente Cloud-Datenbank)
-**Naechster Meilenstein:** Quiz-Content fuer fehlende Stufen erstellen (Festung MS, Werkzeuge US/MS, Faeden alle)
+# AENDERUNGEN (23. Februar 2026)
+
+## JaaS Video-Integration: Jitsi ohne 5-Minuten-Limit
+
+### Problem
+Die eingebettete Jitsi-Videokonferenz (meet.jit.si) hatte ein 5-Minuten-Demo-Limit fuer iframe-Einbettungen. Nach 5 Minuten erschien eine Warnung und der Teilnehmer wurde getrennt. Fuer die Lerngruppen-Treffen (30-60 Min) nicht nutzbar.
+
+### Loesung: JaaS (Jitsi as a Service) mit JWT-Authentifizierung
+Registrierung bei **jaas.8x8.vc** (Free Tier, 25 MAU). Server-seitige JWT-Generierung mit RS256 Private Key.
+
+### Was wurde gemacht?
+
+**1. JaaS-Konfiguration**
+- `.streamlit/secrets.toml`: `[jaas]`-Section mit app_id, key_id, private_key_path
+- `.secrets/jaas_key`: RSA Private Key (PKCS#8, nicht in Git)
+- `.gitignore`: `.secrets/` hinzugefuegt
+
+**2. JWT-Generierung** (`utils/lerngruppen_db.py`)
+```python
+generate_jaas_jwt(user_name, user_id, is_moderator, room, user_email)
+# RS256 JWT mit 2h Gueltigkeit
+# Coach = is_moderator=True, Kind = is_moderator=False
+```
+
+**3. Lerngruppen-Seite** (`pages/7_Lerngruppen.py`)
+- `_render_jitsi_meeting()`: `meet.jit.si` durch `8x8.vc` mit JWT ersetzt
+- External API von `https://8x8.vc/{appId}/external_api.js` laden
+- Raum-Name Format: `{appId}/{roomName}`
+- Raum-Details Link aktualisiert auf 8x8.vc
+
+**4. Schatzkarte FloatingJitsiWidget** (`FloatingJitsiWidget.tsx`)
+- `@jitsi/react-sdk` komplett umgangen (SDK hat einen Caching-Bug: cached `window.JitsiMeetExternalAPI` auf Modul-Ebene, laed nie von 8x8.vc nach)
+- Eigene `loadJaaSApi(appId)` Funktion: loescht Cache, entfernt alte Scripts, laed frisch von 8x8.vc
+- `JitsiMeetExternalAPI` direkt instanziiert mit domain='8x8.vc', JWT, fullRoomName
+
+**5. Coach-Gruppenzuordnung** (`pages/1_Schatzkarte.py`)
+- `load_meeting_data()` prueft jetzt sowohl `group_members` als auch `learning_groups.coach_id`
+- Iteriert alle Coach-Gruppen und findet die mit aktivem Meeting
+
+### JaaS-Credentials
+| Setting | Wert |
+|---------|------|
+| AppID | `vpaas-magic-cookie-b84a3592bf8743339eab099ce877c682` |
+| Key-ID | `vpaas-magic-cookie-b84a3592bf8743339eab099ce877c682/dd082c` |
+| Private Key | `.secrets/jaas_key` (lokal) / `private_key` als String (Streamlit Cloud) |
+
+### Z-Index im React-iframe
+| Element | Z-Index |
+|---------|---------|
+| Map | 1-10 |
+| Jitsi Widget | 900 |
+| Insel-Modals | 1000 |
+| Brainy/Bandura | 2000 |
+
+### Widget-Zustaende (FloatingJitsiWidget)
+- **join-button**: Goldener "Video-Treffen beitreten" Button (unten rechts)
+- **small** (320x240): Jitsi-Video klein, Kontrollleiste
+- **large** (80vw x 80vh): Jitsi-Video gross, zentriert
+- **minimized**: Kleine Pill "Video-Treffen"
+- **waiting**: Pill mit Countdown "Treffen in X Min"
+
+## Bekannte offene Bugs
+
+### Login-Loop auf der Schatzkarte
+Einloggen direkt auf der Schatzkarte fuehrt zu einer Dauerschleife (Seite laedt staendig neu).
+**Workaround:** Auf einer anderen Seite einloggen (z.B. Lerngruppen oder Home), dann zur Schatzkarte navigieren.
+**Vermutung:** Cookie-Problem bei der Streamlit-Session.
+
+## Commits (23. Feb 2026)
+- `fe6328a` Feat: JaaS JWT-Authentifizierung fuer Jitsi Video-Widget
+- `b27c0e6` Fix: JaaSMeeting statt JitsiMeeting fuer korrekte JaaS-Authentifizierung
+- `4abc274` Feat: JaaS 8x8.vc Integration fuer Jitsi Video ohne 5-Min-Limit
+
+---
+
+# TODO / Naechste Schritte
+
+### Prioritaet 1 (naechste Session)
+- [ ] JaaS Secrets auf Streamlit Cloud konfigurieren (`private_key` als String in Cloud-Secrets)
+- [ ] Login-Loop auf der Schatzkarte fixen (Cookie-/Session-Problem)
+- [ ] Testen: Kind tritt ueber Schatzkarte-Widget dem Meeting bei (beide Seiten gleichzeitig)
+
+### Prioritaet 2
+- [ ] Quiz-Content fuer fehlende Stufen erstellen (Festung MS, Werkzeuge US/MS, Faeden alle)
+
+---
+
+**Letzte Bearbeitung:** 23. Februar 2026
+**Letzter Meilenstein:** JaaS Video-Integration fertig (kein 5-Minuten-Limit mehr)
+**Naechster Meilenstein:** Streamlit Cloud Deployment mit JaaS + Login-Loop fixen
