@@ -28,11 +28,13 @@ def get_unlocked_islands(user_id, current_week=None):
     # Woche bestimmen
     week = get_preview_week() if is_preview_mode() else (current_week or 0)
     
-    # Inseln sammeln
-    unlocked = ["start"]
-    
-    # Feste Inseln (Woche 1-4)
+    # Inseln sammeln (Basiscamp + Mental stark immer offen)
+    unlocked = ["start", "festung"]
+
+    # Feste Inseln (Woche 2-4, festung ist schon drin)
     for i, island_id in enumerate(FIXED_ISLANDS):
+        if island_id == "festung":
+            continue  # bereits freigeschaltet
         if week >= (i + 1):
             unlocked.append(island_id)
     
