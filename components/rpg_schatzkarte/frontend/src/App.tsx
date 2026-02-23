@@ -48,6 +48,8 @@ import { MemoryGame, RewardModal, MiniGameSelector } from './components/MiniGame
 import { LootLernkarten } from './components/LootLernkarten';
 import { RunnerGame } from './components/MiniGames/Runner/RunnerGame';
 import { TestPanel } from './components/TestPanel';
+import FloatingJitsiWidget from './components/VideoChat/FloatingJitsiWidget';
+import type { MeetingData } from './components/VideoChat/FloatingJitsiWidget';
 import { SchatzkammerModal } from './components/SchatzkammerModal';
 import type { GameResult } from './types/games';
 import type { GameResult as RunnerGameResult } from './components/MiniGames/Runner/RunnerEngine';
@@ -1485,6 +1487,7 @@ function RPGSchatzkarteStreamlit({ args }: ComponentProps) {
   // Auto-Open: Öffnet automatisch eine Insel (z.B. nach Rückkehr von Polarstern)
   const autoOpenIsland: string | null = args?.autoOpenIsland || null;
   const autoOpenPhase: string | null = args?.autoOpenPhase || null;
+  const meetingData: MeetingData | null = args?.meetingData || null;
   const [currentTheme, setCurrentTheme] = useState<ThemeType>(loadSavedTheme);
 
   // Streamlit-Höhe setzen - WICHTIG: muss immer aufgerufen werden
@@ -1538,6 +1541,12 @@ function RPGSchatzkarteStreamlit({ args }: ComponentProps) {
         autoOpenIsland={autoOpenIsland}
         autoOpenPhase={autoOpenPhase}
       />
+      {meetingData && meetingData.roomName && (
+        <FloatingJitsiWidget
+          meetingData={meetingData}
+          onAction={handleAction}
+        />
+      )}
     </div>
   );
 }

@@ -59,6 +59,7 @@ def rpg_schatzkarte(
     is_logged_in: bool = False,
     auto_open_island: str = None,
     auto_open_phase: str = None,
+    meeting_data: dict = None,
     height: int = 700,
     key: str = None
 ) -> dict:
@@ -117,6 +118,7 @@ def rpg_schatzkarte(
         isLoggedIn=is_logged_in,
         autoOpenIsland=auto_open_island,
         autoOpenPhase=auto_open_phase,
+        meetingData=meeting_data,
         key=key,
         default=None,
     )

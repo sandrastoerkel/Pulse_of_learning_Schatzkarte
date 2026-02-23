@@ -28,6 +28,12 @@ from utils.user_system import (
     is_coach
 )
 from utils.page_config import get_page_path
+from utils.lerngruppen_db import (
+    get_user_group,
+    get_meeting_access,
+    record_meeting_join,
+    record_meeting_leave
+)
 
 # React-Komponente importieren
 try:
@@ -218,6 +224,43 @@ def create_hero_data(user_data):
         "titles": []  # TODO: Titel-System implementieren
     }
 
+def load_meeting_data(uid):
+    """Laedt Meeting-Daten fuer das Floating Jitsi Widget."""
+    try:
+        group = get_user_group(uid)
+        if not group:
+            return None
+
+        group_id = group["group_id"]
+        user_role = "coach" if is_coach() else "kind"
+        access = get_meeting_access(group_id, uid, user_role)
+
+        if not access or not access.get("meeting"):
+            return None
+
+        # User-Name fuer Jitsi
+        u = get_current_user()
+        display_name = "Lern-Held"
+        if u:
+            display_name = u.get("name", u.get("username", "Lern-Held"))
+
+        meeting = access["meeting"]
+        return {
+            "canJoin": access.get("canJoin", False),
+            "roomName": access.get("roomName"),
+            "config": access.get("config", {}),
+            "interfaceConfig": access.get("interfaceConfig", {}),
+            "displayName": display_name,
+            "meetingId": meeting.get("id"),
+            "meetingTitle": meeting.get("title", "Schatzkarten-Treffen"),
+            "timeStatus": access.get("timeStatus", {}),
+            "userRole": user_role
+        }
+    except Exception as e:
+        print(f"Error loading meeting data: {e}")
+        return None
+
+
 # ===============================================================
 # HAUPTBEREICH
 # ===============================================================
@@ -397,6 +440,11 @@ except Exception:
     preview_mode = False
     logged_in = False
 
+# Meeting-Daten laden (fuer Floating Jitsi Widget)
+meeting_data = None
+if not is_preview_mode():
+    meeting_data = load_meeting_data(user_id)
+
 result = rpg_schatzkarte(
     islands=islands,
     user_progress=user_data.get("progress", {}),
@@ -409,6 +457,7 @@ result = rpg_schatzkarte(
     is_logged_in=bool(logged_in and not preview_mode),  # Eingeloggt aber nicht Preview
     auto_open_island=auto_open_island,  # Automatisch eine Insel öffnen (z.B. nach Polarstern)
     auto_open_phase=auto_open_phase,  # Phase für die Insel (z.B. 'ready' für Base Camp)
+    meeting_data=meeting_data,  # Floating Jitsi Widget
     height=900,  # Basis-Hoehe, wird per CSS auf calc(100vh - 60px) ueberschrieben
     key="rpg_schatzkarte"
 )
@@ -447,6 +496,17 @@ if result:
         if is_preview_mode():
             end_preview_mode()
         st.switch_page("Home.py")
+
+    # Meeting Join/Leave Tracking
+    if action == "meeting_join":
+        mid = result.get("meetingId")
+        if mid and meeting_data:
+            record_meeting_join(mid, user_id, meeting_data.get("displayName", ""), meeting_data.get("userRole", "kind"))
+
+    if action == "meeting_leave":
+        mid = result.get("meetingId")
+        if mid:
+            record_meeting_leave(mid, user_id)
 
     # Auto-Open wurde verarbeitet - Session State zurücksetzen
     if action == "auto_open_handled":
