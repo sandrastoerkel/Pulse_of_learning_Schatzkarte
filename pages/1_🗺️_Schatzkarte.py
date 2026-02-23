@@ -87,6 +87,10 @@ with st.sidebar:
     st.page_link("pages/1_🗺️_Schatzkarte.py", label="🗺️ Schatzkarte", icon="🗺️")
     st.page_link("pages/9_🎒_Meine_Lernreise.py", label="🎒 Meine Lernreise", icon="🎒")
 
+# Button zu Meine Lernreise
+if st.button("🎒 Meine Lernreise", type="primary"):
+    st.switch_page("pages/9_🎒_Meine_Lernreise.py")
+
 # ===============================================================
 # ALTERSSTUFEN-WEICHE
 # ===============================================================
