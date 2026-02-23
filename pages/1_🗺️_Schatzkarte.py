@@ -69,6 +69,13 @@ else:
         st.stop()
     user_id = user["user_id"]
 
+# ===============================================================
+# SIDEBAR-NAVIGATION
+# ===============================================================
+
+with st.sidebar:
+    st.page_link("pages/1_🗺️_Schatzkarte.py", label="🗺️ Schatzkarte", icon="🗺️")
+    st.page_link("pages/9_🎒_Meine_Lernreise.py", label="🎒 Meine Lernreise", icon="🎒")
 
 # ===============================================================
 # ALTERSSTUFEN-WEICHE

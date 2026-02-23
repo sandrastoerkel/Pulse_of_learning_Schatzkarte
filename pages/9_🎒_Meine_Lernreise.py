@@ -43,6 +43,14 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# ============================================
+# SIDEBAR-NAVIGATION
+# ============================================
+
+with st.sidebar:
+    st.page_link("pages/1_🗺️_Schatzkarte.py", label="🗺️ Schatzkarte", icon="🗺️")
+    st.page_link("pages/9_🎒_Meine_Lernreise.py", label="🎒 Meine Lernreise", icon="🎒")
+
 
 DAYS_OF_WEEK = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"]
 
