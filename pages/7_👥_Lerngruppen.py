@@ -858,13 +858,20 @@ def _send_welcome_after_join(invitation: dict, user_id: str):
             start_date = group["start_date"]
 
     meeting_info = None
-    next_meeting = get_next_meeting(group_id)
-    if next_meeting:
-        day_name = DAYS_OF_WEEK[next_meeting["day_of_week"]]
-        meeting_info = f"Jeden {day_name} um {next_meeting['time_of_day']} Uhr ({next_meeting['duration_minutes']} Min.)"
+    meetings = get_group_meetings(group_id)
+    if meetings:
+        seen = set()
+        lines = []
+        for m in meetings:
+            key = (m["day_of_week"], m["time_of_day"])
+            if key not in seen:
+                seen.add(key)
+                day_name = DAYS_OF_WEEK[m["day_of_week"]]
+                lines.append(f"{day_name} um {m['time_of_day']} Uhr ({m['duration_minutes']} Min.)")
+        meeting_info = " + ".join(lines)
 
-    app_url = st.secrets.get("APP_URL", "https://pulse-of-learning.streamlit.app")
-    schatzkarte_url = app_url
+    app_url = st.secrets.get("APP_URL", "https://learnerspulse.streamlit.app")
+    schatzkarte_url = f"{app_url}/Schatzkarte"
 
     send_welcome_email(email, child_name, group_name, start_date, meeting_info, schatzkarte_url)
 
@@ -901,12 +908,21 @@ def _render_welcome_page(group_id: str):
         except ValueError:
             start_date_str = group["start_date"]
 
-    # Meeting-Info
-    meeting_text = "Wird noch vom Coach geplant"
-    next_meeting = get_next_meeting(group_id)
-    if next_meeting:
-        day_name = DAYS_OF_WEEK[next_meeting["day_of_week"]]
-        meeting_text = f"Jeden **{day_name}** um **{next_meeting['time_of_day']} Uhr** ({next_meeting['duration_minutes']} Min.)"
+    # Meeting-Info — alle geplanten Treffen anzeigen
+    meetings = get_group_meetings(group_id)
+    if meetings:
+        # Dedupliziere nach Wochentag+Uhrzeit (wöchentliche Treffen)
+        seen = set()
+        meeting_lines = []
+        for m in meetings:
+            key = (m["day_of_week"], m["time_of_day"])
+            if key not in seen:
+                seen.add(key)
+                day_name = DAYS_OF_WEEK[m["day_of_week"]]
+                meeting_lines.append(f"**{day_name}** um **{m['time_of_day']} Uhr** ({m['duration_minutes']} Min.)")
+        meeting_text = "<br>".join(meeting_lines)
+    else:
+        meeting_text = "Wird noch vom Coach geplant"
 
     # Info-Karten
     col1, col2 = st.columns(2)
@@ -949,10 +965,9 @@ def _render_welcome_page(group_id: str):
     st.markdown("")
     col_a, col_b = st.columns(2)
     with col_a:
-        st.link_button(
-            "Zur Schatzkarte", "/🗺️_Schatzkarte",
-            type="primary", use_container_width=True
-        )
+        if st.button("Zur Schatzkarte", type="primary", use_container_width=True):
+            st.session_state.pop("welcome_group_id", None)
+            st.switch_page("pages/1_🗺️_Schatzkarte.py")
     with col_b:
         if st.button("Fertig", use_container_width=True):
             st.session_state.pop("welcome_group_id", None)
