@@ -37,6 +37,8 @@ try:
         # Meetings
         schedule_meeting, get_next_meeting, get_group_meetings,
         get_meeting_access, cancel_meeting, record_meeting_join, record_meeting_leave,
+        # JaaS JWT
+        generate_jaas_jwt,
     )
     from schatzkarte.map_data import ISLANDS
 except ImportError as e:
@@ -551,7 +553,11 @@ def render_next_meeting(group_id: str, coach_id: str, coach_tz: str):
     # Raum-Details (nur Coach)
     with st.expander("🔑 Raum-Details (nur für Coach)"):
         room_name = meeting.get('jitsi_room_name', 'N/A')
-        jitsi_url = f"https://meet.jit.si/{room_name}" if room_name else None
+        try:
+            jaas_app_id = st.secrets["jaas"]["app_id"]
+            jitsi_url = f"https://8x8.vc/{jaas_app_id}/{room_name}" if room_name else None
+        except (KeyError, AttributeError):
+            jitsi_url = None
         st.markdown(f"**Raum-Name:** `{room_name}`")
         if jitsi_url:
             st.markdown(f"**Externer Link:** {jitsi_url}")
@@ -621,13 +627,32 @@ def _render_waiting_room(access: dict, meeting: dict):
 
 
 def _render_jitsi_meeting(access: dict, user: dict, meeting: dict):
-    """Rendert das eingebettete Jitsi-Meeting via External API."""
+    """Rendert das eingebettete Jitsi-Meeting via JaaS (8x8.vc) mit JWT."""
     room_name = access['roomName']
     display_name = user.get('display_name', 'Coach')
     config = access['config']
     interface_config = access['interfaceConfig']
     meeting_id = meeting['id']
     user_id = get_current_user_id()
+
+    # JaaS JWT generieren
+    try:
+        jaas_cfg = st.secrets["jaas"]
+        app_id = jaas_cfg["app_id"]
+    except (KeyError, AttributeError):
+        st.error("JaaS-Konfiguration fehlt. Bitte secrets.toml pruefen.")
+        return
+
+    jwt_token = generate_jaas_jwt(
+        user_name=display_name,
+        user_id=user_id,
+        is_moderator=True,  # Coach = Moderator
+        room=room_name,
+        user_email=user.get('email', '')
+    )
+    if not jwt_token:
+        st.error("JWT-Generierung fehlgeschlagen. Bitte JaaS-Konfiguration pruefen.")
+        return
 
     # Participant-Tracking: Join registrieren (nur einmal pro Session)
     join_key = f"joined_{meeting_id}_{user_id}"
@@ -644,20 +669,22 @@ def _render_jitsi_meeting(access: dict, user: dict, meeting: dict):
     </div>
     """, unsafe_allow_html=True)
 
-    # Jitsi External API einbetten
+    # Jitsi External API einbetten (JaaS / 8x8.vc)
     config_json = json.dumps(config)
     interface_config_json = json.dumps(interface_config)
     display_name_js = json.dumps(display_name)
+    full_room_name = f"{app_id}/{room_name}"
 
     jitsi_html = f"""
     <div id="jitsi-container" style="width: 100%; height: 600px; border-radius: 12px;
          overflow: hidden; border: 2px solid #e2e8f0; background: #1a1a2e;"></div>
 
-    <script src="https://meet.jit.si/external_api.js"></script>
+    <script src="https://8x8.vc/{app_id}/external_api.js"></script>
     <script>
     (function() {{
-        var api = new JitsiMeetExternalAPI("meet.jit.si", {{
-            roomName: "{room_name}",
+        var api = new JitsiMeetExternalAPI("8x8.vc", {{
+            roomName: "{full_room_name}",
+            jwt: "{jwt_token}",
             parentNode: document.querySelector('#jitsi-container'),
             width: "100%",
             height: 600,
@@ -671,22 +698,22 @@ def _render_jitsi_meeting(access: dict, user: dict, meeting: dict):
 
         // Event: Jemand hat den Raum betreten
         api.on('videoConferenceJoined', function(data) {{
-            console.log('[Schatzkarte] Meeting beigetreten:', data);
+            console.log('[JaaS] Meeting beigetreten:', data);
         }});
 
         // Event: Jemand hat den Raum verlassen
         api.on('videoConferenceLeft', function(data) {{
-            console.log('[Schatzkarte] Meeting verlassen:', data);
+            console.log('[JaaS] Meeting verlassen:', data);
         }});
 
         // Event: Teilnehmer beigetreten
         api.on('participantJoined', function(data) {{
-            console.log('[Schatzkarte] Teilnehmer beigetreten:', data.displayName);
+            console.log('[JaaS] Teilnehmer beigetreten:', data.displayName);
         }});
 
         // Event: Screen-Sharing geändert
         api.on('screenSharingStatusChanged', function(data) {{
-            console.log('[Schatzkarte] Screen-Sharing:', data.on ? 'gestartet' : 'gestoppt');
+            console.log('[JaaS] Screen-Sharing:', data.on ? 'gestartet' : 'gestoppt');
         }});
     }})();
     </script>

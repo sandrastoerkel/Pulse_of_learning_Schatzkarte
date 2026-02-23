@@ -226,18 +226,53 @@ def create_hero_data(user_data):
     }
 
 def load_meeting_data(uid):
-    """Laedt Meeting-Daten fuer das Floating Jitsi Widget."""
+    """Laedt Meeting-Daten fuer das Floating Jitsi Widget.
+    Sucht als Mitglied UND als Coach nach aktiven Meetings."""
     try:
+        from utils.database import get_db
+
+        # Alle relevanten Gruppen-IDs sammeln
+        group_ids = []
+
+        # Als Mitglied
         group = get_user_group(uid)
-        if not group:
+        if group:
+            group_ids.append(group["group_id"])
+
+        # Als Coach (alle aktiven Gruppen)
+        if is_coach():
+            db = get_db()
+            coach_groups = db.table("learning_groups") \
+                .select("group_id") \
+                .eq("coach_id", uid) \
+                .eq("is_active", 1) \
+                .execute()
+            for cg in coach_groups.data:
+                if cg["group_id"] not in group_ids:
+                    group_ids.append(cg["group_id"])
+
+        if not group_ids:
             return None
 
-        group_id = group["group_id"]
+        # Beste Meeting-Daten finden (erste Gruppe mit aktivem Meeting)
+        best_access = None
+        best_group_id = None
+        for gid in group_ids:
+            access = get_meeting_access(gid, uid, "coach" if is_coach() else "kind")
+            if access and access.get("canJoin"):
+                best_access = access
+                best_group_id = gid
+                break
+            # Falls kein aktives, nimm das naechste geplante
+            if access and access.get("meeting") and not best_access:
+                best_access = access
+                best_group_id = gid
+
+        if not best_access or not best_access.get("meeting"):
+            return None
+
         user_role = "coach" if is_coach() else "kind"
-        access = get_meeting_access(group_id, uid, user_role)
-
-        if not access or not access.get("meeting"):
-            return None
+        access = best_access
 
         # User-Name fuer Jitsi
         u = get_current_user()

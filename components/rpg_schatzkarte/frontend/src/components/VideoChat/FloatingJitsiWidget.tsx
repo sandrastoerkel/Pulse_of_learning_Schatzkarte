@@ -1,9 +1,9 @@
 // components/VideoChat/FloatingJitsiWidget.tsx
 // Floating Jitsi Video-Widget for the Schatzkarte
-// Keeps video in the same tab so iPad Safari doesn't pause audio
+// Uses JaaS (8x8.vc) with JWT authentication
+// Loads external_api.js directly from 8x8.vc to avoid SDK caching issues
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { JaaSMeeting } from '@jitsi/react-sdk';
 import { SchatzkartAction } from '../../types';
 import './floating-jitsi-widget.css';
 
@@ -34,12 +34,43 @@ interface FloatingJitsiWidgetProps {
   onAction?: (action: SchatzkartAction) => void;
 }
 
+// Load 8x8.vc external API (bypasses @jitsi/react-sdk caching)
+let jaasApiPromise: Promise<any> | null = null;
+function loadJaaSApi(appId: string): Promise<any> {
+  if (jaasApiPromise) return jaasApiPromise;
+
+  jaasApiPromise = new Promise((resolve, reject) => {
+    // Remove any cached meet.jit.si API
+    if ((window as any).JitsiMeetExternalAPI) {
+      delete (window as any).JitsiMeetExternalAPI;
+    }
+    // Remove old scripts
+    document.querySelectorAll('script[src*="external_api.js"]').forEach(s => s.remove());
+
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = `https://8x8.vc/${appId}/external_api.js`;
+    script.onload = () => {
+      if ((window as any).JitsiMeetExternalAPI) {
+        resolve((window as any).JitsiMeetExternalAPI);
+      } else {
+        reject(new Error('JitsiMeetExternalAPI not found after loading script'));
+      }
+    };
+    script.onerror = () => reject(new Error('Failed to load 8x8.vc external_api.js'));
+    document.head.appendChild(script);
+  });
+
+  return jaasApiPromise;
+}
+
 const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
   meetingData,
   onAction
 }) => {
   const apiRef = useRef<any>(null);
   const hasJoinedRef = useRef(false);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [widgetState, setWidgetState] = useState<WidgetState>(() => {
     if (!meetingData.canJoin && meetingData.timeStatus?.reason === 'too_early') {
       const mins = meetingData.timeStatus.minutesUntilStart ?? 999;
@@ -51,6 +82,87 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
   const [minutesUntil, setMinutesUntil] = useState(
     meetingData.timeStatus?.minutesUntilStart ?? 0
   );
+
+  // Load Jitsi when widget enters video state
+  useEffect(() => {
+    if (widgetState !== 'small' && widgetState !== 'large') return;
+    if (apiRef.current) return; // Already loaded
+    if (!meetingData.appId || !meetingData.roomName) return;
+
+    const fullRoomName = `${meetingData.appId}/${meetingData.roomName}`;
+
+    loadJaaSApi(meetingData.appId)
+      .then((JitsiMeetExternalAPI) => {
+        if (!containerRef.current) return;
+
+        const api = new JitsiMeetExternalAPI('8x8.vc', {
+          roomName: fullRoomName,
+          jwt: meetingData.jwt || undefined,
+          configOverwrite: {
+            ...meetingData.config,
+            desktopSharingEnabled: true
+          },
+          interfaceConfigOverwrite: meetingData.interfaceConfig,
+          userInfo: {
+            displayName: meetingData.displayName,
+            email: ''
+          },
+          parentNode: containerRef.current
+        });
+
+        apiRef.current = api;
+        setJitsiLoaded(true);
+        hasJoinedRef.current = false;
+
+        // Style the iframe
+        const iframe = containerRef.current?.querySelector('iframe');
+        if (iframe) {
+          iframe.style.height = '100%';
+          iframe.style.width = '100%';
+          iframe.style.border = 'none';
+          iframe.style.borderRadius = '0 0 12px 12px';
+        }
+
+        api.addListener('videoConferenceJoined', () => {
+          hasJoinedRef.current = true;
+          // Style iframe again after join (it may have been recreated)
+          const iframe = containerRef.current?.querySelector('iframe');
+          if (iframe) {
+            iframe.style.height = '100%';
+            iframe.style.width = '100%';
+            iframe.style.border = 'none';
+            iframe.style.borderRadius = '0 0 12px 12px';
+          }
+          if (onAction) {
+            onAction({
+              action: 'meeting_join',
+              meetingId: meetingData.meetingId,
+              islandId: 'jitsi_meeting'
+            });
+          }
+        });
+
+        api.addListener('videoConferenceLeft', () => {
+          if (!hasJoinedRef.current) return;
+          handleLeaveInternal();
+        });
+
+        api.addListener('readyToClose', () => {
+          if (hasJoinedRef.current) handleLeaveInternal();
+        });
+      })
+      .catch((err) => {
+        console.error('[JaaS] Failed to load Jitsi API:', err);
+      });
+
+    return () => {
+      // Cleanup on unmount
+      if (apiRef.current) {
+        try { apiRef.current.dispose(); } catch {}
+        apiRef.current = null;
+      }
+    };
+  }, [widgetState]);
 
   // Update waiting countdown
   useEffect(() => {
@@ -69,6 +181,23 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
 
     return () => clearInterval(interval);
   }, [widgetState]);
+
+  const handleLeaveInternal = useCallback(() => {
+    if (apiRef.current) {
+      try { apiRef.current.dispose(); } catch {}
+      apiRef.current = null;
+    }
+    setJitsiLoaded(false);
+    setWidgetState('join-button');
+    hasJoinedRef.current = false;
+    if (onAction) {
+      onAction({
+        action: 'meeting_leave',
+        meetingId: meetingData.meetingId,
+        islandId: 'jitsi_meeting'
+      });
+    }
+  }, [meetingData.meetingId, onAction]);
 
   // Join the meeting (switch to small view)
   const handleJoin = useCallback(() => {
@@ -111,51 +240,8 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
         // ignore
       }
     }
-    setJitsiLoaded(false);
-    setWidgetState('join-button');
-
-    if (onAction) {
-      onAction({
-        action: 'meeting_leave',
-        meetingId: meetingData.meetingId,
-        islandId: 'jitsi_meeting'
-      });
-    }
-  }, [meetingData.meetingId, onAction]);
-
-  // Jitsi API ready handler
-  const handleApiReady = useCallback((externalApi: any) => {
-    apiRef.current = externalApi;
-    setJitsiLoaded(true);
-    hasJoinedRef.current = false;
-
-    externalApi.addListener('videoConferenceJoined', () => {
-      hasJoinedRef.current = true;
-      if (onAction) {
-        onAction({
-          action: 'meeting_join',
-          meetingId: meetingData.meetingId,
-          islandId: 'jitsi_meeting'
-        });
-      }
-    });
-
-    // Only reset widget if user actually joined and then left
-    // (not on auth redirects or internal Jitsi navigation)
-    externalApi.addListener('videoConferenceLeft', () => {
-      if (!hasJoinedRef.current) return;
-      setJitsiLoaded(false);
-      setWidgetState('join-button');
-      hasJoinedRef.current = false;
-      if (onAction) {
-        onAction({
-          action: 'meeting_leave',
-          meetingId: meetingData.meetingId,
-          islandId: 'jitsi_meeting'
-        });
-      }
-    });
-  }, [meetingData.meetingId, onAction]);
+    handleLeaveInternal();
+  }, [handleLeaveInternal]);
 
   // Don't render if no meeting or ended
   if (!meetingData.roomName || meetingData.timeStatus?.reason === 'ended' || meetingData.timeStatus?.reason === 'no_meeting') {
@@ -260,36 +346,14 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
         </div>
       </div>
 
-      {/* Jitsi iframe */}
-      <div className="fjw__jitsi-container">
-        <JaaSMeeting
-          appId={meetingData.appId || ''}
-          roomName={meetingData.roomName!}
-          jwt={meetingData.jwt || undefined}
-          configOverwrite={{
-            ...meetingData.config,
-            desktopSharingEnabled: true
-          }}
-          interfaceConfigOverwrite={meetingData.interfaceConfig}
-          userInfo={{
-            displayName: meetingData.displayName,
-            email: ''
-          }}
-          onApiReady={handleApiReady}
-          onReadyToClose={() => { if (hasJoinedRef.current) handleLeave(); }}
-          getIFrameRef={(iframeRef) => {
-            iframeRef.style.height = '100%';
-            iframeRef.style.width = '100%';
-            iframeRef.style.border = 'none';
-            iframeRef.style.borderRadius = '0 0 12px 12px';
-          }}
-          spinner={() => (
-            <div className="fjw__loading">
-              <span className="fjw__loading-icon">&#128249;</span>
-              <p>Lade Video-Treffen...</p>
-            </div>
-          )}
-        />
+      {/* Jitsi container */}
+      <div className="fjw__jitsi-container" ref={containerRef}>
+        {!jitsiLoaded && (
+          <div className="fjw__loading">
+            <span className="fjw__loading-icon">&#128249;</span>
+            <p>Lade Video-Treffen...</p>
+          </div>
+        )}
       </div>
     </div>
   );
