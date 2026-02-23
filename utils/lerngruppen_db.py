@@ -347,7 +347,8 @@ def use_invitation(token: str, user_id: str) -> Dict[str, Any]:
 
     if invitation.get('expires_at'):
         expires = datetime.fromisoformat(invitation['expires_at'])
-        if datetime.now() > expires:
+        now = datetime.now(expires.tzinfo) if expires.tzinfo else datetime.now()
+        if now > expires:
             return {"success": False, "message": "Einladung ist abgelaufen", "group_id": None}
 
     existing_group = get_user_group(user_id)
