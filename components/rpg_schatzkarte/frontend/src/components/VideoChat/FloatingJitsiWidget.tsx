@@ -23,6 +23,7 @@ export interface MeetingData {
     canJoin?: boolean;
   };
   userRole: 'coach' | 'kind';
+  jwt?: string | null;
 }
 
 type WidgetState = 'join-button' | 'small' | 'large' | 'minimized' | 'waiting';
@@ -37,6 +38,7 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
   onAction
 }) => {
   const apiRef = useRef<any>(null);
+  const hasJoinedRef = useRef(false);
   const [widgetState, setWidgetState] = useState<WidgetState>(() => {
     if (!meetingData.canJoin && meetingData.timeStatus?.reason === 'too_early') {
       const mins = meetingData.timeStatus.minutesUntilStart ?? 999;
@@ -75,13 +77,14 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
   // Open in a new tab
   const handleOpenInNewTab = useCallback(() => {
     if (meetingData.roomName) {
+      const jwtParam = meetingData.jwt ? `?jwt=${meetingData.jwt}` : '';
       window.open(
-        `https://meet.jit.si/${meetingData.roomName}`,
+        `https://8x8.vc/${meetingData.roomName}${jwtParam}`,
         '_blank',
         'noopener,noreferrer'
       );
     }
-  }, [meetingData.roomName]);
+  }, [meetingData.roomName, meetingData.jwt]);
 
   // Toggle between small and large
   const handleToggleSize = useCallback(() => {
@@ -123,8 +126,10 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
   const handleApiReady = useCallback((externalApi: any) => {
     apiRef.current = externalApi;
     setJitsiLoaded(true);
+    hasJoinedRef.current = false;
 
     externalApi.addListener('videoConferenceJoined', () => {
+      hasJoinedRef.current = true;
       if (onAction) {
         onAction({
           action: 'meeting_join',
@@ -134,13 +139,18 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
       }
     });
 
+    // Only reset widget if user actually joined and then left
+    // (not on auth redirects or internal Jitsi navigation)
     externalApi.addListener('videoConferenceLeft', () => {
+      if (!hasJoinedRef.current) return;
       setJitsiLoaded(false);
       setWidgetState('join-button');
+      hasJoinedRef.current = false;
       if (onAction) {
         onAction({
           action: 'meeting_leave',
-          meetingId: meetingData.meetingId
+          meetingId: meetingData.meetingId,
+          islandId: 'jitsi_meeting'
         });
       }
     });
@@ -252,8 +262,9 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
       {/* Jitsi iframe */}
       <div className="fjw__jitsi-container">
         <JitsiMeeting
-          domain="meet.jit.si"
+          domain="8x8.vc"
           roomName={meetingData.roomName!}
+          jwt={meetingData.jwt || undefined}
           configOverwrite={{
             ...meetingData.config,
             desktopSharingEnabled: true
@@ -264,7 +275,7 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
             email: ''
           }}
           onApiReady={handleApiReady}
-          onReadyToClose={handleLeave}
+          onReadyToClose={() => { if (hasJoinedRef.current) handleLeave(); }}
           getIFrameRef={(iframeRef) => {
             iframeRef.style.height = '100%';
             iframeRef.style.width = '100%';

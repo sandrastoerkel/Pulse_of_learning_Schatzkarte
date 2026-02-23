@@ -32,7 +32,8 @@ from utils.lerngruppen_db import (
     get_user_group,
     get_meeting_access,
     record_meeting_join,
-    record_meeting_leave
+    record_meeting_leave,
+    generate_jaas_jwt
 )
 
 # React-Komponente importieren
@@ -245,16 +246,36 @@ def load_meeting_data(uid):
             display_name = u.get("name", u.get("username", "Lern-Held"))
 
         meeting = access["meeting"]
+        room_name = access.get("roomName")
+
+        # JaaS JWT generieren und Room-Name mit AppID prefixen
+        jaas_jwt = None
+        try:
+            jaas_cfg = st.secrets.get("jaas", {})
+            app_id = jaas_cfg.get("app_id", "")
+            if app_id and room_name:
+                jaas_jwt = generate_jaas_jwt(
+                    user_name=display_name,
+                    user_id=uid,
+                    is_moderator=(user_role == "coach"),
+                    room=room_name
+                )
+                # JaaS erfordert AppID-Prefix im Raumnamen
+                room_name = f"{app_id}/{room_name}"
+        except Exception as e:
+            print(f"JaaS JWT generation failed: {e}")
+
         return {
             "canJoin": access.get("canJoin", False),
-            "roomName": access.get("roomName"),
+            "roomName": room_name,
             "config": access.get("config", {}),
             "interfaceConfig": access.get("interfaceConfig", {}),
             "displayName": display_name,
             "meetingId": meeting.get("id"),
             "meetingTitle": meeting.get("title", "Schatzkarten-Treffen"),
             "timeStatus": access.get("timeStatus", {}),
-            "userRole": user_role
+            "userRole": user_role,
+            "jwt": jaas_jwt
         }
     except Exception as e:
         print(f"Error loading meeting data: {e}")

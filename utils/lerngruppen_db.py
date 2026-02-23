@@ -14,12 +14,16 @@ import json
 import secrets
 import hashlib
 import smtplib
+import time
+import uuid
+from pathlib import Path
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
 from zoneinfo import ZoneInfo
 
+import jwt
 import streamlit as st
 from utils.database import get_db
 
@@ -36,6 +40,114 @@ def _get_room_secret() -> str:
 def _get_app_url() -> str:
     """App-URL für Einladungslinks aus Streamlit Secrets."""
     return st.secrets.get("APP_URL", "https://learnerspulse.streamlit.app")
+
+
+# ============================================
+# JAAS JWT GENERATION
+# ============================================
+
+_jaas_private_key_cache: Optional[str] = None
+
+
+def _get_jaas_private_key() -> Optional[str]:
+    """Liest den JaaS Private Key (cached).
+    Versucht zuerst 'private_key' als direkten String (Streamlit Cloud),
+    dann 'private_key_path' als Dateipfad (lokal)."""
+    global _jaas_private_key_cache
+    if _jaas_private_key_cache:
+        return _jaas_private_key_cache
+
+    try:
+        jaas_cfg = st.secrets["jaas"]
+
+        # Option 1: Key direkt als String in secrets (fuer Streamlit Cloud)
+        direct_key = jaas_cfg.get("private_key")
+        if direct_key and direct_key.strip().startswith("-----BEGIN"):
+            _jaas_private_key_cache = direct_key
+            return _jaas_private_key_cache
+
+        # Option 2: Key aus Datei lesen (lokal)
+        key_path = jaas_cfg.get("private_key_path")
+        if key_path:
+            key_file = Path(key_path)
+            if not key_file.is_absolute():
+                key_file = Path(__file__).parent.parent / key_path
+            _jaas_private_key_cache = key_file.read_text()
+            return _jaas_private_key_cache
+
+        print("JaaS: Weder private_key noch private_key_path konfiguriert")
+        return None
+    except Exception as e:
+        print(f"Error reading JaaS private key: {e}")
+        return None
+
+
+def generate_jaas_jwt(
+    user_name: str,
+    user_id: str,
+    is_moderator: bool = False,
+    room: str = "*",
+    user_email: str = ""
+) -> Optional[str]:
+    """Generiert ein JaaS JWT fuer die Jitsi-Authentifizierung.
+
+    Args:
+        user_name: Anzeigename des Users
+        user_id: Eindeutige User-ID
+        is_moderator: True fuer Coaches (Moderator-Rechte)
+        room: Raumname (ohne AppID-Prefix) oder '*' fuer alle Raeume
+        user_email: Optional, E-Mail des Users
+
+    Returns:
+        JWT-String oder None bei Fehler
+    """
+    try:
+        jaas_cfg = st.secrets["jaas"]
+        app_id = jaas_cfg["app_id"]
+        key_id = jaas_cfg["key_id"]
+    except (KeyError, AttributeError):
+        print("JaaS-Konfiguration fehlt in secrets.toml")
+        return None
+
+    private_key = _get_jaas_private_key()
+    if not private_key:
+        return None
+
+    now = int(time.time())
+
+    payload = {
+        "iss": "chat",
+        "aud": "jitsi",
+        "sub": app_id,
+        "room": room,
+        "exp": now + 7200,  # 2 Stunden gueltig
+        "nbf": now - 10,
+        "context": {
+            "user": {
+                "name": user_name,
+                "email": user_email,
+                "id": user_id,
+                "moderator": "true" if is_moderator else "false",
+                "avatar": ""
+            },
+            "features": {
+                "livestreaming": "false",
+                "recording": "false",
+                "transcription": "false",
+                "outbound-call": "false",
+                "sip-outbound-call": "false"
+            }
+        }
+    }
+
+    headers = {
+        "kid": key_id,
+        "typ": "JWT",
+        "alg": "RS256"
+    }
+
+    token = jwt.encode(payload, private_key, algorithm="RS256", headers=headers)
+    return token
 
 
 # ============================================

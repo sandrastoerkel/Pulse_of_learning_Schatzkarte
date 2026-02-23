@@ -43,6 +43,9 @@ venv.bak/
 # Jupyter Notebook
 .ipynb_checkpoints
 
+# Secrets / Keys
+.secrets/
+
 # Environment variables
 .env
 .env.local
