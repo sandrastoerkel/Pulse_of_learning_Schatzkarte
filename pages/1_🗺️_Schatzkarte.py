@@ -44,7 +44,7 @@ st.set_page_config(
     page_title="Schatzkarte",
     page_icon="🗺",
     layout="wide",
-    initial_sidebar_state="collapsed"  # Sidebar eingeklappt für mehr Platz
+    initial_sidebar_state="expanded"
 )
 
 # ===============================================================
@@ -69,20 +69,6 @@ else:
         st.stop()
     user_id = user["user_id"]
 
-    # Kinder: Sidebar oeffnen, nur Schatzkarte + Meine Lernreise zeigen
-    if not is_coach(user_id):
-        st.markdown("""
-        <style>
-        [data-testid="stSidebarNavItems"] li:nth-child(n+2):nth-child(-n+8) {
-            display: none !important;
-        }
-        </style>
-        <script>
-        // Sidebar aufklappen fuer Kinder
-        window.parent.document.querySelector('[data-testid="stSidebar"]')
-            ?.setAttribute('aria-expanded', 'true');
-        </script>
-        """, unsafe_allow_html=True)
 
 # ===============================================================
 # ALTERSSTUFEN-WEICHE

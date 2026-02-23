@@ -43,14 +43,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Nur Schatzkarte + Meine Lernreise in der Sidebar zeigen
-st.markdown("""
-<style>
-[data-testid="stSidebarNavItems"] li:nth-child(n+2):nth-child(-n+8) {
-    display: none !important;
-}
-</style>
-""", unsafe_allow_html=True)
 
 DAYS_OF_WEEK = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"]
 
