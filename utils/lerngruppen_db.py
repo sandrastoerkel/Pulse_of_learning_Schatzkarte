@@ -307,7 +307,7 @@ def create_invitation(group_id: str, email: str = None, expires_days: int = 7) -
 
 def get_invitation_url(token: str) -> str:
     """Generiert die vollständige Einladungs-URL."""
-    return f"{_get_app_url()}/Lerngruppen?invite={token}"
+    return f"{_get_app_url()}/Meine_Lernreise?invite={token}"
 
 
 def get_invitation(token: str) -> Optional[Dict]:
