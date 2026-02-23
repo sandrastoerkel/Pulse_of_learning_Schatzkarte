@@ -275,7 +275,7 @@ if unlocked_islands:
 # REACT SCHATZKARTE RENDERN
 # ===============================================================
 
-# CSS fuer Vollbild-Schatzkarte + JavaScript zum Schließen der Sidebar
+# CSS fuer Vollbild-Schatzkarte
 st.markdown("""
 <style>
     /* Streamlit-Container maximieren */
@@ -323,34 +323,10 @@ st.markdown("""
         margin: 0 !important;
     }
 
-    """ + ("" if is_coach() else """
-    /* Sidebar sofort einklappen/verstecken (nur für Schüler) */
-    [data-testid="stSidebar"] {
-        transform: translateX(-100%) !important;
-        transition: none !important;
-    }
-    [data-testid="stSidebar"][aria-expanded="true"] {
-        transform: translateX(-100%) !important;
-    }
-    """) + """
+    """  + """
 
-</style>""" + ("" if is_coach() else """
-<script>
-    // Sidebar automatisch einklappen beim Laden der Seite (nur für Schüler)
-    const collapseSidebar = () => {
-        const sidebar = parent.document.querySelector('[data-testid="stSidebar"]');
-        if (sidebar) {
-            sidebar.setAttribute('aria-expanded', 'false');
-            const collapseBtn = parent.document.querySelector('[data-testid="stSidebarCollapseButton"]');
-            if (collapseBtn) {
-                collapseBtn.click();
-            }
-        }
-    };
-    setTimeout(collapseSidebar, 100);
-    setTimeout(collapseSidebar, 300);
-    setTimeout(collapseSidebar, 500);
-</script>""") + """
+</style>
+
 """, unsafe_allow_html=True)
 
 # Altersstufe aus Session-State holen
