@@ -20,9 +20,128 @@ import streamlit as st
 from datetime import datetime
 from typing import Dict, Optional, Any, List
 import hashlib
+import hmac
+import time
+import base64
 import json
+import streamlit.components.v1 as components
 
 from utils.database import get_db
+
+# ============================================
+# COOKIE-BASIERTER AUTO-LOGIN
+# ============================================
+
+COOKIE_NAME = "pol_auth"
+COOKIE_MAX_AGE_DAYS = 30
+
+
+def _get_cookie_secret() -> str:
+    """Liest das Cookie-Secret aus st.secrets."""
+    try:
+        return st.secrets["cookie_secret"]
+    except (KeyError, FileNotFoundError):
+        # Fallback für lokale Entwicklung ohne secrets.toml
+        return "dev-fallback-secret-nicht-fuer-produktion"
+
+
+def _create_login_token(user_id: str) -> str:
+    """Erstellt ein HMAC-signiertes Token: base64(user_id:timestamp:signature)."""
+    timestamp = str(int(time.time()))
+    payload = f"{user_id}:{timestamp}"
+    signature = hmac.new(
+        _get_cookie_secret().encode(),
+        payload.encode(),
+        hashlib.sha256
+    ).hexdigest()
+    token = f"{payload}:{signature}"
+    return base64.urlsafe_b64encode(token.encode()).decode()
+
+
+def _verify_login_token(token: str) -> Optional[str]:
+    """Verifiziert ein Token. Gibt user_id zurück oder None bei Fehler/Ablauf."""
+    try:
+        decoded = base64.urlsafe_b64decode(token.encode()).decode()
+        parts = decoded.split(":")
+        if len(parts) != 3:
+            return None
+
+        user_id, timestamp_str, signature = parts
+
+        # HMAC prüfen
+        payload = f"{user_id}:{timestamp_str}"
+        expected = hmac.new(
+            _get_cookie_secret().encode(),
+            payload.encode(),
+            hashlib.sha256
+        ).hexdigest()
+        if not hmac.compare_digest(signature, expected):
+            return None
+
+        # Ablauf prüfen
+        token_time = int(timestamp_str)
+        max_age_seconds = COOKIE_MAX_AGE_DAYS * 24 * 60 * 60
+        if time.time() - token_time > max_age_seconds:
+            return None
+
+        return user_id
+    except Exception:
+        return None
+
+
+def _set_cookie_js(name: str, value: str, days: int):
+    """Setzt ein Cookie via unsichtbares JavaScript-Snippet."""
+    max_age = days * 24 * 60 * 60
+    js = f"""
+    <script>
+    document.cookie = "{name}={value}; path=/; max-age={max_age}; SameSite=Lax";
+    </script>
+    """
+    components.html(js, height=0)
+
+
+def _delete_cookie_js(name: str):
+    """Löscht ein Cookie via JavaScript."""
+    js = f"""
+    <script>
+    document.cookie = "{name}=; path=/; max-age=0; SameSite=Lax";
+    </script>
+    """
+    components.html(js, height=0)
+
+
+def try_auto_login() -> bool:
+    """Versucht Auto-Login via Cookie. Gibt True zurück wenn eingeloggt."""
+    if is_logged_in():
+        return True
+
+    try:
+        cookie_value = st.context.cookies.get(COOKIE_NAME)
+    except Exception:
+        return False
+
+    if not cookie_value:
+        return False
+
+    user_id = _verify_login_token(cookie_value)
+    if not user_id:
+        return False
+
+    user = get_user_by_id(user_id)
+    if not user:
+        return False
+
+    # Session State wiederherstellen
+    st.session_state.current_user_id = user["user_id"]
+    st.session_state.current_user_name = user["display_name"]
+    st.session_state.current_user_age_group = user.get("age_group", "grundschule")
+
+    # Admin/Coach-Status wiederherstellen
+    user_role = user.get("role", "student")
+    if user_role in ["coach", "admin", "paedagoge", "pädagoge"]:
+        st.session_state.show_admin_user_list = True
+
+    return True
 
 # ============================================
 # AVATAR KONFIGURATION (DiceBear)
@@ -239,10 +358,17 @@ def login_user(display_name: str, age_group: str = None, avatar_style: str = Non
     if user_role in ['coach', 'admin', 'paedagoge', 'pädagoge']:
         st.session_state.show_admin_user_list = True
 
+    # Auto-Login Cookie setzen
+    token = _create_login_token(user['user_id'])
+    _set_cookie_js(COOKIE_NAME, token, COOKIE_MAX_AGE_DAYS)
+
     return user
 
 def logout_user():
     """Loggt den aktuellen Benutzer aus."""
+    # Auto-Login Cookie löschen
+    _delete_cookie_js(COOKIE_NAME)
+
     # Admin-Status NICHT löschen, damit Quick-Login-Liste sichtbar bleibt
     keys_to_delete = ["current_user_id", "current_user_name", "current_user_age_group",
                       "registration_step", "registration_name", "registration_age",
@@ -267,6 +393,9 @@ def render_user_login(show_stats: bool = True, show_info_bar: bool = True):
     if is_preview_mode():
         render_preview_banner()
         return
+
+    # Auto-Login via Cookie versuchen
+    try_auto_login()
 
     if is_logged_in():
         user = get_current_user()

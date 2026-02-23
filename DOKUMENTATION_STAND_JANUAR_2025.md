@@ -1,5 +1,5 @@
 # Pulse of Learning - Schatzkarte
-## Dokumentation Stand 21. Februar 2026
+## Dokumentation Stand 23. Februar 2026
 
 ---
 
@@ -56,6 +56,8 @@ users = result.data  # Liste von Dicts
 ```
 SUPABASE_URL = "https://djkjjqabwxzclgvulpzu.supabase.co"
 SUPABASE_KEY = "sb_publishable_..."
+APP_URL = "https://pulse-of-learning.streamlit.app"
+JITSI_ROOM_SECRET = "ein-sicherer-zufalls-string"
 ```
 
 **Tabellen in Supabase (alle vorhanden):**
@@ -94,6 +96,33 @@ get_db().table("users").delete().eq("user_id", uid).execute()
 ### Performance-Optimierung
 - `get_all_island_progress(user_id)`: Laedt Fortschritt aller 15 Inseln in 1 Query statt 15
 - Supabase-Client wird pro Session erstellt (`st.session_state`), nicht global gecacht
+
+---
+
+# ÄNDERUNGEN (23. Februar 2026)
+
+## Lerngruppen-System Überarbeitung: React → Pure Streamlit + Jitsi External API
+
+### Warum?
+Die bisherige Video-Chat-Lösung basierte auf React-Komponenten (`SchatzkarteMeetingWithScreenShare.jsx`, `ScreenShareHelper.jsx`, `useMeeting.ts`, CSS-Dateien), die aber **nie in die Streamlit-Seite eingebunden** waren. Es gab nur einen externen Jitsi-Link. Zusätzlich fehlte Zeitzonen-Support (Coach in Malaysia, Kinder in DACH).
+
+### Was wurde gemacht?
+
+| Metrik | Vorher | Nachher |
+|--------|--------|---------|
+| Python-Code | 1.428 Zeilen | 1.686 Zeilen |
+| React/CSS | 2.210 Zeilen (nicht eingebunden) | 0 (entfernt) |
+| **Gesamt** | **3.638 Zeilen** | **1.686 Zeilen** |
+| Video-Chat | Nur externer Link | Eingebettet in Seite |
+| Zeitzonen | Nicht implementiert | Voll funktionsfähig |
+| Recurring Meetings | Nicht implementiert | Automatische Erneuerung |
+| Einladungs-URL | Platzhalter-Domain | Konfigurierbar via Secrets |
+
+### Datenbank
+**Keine Migration nötig.** Alle 6 Lerngruppen-Tabellen bleiben unverändert:
+`learning_groups`, `group_members`, `group_invitations`, `group_weekly_islands`, `scheduled_meetings`, `meeting_participants`
+
+Details zu den Code-Änderungen: siehe Abschnitt "Video-Chat Integration" unter den Änderungen vom 14. Januar 2025.
 
 ---
 
@@ -536,80 +565,118 @@ Alle 15 Inseln wurden gleichmäßig auf der Landmasse verteilt:
 
 ---
 
-## 2. Video-Chat Integration (NEU!)
+## 2. Video-Chat Integration (ÜBERARBEITET 23. Februar 2026)
 
-### Neues Feature: Jitsi Meet Video-Treffen für Lerngruppen
+### Architektur-Wechsel: React-Komponenten entfernt, Jitsi direkt in Streamlit eingebettet
 
-Coaches können jetzt Video-Treffen für ihre Lerngruppen planen. Kinder sehen einen Countdown und können zur geplanten Zeit beitreten.
+Die ursprünglichen React-Komponenten (`SchatzkarteMeetingWithScreenShare.jsx`, `ScreenShareHelper.jsx`, `useMeeting.ts`, CSS-Dateien) waren nie in die Streamlit-Seite eingebunden und wurden komplett durch eine reine Streamlit-Lösung ersetzt. Jitsi Meet wird jetzt direkt via `JitsiMeetExternalAPI` in `streamlit.components.v1.html()` eingebettet.
 
-### Neue Dateien erstellt:
+### Entfernte Dateien (nicht mehr benötigt):
 
-| Datei | Beschreibung |
-|-------|--------------|
-| `VideoChat/ScreenShareHelper.jsx` | Kindgerechte Screen-Sharing-Anleitung (Schritt für Schritt) |
-| `VideoChat/SchatzkarteMeetingWithScreenShare.jsx` | Jitsi Meeting-Komponente mit Sidebar |
-| `VideoChat/screen-share-helper.css` | Nintendo-inspirierte Styles |
-| `VideoChat/video-chat.css` | Meeting-Container, Warteraum, Scheduler Styles |
-| `hooks/useMeeting.ts` | React Hook für Meeting-Zugriff |
+| Datei | Zeilen | Status |
+|-------|--------|--------|
+| `VideoChat/ScreenShareHelper.jsx` | 363 | Entfernt (Archiv) |
+| `VideoChat/SchatzkarteMeetingWithScreenShare.jsx` | 308 | Entfernt (Archiv) |
+| `VideoChat/screen-share-helper.css` | 871 | Entfernt (Archiv) |
+| `VideoChat/video-chat.css` | 515 | Entfernt (Archiv) |
+| `hooks/useMeeting.ts` | 153 | Entfernt (Archiv) |
 
-### Backend-Erweiterungen:
+**Dependency `@jitsi/react-sdk` wird nicht mehr gebraucht.**
 
-**lerngruppen_db.py** - Neue Meeting-Tabellen und Funktionen:
-- `scheduled_meetings` Tabelle (Treffen planen)
-- `meeting_participants` Tabelle (Teilnahme tracken)
-- `init_meeting_tables()` - Tabellen initialisieren
-- `schedule_meeting()` - Treffen planen
-- `get_next_meeting()` - Nächstes Treffen abrufen
-- `get_group_meetings()` - Alle Treffen einer Gruppe
-- `get_meeting_access()` - Zugriffsrechte prüfen
-- `get_jitsi_config()` - Rollen-basierte Jitsi-Konfiguration
-- `record_meeting_join()` / `record_meeting_leave()` - Teilnahme erfassen
-- `cancel_meeting()` - Treffen absagen
+### Geänderte Dateien:
 
-### Streamlit UI:
+**`utils/lerngruppen_db.py`** (684 → 854 Zeilen):
 
-**pages/7_👥_Lerngruppen.py** - Neuer Tab "📹 Video-Treffen":
-- Gruppen-Auswahl Dropdown
-- "📅 Nächstes Treffen" - Zeigt geplante Treffen mit Details
-- "➕ Neues Treffen planen" - Formular mit Tag, Uhrzeit, Dauer, Wiederholung
+Neue Funktionen:
+- `_get_room_secret()` — Room-Secret aus `st.secrets` statt hardcoded
+- `_get_app_url()` — App-URL aus `st.secrets` für Einladungslinks
+- `get_group_timezone(group_id)` — Liest Zeitzone aus `settings` JSON-Feld
+- `set_group_timezone(group_id, timezone)` — Setzt Zeitzone
+- `convert_meeting_time_display(time, day, group_tz, coach_tz)` — Zeitkonvertierung für Dual-Anzeige
+- `get_invitation_url(token)` — Generiert vollständige Einladungs-URL
+- `renew_recurring_meeting(meeting)` — Erstellt automatisch nächstes Meeting für wöchentliche Treffen
+
+Geänderte Funktionen:
+- `calculate_next_meeting_date()` — Nutzt `ZoneInfo` für Timezone-aware Datumsberechnung
+- `schedule_meeting()` — Nutzt Gruppen-Zeitzone
+- `get_next_meeting()` — Nutzt Gruppen-Zeitzone + Auto-Renewal für wöchentliche Meetings
+- `get_group_meetings()` — Nutzt Gruppen-Zeitzone
+- `get_meeting_access()` — Nutzt Gruppen-Zeitzone + Legacy-Fallback für naive Datetimes
+- `delete_group()` — Löscht jetzt auch `scheduled_meetings` und `meeting_participants` (mit Guard für leere Listen)
+- `generate_secure_room_name()` — Nutzt Secret aus `st.secrets`
+
+**`pages/7_👥_Lerngruppen.py`** (744 → 832 Zeilen):
+
+Tab 1 (Meine Gruppen):
+- Zeitzone-Button zum Ändern direkt in der Gruppen-Karte
+
+Tab 2 (Neue Gruppe):
+- Zeitzonen-Auswahl bei Gruppenerstellung (Default: Europe/Berlin)
+
+Tab 3 (Video-Treffen) — KOMPLETT NEU:
+- Coach-Zeitzonen-Selectbox (Malaysia/DE/CH/AT)
+- Dual-Zeitanzeige (Gruppen-TZ ↔ Coach-TZ) überall
+- **Eingebettetes Jitsi-Meeting** via `JitsiMeetExternalAPI` in `components.html()`
+- Warteraum mit Countdown + Auto-Refresh (30s via JavaScript)
+- Screen-Share direkt über Jitsi-Toolbar (kein separater Helper mehr)
+- Participant-Tracking bei Beitritt (mit Session-State Guard gegen Duplikate)
+- Alle geplanten Treffen mit Dual-Zeitanzeige
 - Treffen absagen mit Bestätigung
 
-### Dependencies:
+### Zeitzonen-Support (NEU):
 
-- `@jitsi/react-sdk` (v1.4.4) zu npm hinzugefügt
+Sandra (Coach) ist in Malaysia (UTC+8), die Kinder in Deutschland (UTC+1/+2).
+- **Zeitzone pro Gruppe** im `settings`-JSON der `learning_groups`-Tabelle gespeichert
+- **Coach-Zeitzone** per Selectbox, gespeichert in `st.session_state`
+- **Dual-Anzeige** bei allen Uhrzeiten: z.B. "Mittwoch, 16:00 Uhr (Gruppe) = Mittwoch, 23:00 Uhr (Deine Zeit)"
+- **Keine externe Dependency**: Python stdlib `zoneinfo` (3.9+)
+
+### Konfiguration (Streamlit Secrets):
+
+Folgende Werte müssen in `.streamlit/secrets.toml` oder Streamlit Cloud Secrets stehen:
+```toml
+APP_URL = "https://pulse-of-learning.streamlit.app"
+JITSI_ROOM_SECRET = "ein-sicherer-zufalls-string"
+```
+
+### Jitsi-Einbettung (technisches Detail):
+
+```python
+jitsi_html = f"""
+<div id="jitsi-container" style="width: 100%; height: 600px;"></div>
+<script src="https://meet.jit.si/external_api.js"></script>
+<script>
+(function() {{
+    var api = new JitsiMeetExternalAPI("meet.jit.si", {{
+        roomName: "{room_name}",
+        parentNode: document.querySelector('#jitsi-container'),
+        configOverwrite: {config_json},
+        interfaceConfigOverwrite: {interface_config_json},
+        userInfo: {{ displayName: {display_name_js}, email: "" }}
+    }});
+}})();
+</script>
+"""
+components.html(jitsi_html, height=620)
+```
 
 ### Features:
 - Coach plant wöchentliche/einmalige Meetings
-- Sichere, nicht-erratbare Raum-Namen (Hash-basiert)
-- Kindgerechte Screen-Sharing-Anleitung
-- Warteraum mit Countdown für Kinder
-- Rollen-basierte Jitsi-Konfiguration (Coach vs Kind)
-- Mikro/Kamera standardmäßig aus für Kinder
-- **🚀 Jetzt beitreten** Button öffnet Jitsi direkt im Browser
-
-### Bug-Fixes (14. Januar):
-- `status`-Spalte Migration für `group_members` Tabelle hinzugefügt
-- `jitsi_room_name` Feldname korrigiert (war: `room_name`)
-- Alte Datenbank-Tabellen gelöscht und neu erstellt
-
-### Jitsi Meet Hinweise:
-
-**Für Coaches (Moderatoren):**
-- Der Coach muss sich mit **Google anmelden** um Moderator zu sein
-- Nach der Anmeldung kann er Teilnehmer einlassen und die Konferenz steuern
-
-**Für Kinder (Teilnehmer):**
-- Kinder müssen sich **NICHT** anmelden
-- Sie warten im Warteraum bis der Coach sie reinlässt
+- Sichere, nicht-erratbare Raum-Namen (SHA256-Hash-basiert)
+- Wöchentliche Meetings werden automatisch erneuert (`renew_recurring_meeting`)
+- Warteraum mit Countdown (Beitritt 5 Min. vor Start)
+- Screen-Sharing direkt über Jitsi-Toolbar
+- Rollen-basierte Jitsi-Konfiguration (Coach: mute-everyone, participants-pane, settings / Kind: Basis-Toolbar)
+- XSS-Schutz: `display_name` via `json.dumps()` escaped
+- Participant-Tracking mit Session-State Guard (kein Doppel-Insert bei Re-Render)
 
 ### So startest du ein Video-Treffen:
 
-1. Gehe zu **👥 Lerngruppen** → Tab **📹 Video-Treffen**
-2. Wähle deine Lerngruppe im Dropdown
-3. Falls kein Treffen existiert: Tab "➕ Neues Treffen planen" → Treffen erstellen
-4. Klicke auf **🚀 Jetzt beitreten** (grüner Button)
-5. Melde dich mit Google an (nur einmalig als Moderator)
-6. Warte auf Teilnehmer und lasse sie rein
+1. Gehe zu **Lerngruppen** → Tab **Video-Treffen**
+2. Wähle deine Zeitzone (z.B. Malaysia) und Lerngruppe
+3. Falls kein Treffen existiert: Tab "Neues Treffen planen" → Treffen erstellen
+4. Das Jitsi-Meeting wird **direkt auf der Seite** eingebettet (kein externer Link)
+5. Screen-Sharing: Klicke auf das Bildschirm-Symbol in der Jitsi-Toolbar
 
 ---
 

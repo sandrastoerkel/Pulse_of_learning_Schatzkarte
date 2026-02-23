@@ -24,7 +24,8 @@ from utils.user_system import (
     zeige_schatzkarte,
     end_preview_mode,
     logout_user,
-    is_admin
+    is_admin,
+    is_coach
 )
 from utils.page_config import get_page_path
 
@@ -300,7 +301,8 @@ st.markdown("""
         margin: 0 !important;
     }
 
-    /* Sidebar sofort einklappen/verstecken */
+    """ + ("" if is_coach() else """
+    /* Sidebar sofort einklappen/verstecken (nur für Schüler) */
     [data-testid="stSidebar"] {
         transform: translateX(-100%) !important;
         transition: none !important;
@@ -308,26 +310,25 @@ st.markdown("""
     [data-testid="stSidebar"][aria-expanded="true"] {
         transform: translateX(-100%) !important;
     }
+    """) + """
 
-</style>
+</style>""" + ("" if is_coach() else """
 <script>
-    // Sidebar automatisch einklappen beim Laden der Seite
+    // Sidebar automatisch einklappen beim Laden der Seite (nur für Schüler)
     const collapseSidebar = () => {
         const sidebar = parent.document.querySelector('[data-testid="stSidebar"]');
         if (sidebar) {
             sidebar.setAttribute('aria-expanded', 'false');
-            // Finde den Collapse-Button und klicke ihn
             const collapseBtn = parent.document.querySelector('[data-testid="stSidebarCollapseButton"]');
             if (collapseBtn) {
                 collapseBtn.click();
             }
         }
     };
-    // Mehrfach versuchen, da Streamlit manchmal langsam lädt
     setTimeout(collapseSidebar, 100);
     setTimeout(collapseSidebar, 300);
     setTimeout(collapseSidebar, 500);
-</script>
+</script>""") + """
 """, unsafe_allow_html=True)
 
 # Altersstufe aus Session-State holen

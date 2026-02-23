@@ -8,15 +8,15 @@ import streamlit as st
 from supabase import create_client, Client
 
 
+@st.cache_resource
 def get_db() -> Client:
-    """Gibt den Supabase-Client zurück.
+    """Gibt den Supabase-Client zurück (gecacht über alle Sessions).
 
-    Erstellt pro Script-Run einen neuen Client um
-    stale HTTP-Verbindungen auf Streamlit Cloud zu vermeiden.
+    Supabase nutzt HTTP/REST — keine persistenten DB-Verbindungen
+    die "stale" werden können. @st.cache_resource ist hier sicher
+    und überlebt WebSocket-Reconnects (wichtig für Multipage-Apps).
     """
-    if "supabase_client" not in st.session_state:
-        st.session_state.supabase_client = create_client(
-            st.secrets["SUPABASE_URL"],
-            st.secrets["SUPABASE_KEY"]
-        )
-    return st.session_state.supabase_client
+    return create_client(
+        st.secrets["SUPABASE_URL"],
+        st.secrets["SUPABASE_KEY"]
+    )
