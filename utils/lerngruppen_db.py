@@ -307,7 +307,7 @@ def create_invitation(group_id: str, email: str = None, expires_days: int = 7) -
 
 def get_invitation_url(token: str) -> str:
     """Generiert die vollständige Einladungs-URL."""
-    return f"{_get_app_url()}/?invite={token}"
+    return f"{_get_app_url()}/👥_Lerngruppen?invite={token}"
 
 
 def get_invitation(token: str) -> Optional[Dict]:
@@ -446,6 +446,89 @@ def send_invitation_email(to_email: str, group_name: str, invite_url: str) -> bo
         return True
     except Exception as e:
         print(f"Email-Versand fehlgeschlagen: {e}")
+        return False
+
+
+def send_welcome_email(
+    to_email: str, child_name: str, group_name: str,
+    start_date: str, meeting_info: str, schatzkarte_url: str
+) -> bool:
+    """Sendet eine Willkommens-Email nach Gruppenbeitritt. Returns True bei Erfolg."""
+    try:
+        email_cfg = st.secrets["email"]
+    except (KeyError, AttributeError):
+        print("Email-Konfiguration fehlt in secrets.toml")
+        return False
+
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = f'Willkommen in der Lerngruppe "{group_name}"!'
+    msg["From"] = email_cfg["sender"]
+    msg["To"] = to_email
+
+    start_text = f"Startdatum: {start_date}" if start_date else "Startdatum: wird noch bekannt gegeben"
+    meeting_text = meeting_info if meeting_info else "Wird noch vom Coach geplant"
+
+    text_body = (
+        f"Hallo {child_name}!\n\n"
+        f'Willkommen in der Lerngruppe "{group_name}"!\n\n'
+        f"{start_text}\n"
+        f"Treffen: {meeting_text}\n\n"
+        f"So funktioniert's:\n"
+        f"1. Oeffne die Schatzkarte: {schatzkarte_url}\n"
+        f"2. Beim Treffen oeffnest du den Video-Chat (Link auf der Schatzkarte)\n"
+        f"3. Tipp: Oeffne beides in eigenen Browser-Tabs!\n\n"
+        f"Viel Spass bei der Lernreise!\n"
+    )
+
+    html_body = f"""\
+<html>
+<body style="font-family: Arial, sans-serif; color: #333;">
+  <div style="max-width: 500px; margin: 0 auto; padding: 20px;">
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white; padding: 20px; border-radius: 15px; text-align: center;">
+      <h2 style="margin: 0;">Willkommen, {child_name}!</h2>
+      <h3 style="margin: 10px 0 0 0;">Lerngruppe: {group_name}</h3>
+    </div>
+
+    <div style="background: #f0f9ff; border-radius: 10px; padding: 15px; margin-top: 20px;">
+      <h4 style="margin: 0 0 10px 0; color: #0369a1;">Deine Lernreise</h4>
+      <p style="margin: 5px 0;"><strong>Startdatum:</strong> {start_date or "wird noch bekannt gegeben"}</p>
+      <p style="margin: 5px 0;"><strong>Treffen:</strong> {meeting_info or "Wird noch vom Coach geplant"}</p>
+    </div>
+
+    <div style="background: #f0fdf4; border-radius: 10px; padding: 15px; margin-top: 15px;">
+      <h4 style="margin: 0 0 10px 0; color: #166534;">So funktioniert's</h4>
+      <p style="margin: 5px 0;">1. Oeffne die <strong>Schatzkarte</strong> zum Lernen</p>
+      <p style="margin: 5px 0;">2. Beim Treffen oeffnest du den <strong>Video-Chat</strong></p>
+      <p style="margin: 5px 0;">3. Tipp: Oeffne beides in eigenen Browser-Tabs!</p>
+    </div>
+
+    <p style="text-align: center; margin: 25px 0;">
+      <a href="{schatzkarte_url}"
+         style="background: #667eea; color: white; padding: 12px 30px;
+                border-radius: 25px; text-decoration: none; font-weight: bold;">
+        Zur Schatzkarte
+      </a>
+    </p>
+
+    <p style="font-size: 0.85em; color: #999; text-align: center;">
+      Hebe diese Email auf — so findest du den Link immer wieder!
+    </p>
+  </div>
+</body>
+</html>"""
+
+    msg.attach(MIMEText(text_body, "plain", "utf-8"))
+    msg.attach(MIMEText(html_body, "html", "utf-8"))
+
+    try:
+        with smtplib.SMTP(email_cfg["smtp_server"], int(email_cfg["smtp_port"]), timeout=15) as server:
+            server.starttls()
+            server.login(email_cfg["sender"], email_cfg["password"])
+            server.sendmail(email_cfg["sender"], to_email, msg.as_string())
+        return True
+    except Exception as e:
+        print(f"Willkommens-Email fehlgeschlagen: {e}")
         return False
 
 
