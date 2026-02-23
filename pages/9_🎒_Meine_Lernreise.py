@@ -44,8 +44,18 @@ st.set_page_config(
 )
 
 # ============================================
-# SIDEBAR-NAVIGATION
+# SIDEBAR-NAVIGATION (offen erzwingen)
 # ============================================
+
+st.markdown("""
+<style>
+section[data-testid="stSidebar"] {
+    width: 245px !important;
+    min-width: 245px !important;
+    transform: none !important;
+}
+</style>
+""", unsafe_allow_html=True)
 
 with st.sidebar:
     st.page_link("pages/1_🗺️_Schatzkarte.py", label="🗺️ Schatzkarte", icon="🗺️")
