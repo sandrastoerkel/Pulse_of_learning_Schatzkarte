@@ -3,7 +3,7 @@
 // Keeps video in the same tab so iPad Safari doesn't pause audio
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { JitsiMeeting } from '@jitsi/react-sdk';
+import { JaaSMeeting } from '@jitsi/react-sdk';
 import { SchatzkartAction } from '../../types';
 import './floating-jitsi-widget.css';
 
@@ -24,6 +24,7 @@ export interface MeetingData {
   };
   userRole: 'coach' | 'kind';
   jwt?: string | null;
+  appId?: string;
 }
 
 type WidgetState = 'join-button' | 'small' | 'large' | 'minimized' | 'waiting';
@@ -76,15 +77,15 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
 
   // Open in a new tab
   const handleOpenInNewTab = useCallback(() => {
-    if (meetingData.roomName) {
+    if (meetingData.roomName && meetingData.appId) {
       const jwtParam = meetingData.jwt ? `?jwt=${meetingData.jwt}` : '';
       window.open(
-        `https://8x8.vc/${meetingData.roomName}${jwtParam}`,
+        `https://8x8.vc/${meetingData.appId}/${meetingData.roomName}${jwtParam}`,
         '_blank',
         'noopener,noreferrer'
       );
     }
-  }, [meetingData.roomName, meetingData.jwt]);
+  }, [meetingData.roomName, meetingData.jwt, meetingData.appId]);
 
   // Toggle between small and large
   const handleToggleSize = useCallback(() => {
@@ -261,8 +262,8 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
 
       {/* Jitsi iframe */}
       <div className="fjw__jitsi-container">
-        <JitsiMeeting
-          domain="8x8.vc"
+        <JaaSMeeting
+          appId={meetingData.appId || ''}
           roomName={meetingData.roomName!}
           jwt={meetingData.jwt || undefined}
           configOverwrite={{

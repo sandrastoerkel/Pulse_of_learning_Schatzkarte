@@ -248,20 +248,19 @@ def load_meeting_data(uid):
         meeting = access["meeting"]
         room_name = access.get("roomName")
 
-        # JaaS JWT generieren und Room-Name mit AppID prefixen
+        # JaaS JWT generieren
         jaas_jwt = None
+        jaas_app_id = ""
         try:
             jaas_cfg = st.secrets.get("jaas", {})
-            app_id = jaas_cfg.get("app_id", "")
-            if app_id and room_name:
+            jaas_app_id = jaas_cfg.get("app_id", "")
+            if jaas_app_id and room_name:
                 jaas_jwt = generate_jaas_jwt(
                     user_name=display_name,
                     user_id=uid,
                     is_moderator=(user_role == "coach"),
                     room=room_name
                 )
-                # JaaS erfordert AppID-Prefix im Raumnamen
-                room_name = f"{app_id}/{room_name}"
         except Exception as e:
             print(f"JaaS JWT generation failed: {e}")
 
@@ -275,7 +274,8 @@ def load_meeting_data(uid):
             "meetingTitle": meeting.get("title", "Schatzkarten-Treffen"),
             "timeStatus": access.get("timeStatus", {}),
             "userRole": user_role,
-            "jwt": jaas_jwt
+            "jwt": jaas_jwt,
+            "appId": jaas_app_id
         }
     except Exception as e:
         print(f"Error loading meeting data: {e}")
