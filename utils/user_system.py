@@ -115,6 +115,12 @@ def try_auto_login() -> bool:
     if is_logged_in():
         return True
 
+    # Nach Logout: Cookie loeschen und NICHT auto-einloggen
+    if st.session_state.get("_just_logged_out"):
+        del st.session_state["_just_logged_out"]
+        _delete_cookie_js(COOKIE_NAME)
+        return False
+
     try:
         cookie_value = st.context.cookies.get(COOKIE_NAME)
     except Exception:
@@ -372,6 +378,10 @@ def logout_user():
     """Loggt den aktuellen Benutzer aus."""
     # Auto-Login Cookie löschen
     _delete_cookie_js(COOKIE_NAME)
+
+    # Flag setzen damit try_auto_login() den Cookie beim naechsten Render loescht
+    # (components.html wird bei st.rerun/switch_page nicht ausgefuehrt)
+    st.session_state._just_logged_out = True
 
     # Admin-Status NICHT löschen, damit Quick-Login-Liste sichtbar bleibt
     keys_to_delete = ["current_user_id", "current_user_name", "current_user_age_group",

@@ -547,7 +547,7 @@ if result:
     # Header-Button: Logout
     if action == "logout":
         logout_user()
-        st.switch_page("Home.py")
+        st.rerun()
 
     # Header-Button: Zurück zur Landing Page
     if action == "go_to_landing":
