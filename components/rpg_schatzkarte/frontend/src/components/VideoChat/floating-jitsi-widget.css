@@ -251,6 +251,17 @@
 }
 
 /* ========================================
+   DRAG OVERLAY (blocks iframe mouse capture)
+   ======================================== */
+
+.fjw__drag-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  cursor: grabbing;
+}
+
+/* ========================================
    RESIZE HANDLE
    ======================================== */
 

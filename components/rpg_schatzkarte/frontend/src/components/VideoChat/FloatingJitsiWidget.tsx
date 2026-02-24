@@ -90,6 +90,7 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
   // --- Drag & Resize state ---
   const [pos, setPos] = useState({ x: -1, y: -1 }); // -1 = not yet placed
   const [size, setSize] = useState(SMALL_DEFAULT);
+  const [isDragging, setIsDragging] = useState(false);
   const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null);
   const resizeRef = useRef<{ startX: number; startY: number; origW: number; origH: number } | null>(null);
 
@@ -103,62 +104,36 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
     }
   }, [widgetState]);
 
-  // --- Drag handlers ---
-  const onDragStart = useCallback((e: React.MouseEvent | React.TouchEvent) => {
-    if (widgetState === 'large') return; // large = centered, no drag
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    dragRef.current = { startX: clientX, startY: clientY, origX: pos.x, origY: pos.y };
-    e.preventDefault();
-  }, [pos, widgetState]);
-
+  // --- Shared drag/resize move+up listeners ---
   useEffect(() => {
     const onMove = (e: MouseEvent | TouchEvent) => {
-      if (!dragRef.current) return;
       const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
       const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-      const dx = clientX - dragRef.current.startX;
-      const dy = clientY - dragRef.current.startY;
-      const newX = Math.max(0, Math.min(window.innerWidth - size.width, dragRef.current.origX + dx));
-      const newY = Math.max(0, Math.min(window.innerHeight - size.height, dragRef.current.origY + dy));
-      setPos({ x: newX, y: newY });
-    };
-    const onUp = () => { dragRef.current = null; };
 
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
-    window.addEventListener('touchmove', onMove);
-    window.addEventListener('touchend', onUp);
-    return () => {
-      window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('mouseup', onUp);
-      window.removeEventListener('touchmove', onMove);
-      window.removeEventListener('touchend', onUp);
-    };
-  }, [size]);
+      if (dragRef.current) {
+        const dx = clientX - dragRef.current.startX;
+        const dy = clientY - dragRef.current.startY;
+        const newX = Math.max(0, Math.min(window.innerWidth - 100, dragRef.current.origX + dx));
+        const newY = Math.max(0, Math.min(window.innerHeight - 40, dragRef.current.origY + dy));
+        setPos({ x: newX, y: newY });
+      }
 
-  // --- Resize handlers ---
-  const onResizeStart = useCallback((e: React.MouseEvent | React.TouchEvent) => {
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    resizeRef.current = { startX: clientX, startY: clientY, origW: size.width, origH: size.height };
-    e.preventDefault();
-    e.stopPropagation();
-  }, [size]);
-
-  useEffect(() => {
-    const onMove = (e: MouseEvent | TouchEvent) => {
-      if (!resizeRef.current) return;
-      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-      const dw = clientX - resizeRef.current.startX;
-      const dh = clientY - resizeRef.current.startY;
-      setSize({
-        width: Math.max(MIN_SIZE.width, resizeRef.current.origW + dw),
-        height: Math.max(MIN_SIZE.height, resizeRef.current.origH + dh)
-      });
+      if (resizeRef.current) {
+        const dw = clientX - resizeRef.current.startX;
+        const dh = clientY - resizeRef.current.startY;
+        setSize({
+          width: Math.max(MIN_SIZE.width, resizeRef.current.origW + dw),
+          height: Math.max(MIN_SIZE.height, resizeRef.current.origH + dh)
+        });
+      }
     };
-    const onUp = () => { resizeRef.current = null; };
+
+    const onUp = () => {
+      const wasDragging = dragRef.current !== null || resizeRef.current !== null;
+      dragRef.current = null;
+      resizeRef.current = null;
+      if (wasDragging) setIsDragging(false);
+    };
 
     window.addEventListener('mousemove', onMove);
     window.addEventListener('mouseup', onUp);
@@ -171,6 +146,27 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
       window.removeEventListener('touchend', onUp);
     };
   }, []);
+
+  // --- Drag handler ---
+  const onDragStart = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    // Don't drag when clicking buttons
+    if ((e.target as HTMLElement).closest('button')) return;
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    dragRef.current = { startX: clientX, startY: clientY, origX: pos.x, origY: pos.y };
+    setIsDragging(true);
+    e.preventDefault();
+  }, [pos]);
+
+  // --- Resize handler ---
+  const onResizeStart = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    resizeRef.current = { startX: clientX, startY: clientY, origW: size.width, origH: size.height };
+    setIsDragging(true);
+    e.preventDefault();
+    e.stopPropagation();
+  }, [size]);
 
   // Load Jitsi when widget enters video state
   useEffect(() => {
@@ -474,6 +470,8 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
             <p>Lade Video-Treffen...</p>
           </div>
         )}
+        {/* Transparent overlay blocks iframe from stealing mouse events during drag/resize */}
+        {isDragging && <div className="fjw__drag-overlay" />}
       </div>
 
       {/* Resize handle */}
