@@ -166,22 +166,7 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ---- SMALL (320x240 bottom-right) ---- */
-.fjw--small {
-  bottom: 24px;
-  right: 24px;
-  width: 320px;
-  height: 280px; /* 240 video + 40 controls */
-}
-
-/* ---- LARGE (80vw x 80vh centered) ---- */
-.fjw--large {
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 80vw;
-  height: 80vh;
-}
+/* Size & position now controlled via inline styles (drag & resize) */
 
 /* ========================================
    CONTROL BAR
@@ -196,6 +181,16 @@
   color: #FFD700;
   min-height: 40px;
   flex-shrink: 0;
+}
+
+.fjw__controls--draggable {
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.fjw__controls--draggable:active {
+  cursor: grabbing;
 }
 
 .fjw__controls-title {
@@ -256,6 +251,28 @@
 }
 
 /* ========================================
+   RESIZE HANDLE
+   ======================================== */
+
+.fjw__resize-handle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 18px;
+  height: 18px;
+  cursor: nwse-resize;
+  background:
+    linear-gradient(135deg, transparent 50%, rgba(255, 215, 0, 0.5) 50%);
+  border-radius: 0 0 12px 0;
+  z-index: 10;
+}
+
+.fjw__resize-handle:hover {
+  background:
+    linear-gradient(135deg, transparent 50%, rgba(255, 215, 0, 0.8) 50%);
+}
+
+/* ========================================
    LOADING SPINNER
    ======================================== */
 
@@ -290,18 +307,6 @@
    ======================================== */
 
 @media (max-width: 768px) {
-  .fjw--small {
-    width: 280px;
-    height: 260px;
-    bottom: 16px;
-    right: 16px;
-  }
-
-  .fjw--large {
-    width: 95vw;
-    height: 85vh;
-  }
-
   .fjw--join-buttons {
     bottom: 16px;
     right: 16px;
@@ -320,23 +325,6 @@
 }
 
 @media (max-width: 480px) {
-  .fjw--small {
-    width: 260px;
-    height: 240px;
-    bottom: 12px;
-    right: 12px;
-  }
-
-  .fjw--large {
-    width: 100vw;
-    height: 90vh;
-    border-radius: 0;
-    top: auto;
-    bottom: 0;
-    left: 0;
-    transform: none;
-  }
-
   .fjw__join-btn {
     padding: 10px 16px;
     font-size: 0.9rem;

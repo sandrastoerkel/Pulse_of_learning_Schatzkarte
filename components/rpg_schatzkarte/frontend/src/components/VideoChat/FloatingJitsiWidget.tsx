@@ -64,6 +64,9 @@ function loadJaaSApi(appId: string): Promise<any> {
   return jaasApiPromise;
 }
 
+const SMALL_DEFAULT = { width: 320, height: 280 };
+const MIN_SIZE = { width: 240, height: 200 };
+
 const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
   meetingData,
   onAction
@@ -71,6 +74,7 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
   const apiRef = useRef<any>(null);
   const hasJoinedRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const widgetRef = useRef<HTMLDivElement>(null);
   const [widgetState, setWidgetState] = useState<WidgetState>(() => {
     if (!meetingData.canJoin && meetingData.timeStatus?.reason === 'too_early') {
       const mins = meetingData.timeStatus.minutesUntilStart ?? 999;
@@ -82,6 +86,91 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
   const [minutesUntil, setMinutesUntil] = useState(
     meetingData.timeStatus?.minutesUntilStart ?? 0
   );
+
+  // --- Drag & Resize state ---
+  const [pos, setPos] = useState({ x: -1, y: -1 }); // -1 = not yet placed
+  const [size, setSize] = useState(SMALL_DEFAULT);
+  const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null);
+  const resizeRef = useRef<{ startX: number; startY: number; origW: number; origH: number } | null>(null);
+
+  // Place widget at bottom-right on first render into video state
+  useEffect(() => {
+    if ((widgetState === 'small' || widgetState === 'large') && pos.x === -1) {
+      setPos({
+        x: window.innerWidth - size.width - 24,
+        y: window.innerHeight - size.height - 24
+      });
+    }
+  }, [widgetState]);
+
+  // --- Drag handlers ---
+  const onDragStart = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    if (widgetState === 'large') return; // large = centered, no drag
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    dragRef.current = { startX: clientX, startY: clientY, origX: pos.x, origY: pos.y };
+    e.preventDefault();
+  }, [pos, widgetState]);
+
+  useEffect(() => {
+    const onMove = (e: MouseEvent | TouchEvent) => {
+      if (!dragRef.current) return;
+      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+      const dx = clientX - dragRef.current.startX;
+      const dy = clientY - dragRef.current.startY;
+      const newX = Math.max(0, Math.min(window.innerWidth - size.width, dragRef.current.origX + dx));
+      const newY = Math.max(0, Math.min(window.innerHeight - size.height, dragRef.current.origY + dy));
+      setPos({ x: newX, y: newY });
+    };
+    const onUp = () => { dragRef.current = null; };
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    window.addEventListener('touchmove', onMove);
+    window.addEventListener('touchend', onUp);
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+      window.removeEventListener('touchmove', onMove);
+      window.removeEventListener('touchend', onUp);
+    };
+  }, [size]);
+
+  // --- Resize handlers ---
+  const onResizeStart = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    resizeRef.current = { startX: clientX, startY: clientY, origW: size.width, origH: size.height };
+    e.preventDefault();
+    e.stopPropagation();
+  }, [size]);
+
+  useEffect(() => {
+    const onMove = (e: MouseEvent | TouchEvent) => {
+      if (!resizeRef.current) return;
+      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+      const dw = clientX - resizeRef.current.startX;
+      const dh = clientY - resizeRef.current.startY;
+      setSize({
+        width: Math.max(MIN_SIZE.width, resizeRef.current.origW + dw),
+        height: Math.max(MIN_SIZE.height, resizeRef.current.origH + dh)
+      });
+    };
+    const onUp = () => { resizeRef.current = null; };
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    window.addEventListener('touchmove', onMove);
+    window.addEventListener('touchend', onUp);
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+      window.removeEventListener('touchmove', onMove);
+      window.removeEventListener('touchend', onUp);
+    };
+  }, []);
 
   // Load Jitsi when widget enters video state
   useEffect(() => {
@@ -218,7 +307,21 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
 
   // Toggle between small and large
   const handleToggleSize = useCallback(() => {
-    setWidgetState(prev => (prev === 'small' ? 'large' : 'small'));
+    setWidgetState(prev => {
+      if (prev === 'small') {
+        // Going large: center it
+        const lw = Math.round(window.innerWidth * 0.8);
+        const lh = Math.round(window.innerHeight * 0.8);
+        setSize({ width: lw, height: lh });
+        setPos({ x: Math.round((window.innerWidth - lw) / 2), y: Math.round((window.innerHeight - lh) / 2) });
+        return 'large';
+      } else {
+        // Going small: restore default bottom-right
+        setSize(SMALL_DEFAULT);
+        setPos({ x: window.innerWidth - SMALL_DEFAULT.width - 24, y: window.innerHeight - SMALL_DEFAULT.height - 24 });
+        return 'small';
+      }
+    });
   }, []);
 
   // Minimize
@@ -308,9 +411,26 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
   const isLarge = widgetState === 'large';
 
   return (
-    <div className={`fjw fjw--video ${isLarge ? 'fjw--large' : 'fjw--small'}`}>
-      {/* Control bar */}
-      <div className="fjw__controls">
+    <div
+      ref={widgetRef}
+      className="fjw fjw--video"
+      style={{
+        left: pos.x >= 0 ? pos.x : undefined,
+        top: pos.y >= 0 ? pos.y : undefined,
+        width: size.width,
+        height: size.height,
+        // Reset CSS-class positioning
+        bottom: 'auto',
+        right: 'auto',
+        transform: 'none',
+      }}
+    >
+      {/* Control bar – draggable */}
+      <div
+        className="fjw__controls fjw__controls--draggable"
+        onMouseDown={onDragStart}
+        onTouchStart={onDragStart}
+      >
         <span className="fjw__controls-title">
           {meetingData.meetingTitle || 'Video-Treffen'}
         </span>
@@ -355,6 +475,13 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
           </div>
         )}
       </div>
+
+      {/* Resize handle */}
+      <div
+        className="fjw__resize-handle"
+        onMouseDown={onResizeStart}
+        onTouchStart={onResizeStart}
+      />
     </div>
   );
 };
