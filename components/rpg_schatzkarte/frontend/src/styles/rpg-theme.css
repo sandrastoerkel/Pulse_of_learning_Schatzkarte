@@ -921,6 +921,17 @@ body {
    RPG SCHATZKARTE - Zusaetzliche Styles
    ============================================ */
 
+/* !! KEYBOARD-FIX: Extra Scroll-Platz fuer Mobile-Tastatur + Chrome Autofill-Leiste.
+   Zum Entfernen: Diesen ganzen Block loeschen (bis zum naechsten !! KEYBOARD-FIX Ende). */
+.modal-body,
+.polarstern-modal__content,
+.ship-modal-body,
+.companion-selector-modal,
+.quest-modal-content {
+  padding-bottom: 200px !important;
+}
+/* !! KEYBOARD-FIX Ende */
+
 .rpg-schatzkarte {
   background: var(--ui-base);
   font-family: var(--font-ui);
