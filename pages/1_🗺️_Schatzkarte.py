@@ -84,7 +84,6 @@ else:
 # ===============================================================
 
 with st.sidebar:
-    st.caption("Zum Schliessen auf den Pfeil klicken")
     st.page_link("pages/1_🗺️_Schatzkarte.py", label="🗺️ Schatzkarte", icon="🗺️")
     st.page_link("pages/9_🎒_Meine_Lernreise.py", label="🎒 Meine Lernreise", icon="🎒")
 
@@ -455,6 +454,31 @@ st.markdown("""
             box-shadow: 0 4px 15px rgba(255, 165, 0, 0.5),
                         0 0 0 10px rgba(255, 215, 0, 0);
         }
+    }
+
+    /* Hinweistext direkt unter dem Schliessen-Pfeil in der Sidebar */
+    [data-testid="stSidebar"][aria-expanded="true"] [data-testid="stSidebarCollapseButton"]::after,
+    [data-testid="stSidebar"][aria-expanded="true"] button[kind="headerNoPadding"]::after {
+        content: "Hier klicken zum Schliessen";
+        display: block;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        margin-top: 6px;
+        font-size: 11px;
+        color: #FFD700;
+        background: rgba(26, 35, 126, 0.9);
+        padding: 4px 10px;
+        border-radius: 8px;
+        white-space: nowrap;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        animation: sidebar-hint-fade 3s ease-in-out infinite;
+    }
+
+    @keyframes sidebar-hint-fade {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.6; }
     }
 
     /* Sidebar offen: Abdunklung des Hintergrunds als Hinweis */
