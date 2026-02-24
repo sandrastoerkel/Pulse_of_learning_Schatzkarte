@@ -13,10 +13,11 @@ import SchatzkarteLandingEltern from "./SchatzkarteLanding_Eltern";
 const WHATSAPP_NUMBER = "60172904521";
 
 interface SchatzkarteLandingCombinedProps {
+  onGoToMap?: () => void;
   onGuestMode?: () => void;
 }
 
-export default function SchatzkarteLandingCombined({ onGuestMode }: SchatzkarteLandingCombinedProps) {
+export default function SchatzkarteLandingCombined({ onGoToMap, onGuestMode }: SchatzkarteLandingCombinedProps) {
   const [showElternVersion, setShowElternVersion] = useState(false);
 
   return (
@@ -167,8 +168,8 @@ export default function SchatzkarteLandingCombined({ onGuestMode }: SchatzkarteL
           }}
         >
           {showElternVersion
-            ? <SchatzkarteLandingEltern onGuestMode={onGuestMode} />
-            : <SchatzkarteLandingJugend onGuestMode={onGuestMode} />}
+            ? <SchatzkarteLandingEltern onGoToMap={onGoToMap} onGuestMode={onGuestMode} />
+            : <SchatzkarteLandingJugend onGoToMap={onGoToMap} onGuestMode={onGuestMode} />}
         </div>
       </div>
 

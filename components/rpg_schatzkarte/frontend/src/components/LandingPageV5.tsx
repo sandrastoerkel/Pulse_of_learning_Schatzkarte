@@ -6,9 +6,9 @@ interface LandingPageV5Props {
 }
 
 const LandingPageV5 = ({ onClose, onGuestMode }: LandingPageV5Props) => {
-  // SchatzkarteLandingCombined hat Toggle zwischen Schüler- und Elternversion
-  // onGuestMode wird für "Demo ansehen" Button verwendet
-  return <SchatzkarteLandingCombined onGuestMode={onGuestMode || onClose} />;
+  // onClose = go_to_map (normaler Login-Flow auf der Schatzkarte)
+  // onGuestMode = start_preview (Demo ohne Login)
+  return <SchatzkarteLandingCombined onGoToMap={onClose} onGuestMode={onGuestMode || onClose} />;
 };
 
 export { LandingPageV5 };

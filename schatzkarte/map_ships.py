@@ -275,7 +275,8 @@ def get_polarstern_data(user_id: str) -> Dict[str, Any]:
             "total_xp": stats.get('total_xp', 0),
             "goals": all_goals[:5]  # Maximal 5 für die Anzeige
         }
-    except ImportError:
+    except Exception:
+        # ImportError oder DB-Fehler (httpx.ReadError etc.) - Fallback
         return {
             "active": 0,
             "achieved": 0,

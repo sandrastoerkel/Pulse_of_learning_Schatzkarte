@@ -135,10 +135,11 @@ const inputBase: React.CSSProperties = {
 // ─── MAIN COMPONENT ─────────────────────────────────────────
 
 interface SchatzkarteLandingJugendProps {
+  onGoToMap?: () => void;
   onGuestMode?: () => void;
 }
 
-export default function SchatzkarteLandingJugend({ onGuestMode }: SchatzkarteLandingJugendProps) {
+export default function SchatzkarteLandingJugend({ onGoToMap, onGuestMode }: SchatzkarteLandingJugendProps) {
   const [activeChallenge, setActiveChallenge] = useState<number | null>(null);
   const [formName, setFormName] = useState("");
   const [formEmail, setFormEmail] = useState("");
@@ -340,7 +341,7 @@ export default function SchatzkarteLandingJugend({ onGuestMode }: SchatzkarteLan
             justifyContent: "center",
             marginBottom: 64,
           }}>
-            <button className="btn-hero-primary" onClick={() => onGuestMode?.()}>
+            <button className="btn-hero-primary" onClick={() => (onGoToMap || onGuestMode)?.()}>
               <Sparkle size={20} color={THEME.dark} />
               Starte deine Schatzreise
             </button>

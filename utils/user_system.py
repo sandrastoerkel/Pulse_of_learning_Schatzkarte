@@ -127,7 +127,11 @@ def try_auto_login() -> bool:
     if not user_id:
         return False
 
-    user = get_user_by_id(user_id)
+    try:
+        user = get_user_by_id(user_id)
+    except Exception:
+        # DB-Verbindung fehlgeschlagen - Cookie ignorieren, kein Crash
+        return False
     if not user:
         return False
 

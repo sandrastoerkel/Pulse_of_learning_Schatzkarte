@@ -12,5 +12,9 @@ plotly>=5.17.0
 # Cloud Database (Supabase - PostgreSQL)
 supabase>=2.0.0
 
+# JWT fuer JaaS Video-Integration
+PyJWT>=2.8.0
+cryptography>=41.0.0  # Fuer RS256 JWT-Signierung
+
 # Optional (for extended features)
 openpyxl>=3.1.0  # Excel export functionality

@@ -201,10 +201,11 @@ const dotPattern: React.CSSProperties = {
 // ─── MAIN COMPONENT ─────────────────────────────────────────
 
 interface SchatzkarteLandingElternProps {
+  onGoToMap?: () => void;
   onGuestMode?: () => void;
 }
 
-export default function SchatzkarteLandingEltern({ onGuestMode }: SchatzkarteLandingElternProps) {
+export default function SchatzkarteLandingEltern({ onGoToMap, onGuestMode }: SchatzkarteLandingElternProps) {
   const [activeQuestion, setActiveQuestion] = useState<number | null>(null);
   const [answeredQuestions, setAnsweredQuestions] = useState<Set<number>>(new Set());
   const [formName, setFormName] = useState("");

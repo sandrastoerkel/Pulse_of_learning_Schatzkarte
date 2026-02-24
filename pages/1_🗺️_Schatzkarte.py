@@ -70,9 +70,12 @@ else:
         st.stop()
 
     # Eingeloggter User
-    user = get_current_user()
+    try:
+        user = get_current_user()
+    except Exception:
+        user = None
     if user is None:
-        st.error("Fehler beim Laden der Benutzerdaten.")
+        st.error("Fehler beim Laden der Benutzerdaten. Bitte Seite neu laden.")
         st.stop()
     user_id = user["user_id"]
 
