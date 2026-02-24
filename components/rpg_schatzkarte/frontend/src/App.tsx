@@ -1358,49 +1358,43 @@ function RPGSchatzkarteContent({
 
       {/* Avatar Edit Widget - jetzt im linken Panel integriert */}
 
-      {/* Memory Game Button - erscheint wenn kein Modal offen */}
+      {/* Bottom Action Bar - Memory, Shop, Runner */}
       {!showQuestModal && !showBanduraModal && !showHattieModal && !showMemoryGame && !showRunnerGame && !showAvatarShop && !showAvatarCreator && (
-        <button
-          className="memory-game-widget"
-          onClick={() => setShowMemoryGame(true)}
-          title="Memory spielen"
-        >
-          <span className="memory-game-widget__icon">🧠</span>
-          <div className="memory-game-widget__info">
-            <span className="memory-game-widget__title">Memory</span>
-            <span className="memory-game-widget__xp">{playerXP} XP</span>
-          </div>
-        </button>
-      )}
+        <div className="bottom-action-bar">
+          <button
+            className="bottom-action-bar__btn bottom-action-bar__btn--memory"
+            onClick={() => setShowMemoryGame(true)}
+            title="Memory spielen"
+          >
+            <span className="bottom-action-bar__icon">🧠</span>
+            <span className="bottom-action-bar__label">Memory</span>
+            <span className="bottom-action-bar__sub">{playerXP} XP</span>
+          </button>
 
-      {/* Runner Game Button - erscheint wenn kein Modal offen UND Avatar vorhanden */}
-      {customAvatar && !showQuestModal && !showBanduraModal && !showHattieModal && !showMemoryGame && !showRunnerGame && !showAvatarShop && !showAvatarCreator && (
-        <button
-          className="runner-game-widget"
-          onClick={() => setShowRunnerGame(true)}
-          title="Runner spielen"
-        >
-          <span className="runner-game-widget__icon">🏃</span>
-          <div className="runner-game-widget__info">
-            <span className="runner-game-widget__title">Runner</span>
-            <span className="runner-game-widget__xp">{playerXP} XP</span>
-          </div>
-        </button>
-      )}
+          {customAvatar && (
+            <button
+              className="bottom-action-bar__btn bottom-action-bar__btn--shop"
+              onClick={() => setShowAvatarShop(true)}
+              title="Avatar Shop öffnen"
+            >
+              <span className="bottom-action-bar__icon">🛒</span>
+              <span className="bottom-action-bar__label">Shop</span>
+              <span className="bottom-action-bar__sub">{playerGold} 💰</span>
+            </button>
+          )}
 
-      {/* Avatar Shop Button - erscheint wenn kein Modal offen UND Avatar vorhanden */}
-      {customAvatar && !showQuestModal && !showBanduraModal && !showHattieModal && !showMemoryGame && !showRunnerGame && !showAvatarShop && !showAvatarCreator && (
-        <button
-          className="avatar-shop-widget"
-          onClick={() => setShowAvatarShop(true)}
-          title="Avatar Shop öffnen"
-        >
-          <span className="avatar-shop-widget__icon">🛒</span>
-          <div className="avatar-shop-widget__info">
-            <span className="avatar-shop-widget__title">Shop</span>
-            <span className="avatar-shop-widget__gold">{playerGold} 💰</span>
-          </div>
-        </button>
+          {customAvatar && (
+            <button
+              className="bottom-action-bar__btn bottom-action-bar__btn--runner"
+              onClick={() => setShowRunnerGame(true)}
+              title="Runner spielen"
+            >
+              <span className="bottom-action-bar__icon">🏃</span>
+              <span className="bottom-action-bar__label">Runner</span>
+              <span className="bottom-action-bar__sub">{playerXP} XP</span>
+            </button>
+          )}
+        </div>
       )}
 
       <footer className="app-footer">

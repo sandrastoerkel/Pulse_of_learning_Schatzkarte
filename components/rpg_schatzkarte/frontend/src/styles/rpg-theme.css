@@ -5494,54 +5494,70 @@ body {
   }
 }
 
-/* Memory Game Widget Button — Unified Bottom Nav Style */
-.memory-game-widget {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
+/* ============================================
+   BOTTOM ACTION BAR - Memory, Shop, Runner
+   Im normalen Dokument-Flow statt position:fixed
+   (position:fixed funktioniert nicht in Streamlit iframes)
+   ============================================ */
+.bottom-action-bar {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px;
+  background: var(--ui-base);
+  border-top: 1px solid var(--ui-border);
+  flex-wrap: wrap;
+}
+
+.bottom-action-bar__btn {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 16px;
+  padding: 10px 18px;
   background: var(--ui-surface);
   border: 1px solid var(--ui-border);
   border-radius: 14px;
   cursor: pointer;
   box-shadow: var(--shadow-sm);
   transition: border-color var(--transition-fast), background var(--transition-fast);
-  z-index: 1000;
   font-family: var(--font-ui);
 }
 
-.memory-game-widget:hover {
-  border-color: var(--ui-action);
+.bottom-action-bar__btn:hover {
   background: var(--ui-surface-hover);
   box-shadow: var(--shadow-action);
 }
 
-.memory-game-widget:active {
+.bottom-action-bar__btn:active {
   background: var(--ui-base);
 }
 
-.memory-game-widget__icon {
+.bottom-action-bar__btn--memory:hover {
+  border-color: var(--ui-action);
+}
+
+.bottom-action-bar__btn--shop:hover {
+  border-color: var(--fb-reward);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.15);
+}
+
+.bottom-action-bar__btn--runner:hover {
+  border-color: var(--fb-success);
+  box-shadow: 0 0 12px rgba(52, 211, 153, 0.15);
+}
+
+.bottom-action-bar__icon {
   font-size: 28px;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-  /* REMOVED: infinite brainPulse animation */
 }
 
-.memory-game-widget__info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.memory-game-widget__title {
+.bottom-action-bar__label {
   color: var(--ui-text);
   font-size: 13px;
   font-weight: 600;
 }
 
-.memory-game-widget__xp {
+.bottom-action-bar__sub {
   color: var(--ui-text-muted);
   font-size: 12px;
   font-weight: 500;
@@ -5620,80 +5636,29 @@ body {
   line-height: 1.5;
 }
 
-/* Responsive für Memory Widget */
+/* Responsive für Bottom Action Bar */
 @media (max-width: 600px) {
-  .memory-game-widget {
-    bottom: 15px;
-    left: 12px;
-    padding: 10px 14px;
+  .bottom-action-bar {
+    gap: 8px;
+    padding: 12px;
   }
 
-  .memory-game-widget__icon {
-    font-size: 24px;
+  .bottom-action-bar__btn {
+    padding: 8px 12px;
+    gap: 6px;
   }
 
-  .memory-game-widget__title {
+  .bottom-action-bar__icon {
+    font-size: 22px;
+  }
+
+  .bottom-action-bar__label {
     font-size: 12px;
   }
 
-  .memory-game-widget__xp {
+  .bottom-action-bar__sub {
     font-size: 10px;
   }
-}
-
-/* =============================================
-   RUNNER GAME WIDGET BUTTON — Unified Bottom Nav Style
-   ============================================= */
-.runner-game-widget {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 16px;
-  background: var(--ui-surface);
-  border: 1px solid var(--ui-border);
-  border-radius: 14px;
-  cursor: pointer;
-  box-shadow: var(--shadow-sm);
-  transition: border-color var(--transition-fast), background var(--transition-fast);
-  z-index: 1000;
-  font-family: var(--font-ui);
-}
-
-.runner-game-widget:hover {
-  border-color: var(--fb-success);
-  background: var(--ui-surface-hover);
-  box-shadow: 0 0 12px rgba(52, 211, 153, 0.15);
-}
-
-.runner-game-widget:active {
-  background: var(--ui-base);
-}
-
-.runner-game-widget__icon {
-  font-size: 28px;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-  /* REMOVED: infinite runnerBounce animation */
-}
-
-.runner-game-widget__info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.runner-game-widget__title {
-  color: var(--ui-text);
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.runner-game-widget__xp {
-  color: var(--ui-text-muted);
-  font-size: 12px;
-  font-weight: 500;
 }
 
 /* Runner Game Modal */
@@ -5707,82 +5672,6 @@ body {
   justify-content: center;
 }
 
-/* Responsive für Runner Widget */
-@media (max-width: 600px) {
-  .runner-game-widget {
-    bottom: 15px;
-    right: 12px;
-    padding: 10px 14px;
-  }
-
-  .runner-game-widget__icon {
-    font-size: 24px;
-  }
-
-  .runner-game-widget__title {
-    font-size: 12px;
-  }
-
-  .runner-game-widget__xp {
-    font-size: 10px;
-  }
-}
-
-/* ============================================
-   AVATAR SHOP WIDGET — Unified Bottom Nav Style
-   ============================================ */
-
-.avatar-shop-widget {
-  position: fixed;
-  bottom: 20px;
-  right: 140px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 16px;
-  background: var(--ui-surface);
-  border: 1px solid var(--ui-border);
-  border-radius: 14px;
-  cursor: pointer;
-  box-shadow: var(--shadow-sm);
-  transition: border-color var(--transition-fast), background var(--transition-fast);
-  z-index: 1000;
-  font-family: var(--font-ui);
-}
-
-.avatar-shop-widget:hover {
-  border-color: var(--fb-reward);
-  background: var(--ui-surface-hover);
-  box-shadow: 0 0 12px rgba(245, 158, 11, 0.15);
-}
-
-.avatar-shop-widget:active {
-  background: var(--ui-base);
-}
-
-.avatar-shop-widget__icon {
-  font-size: 28px;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-  /* REMOVED: infinite shopBounce animation */
-}
-
-.avatar-shop-widget__info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.avatar-shop-widget__title {
-  color: var(--ui-text);
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.avatar-shop-widget__gold {
-  color: var(--ui-text-muted);
-  font-size: 12px;
-  font-weight: 500;
-}
 
 /* Avatar Shop Modal */
 .avatar-shop-modal {
@@ -5796,23 +5685,3 @@ body {
   overflow-y: auto;
 }
 
-/* Responsive für Avatar Shop Widget */
-@media (max-width: 600px) {
-  .avatar-shop-widget {
-    bottom: 15px;
-    right: 120px;
-    padding: 10px 14px;
-  }
-
-  .avatar-shop-widget__icon {
-    font-size: 24px;
-  }
-
-  .avatar-shop-widget__title {
-    font-size: 12px;
-  }
-
-  .avatar-shop-widget__gold {
-    font-size: 10px;
-  }
-}
