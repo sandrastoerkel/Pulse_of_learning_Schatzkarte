@@ -51,7 +51,7 @@ st.set_page_config(
     page_title="Schatzkarte",
     page_icon="🗺",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 # ===============================================================
@@ -80,18 +80,8 @@ else:
     user_id = user["user_id"]
 
 # ===============================================================
-# SIDEBAR-NAVIGATION (offen erzwingen)
+# SIDEBAR-NAVIGATION
 # ===============================================================
-
-st.markdown("""
-<style>
-section[data-testid="stSidebar"] {
-    width: 245px !important;
-    min-width: 245px !important;
-    transform: none !important;
-}
-</style>
-""", unsafe_allow_html=True)
 
 with st.sidebar:
     st.page_link("pages/1_🗺️_Schatzkarte.py", label="🗺️ Schatzkarte", icon="🗺️")
