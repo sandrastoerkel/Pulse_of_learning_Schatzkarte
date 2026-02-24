@@ -32,6 +32,7 @@ type WidgetState = 'join-button' | 'small' | 'large' | 'minimized' | 'waiting';
 interface FloatingJitsiWidgetProps {
   meetingData: MeetingData;
   onAction?: (action: SchatzkartAction) => void;
+  forceJoin?: boolean;
 }
 
 // Load 8x8.vc external API (bypasses @jitsi/react-sdk caching)
@@ -69,7 +70,8 @@ const MIN_SIZE = { width: 240, height: 200 };
 
 const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
   meetingData,
-  onAction
+  onAction,
+  forceJoin
 }) => {
   const apiRef = useRef<any>(null);
   const hasJoinedRef = useRef(false);
@@ -93,6 +95,13 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
   const [isDragging, setIsDragging] = useState(false);
   const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null);
   const resizeRef = useRef<{ startX: number; startY: number; origW: number; origH: number } | null>(null);
+
+  // Force join from external trigger (Header-Button)
+  useEffect(() => {
+    if (forceJoin && widgetState === 'join-button' && meetingData.canJoin) {
+      setWidgetState('small');
+    }
+  }, [forceJoin]);
 
   // Place widget at bottom-right on first render into video state
   useEffect(() => {

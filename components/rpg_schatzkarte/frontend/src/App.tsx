@@ -121,7 +121,9 @@ function RPGSchatzkarteContent({
   onProgressChange,
   onUnlockedIslandsChange,
   autoOpenIsland,
-  autoOpenPhase
+  autoOpenPhase,
+  meetingData,
+  onVideoStart
 }: {
   islands: Island[];
   userProgress: UserProgress;
@@ -137,6 +139,8 @@ function RPGSchatzkarteContent({
   onUnlockedIslandsChange?: (islands: string[]) => void;
   autoOpenIsland?: string | null;
   autoOpenPhase?: string | null;
+  meetingData?: MeetingData | null;
+  onVideoStart?: () => void;
 }) {
   // Lokaler State für TestPanel-Manipulationen
   const [userProgress, setUserProgress] = useState<UserProgress>(initialProgress);
@@ -971,6 +975,12 @@ function RPGSchatzkarteContent({
     }
   }, [onAction]);
 
+  const handleGoToLernreise = useCallback(() => {
+    if (onAction) {
+      onAction({ action: 'go_to_lernreise' });
+    }
+  }, [onAction]);
+
   return (
     <div className="rpg-schatzkarte">
       <header className="app-header">
@@ -981,9 +991,8 @@ function RPGSchatzkarteContent({
             <span className="title-decoration">⚔️</span>
           </h1>
 
-          {/* Header Buttons - Login/Logout/Landing */}
+          {/* Header Buttons */}
           <div className="header-buttons">
-            {/* Zurück zur Landing Page */}
             <button className="header-btn header-btn--landing" onClick={handleBackToLanding}>
               <span className="header-btn__icon">🏠</span>
               <span className="header-btn__text">Startseite</span>
@@ -997,12 +1006,24 @@ function RPGSchatzkarteContent({
               </button>
             )}
 
-            {/* Eingeloggt: Logout-Button zeigen */}
+            {/* Eingeloggt: Logout, Video, Lernreise */}
             {isLoggedIn && (
-              <button className="header-btn header-btn--logout" onClick={handleLogout}>
-                <span className="header-btn__icon">🚪</span>
-                <span className="header-btn__text">Logout</span>
-              </button>
+              <>
+                <button className="header-btn header-btn--logout" onClick={handleLogout}>
+                  <span className="header-btn__icon">🚪</span>
+                  <span className="header-btn__text">Logout</span>
+                </button>
+                {meetingData && meetingData.canJoin && meetingData.roomName && onVideoStart && (
+                  <button className="header-btn header-btn--video" onClick={onVideoStart}>
+                    <span className="header-btn__icon">📹</span>
+                    <span className="header-btn__text">Video starten</span>
+                  </button>
+                )}
+                <button className="header-btn header-btn--lernreise" onClick={handleGoToLernreise}>
+                  <span className="header-btn__icon">🎒</span>
+                  <span className="header-btn__text">Meine Lernreise</span>
+                </button>
+              </>
             )}
           </div>
         </div>
@@ -1489,6 +1510,7 @@ function RPGSchatzkarteStreamlit({ args }: ComponentProps) {
   const autoOpenPhase: string | null = args?.autoOpenPhase || null;
   const meetingData: MeetingData | null = args?.meetingData || null;
   const [currentTheme, setCurrentTheme] = useState<ThemeType>(loadSavedTheme);
+  const [videoForceJoin, setVideoForceJoin] = useState(false);
 
   // Streamlit-Höhe setzen - WICHTIG: muss immer aufgerufen werden
   useEffect(() => {
@@ -1540,11 +1562,14 @@ function RPGSchatzkarteStreamlit({ args }: ComponentProps) {
         onAction={handleAction}
         autoOpenIsland={autoOpenIsland}
         autoOpenPhase={autoOpenPhase}
+        meetingData={meetingData}
+        onVideoStart={() => setVideoForceJoin(true)}
       />
       {meetingData && meetingData.roomName && (
         <FloatingJitsiWidget
           meetingData={meetingData}
           onAction={handleAction}
+          forceJoin={videoForceJoin}
         />
       )}
     </div>

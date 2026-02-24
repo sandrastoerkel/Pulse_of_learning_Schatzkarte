@@ -87,9 +87,6 @@ with st.sidebar:
     st.page_link("pages/1_🗺️_Schatzkarte.py", label="🗺️ Schatzkarte", icon="🗺️")
     st.page_link("pages/9_🎒_Meine_Lernreise.py", label="🎒 Meine Lernreise", icon="🎒")
 
-# Button zu Meine Lernreise
-if st.button("🎒 Meine Lernreise", type="primary"):
-    st.switch_page("pages/9_🎒_Meine_Lernreise.py")
 
 # ===============================================================
 # ALTERSSTUFEN-WEICHE
@@ -545,6 +542,9 @@ if result:
         if is_preview_mode():
             end_preview_mode()
         st.switch_page("Home.py")
+
+    if action == "go_to_lernreise":
+        st.switch_page("pages/9_🎒_Meine_Lernreise.py")
 
     # Meeting Join/Leave Tracking
     if action == "meeting_join":
