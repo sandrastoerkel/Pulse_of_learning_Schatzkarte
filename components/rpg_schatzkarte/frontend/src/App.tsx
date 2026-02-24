@@ -1440,16 +1440,24 @@ function RPGSchatzkarteStreamlit({ args }: ComponentProps) {
   const meetingData: MeetingData | null = args?.meetingData || null;
   const [videoForceJoin, setVideoForceJoin] = useState(false);
 
-  // Streamlit-Höhe setzen - WICHTIG: muss immer aufgerufen werden
+  // Streamlit-Höhe dynamisch setzen
   useEffect(() => {
-    // Kleiner Delay um sicherzustellen, dass Streamlit die Komponente registriert hat
-    const timer = setTimeout(() => {
-      // Landing Page: Neue Combined-Version mit Jugend/Eltern Toggle (~6500px)
-      // Map: Kleinere Höhe für die Schatzkarte
-      const height = view === 'landing' ? 6500 : 700;
-      Streamlit.setFrameHeight(height);
-    }, 100);
-    return () => clearTimeout(timer);
+    const setHeight = () => {
+      if (view === 'landing') {
+        Streamlit.setFrameHeight(6500);
+      } else {
+        // Viewport-Höhe minus Streamlit-Overhead (Header/Padding ~80px)
+        const vh = window.innerHeight || document.documentElement.clientHeight;
+        Streamlit.setFrameHeight(Math.max(500, vh - 80));
+      }
+    };
+
+    const timer = setTimeout(setHeight, 100);
+    window.addEventListener('resize', setHeight);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', setHeight);
+    };
   }, [view]);
 
   const handleAction = useCallback((action: SchatzkartAction) => {
