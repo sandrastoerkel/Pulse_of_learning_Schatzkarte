@@ -922,11 +922,8 @@ body {
    ============================================ */
 
 .rpg-schatzkarte {
-  min-height: 100%;
-  height: 100%;
   background: var(--ui-base);
   font-family: var(--font-ui);
-  overflow: visible;
 }
 
 /* App Header */

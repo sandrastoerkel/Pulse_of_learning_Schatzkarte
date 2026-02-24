@@ -1440,37 +1440,30 @@ function RPGSchatzkarteStreamlit({ args }: ComponentProps) {
   const meetingData: MeetingData | null = args?.meetingData || null;
   const [videoForceJoin, setVideoForceJoin] = useState(false);
 
-  // Streamlit-Höhe = tatsächliche Inhaltshöhe (Streamlit scrollt die Seite)
+  // Streamlit-Höhe setzen
   useEffect(() => {
     const setHeight = () => {
       if (view === 'landing') {
         Streamlit.setFrameHeight(6500);
-      } else {
-        // Inhaltshöhe messen statt Viewport-Höhe
-        const body = document.body;
-        const html = document.documentElement;
-        const contentHeight = Math.max(
-          body.scrollHeight, body.offsetHeight,
-          html.clientHeight, html.scrollHeight, html.offsetHeight
-        );
-        Streamlit.setFrameHeight(Math.max(600, contentHeight));
+        return;
       }
+      // Content-Höhe messen (root-Element)
+      const root = document.getElementById('root');
+      const contentH = root ? root.scrollHeight : 0;
+      // Mindestens 700px, maximal was der Content braucht
+      Streamlit.setFrameHeight(Math.max(700, contentH + 20));
     };
 
-    // Initial + nach kurzem Delay (Content muss erst rendern)
-    const t1 = setTimeout(setHeight, 100);
-    const t2 = setTimeout(setHeight, 500);
-    const t3 = setTimeout(setHeight, 1500);
+    const t1 = setTimeout(setHeight, 200);
+    const t2 = setTimeout(setHeight, 1000);
     window.addEventListener('resize', setHeight);
 
-    // MutationObserver: Höhe anpassen wenn sich DOM ändert (z.B. Insel öffnen)
-    const observer = new MutationObserver(() => setTimeout(setHeight, 50));
-    observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+    const observer = new MutationObserver(() => setTimeout(setHeight, 100));
+    observer.observe(document.body, { childList: true, subtree: true });
 
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
-      clearTimeout(t3);
       window.removeEventListener('resize', setHeight);
       observer.disconnect();
     };

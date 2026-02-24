@@ -381,11 +381,11 @@ st.markdown("""
         height: 2.5rem !important;
     }
 
-    /* iframe auf volle Bildschirmhoehe */
+    /* iframe: Mindesthoehe + Scrollbar als Fallback */
     iframe[title="components.rpg_schatzkarte.rpg_schatzkarte"] {
-        min-height: calc(100vh - 60px) !important;
-        height: calc(100vh - 60px) !important;
+        min-height: 700px;
         border: none !important;
+        overflow: auto !important;
     }
 
     /* Popover fuer Altersstufen-Wechsler positionieren */
