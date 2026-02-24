@@ -84,6 +84,7 @@ else:
 # ===============================================================
 
 with st.sidebar:
+    st.caption("Zum Schliessen auf den Pfeil klicken")
     st.page_link("pages/1_🗺️_Schatzkarte.py", label="🗺️ Schatzkarte", icon="🗺️")
     st.page_link("pages/9_🎒_Meine_Lernreise.py", label="🎒 Meine Lernreise", icon="🎒")
 
@@ -410,6 +411,60 @@ st.markdown("""
     /* Element-Container ohne extra Spacing */
     .element-container {
         margin: 0 !important;
+    }
+
+    /* ===== SIDEBAR TOGGLE BUTTON - gross und sichtbar ===== */
+
+    /* Eingeklappter Zustand: grosser runder Button mit Puls */
+    [data-testid="collapsedControl"],
+    [data-testid="stSidebarCollapseButton"] {
+        z-index: 99999 !important;
+    }
+
+    [data-testid="collapsedControl"] button,
+    [data-testid="stSidebarCollapseButton"] button {
+        width: 48px !important;
+        height: 48px !important;
+        background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%) !important;
+        border: 3px solid #fff !important;
+        border-radius: 50% !important;
+        box-shadow: 0 4px 15px rgba(255, 165, 0, 0.5) !important;
+        animation: sidebar-pulse 2.5s ease-in-out infinite !important;
+        transition: transform 0.2s ease !important;
+    }
+
+    [data-testid="collapsedControl"] button:hover,
+    [data-testid="stSidebarCollapseButton"] button:hover {
+        transform: scale(1.15) !important;
+        box-shadow: 0 6px 20px rgba(255, 165, 0, 0.7) !important;
+    }
+
+    [data-testid="collapsedControl"] svg,
+    [data-testid="stSidebarCollapseButton"] svg {
+        width: 24px !important;
+        height: 24px !important;
+        color: #1a237e !important;
+    }
+
+    @keyframes sidebar-pulse {
+        0%, 100% {
+            box-shadow: 0 4px 15px rgba(255, 165, 0, 0.5),
+                        0 0 0 0 rgba(255, 215, 0, 0.4);
+        }
+        50% {
+            box-shadow: 0 4px 15px rgba(255, 165, 0, 0.5),
+                        0 0 0 10px rgba(255, 215, 0, 0);
+        }
+    }
+
+    /* Sidebar offen: Abdunklung des Hintergrunds als Hinweis */
+    [data-testid="stSidebar"][aria-expanded="true"] ~ section.main::before {
+        content: "";
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.25);
+        z-index: 999;
+        pointer-events: none;
     }
 
     """  + """
