@@ -1416,80 +1416,9 @@ function RPGSchatzkarteContent({
 }
 
 // Verfügbare Themes
-type ThemeType = 'rpg' | 'nintendo' | 'duolingo' | 'space';
+type ThemeType = 'rpg';
 
-const THEMES: { id: ThemeType; name: string; icon: string }[] = [
-  { id: 'rpg', name: 'RPG Fantasy', icon: '⚔️' },
-  { id: 'nintendo', name: 'Nintendo Style', icon: '🎮' },
-  { id: 'duolingo', name: 'Duolingo Style', icon: '🦉' },
-  { id: 'space', name: 'Weltraum', icon: '🚀' }
-];
-
-// Theme aus localStorage laden
-function loadSavedTheme(): ThemeType {
-  try {
-    const saved = localStorage.getItem('schatzkarte_theme');
-    if (saved && THEMES.some(t => t.id === saved)) {
-      return saved as ThemeType;
-    }
-  } catch (e) {
-    // localStorage nicht verfügbar
-  }
-  return 'nintendo';
-}
-
-// Theme in localStorage speichern
-function saveTheme(theme: ThemeType) {
-  try {
-    localStorage.setItem('schatzkarte_theme', theme);
-  } catch (e) {
-    // localStorage nicht verfügbar
-  }
-}
-
-// Theme-Switcher Komponente
-function ThemeSwitcher({
-  currentTheme,
-  onThemeChange
-}: {
-  currentTheme: ThemeType;
-  onThemeChange: (theme: ThemeType) => void;
-}) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <div className="theme-switcher-container">
-      <button
-        className="theme-toggle-btn"
-        onClick={() => setIsOpen(!isOpen)}
-        title="Design ändern"
-      >
-        🎨
-      </button>
-
-      {isOpen && (
-        <div className="theme-dropdown">
-          <div className="theme-dropdown-header">Design wählen</div>
-          {THEMES.map(theme => (
-            <button
-              key={theme.id}
-              className={`theme-option ${currentTheme === theme.id ? 'active' : ''}`}
-              onClick={() => {
-                onThemeChange(theme.id);
-                saveTheme(theme.id);
-                setIsOpen(false);
-              }}
-            >
-              <span className="theme-icon">{theme.icon}</span>
-              <span className="theme-name">{theme.name}</span>
-              {currentTheme === theme.id && <span className="theme-check">✓</span>}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
+const FIXED_THEME: ThemeType = 'rpg';
 
 // Streamlit-Wrapper Komponente
 function RPGSchatzkarteStreamlit({ args }: ComponentProps) {
@@ -1509,7 +1438,6 @@ function RPGSchatzkarteStreamlit({ args }: ComponentProps) {
   const autoOpenIsland: string | null = args?.autoOpenIsland || null;
   const autoOpenPhase: string | null = args?.autoOpenPhase || null;
   const meetingData: MeetingData | null = args?.meetingData || null;
-  const [currentTheme, setCurrentTheme] = useState<ThemeType>(loadSavedTheme);
   const [videoForceJoin, setVideoForceJoin] = useState(false);
 
   // Streamlit-Höhe setzen - WICHTIG: muss immer aufgerufen werden
@@ -1544,11 +1472,7 @@ function RPGSchatzkarteStreamlit({ args }: ComponentProps) {
 
   // Schatzkarte anzeigen (default)
   return (
-    <div className={`theme-${currentTheme}`}>
-      <ThemeSwitcher
-        currentTheme={currentTheme}
-        onThemeChange={setCurrentTheme}
-      />
+    <div className={`theme-${FIXED_THEME}`}>
       <RPGSchatzkarteContent
         islands={islands}
         userProgress={userProgress}
@@ -1578,7 +1502,6 @@ function RPGSchatzkarteStreamlit({ args }: ComponentProps) {
 
 // Development-Modus Komponente (ohne Streamlit)
 function RPGSchatzkarteDev() {
-  const [currentTheme, setCurrentTheme] = useState<ThemeType>(loadSavedTheme);
   const [ageGroup, setAgeGroup] = useState<AgeGroup>('grundschule');
   const [showLanding, setShowLanding] = useState(true); // Starte mit Landing Page
 
@@ -1595,12 +1518,7 @@ function RPGSchatzkarteDev() {
   }
 
   return (
-    <div className={`theme-${currentTheme}`}>
-      <ThemeSwitcher
-        currentTheme={currentTheme}
-        onThemeChange={setCurrentTheme}
-      />
-
+    <div className={`theme-${FIXED_THEME}`}>
       {/* Button um zurück zur Landing Page zu gehen */}
       <button
         onClick={() => setShowLanding(true)}

@@ -368,7 +368,7 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
     );
   }
 
-  // === JOIN BUTTON STATE ===
+  // === JOIN BUTTON STATE (Video-Start ist jetzt im Header) ===
   if (widgetState === 'join-button') {
     if (!meetingData.canJoin && meetingData.timeStatus?.reason === 'too_early') {
       const mins = meetingData.timeStatus.minutesUntilStart ?? 0;
@@ -382,23 +382,8 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
       );
     }
 
-    if (!meetingData.canJoin) return null;
-
-    return (
-      <div className="fjw fjw--join-buttons">
-        <button className="fjw__join-btn" onClick={handleJoin}>
-          <span className="fjw__join-icon">&#128249;</span>
-          Video-Treffen beitreten
-        </button>
-        <button
-          className="fjw__newtab-btn"
-          onClick={handleOpenInNewTab}
-          title="In neuem Tab oeffnen"
-        >
-          &#8599;
-        </button>
-      </div>
-    );
+    // Kein Floating-Button mehr - Video wird ueber Header-Button gestartet
+    return null;
   }
 
   // === MINIMIZED STATE ===
