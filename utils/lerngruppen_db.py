@@ -1050,7 +1050,7 @@ def get_jitsi_config(role: str) -> Dict:
     """Jitsi-Konfiguration basierend auf Benutzerrolle (coach/kind)."""
     base_buttons = [
         'microphone', 'camera', 'desktop', 'hangup',
-        'chat', 'raisehand', 'tileview'
+        'chat', 'raisehand', 'tileview', 'select-background'
     ]
     coach_buttons = base_buttons + [
         'mute-everyone', 'participants-pane', 'settings'
