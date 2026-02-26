@@ -777,9 +777,8 @@ def get_group_progress(group_id: str) -> Dict[str, Any]:
 
 def generate_secure_room_name(group_id: str, scheduled_start: str) -> str:
     """Pattern: 'schatzkarte-{sha256[:12]}'
-    Deterministisch: gleicher Gruppen-ID + gleicher Tag = gleicher Raum."""
-    date_str = scheduled_start.split('T')[0] if 'T' in scheduled_start else scheduled_start.split(' ')[0]
-    hash_input = f"{group_id}-{date_str}-{_get_room_secret()}"
+    Deterministisch: gleicher Gruppen-ID + gleicher Startzeit = gleicher Raum."""
+    hash_input = f"{group_id}-{scheduled_start}-{_get_room_secret()}"
     hash_value = hashlib.sha256(hash_input.encode()).hexdigest()[:12]
     return f"schatzkarte-{hash_value}"
 
@@ -791,11 +790,20 @@ def schedule_meeting(
     time_of_day: str,
     duration_minutes: int = 45,
     recurrence: str = 'einmalig',
-    title: str = None
+    title: str = None,
+    specific_date=None
 ) -> Optional[Dict]:
-    """Plant ein Meeting. Nutzt Gruppen-Zeitzone für Datumsberechnung."""
+    """Plant ein Meeting. Nutzt specific_date wenn angegeben, sonst berechnet."""
     group_tz = get_group_timezone(group_id)
-    next_date = calculate_next_meeting_date(day_of_week, time_of_day, group_tz)
+    if specific_date:
+        # Exaktes Datum verwenden statt zu berechnen
+        hour, minute = map(int, time_of_day.split(':'))
+        next_date = datetime(
+            specific_date.year, specific_date.month, specific_date.day,
+            hour, minute, 0, tzinfo=ZoneInfo(group_tz)
+        )
+    else:
+        next_date = calculate_next_meeting_date(day_of_week, time_of_day, group_tz, duration_minutes)
     end_date = next_date + timedelta(minutes=duration_minutes)
 
     meeting_id = hashlib.md5(
@@ -832,14 +840,18 @@ def schedule_meeting(
             "recurrence_type": recurrence
         }
     except Exception as e:
+        import traceback
         print(f"Error scheduling meeting: {e}")
+        traceback.print_exc()
         return None
 
 
 def calculate_next_meeting_date(
-    day_of_week: int, time_of_day: str, timezone: str = "Europe/Berlin"
+    day_of_week: int, time_of_day: str, timezone: str = "Europe/Berlin",
+    duration_minutes: int = 0
 ) -> datetime:
-    """Berechnet nächstes Datum für Wochentag/Uhrzeit. Timezone-aware."""
+    """Berechnet nächstes Datum für Wochentag/Uhrzeit. Timezone-aware.
+    Berücksichtigt duration_minutes: solange das Meeting noch laufen würde, wird heute geplant."""
     tz = ZoneInfo(timezone)
     now = datetime.now(tz)
     hour, minute = map(int, time_of_day.split(':'))
@@ -849,7 +861,8 @@ def calculate_next_meeting_date(
         days_ahead += 7
     elif days_ahead == 0:
         target_time = now.replace(hour=hour, minute=minute, second=0, microsecond=0)
-        if now >= target_time:
+        target_end = target_time + timedelta(minutes=duration_minutes)
+        if now >= target_end:
             days_ahead = 7
 
     next_date = now + timedelta(days=days_ahead)
@@ -866,7 +879,8 @@ def renew_recurring_meeting(meeting: Dict) -> Optional[Dict]:
 
     group_tz = get_group_timezone(meeting['group_id'])
     next_date = calculate_next_meeting_date(
-        meeting['day_of_week'], meeting['time_of_day'], group_tz
+        meeting['day_of_week'], meeting['time_of_day'], group_tz,
+        meeting.get('duration_minutes', 0)
     )
     end_date = next_date + timedelta(minutes=meeting['duration_minutes'])
 
@@ -1116,10 +1130,13 @@ def record_meeting_leave(meeting_id: str, user_id: str) -> bool:
 
 
 def cancel_meeting(meeting_id: str) -> bool:
-    """Storniert ein Meeting (setzt status auf 'cancelled')."""
+    """Storniert ein Meeting und gibt den Raumnamen frei."""
     try:
         result = get_db().table("scheduled_meetings") \
-            .update({"status": "cancelled"}) \
+            .update({
+                "status": "cancelled",
+                "jitsi_room_name": f"cancelled-{meeting_id}"
+            }) \
             .eq("id", meeting_id) \
             .execute()
         return len(result.data) > 0

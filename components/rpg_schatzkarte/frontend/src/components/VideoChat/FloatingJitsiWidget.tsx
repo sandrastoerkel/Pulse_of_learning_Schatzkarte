@@ -2,6 +2,10 @@
 // Floating Jitsi Video-Widget for the Schatzkarte
 // Uses JaaS (8x8.vc) with JWT authentication
 // Loads external_api.js directly from 8x8.vc to avoid SDK caching issues
+//
+// WICHTIG: Jitsi wird einmal geladen und bleibt aktiv (auch minimiert).
+// Audio laeuft weiter, damit Kinder den Coach immer hoeren koennen.
+// Nur der X-Button beendet die Verbindung.
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { SchatzkartAction } from '../../types';
@@ -27,7 +31,7 @@ export interface MeetingData {
   appId?: string;
 }
 
-type WidgetState = 'join-button' | 'small' | 'large' | 'minimized' | 'waiting';
+type WidgetView = 'join-button' | 'small' | 'large' | 'minimized' | 'waiting';
 
 interface FloatingJitsiWidgetProps {
   meetingData: MeetingData;
@@ -75,15 +79,18 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
 }) => {
   const apiRef = useRef<any>(null);
   const hasJoinedRef = useRef(false);
+  const isLeavingRef = useRef(false); // Flag: nur true wenn X-Button geklickt
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetRef = useRef<HTMLDivElement>(null);
-  const [widgetState, setWidgetState] = useState<WidgetState>(() => {
+  const [view, setView] = useState<WidgetView>(() => {
     if (!meetingData.canJoin && meetingData.timeStatus?.reason === 'too_early') {
       const mins = meetingData.timeStatus.minutesUntilStart ?? 999;
       return mins <= 30 ? 'waiting' : 'join-button';
     }
     return 'join-button';
   });
+  // Jitsi ist aktiv wenn wir jemals in einen Video-State gewechselt haben
+  const [jitsiActive, setJitsiActive] = useState(false);
   const [jitsiLoaded, setJitsiLoaded] = useState(false);
   const [minutesUntil, setMinutesUntil] = useState(
     meetingData.timeStatus?.minutesUntilStart ?? 0
@@ -96,22 +103,25 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
   const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null);
   const resizeRef = useRef<{ startX: number; startY: number; origW: number; origH: number } | null>(null);
 
+  const isVideoView = view === 'small' || view === 'large';
+
   // Force join from external trigger (Header-Button)
   useEffect(() => {
-    if (forceJoin && widgetState === 'join-button' && meetingData.canJoin) {
-      setWidgetState('small');
+    if (forceJoin && view === 'join-button' && meetingData.canJoin) {
+      setView('small');
+      setJitsiActive(true);
     }
   }, [forceJoin]);
 
   // Place widget at bottom-right on first render into video state
   useEffect(() => {
-    if ((widgetState === 'small' || widgetState === 'large') && pos.x === -1) {
+    if (isVideoView && pos.x === -1) {
       setPos({
         x: window.innerWidth - size.width - 24,
         y: window.innerHeight - size.height - 24
       });
     }
-  }, [widgetState]);
+  }, [view]);
 
   // --- Shared drag/resize move+up listeners ---
   useEffect(() => {
@@ -177,9 +187,9 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
     e.stopPropagation();
   }, [size]);
 
-  // Load Jitsi when widget enters video state
+  // Load Jitsi ONCE when jitsiActive becomes true — never dispose on view changes
   useEffect(() => {
-    if (widgetState !== 'small' && widgetState !== 'large') return;
+    if (!jitsiActive) return;
     if (apiRef.current) return; // Already loaded
     if (!meetingData.appId || !meetingData.roomName) return;
 
@@ -236,37 +246,39 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
           }
         });
 
+        // Nur bei echtem Leave (X-Button) reagieren, nicht bei Minimize/Resize
         api.addListener('videoConferenceLeft', () => {
           if (!hasJoinedRef.current) return;
-          handleLeaveInternal();
+          if (!isLeavingRef.current) return; // Ignorieren wenn nicht explizit verlassen
+          doLeaveCleanup();
         });
 
         api.addListener('readyToClose', () => {
-          if (hasJoinedRef.current) handleLeaveInternal();
+          if (hasJoinedRef.current && isLeavingRef.current) doLeaveCleanup();
         });
       })
       .catch((err) => {
         console.error('[JaaS] Failed to load Jitsi API:', err);
       });
 
+    // Cleanup NUR bei Component-Unmount (nicht bei View-Wechsel!)
     return () => {
-      // Cleanup on unmount
       if (apiRef.current) {
         try { apiRef.current.dispose(); } catch {}
         apiRef.current = null;
       }
     };
-  }, [widgetState]);
+  }, [jitsiActive]); // Nur von jitsiActive abhaengig, NICHT von view!
 
   // Update waiting countdown
   useEffect(() => {
-    if (widgetState !== 'waiting') return;
+    if (view !== 'waiting') return;
 
     const interval = setInterval(() => {
       setMinutesUntil(prev => {
         if (prev <= 1) {
           clearInterval(interval);
-          setWidgetState('join-button');
+          setView('join-button');
           return 0;
         }
         return prev - 1;
@@ -274,16 +286,19 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
     }, 60_000);
 
     return () => clearInterval(interval);
-  }, [widgetState]);
+  }, [view]);
 
-  const handleLeaveInternal = useCallback(() => {
+  // Cleanup nach echtem Verlassen
+  const doLeaveCleanup = useCallback(() => {
     if (apiRef.current) {
       try { apiRef.current.dispose(); } catch {}
       apiRef.current = null;
     }
     setJitsiLoaded(false);
-    setWidgetState('join-button');
+    setJitsiActive(false);
+    setView('join-button');
     hasJoinedRef.current = false;
+    isLeavingRef.current = false;
     if (onAction) {
       onAction({
         action: 'meeting_leave',
@@ -295,7 +310,8 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
 
   // Join the meeting (switch to small view)
   const handleJoin = useCallback(() => {
-    setWidgetState('small');
+    setView('small');
+    setJitsiActive(true);
   }, []);
 
   // Open in a new tab
@@ -310,18 +326,16 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
     }
   }, [meetingData.roomName, meetingData.jwt, meetingData.appId]);
 
-  // Toggle between small and large
+  // Toggle between small and large — Jitsi bleibt aktiv!
   const handleToggleSize = useCallback(() => {
-    setWidgetState(prev => {
+    setView(prev => {
       if (prev === 'small') {
-        // Going large: center it
         const lw = Math.round(window.innerWidth * 0.8);
         const lh = Math.round(window.innerHeight * 0.8);
         setSize({ width: lw, height: lh });
         setPos({ x: Math.round((window.innerWidth - lw) / 2), y: Math.round((window.innerHeight - lh) / 2) });
         return 'large';
       } else {
-        // Going small: restore default bottom-right
         setSize(SMALL_DEFAULT);
         setPos({ x: window.innerWidth - SMALL_DEFAULT.width - 24, y: window.innerHeight - SMALL_DEFAULT.height - 24 });
         return 'small';
@@ -329,27 +343,37 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
     });
   }, []);
 
-  // Minimize
+  // Minimize — Jitsi bleibt aktiv, Audio laeuft weiter!
   const handleMinimize = useCallback(() => {
-    setWidgetState('minimized');
+    setView('minimized');
   }, []);
 
   // Restore from minimized
   const handleRestore = useCallback(() => {
-    setWidgetState('small');
-  }, []);
+    setView('small');
+    // Position neu setzen falls noetig
+    if (pos.x === -1) {
+      setPos({
+        x: window.innerWidth - size.width - 24,
+        y: window.innerHeight - size.height - 24
+      });
+    }
+  }, [pos, size]);
 
-  // Leave the meeting
+  // Leave the meeting — NUR hier wird Jitsi wirklich beendet
   const handleLeave = useCallback(() => {
+    isLeavingRef.current = true;
     if (apiRef.current) {
       try {
         apiRef.current.executeCommand('hangup');
       } catch {
-        // ignore
+        // hangup hat nicht geklappt → direkt aufräumen
+        doLeaveCleanup();
       }
+    } else {
+      doLeaveCleanup();
     }
-    handleLeaveInternal();
-  }, [handleLeaveInternal]);
+  }, [doLeaveCleanup]);
 
   // Don't render if no meeting or ended
   if (!meetingData.roomName || meetingData.timeStatus?.reason === 'ended' || meetingData.timeStatus?.reason === 'no_meeting') {
@@ -357,7 +381,7 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
   }
 
   // === WAITING STATE ===
-  if (widgetState === 'waiting') {
+  if (view === 'waiting') {
     return (
       <div className="fjw fjw--waiting">
         <span className="fjw__waiting-icon">&#9203;</span>
@@ -369,7 +393,7 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
   }
 
   // === JOIN BUTTON STATE (Video-Start ist jetzt im Header) ===
-  if (widgetState === 'join-button') {
+  if (view === 'join-button') {
     if (!meetingData.canJoin && meetingData.timeStatus?.reason === 'too_early') {
       const mins = meetingData.timeStatus.minutesUntilStart ?? 0;
       return (
@@ -386,19 +410,27 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
     return null;
   }
 
-  // === MINIMIZED STATE ===
-  if (widgetState === 'minimized') {
+  // === MINIMIZED STATE — Jitsi Container bleibt im DOM (versteckt) ===
+  if (view === 'minimized') {
     return (
-      <button className="fjw fjw--minimized" onClick={handleRestore}>
-        <span className="fjw__min-icon">&#128249;</span>
-        <span className="fjw__min-text">Video-Treffen</span>
-        <span className="fjw__min-arrow">&#9650;</span>
-      </button>
+      <>
+        {/* Versteckter Jitsi-Container — Audio laeuft weiter! */}
+        <div style={{ position: 'fixed', left: -9999, top: -9999, width: 1, height: 1, overflow: 'hidden' }}>
+          <div ref={containerRef} style={{ width: 320, height: 280 }} />
+        </div>
+
+        {/* Sichtbare Minimiert-Leiste */}
+        <button className="fjw fjw--minimized" onClick={handleRestore}>
+          <span className="fjw__min-icon">&#128249;</span>
+          <span className="fjw__min-text">Video-Treffen</span>
+          <span className="fjw__min-arrow">&#9650;</span>
+        </button>
+      </>
     );
   }
 
   // === SMALL & LARGE STATES (with Jitsi) ===
-  const isLarge = widgetState === 'large';
+  const isLarge = view === 'large';
 
   return (
     <div
@@ -409,7 +441,6 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
         top: pos.y >= 0 ? pos.y : undefined,
         width: size.width,
         height: size.height,
-        // Reset CSS-class positioning
         bottom: 'auto',
         right: 'auto',
         transform: 'none',
@@ -428,30 +459,30 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
           <button
             className="fjw__ctrl-btn"
             onClick={handleToggleSize}
-            title={isLarge ? 'Verkleinern' : 'Vergroessern'}
+            title={isLarge ? 'Kleines Fenster' : 'Grosses Fenster'}
           >
-            {isLarge ? '\u2199' : '\u2197'}
+            {isLarge ? '⧉' : '□'}
           </button>
           <button
             className="fjw__ctrl-btn"
             onClick={handleOpenInNewTab}
             title="In neuem Tab oeffnen"
           >
-            &#8599;&#xFE0E;
+            ↗
           </button>
           <button
             className="fjw__ctrl-btn"
             onClick={handleMinimize}
-            title="Minimieren"
+            title="Minimieren (Audio laeuft weiter)"
           >
-            &#9660;
+            ─
           </button>
           <button
             className="fjw__ctrl-btn fjw__ctrl-btn--close"
             onClick={handleLeave}
             title="Treffen verlassen"
           >
-            &#10005;
+            ✕
           </button>
         </div>
       </div>

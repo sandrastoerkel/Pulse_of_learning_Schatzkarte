@@ -368,9 +368,16 @@ def login_user(display_name: str, age_group: str = None, avatar_style: str = Non
     if user_role in ['coach', 'admin', 'paedagoge', 'pädagoge']:
         st.session_state.show_admin_user_list = True
 
-    # Auto-Login Cookie setzen
+    # Cookie NICHT sofort setzen (components.html() im Button-Callback
+    # verursacht Login-Loop auf Schatzkarte). Stattdessen als pending markieren —
+    # wird beim naechsten normalen Render in render_user_login() gesetzt.
     token = _create_login_token(user['user_id'])
-    _set_cookie_js(COOKIE_NAME, token, COOKIE_MAX_AGE_DAYS)
+    st.session_state._pending_login_cookie = token
+
+    # Registrierungs-State aufräumen (verhindert Login-Loop auf Schatzkarte)
+    for key in ["registration_step", "registration_name", "registration_age", "registration_password"]:
+        if key in st.session_state:
+            del st.session_state[key]
 
     return user
 
@@ -407,6 +414,11 @@ def render_user_login(show_stats: bool = True, show_info_bar: bool = True):
     if is_preview_mode():
         render_preview_banner()
         return
+
+    # Pending Cookie setzen (von login_user() aufgeschoben)
+    if st.session_state.get("_pending_login_cookie"):
+        _set_cookie_js(COOKIE_NAME, st.session_state._pending_login_cookie, COOKIE_MAX_AGE_DAYS)
+        del st.session_state["_pending_login_cookie"]
 
     # Auto-Login via Cookie versuchen
     try_auto_login()
@@ -516,21 +528,7 @@ def render_login_form():
                         st.rerun()
 
             with col2:
-                # Quick-Login Liste nur für Admins/Coaches sichtbar
-                show_user_list = st.session_state.get("show_admin_user_list", False)
-
-                if show_user_list:
-                    existing_users = get_all_users()
-                    if existing_users:
-                        st.markdown("**🔄 Zurückkehrende Schüler:**")
-                        for user in existing_users[:5]:
-                            display = user.get('display_name', 'Unbekannt')
-                            level = user.get('level', 1)
-
-                            if st.button(f"👤 {display} (Lvl {level})", key=f"quick_login_{user['user_id']}",
-                                       use_container_width=True):
-                                login_user(display)
-                                st.rerun()
+                pass
 
         # === SCHRITT 2: Altersstufe wählen ===
         elif st.session_state.registration_step == 2:

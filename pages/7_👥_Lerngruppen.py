@@ -17,6 +17,7 @@ import json
 import streamlit as st
 import streamlit.components.v1 as components
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 # Lokale Imports
 try:
@@ -593,7 +594,25 @@ def render_next_meeting(group_id: str, coach_id: str, coach_tz: str):
             ti = convert_meeting_time_display(m['time_of_day'], m['day_of_week'], group_tz, coach_tz)
             status_icon = "🟢" if m['status'] == 'scheduled' else "⚪"
             dual = f" (= {ti['coach_time']} deine Zeit)" if group_tz != coach_tz else ""
-            st.markdown(f"{status_icon} **{ti['group_day_name']}**, {ti['group_time']} Uhr{dual} — {m.get('title', 'Treffen')} ({m['duration_minutes']} Min.)")
+            recurrence_label = "🔄" if m.get('recurrence_type') == 'woechentlich' else ""
+
+            col_info, col_cancel = st.columns([5, 1])
+            with col_info:
+                st.markdown(f"{status_icon} {recurrence_label} **{ti['group_day_name']}**, {ti['group_time']} Uhr{dual} — {m.get('title', 'Treffen')} ({m['duration_minutes']} Min.)")
+            with col_cancel:
+                confirm_key = f"confirm_cancel_list_{m['id']}"
+                if st.session_state.get(confirm_key):
+                    if st.button("✅ Ja", key=f"yes_list_{m['id']}"):
+                        if cancel_meeting(m['id']):
+                            st.session_state[confirm_key] = False
+                            st.rerun()
+                    if st.button("❌ Nein", key=f"no_list_{m['id']}"):
+                        st.session_state[confirm_key] = False
+                        st.rerun()
+                else:
+                    if st.button("🗑️", key=f"cancel_list_{m['id']}", help="Treffen absagen"):
+                        st.session_state[confirm_key] = True
+                        st.rerun()
     else:
         st.caption("Keine weiteren Treffen geplant.")
 
@@ -732,7 +751,17 @@ def render_schedule_meeting(group_id: str, coach_id: str, coach_tz: str):
 
     group_tz = get_group_timezone(group_id)
     if group_tz != coach_tz:
-        st.info(f"⏰ Uhrzeiten werden in der **Gruppen-Zeitzone** eingegeben ({group_tz.split('/')[-1]})")
+        # Aktuellen Zeitunterschied berechnen
+        now = datetime.now(ZoneInfo(group_tz))
+        now_coach = now.astimezone(ZoneInfo(coach_tz))
+        offset_hours = (now_coach.utcoffset().total_seconds() - now.utcoffset().total_seconds()) / 3600
+        offset_str = f"+{offset_hours:g}" if offset_hours >= 0 else f"{offset_hours:g}"
+        coach_city = coach_tz.split('/')[-1].replace('_', ' ')
+        group_city = group_tz.split('/')[-1].replace('_', ' ')
+        st.info(f"⏰ Uhrzeiten werden in **{group_city}**-Zeit eingegeben — deine Zeit ({coach_city}) ist **{offset_str}h** davon")
+
+    # Aktuelles Datum in Gruppen-Zeitzone für Datumspicker
+    now_group = datetime.now(ZoneInfo(group_tz))
 
     with st.form("schedule_meeting_form"):
         title = st.text_input(
@@ -742,11 +771,18 @@ def render_schedule_meeting(group_id: str, coach_id: str, coach_tz: str):
 
         col1, col2 = st.columns(2)
         with col1:
-            day = st.selectbox("📅 Wochentag:", DAYS_OF_WEEK, index=0)
-            day_index = DAYS_OF_WEEK.index(day)
+            meeting_date = st.date_input(
+                "📅 Datum:",
+                value=now_group.date(),
+                min_value=now_group.date(),
+                format="DD.MM.YYYY",
+                help="Wähle das genaue Datum für das Treffen"
+            )
         with col2:
+            coach_city_short = coach_tz.split('/')[-1].replace('_', ' ') if group_tz != coach_tz else ""
             time = st.time_input("⏰ Uhrzeit:", value=None,
-                                 help="Uhrzeit in der Gruppen-Zeitzone")
+                                 help=f"Uhrzeit in der Gruppen-Zeitzone ({group_tz.split('/')[-1].replace('_', ' ')})"
+                                      + (f" — wird nach {coach_city_short} umgerechnet" if coach_city_short else ""))
 
         duration = st.select_slider(
             "⏱️ Dauer:", options=[15, 30, 45, 60, 90], value=30,
@@ -767,24 +803,27 @@ def render_schedule_meeting(group_id: str, coach_id: str, coach_tz: str):
                 st.error("Bitte wähle eine Uhrzeit aus.")
             else:
                 time_str = time.strftime("%H:%M")
+                day_index = meeting_date.weekday()
+                day_name = DAYS_OF_WEEK[day_index]
                 result = schedule_meeting(
                     group_id=group_id, coach_id=coach_id,
                     day_of_week=day_index, time_of_day=time_str,
                     duration_minutes=duration, recurrence=recurrence,
-                    title=title or "Lerngruppen-Treffen"
+                    title=title or "Lerngruppen-Treffen",
+                    specific_date=meeting_date
                 )
 
                 if result:
-                    st.success(f"🎉 Treffen für {day} um {time_str} Uhr geplant!")
-
-                    # Zeitzonen-Info anzeigen
+                    date_str = meeting_date.strftime("%d.%m.%Y")
                     if group_tz != coach_tz:
                         ti = convert_meeting_time_display(time_str, day_index, group_tz, coach_tz)
-                        st.info(f"Das ist {ti['coach_day_name']}, {ti['coach_time']} Uhr in deiner Zeitzone.")
-
-                    st.balloons()
-                else:
-                    st.error("Fehler beim Planen des Treffens.")
+                        coach_city = coach_tz.split('/')[-1].replace('_', ' ')
+                        st.toast(f"🎉 Treffen geplant: {day_name} {date_str}, {time_str} Uhr (Kinder) = {ti['coach_day_name']} {ti['coach_time']} Uhr ({coach_city})")
+                    else:
+                        st.toast(f"🎉 Treffen für {day_name} {date_str} um {time_str} Uhr geplant!")
+                    st.rerun()
+                elif result is None:
+                    st.error("Fehler beim Planen des Treffens. Bitte prüfe die Server-Logs.")
 
 
 # ============================================

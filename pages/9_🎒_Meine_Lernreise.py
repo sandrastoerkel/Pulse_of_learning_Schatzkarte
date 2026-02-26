@@ -12,7 +12,9 @@ Features:
 - Ablauf-Ueberblick (12 Wochen)
 """
 
+import json
 import streamlit as st
+import streamlit.components.v1 as components
 from datetime import datetime
 
 try:
@@ -25,6 +27,7 @@ try:
         get_invitation, use_invitation,
         get_next_meeting, get_group_meetings,
         get_group_week, get_meeting_access,
+        generate_jaas_jwt, record_meeting_join,
         send_welcome_email,
     )
 except ImportError as e:
@@ -381,28 +384,12 @@ def _render_next_meeting_countdown(group_id: str):
     """, unsafe_allow_html=True)
 
 
-def _build_jitsi_url(room_name: str) -> str:
-    """Baut die Jitsi-URL mit kindgerechter Config via URL-Fragment."""
-    config = (
-        "#config.startWithAudioMuted=true"
-        "&config.startWithVideoMuted=false"
-        "&config.prejoinPageEnabled=true"
-        "&config.disableDeepLinking=true"
-        "&config.defaultLanguage=%22de%22"
-        "&interfaceConfig.SHOW_JITSI_WATERMARK=false"
-        "&interfaceConfig.SHOW_BRAND_WATERMARK=false"
-        "&interfaceConfig.SHOW_POWERED_BY=false"
-        "&interfaceConfig.MOBILE_APP_PROMO=false"
-        "&interfaceConfig.TOOLBAR_ALWAYS_VISIBLE=true"
-    )
-    return f"https://meet.jit.si/{room_name}{config}"
-
-
 def _render_action_buttons(group_id: str, user_id: str):
-    """Schatzkarte-Button (immer aktiv) + Video-Treffen-Button (neuer Tab / ausgegraut)."""
+    """Schatzkarte-Button (immer aktiv) + Video-Treffen-Button (JaaS eingebettet / ausgegraut)."""
     access = get_meeting_access(group_id, user_id, 'kind')
     meeting_active = access.get("canJoin", False)
     room_name = access.get("roomName")
+    meeting = access.get("meeting")
 
     col_a, col_b = st.columns(2)
 
@@ -412,29 +399,10 @@ def _render_action_buttons(group_id: str, user_id: str):
 
     with col_b:
         if meeting_active and room_name:
-            jitsi_url = _build_jitsi_url(room_name)
-            # Goldener Button als Link — oeffnet Jitsi in neuem Tab
-            st.markdown(f"""
-            <a href="{jitsi_url}" target="_blank" rel="noopener noreferrer"
-               style="display: block; text-align: center; padding: 14px 20px;
-                      background: linear-gradient(135deg, #FFD700, #FFA500);
-                      color: #1a1a2e; font-size: 18px; font-weight: bold;
-                      border-radius: 12px; text-decoration: none;
-                      box-shadow: 0 4px 15px rgba(255, 165, 0, 0.4);
-                      transition: transform 0.2s, box-shadow 0.2s;">
-                Video-Treffen beitreten
-            </a>
-            <p style="text-align: center; font-size: 0.85em; color: #6b7280; margin-top: 8px;">
-                Oeffnet sich in einem neuen Tab.<br>
-                Du kannst zwischen den Tabs hin- und herwechseln!
-            </p>
-            <style>
-            @keyframes glow {{
-                0%, 100% {{ box-shadow: 0 4px 15px rgba(255, 165, 0, 0.4); }}
-                50% {{ box-shadow: 0 4px 25px rgba(255, 165, 0, 0.7); }}
-            }}
-            </style>
-            """, unsafe_allow_html=True)
+            # Goldener Button zum Beitreten
+            if st.button("📹 Video-Treffen beitreten", use_container_width=True,
+                         key="join_meeting_btn", type="secondary"):
+                st.session_state["show_jitsi_kid"] = True
         else:
             # Kein Meeting — Button ausgegraut
             st.markdown("""
@@ -450,6 +418,83 @@ def _render_action_buttons(group_id: str, user_id: str):
                 st.caption(f"Noch {minutes} Minuten bis zum Treffen")
             else:
                 st.caption("Kein Treffen gerade aktiv")
+
+    # Eingebetteter JaaS-Videochat (unterhalb der Buttons)
+    if meeting_active and room_name and st.session_state.get("show_jitsi_kid"):
+        _render_jitsi_kid(room_name, meeting, group_id, user_id)
+
+
+def _render_jitsi_kid(room_name: str, meeting: dict, group_id: str, user_id: str):
+    """Rendert den eingebetteten Jitsi-Videochat fuer Kinder via JaaS."""
+    user = get_current_user()
+    display_name = user.get('display_name', 'Kind')
+
+    try:
+        jaas_cfg = st.secrets["jaas"]
+        app_id = jaas_cfg["app_id"]
+    except (KeyError, AttributeError):
+        st.error("Video-Konfiguration fehlt.")
+        return
+
+    jwt_token = generate_jaas_jwt(
+        user_name=display_name,
+        user_id=user_id,
+        is_moderator=False,  # Kind = Teilnehmer, kein Moderator
+        room=room_name,
+        user_email=''
+    )
+    if not jwt_token:
+        st.error("Video-Verbindung fehlgeschlagen.")
+        return
+
+    # Teilnahme tracken
+    meeting_id = meeting.get('id', '')
+    join_key = f"joined_{meeting_id}_{user_id}"
+    if not st.session_state.get(join_key):
+        record_meeting_join(meeting_id, user_id, display_name, 'kind')
+        st.session_state[join_key] = True
+
+    full_room_name = f"{app_id}/{room_name}"
+    config = json.dumps({
+        "startWithAudioMuted": True,
+        "startWithVideoMuted": False,
+        "prejoinPageEnabled": True,
+        "disableDeepLinking": True,
+        "defaultLanguage": "de",
+    })
+    interface_config = json.dumps({
+        "SHOW_JITSI_WATERMARK": False,
+        "SHOW_BRAND_WATERMARK": False,
+        "SHOW_POWERED_BY": False,
+        "MOBILE_APP_PROMO": False,
+        "TOOLBAR_ALWAYS_VISIBLE": True,
+    })
+    display_name_js = json.dumps(display_name)
+
+    jitsi_html = f"""
+    <div id="jitsi-container" style="width: 100%; height: 500px; border-radius: 12px;
+         overflow: hidden; border: 2px solid #e2e8f0; background: #1a1a2e;"></div>
+
+    <script src="https://8x8.vc/{app_id}/external_api.js"></script>
+    <script>
+    (function() {{
+        var api = new JitsiMeetExternalAPI("8x8.vc", {{
+            roomName: "{full_room_name}",
+            jwt: "{jwt_token}",
+            parentNode: document.querySelector('#jitsi-container'),
+            configOverwrite: {config},
+            interfaceConfigOverwrite: {interface_config},
+            userInfo: {{
+                displayName: {display_name_js}
+            }}
+        }});
+    }})();
+    </script>
+    """
+
+    st.markdown("---")
+    st.markdown("### 📹 Video-Treffen")
+    components.html(jitsi_html, height=520)
 
 
 def _render_ablauf_ueberblick(current_week: int):
