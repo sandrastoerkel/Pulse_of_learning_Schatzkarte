@@ -1,5 +1,238 @@
 # Pulse of Learning - Schatzkarte
-## Dokumentation Stand 23. Februar 2026
+## Dokumentation Stand 28. Februar 2026
+
+---
+
+# ÄNDERUNGEN (28. Februar 2026)
+
+## Nachrichtenboard: WhatsApp-Style Chat fuer Lerngruppen
+
+### Zweck
+Kinder und Coach koennen asynchron Nachrichten austauschen — auch wenn jemand aus dem Video-Chat faellt oder ausserhalb der Treffen etwas mitteilen moechte.
+
+### Architektur
+| Aspekt | Loesung |
+|--------|---------|
+| **Nachrichten speichern** | Python → Supabase (ueber `onAction`-Bridge) |
+| **Nachrichten laden** | Python laedt initiale Nachrichten, uebergibt als Props an React |
+| **Echtzeit-Updates** | Supabase Realtime `postgres_changes` direkt im React-Frontend |
+| **UI-Pattern** | `FloatingChatWidget` analog zum `FloatingJitsiWidget` |
+
+### Neue Dateien
+
+**1. SQL-Migration:** `sql/01_migration_group_messages.sql`
+- Tabelle `group_messages` mit Soft-Delete, DM-Support, 500-Zeichen-Limit
+- RLS-Policies: `anon` lesen, `service_role` schreiben
+- Supabase Realtime aktiviert
+- `last_seen_chat` Spalte in `group_members` fuer Ungelesen-Badge
+
+**2. Backend:** `utils/nachrichten_db.py`
+```
+Funktionen:
+├── get_group_messages(group_id, user_id)   → Gruppen-Chat + eigene DMs
+├── send_message(group_id, sender_id, ...)  → Gruppen-Nachricht
+├── send_direct_message(...)                → DM innerhalb einer Gruppe
+├── send_system_message(group_id, text)     → System-Nachricht
+├── delete_message(message_id, deleted_by)  → Soft-Delete (Coach)
+├── get_unread_count(group_id, user_id)     → Ungelesene Nachrichten
+├── update_last_seen(group_id, user_id)     → Badge zuruecksetzen (Kind)
+├── update_last_seen_coach(group_id, ...)   → Badge zuruecksetzen (Coach, via settings JSON)
+└── load_chat_data(user_id)                 → Alle Daten fuer React-Komponente
+```
+
+**3. React:** `components/rpg_schatzkarte/frontend/src/components/Chat/FloatingChatWidget.tsx`
+- Schwebendes Chat-Widget rechts unten (wie FloatingJitsiWidget)
+- WhatsApp-Style Nachrichten-Bubbles (eigene rechts/blau, andere links/grau)
+- Quick-Emoji-Bar (10 kinderfreundliche Emojis)
+- Supabase Realtime Subscription fuer Live-Updates
+- Optimistic Updates beim Senden
+- Notification Sound bei neuen Nachrichten
+- Ungelesen-Badge auf dem FAB-Button
+- DM-System: Briefumschlag-Button → Mitglied waehlen → Direktnachricht
+- Coach kann Nachrichten loeschen (Moderation)
+
+### Gruppen-Wechsler (Coaches mit mehreren Gruppen)
+Coaches mit mehreren Lerngruppen sehen im Header den Gruppennamen mit ▼-Pfeil. Klick oeffnet ein Dropdown mit allen Gruppen. Beim Wechsel werden Nachrichten und Mitglieder direkt von Supabase geladen (kein Page-Reload). Die Realtime-Subscription wechselt automatisch mit.
+
+### Resize + Drag
+- **Verschieben:** Am Header (lila Balken) ziehen — Maus + Touch
+- **Stufenlos resizen:** An der oberen linken Ecke ziehen (Min: 300x350, Max: 800x900)
+- **Preset-Groessen:** ⊕/⊖ Button wechselt zwischen klein (380x520) und gross (600x700)
+
+### Geaenderte Dateien
+
+| Datei | Aenderung |
+|-------|-----------|
+| `pages/1_🗺️_Schatzkarte.py` | Import nachrichten_db, `chat_data` laden, 4 neue Action-Handler (message_send, message_send_dm, message_delete, chat_seen) |
+| `components/rpg_schatzkarte/__init__.py` | `chat_data` Parameter + `chatData` an Component durchreichen |
+| `components/rpg_schatzkarte/frontend/src/App.tsx` | Import FloatingChatWidget, chatData in Props + Rendering |
+| `components/rpg_schatzkarte/frontend/src/types.ts` | 4 neue Actions + 4 neue Felder (messageText, messageId, recipientId, groupId) |
+| `components/rpg_schatzkarte/frontend/package.json` | `@supabase/supabase-js` Dependency |
+
+### Datenfluss
+```
+Kind tippt Nachricht
+        │
+        ▼ onAction({ action: 'message_send', messageText, groupId })
+[React] FloatingChatWidget → [Streamlit Bridge]
+        │
+        ▼
+[Python] Schatzkarte.py → nachrichten_db.send_message()
+        │
+        ▼
+[Supabase] INSERT in group_messages
+        │
+        ▼ postgres_changes Event (Realtime)
+[React] Supabase Subscription → setMessages([...prev, newMsg])
+        │
+        ▼
+Alle Gruppenmitglieder sehen die Nachricht sofort
+```
+
+### Datenbank-Schema: group_messages
+```sql
+CREATE TABLE group_messages (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    group_id TEXT NOT NULL REFERENCES learning_groups(group_id),
+    sender_id TEXT NOT NULL REFERENCES users(user_id),
+    sender_name TEXT NOT NULL,
+    recipient_id TEXT REFERENCES users(user_id),  -- NULL = Gruppe, gesetzt = DM
+    message_text TEXT NOT NULL CHECK (char_length(message_text) <= 500),
+    message_type TEXT DEFAULT 'text',  -- 'text', 'system', 'emoji'
+    is_deleted BOOLEAN DEFAULT FALSE,
+    deleted_by TEXT REFERENCES users(user_id),
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+---
+
+# ÄNDERUNGEN (26. Februar 2026)
+
+## Login-Loop Fix: Deferred Cookie Pattern
+
+### Problem
+Einloggen direkt auf der Schatzkarte fuehrte zu einer Dauerschleife — die Seite lud staendig neu, ohne den Login abzuschliessen. Das Problem trat auch nach Streamlit-Neustarts auf.
+
+### Ursache
+`_set_cookie_js()` in `login_user()` nutzt `components.html()`, das ein unsichtbares iframe rendert. Waehrend eines Button-Callbacks kollidiert dieses iframe mit dem anschliessenden `st.rerun()` — Streamlit kann nicht gleichzeitig ein iframe rendern und die Seite neu laden.
+
+### Loesung: Deferred Cookie Setting
+Der Cookie wird nicht mehr direkt im Button-Callback gesetzt, sondern zwischengespeichert und beim naechsten normalen Render-Durchlauf geschrieben:
+
+```python
+# In login_user() — Cookie nur vormerken:
+token = _create_login_token(user['user_id'])
+st.session_state._pending_login_cookie = token  # Statt _set_cookie_js()
+
+# Registrierungs-State aufraeumen (verhindert Login-Loop):
+for key in ["registration_step", "registration_name", "registration_age", "registration_password"]:
+    if key in st.session_state:
+        del st.session_state[key]
+
+# In render_user_login() — Cookie im normalen Render setzen:
+if st.session_state.get("_pending_login_cookie"):
+    _set_cookie_js(COOKIE_NAME, st.session_state._pending_login_cookie, COOKIE_MAX_AGE_DAYS)
+    del st.session_state["_pending_login_cookie"]
+```
+
+**Datei:** `utils/user_system.py`
+
+---
+
+## Meeting-Planung: Datums-Auswahl + Zeitzonen-Anzeige + Absagen
+
+### Aenderungen an der Lerngruppen-Seite (`pages/7_👥_Lerngruppen.py`)
+
+**1. Datums-Picker statt Wochentag:**
+Statt eines Wochentag-Dropdowns gibt es jetzt einen `st.date_input` mit konkretem Datum (DD.MM.YYYY).
+
+**2. Zeitzonen-Offset-Anzeige:**
+Beim Planen wird der Zeitunterschied zwischen Gruppen-Zeitzone und Coach-Zeitzone angezeigt:
+```
+⏰ Uhrzeiten werden in Berlin-Zeit eingegeben — deine Zeit (Kuala Lumpur) ist +7h davon
+```
+
+**3. Treffen absagen:**
+Jedes geplante Treffen hat jetzt einen 🗑️-Button mit Bestaetigungs-Dialog. Beim Absagen wird der Jitsi-Raumname freigegeben (`cancelled-{meeting_id}`), damit er nicht die Unique-Constraint blockiert.
+
+**4. Toast + Rerun statt Success:**
+Nach dem Planen eines Treffens wird `st.toast()` + `st.rerun()` verwendet (statt `st.success()` + `st.balloons()`), damit das Treffen sofort im "Naechstes Treffen"-Tab erscheint. Problem war: Streamlit rendert Tab 1 bevor Tab 2 das Formular verarbeitet.
+
+### Aenderungen an der Datenbank-Logik (`utils/lerngruppen_db.py`)
+
+**1. `schedule_meeting()` akzeptiert `specific_date`:**
+```python
+def schedule_meeting(group_id, coach_id, day_of_week, time_of_day,
+                    duration_minutes=45, recurrence='einmalig', title=None, specific_date=None):
+```
+
+**2. `calculate_next_meeting_date()` beruecksichtigt Dauer:**
+Wenn ein Treffen noch laeuft (Startzeit + Dauer > jetzt), wird es nicht auf naechste Woche verschoben.
+
+**3. `generate_secure_room_name()` nutzt volle Startzeit:**
+Vorher nur Datum im Hash → Duplikat-Fehler bei mehreren Treffen am selben Tag. Jetzt wird der volle `scheduled_start` Timestamp verwendet.
+
+**4. `cancel_meeting()` gibt Raumnamen frei:**
+```python
+def cancel_meeting(meeting_id):
+    result = get_db().table("scheduled_meetings").update({
+        "status": "cancelled",
+        "jitsi_room_name": f"cancelled-{meeting_id}"
+    }).eq("id", meeting_id).execute()
+```
+
+---
+
+## JaaS fuer Kinder: Meine Lernreise mit 8x8.vc
+
+### Problem
+Kinder auf der Seite "Meine Lernreise" wurden zu `meet.jit.si` (oeffentlicher Server) geleitet, waehrend der Coach auf `8x8.vc` (JaaS) war. Die Kinder sahen "The conference has not yet started" und konnten nicht beitreten.
+
+### Loesung
+`pages/9_🎒_Meine_Lernreise.py` wurde ueberarbeitet:
+- Alte `_build_jitsi_url()` Funktion (meet.jit.si) entfernt
+- Neue `_render_jitsi_kid()` Funktion mit JaaS-Einbettung:
+  ```python
+  jwt_token = generate_jaas_jwt(
+      user_name=display_name, user_id=user_id,
+      is_moderator=False, room=room_name, user_email='')
+  ```
+- Jitsi wird direkt via `components.html()` mit 8x8.vc External API eingebettet
+- Kind ist `is_moderator=False` (kein Mute-alle-Button etc.)
+
+---
+
+## FloatingJitsiWidget: Komplett-Rewrite (Audio bleibt bei Minimierung)
+
+### Problem
+Jeder Button-Klick auf dem Video-Widget (klein/gross/minimieren/schliessen) loggte den Benutzer aus. Zusaetzlich wurde beim Minimieren das Audio gestoppt — Kinder konnten den Coach nicht mehr hoeren.
+
+### Ursache
+`useEffect` mit `[widgetState]` Dependency fuehrte bei jedem State-Wechsel zu:
+`dispose()` → `videoConferenceLeft` Event → `Streamlit.setComponentValue()` → Seiten-Rerun → Logout
+
+### Loesung: Persistent Jitsi
+**Datei:** `components/rpg_schatzkarte/frontend/src/components/VideoChat/FloatingJitsiWidget.tsx`
+
+- Jitsi wird einmal geladen (`jitsiActive` Flag) und bleibt am Leben
+- Minimieren versteckt den Container offscreen (`left: -9999px`), aber das iframe bleibt im DOM → Audio laeuft weiter
+- `isLeavingRef` Flag: Nur der ✕-Button loest einen Streamlit-Rerun aus
+- Resize/Toggle aendert nur CSS, kein Jitsi-Restart
+- Neue eindeutige Button-Icons: □ (maximieren), ↗ (neuer Tab), ─ (minimieren), ✕ (schliessen)
+
+---
+
+## Virtueller Hintergrund in Jitsi
+
+`select-background` wurde zur Toolbar-Button-Liste in `get_jitsi_config()` hinzugefuegt:
+```python
+base_buttons = [
+    'microphone', 'camera', 'desktop', 'hangup',
+    'chat', 'raisehand', 'tileview', 'select-background'
+]
+```
+Coach und Kinder koennen jetzt ihren Video-Hintergrund aendern (verschwommen, Bild, etc.).
 
 ---
 
@@ -605,23 +838,24 @@ Geänderte Funktionen:
 - `delete_group()` — Löscht jetzt auch `scheduled_meetings` und `meeting_participants` (mit Guard für leere Listen)
 - `generate_secure_room_name()` — Nutzt Secret aus `st.secrets`
 
-**`pages/7_👥_Lerngruppen.py`** (744 → 832 Zeilen):
+**`pages/7_👥_Lerngruppen.py`** (744 → 832+ Zeilen):
 
 Tab 1 (Meine Gruppen):
-- Zeitzone-Button zum Ändern direkt in der Gruppen-Karte
+- Zeitzone-Button zum Aendern direkt in der Gruppen-Karte
 
 Tab 2 (Neue Gruppe):
 - Zeitzonen-Auswahl bei Gruppenerstellung (Default: Europe/Berlin)
 
 Tab 3 (Video-Treffen) — KOMPLETT NEU:
 - Coach-Zeitzonen-Selectbox (Malaysia/DE/CH/AT)
-- Dual-Zeitanzeige (Gruppen-TZ ↔ Coach-TZ) überall
-- **Eingebettetes Jitsi-Meeting** via `JitsiMeetExternalAPI` in `components.html()`
+- Zeitzonen-Offset-Anzeige: "deine Zeit (Kuala Lumpur) ist +7h davon" (seit 26.02.)
+- **Eingebettetes Jitsi-Meeting** via `JitsiMeetExternalAPI` in `components.html()` (JaaS/8x8.vc)
 - Warteraum mit Countdown + Auto-Refresh (30s via JavaScript)
-- Screen-Share direkt über Jitsi-Toolbar (kein separater Helper mehr)
+- Screen-Share direkt ueber Jitsi-Toolbar (kein separater Helper mehr)
 - Participant-Tracking bei Beitritt (mit Session-State Guard gegen Duplikate)
+- **Datums-Picker** statt Wochentag-Dropdown (seit 26.02.)
 - Alle geplanten Treffen mit Dual-Zeitanzeige
-- Treffen absagen mit Bestätigung
+- **Treffen einzeln absagen** mit Bestaetigungs-Dialog (seit 26.02.)
 
 ### Zeitzonen-Support (NEU):
 
@@ -641,18 +875,26 @@ JITSI_ROOM_SECRET = "ein-sicherer-zufalls-string"
 
 ### Jitsi-Einbettung (technisches Detail):
 
+**Seit 23.02.2026: JaaS (8x8.vc) statt meet.jit.si** — mit JWT-Authentifizierung, kein 5-Minuten-Limit.
+
 ```python
+# JWT generieren (Server-seitig)
+jwt_token = generate_jaas_jwt(
+    user_name=display_name, user_id=user_id,
+    is_moderator=is_coach, room=room_name, user_email=email)
+
+app_id = st.secrets["jaas"]["app_id"]
 jitsi_html = f"""
 <div id="jitsi-container" style="width: 100%; height: 600px;"></div>
-<script src="https://meet.jit.si/external_api.js"></script>
+<script src="https://8x8.vc/{app_id}/external_api.js"></script>
 <script>
 (function() {{
-    var api = new JitsiMeetExternalAPI("meet.jit.si", {{
-        roomName: "{room_name}",
+    var api = new JitsiMeetExternalAPI("8x8.vc", {{
+        roomName: "{app_id}/{room_name}",
+        jwt: "{jwt_token}",
         parentNode: document.querySelector('#jitsi-container'),
         configOverwrite: {config_json},
-        interfaceConfigOverwrite: {interface_config_json},
-        userInfo: {{ displayName: {display_name_js}, email: "" }}
+        interfaceConfigOverwrite: {interface_config_json}
     }});
 }})();
 </script>
@@ -1337,18 +1579,19 @@ if result:
 
 # APP-ÜBERSICHT
 
-## Seiten (8 Stück)
+## Seiten (9 Stueck)
 
 | Seite | Funktion | Status |
 |-------|----------|--------|
 | 1_🗺️_Schatzkarte | **RPG-Weltkarte (React!)** | ✅ Neu gebaut |
 | 2_📚_Ressourcen | Lern-Ressourcen mit Videos, Tipps, Challenges | ✅ Fertig |
-| 3_🎓_Elternakademie | Diagnostik für Eltern-Unterstützung | ✅ Fertig |
-| 4_🔍_Screening_Diagnostik | 2-stufiges Schüler-Screening | ✅ Fertig |
+| 3_🎓_Elternakademie | Diagnostik fuer Eltern-Unterstuetzung | ✅ Fertig |
+| 4_🔍_Screening_Diagnostik | 2-stufiges Schueler-Screening | ✅ Fertig |
 | 5_📊_Auswertung | Ergebnis-Darstellung mit Hattie-Bezug | ✅ Fertig |
 | 6_📖_PISA_Forschungsgrundlage | Info-Seite zur Forschung | ✅ Fertig |
-| 7_👥_Lerngruppen | Coach-Interface für Gruppenverwaltung | ✅ Fertig |
+| 7_👥_Lerngruppen | Coach-Interface: Gruppen, Meetings, Video-Treffen | ✅ Fertig |
 | 8_🔐_Admin | Benutzer-Rollen verwalten | ✅ Fertig |
+| 9_🎒_Meine_Lernreise | Kind-Interface: Lerngruppe, Video-Treffen (JaaS) | ✅ Fertig |
 
 ---
 
@@ -1488,7 +1731,8 @@ Pulse_of_learning_Schatzkarte/
 │   ├── 5_📊_Auswertung.py
 │   ├── 6_📖_PISA_Forschungsgrundlage.py
 │   ├── 7_👥_Lerngruppen.py
-│   └── 8_🔐_Admin.py
+│   ├── 8_🔐_Admin.py
+│   └── 9_🎒_Meine_Lernreise.py
 ├── components/                  # ← NEU!
 │   ├── __init__.py
 │   └── rpg_schatzkarte/
@@ -1606,6 +1850,13 @@ components/rpg_schatzkarte/frontend/
 
 | Datum | Was | Details |
 |-------|-----|---------|
+| **26.02.2026** | **Login-Loop Fix** | Deferred Cookie Pattern: Cookie wird im normalen Render gesetzt statt im Button-Callback. Registrierungs-State wird nach Login aufgeraeumt. |
+| 26.02.2026 | Meeting-Planung verbessert | Datums-Picker statt Wochentag, Zeitzonen-Offset-Anzeige (Berlin ↔ Kuala Lumpur), Treffen absagen mit Bestaetigungs-Dialog |
+| 26.02.2026 | Duplikat-Raumnamen Fix | `generate_secure_room_name()` nutzt vollen Timestamp statt nur Datum. `cancel_meeting()` gibt Raumnamen frei. |
+| 26.02.2026 | Meeting-Anzeige Fix | Toast + Rerun statt Success, damit Treffen sofort im Tab erscheint |
+| 26.02.2026 | JaaS fuer Kinder | `pages/9_Meine_Lernreise.py`: meet.jit.si durch 8x8.vc JaaS ersetzt, Kinder als nicht-Moderator |
+| 26.02.2026 | FloatingJitsiWidget Rewrite | Jitsi bleibt persistent, Minimierung versteckt nur CSS, Audio laeuft weiter, nur ✕ loest Rerun aus |
+| 26.02.2026 | Virtueller Hintergrund | `select-background` Button in Jitsi-Toolbar fuer Coach und Kinder |
 | **21.02.2026** | **Supabase-Migration** | Komplette DB-Migration von SQLite zu Supabase (PostgreSQL). 12 Module, 23 Dateien. Persistente Cloud-Datenbank fuer 12-Wochen-Test. |
 | 21.02.2026 | Performance-Optimierung | Batch-Query fuer Insel-Fortschritt (1 statt 15 Queries), Session-basierter Supabase-Client |
 | 21.02.2026 | Supabase Schema-Fixes | user_id BIGINT→TEXT in vorexistierenden Tabellen, fehlende Spalten (category, achievement_reflection, role) |
@@ -1784,6 +2035,10 @@ Alle 14 Inseln haben jetzt das animierte Design-System. Die nächsten Aufgaben s
 | `components/rpg_schatzkarte/frontend/src/types.ts` | TypeScript-Definitionen |
 | `components/rpg_schatzkarte/__init__.py` | Python-Bridge zu Streamlit |
 | `pages/1_🗺️_Schatzkarte.py` | Streamlit-Seite die React nutzt |
+| `pages/7_👥_Lerngruppen.py` | Coach-Interface: Gruppen, Meetings, Video |
+| `pages/9_🎒_Meine_Lernreise.py` | Kind-Interface: Lerngruppe, Video (JaaS) |
+| `utils/lerngruppen_db.py` | Meeting-Planung, Jitsi-Config, JWT-Generierung |
+| `utils/user_system.py` | Login, Rollen, Cookie-System |
 | `schatzkarte/map_data.py` | Insel-Definitionen |
 
 ---
@@ -1851,10 +2106,12 @@ generate_jaas_jwt(user_name, user_id, is_moderator, room, user_email)
 
 ## Bekannte offene Bugs
 
-### Login-Loop auf der Schatzkarte
-Einloggen direkt auf der Schatzkarte fuehrt zu einer Dauerschleife (Seite laedt staendig neu).
-**Workaround:** Auf einer anderen Seite einloggen (z.B. Lerngruppen oder Home), dann zur Schatzkarte navigieren.
-**Vermutung:** Cookie-Problem bei der Streamlit-Session.
+### ✅ GELÖST: Login-Loop auf der Schatzkarte
+~~Einloggen direkt auf der Schatzkarte fuehrte zu einer Dauerschleife.~~
+**Geloest am 26.02.2026** durch Deferred Cookie Pattern (siehe Aenderungen 26. Februar 2026). `components.html()` im Button-Callback kollidierte mit `st.rerun()`. Cookie wird jetzt im naechsten normalen Render-Durchlauf gesetzt.
+
+### Coach nicht in group_members
+Coaches stehen nur in `learning_groups.coach_id`, nicht in `group_members`. `load_meeting_data()` in Schatzkarte.py prueft beides.
 
 ## Commits (23. Feb 2026)
 - `fe6328a` Feat: JaaS JWT-Authentifizierung fuer Jitsi Video-Widget
@@ -1867,14 +2124,27 @@ Einloggen direkt auf der Schatzkarte fuehrt zu einer Dauerschleife (Seite laedt 
 
 ### Prioritaet 1 (naechste Session)
 - [ ] JaaS Secrets auf Streamlit Cloud konfigurieren (`private_key` als String in Cloud-Secrets)
-- [ ] Login-Loop auf der Schatzkarte fixen (Cookie-/Session-Problem)
-- [ ] Testen: Kind tritt ueber Schatzkarte-Widget dem Meeting bei (beide Seiten gleichzeitig)
+- [ ] End-to-End Test: Kind tritt ueber Meine Lernreise dem Meeting bei waehrend Coach auf Lerngruppen-Seite ist
+- [ ] End-to-End Test: Kind tritt ueber Schatzkarte-Widget dem Meeting bei
 
 ### Prioritaet 2
 - [ ] Quiz-Content fuer fehlende Stufen erstellen (Festung MS, Werkzeuge US/MS, Faeden alle)
+- [ ] Hintergrundbilder fuer restliche 11 Inseln
+
+### Erledigt (26.02.2026)
+- [x] Login-Loop auf der Schatzkarte gefixt (Deferred Cookie Pattern)
+- [x] JaaS fuer Kinder auf Meine Lernreise (8x8.vc statt meet.jit.si)
+- [x] FloatingJitsiWidget: Audio bleibt bei Minimierung, kein Logout bei Button-Klick
+- [x] Meeting-Planung: Datums-Picker, Zeitzonen-Anzeige, Absagen-Funktion
+- [x] Duplikat-Raumnamen und Meeting-Anzeige Bugs gefixt
+- [x] Virtueller Hintergrund in Jitsi-Toolbar
+
+### Erledigt (23.02.2026)
+- [x] JaaS Video-Integration (kein 5-Minuten-Limit mehr)
+- [x] Lerngruppen-System Ueberarbeitung (React-Komponenten entfernt, pure Streamlit)
 
 ---
 
-**Letzte Bearbeitung:** 23. Februar 2026
-**Letzter Meilenstein:** JaaS Video-Integration fertig (kein 5-Minuten-Limit mehr)
-**Naechster Meilenstein:** Streamlit Cloud Deployment mit JaaS + Login-Loop fixen
+**Letzte Bearbeitung:** 26. Februar 2026
+**Letzter Meilenstein:** Video-System komplett (JaaS fuer Coach + Kinder, persistentes Widget, Login-Loop gefixt)
+**Naechster Meilenstein:** Streamlit Cloud Deployment mit JaaS + End-to-End Tests
