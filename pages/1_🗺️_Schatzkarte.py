@@ -35,6 +35,10 @@ from utils.lerngruppen_db import (
     record_meeting_leave,
     generate_jaas_jwt
 )
+from utils.nachrichten_db import (
+    load_chat_data, send_message, send_direct_message,
+    delete_message, update_last_seen, update_last_seen_coach
+)
 
 # React-Komponente importieren
 try:
@@ -570,6 +574,14 @@ meeting_data = None
 if not is_preview_mode():
     meeting_data = load_meeting_data(user_id)
 
+# Chat-Daten laden (fuer Floating Chat Widget)
+chat_data = None
+if not is_preview_mode():
+    try:
+        chat_data = load_chat_data(user_id)
+    except Exception:
+        chat_data = None
+
 result = rpg_schatzkarte(
     islands=islands,
     user_progress=user_data.get("progress", {}),
@@ -583,6 +595,7 @@ result = rpg_schatzkarte(
     auto_open_island=auto_open_island,  # Automatisch eine Insel öffnen (z.B. nach Polarstern)
     auto_open_phase=auto_open_phase,  # Phase für die Insel (z.B. 'ready' für Base Camp)
     meeting_data=meeting_data,  # Floating Jitsi Widget
+    chat_data=chat_data,  # Floating Chat Widget (Nachrichtenboard)
     height=900,  # Basis-Hoehe, wird per CSS auf calc(100vh - 60px) ueberschrieben
     key="rpg_schatzkarte"
 )
@@ -635,6 +648,51 @@ if result:
         mid = result.get("meetingId")
         if mid:
             record_meeting_leave(mid, user_id)
+
+    # ========== NACHRICHTENBOARD ACTIONS ==========
+
+    # Gruppen-Nachricht senden
+    if action == "message_send":
+        msg_text = result.get("messageText", "").strip()
+        msg_group = result.get("groupId")
+        if msg_text and msg_group:
+            user = get_current_user()
+            send_message(
+                group_id=msg_group,
+                sender_id=user_id,
+                sender_name=user.get("display_name", "") if user else "",
+                text=msg_text
+            )
+
+    # Direktnachricht senden
+    if action == "message_send_dm":
+        msg_text = result.get("messageText", "").strip()
+        msg_group = result.get("groupId")
+        msg_recipient = result.get("recipientId")
+        if msg_text and msg_group and msg_recipient:
+            user = get_current_user()
+            send_direct_message(
+                group_id=msg_group,
+                sender_id=user_id,
+                sender_name=user.get("display_name", "") if user else "",
+                recipient_id=msg_recipient,
+                text=msg_text
+            )
+
+    # Nachricht loeschen (nur Coach)
+    if action == "message_delete":
+        msg_id = result.get("messageId")
+        if msg_id and is_coach():
+            delete_message(msg_id, deleted_by=user_id)
+
+    # Chat gesehen (Ungelesen-Counter zuruecksetzen)
+    if action == "chat_seen":
+        seen_group = result.get("groupId")
+        if seen_group:
+            if is_coach():
+                update_last_seen_coach(seen_group, user_id)
+            else:
+                update_last_seen(seen_group, user_id)
 
     # Auto-Open wurde verarbeitet - Session State zurücksetzen
     if action == "auto_open_handled":

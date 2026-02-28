@@ -50,6 +50,8 @@ import { RunnerGame } from './components/MiniGames/Runner/RunnerGame';
 import { TestPanel } from './components/TestPanel';
 import FloatingJitsiWidget from './components/VideoChat/FloatingJitsiWidget';
 import type { MeetingData } from './components/VideoChat/FloatingJitsiWidget';
+import FloatingChatWidget from './components/Chat/FloatingChatWidget';
+import type { ChatData } from './components/Chat/FloatingChatWidget';
 import { SchatzkammerModal } from './components/SchatzkammerModal';
 import type { GameResult } from './types/games';
 import type { GameResult as RunnerGameResult } from './components/MiniGames/Runner/RunnerEngine';
@@ -123,6 +125,7 @@ function RPGSchatzkarteContent({
   autoOpenIsland,
   autoOpenPhase,
   meetingData,
+  chatData,
   onVideoStart
 }: {
   islands: Island[];
@@ -140,6 +143,7 @@ function RPGSchatzkarteContent({
   autoOpenIsland?: string | null;
   autoOpenPhase?: string | null;
   meetingData?: MeetingData | null;
+  chatData?: ChatData | null;
   onVideoStart?: () => void;
 }) {
   // Lokaler State für TestPanel-Manipulationen
@@ -1432,6 +1436,7 @@ function RPGSchatzkarteStreamlit({ args }: ComponentProps) {
   const autoOpenIsland: string | null = args?.autoOpenIsland || null;
   const autoOpenPhase: string | null = args?.autoOpenPhase || null;
   const meetingData: MeetingData | null = args?.meetingData || null;
+  const chatData: ChatData | null = args?.chatData || null;
   const [videoForceJoin, setVideoForceJoin] = useState(false);
 
   // Streamlit-Höhe setzen
@@ -1498,6 +1503,7 @@ function RPGSchatzkarteStreamlit({ args }: ComponentProps) {
         autoOpenIsland={autoOpenIsland}
         autoOpenPhase={autoOpenPhase}
         meetingData={meetingData}
+        chatData={chatData}
         onVideoStart={() => setVideoForceJoin(true)}
       />
       {meetingData && meetingData.roomName && (
@@ -1505,6 +1511,12 @@ function RPGSchatzkarteStreamlit({ args }: ComponentProps) {
           meetingData={meetingData}
           onAction={handleAction}
           forceJoin={videoForceJoin}
+        />
+      )}
+      {chatData && chatData.groupId && (
+        <FloatingChatWidget
+          chatData={chatData}
+          onAction={handleAction}
         />
       )}
     </div>

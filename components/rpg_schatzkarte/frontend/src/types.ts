@@ -162,7 +162,7 @@ export interface TagebuchEintrag {
 
 // Aktionen die an Python zurueckgegeben werden
 export interface SchatzkartAction {
-  action: 'quest_completed' | 'treasure_collected' | 'xp_earned' | 'item_received' | 'bandura_entry' | 'hattie_entry' | 'hattie_prediction' | 'hattie_complete' | 'tagebuch_entry' | 'polarstern_clicked' | 'companion_selected' | 'minigame_completed' | 'auto_open_handled' | 'go_to_map' | 'start_preview' | 'show_login' | 'logout' | 'go_to_landing' | 'go_to_lernreise' | 'meeting_join' | 'meeting_leave';
+  action: 'quest_completed' | 'treasure_collected' | 'xp_earned' | 'item_received' | 'bandura_entry' | 'hattie_entry' | 'hattie_prediction' | 'hattie_complete' | 'tagebuch_entry' | 'polarstern_clicked' | 'companion_selected' | 'minigame_completed' | 'auto_open_handled' | 'go_to_map' | 'start_preview' | 'show_login' | 'logout' | 'go_to_landing' | 'go_to_lernreise' | 'meeting_join' | 'meeting_leave' | 'message_send' | 'message_send_dm' | 'message_delete' | 'chat_seen';
   companionId?: CompanionType;
   islandId?: string;
   questType?: QuestType;
@@ -183,6 +183,11 @@ export interface SchatzkartAction {
   sourceIsland?: string | null;
   // Meeting spezifisch
   meetingId?: string;
+  // Chat/Nachrichtenboard spezifisch
+  messageText?: string;
+  messageId?: string;
+  recipientId?: string;
+  groupId?: string;
 }
 
 // Bandura-Quellen Konfiguration

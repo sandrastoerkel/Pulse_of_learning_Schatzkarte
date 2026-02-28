@@ -60,6 +60,7 @@ def rpg_schatzkarte(
     auto_open_island: str = None,
     auto_open_phase: str = None,
     meeting_data: dict = None,
+    chat_data: dict = None,
     height: int = 700,
     key: str = None
 ) -> dict:
@@ -119,6 +120,7 @@ def rpg_schatzkarte(
         autoOpenIsland=auto_open_island,
         autoOpenPhase=auto_open_phase,
         meetingData=meeting_data,
+        chatData=chat_data,
         key=key,
         default=None,
     )
