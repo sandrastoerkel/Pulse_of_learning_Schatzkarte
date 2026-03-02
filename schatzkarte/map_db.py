@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
-"""Datenbank fuer Schatzkarte."""
+"""Datenbank fuer Schatzkarte.
+
+PERFORMANCE-OPTIMIERUNG:
+- @st.cache_data(ttl=60) auf Read-Funktionen
+- .clear() bei Write-Operationen
+- Doppelte get_all_island_progress() entfernt (war Zeile 123 + 196)
+"""
+import streamlit as st
 from datetime import datetime
 from typing import List, Tuple
 
@@ -42,11 +49,18 @@ def save_treasure_collected(user_id: str, island_id: str, treasure_id: str, xp: 
     current_streak = user.get('current_streak', 0)
     update_user_stats(user_id, xp, current_streak)
 
+    # ✅ Cache invalidieren nach Write
+    get_collected_treasures.clear()
+
     return True
 
 
+@st.cache_data(ttl=60)
 def get_collected_treasures(user_id: str) -> List[Tuple[str, str]]:
-    """Laedt alle gesammelten Schaetze. Returns: Liste von (island_id, treasure_id)."""
+    """Laedt alle gesammelten Schaetze. Returns: Liste von (island_id, treasure_id).
+
+    OPTIMIERUNG: Gecacht mit TTL=60s. Spart ~1 REST-Call pro Render.
+    """
     result = get_db().table("user_treasures") \
         .select("island_id, treasure_id") \
         .eq("user_id", user_id) \
@@ -120,8 +134,14 @@ def get_island_progress(user_id: str, island_id: str) -> dict:
     }
 
 
+@st.cache_data(ttl=60)
 def get_all_island_progress(user_id: str) -> dict:
-    """Holt den Fortschritt eines Users fuer ALLE Inseln in einer Query."""
+    """Holt den Fortschritt eines Users fuer ALLE Inseln in einer Query.
+
+    OPTIMIERUNG: Gecacht mit TTL=60s. Spart ~1 REST-Call pro Render.
+    HINWEIS: Doppelte Definition entfernt (war Zeile 123 + 196).
+             Diese Version kombiniert die Felder beider Varianten.
+    """
     result = get_db().table("island_progress") \
         .select("*") \
         .eq("user_id", user_id) \
@@ -182,6 +202,9 @@ def complete_island_action(user_id: str, island_id: str, action: str, extra_data
         current_streak = user.get('current_streak', 0)
         update_user_stats(user_id, xp, current_streak)
 
+    # ✅ Cache invalidieren nach Write
+    get_all_island_progress.clear()
+
     return xp
 
 
@@ -192,20 +215,5 @@ def get_island_progress_percentage(user_id: str, island_id: str) -> int:
                     if progress.get(key))
     return int((completed / 4) * 100)
 
-
-def get_all_island_progress(user_id: str) -> dict:
-    """Holt den Fortschritt für alle Inseln eines Users."""
-    result = get_db().table("island_progress") \
-        .select("island_id, video_watched, explanation_read, quiz_passed, challenge_completed") \
-        .eq("user_id", user_id) \
-        .execute()
-
-    return {
-        row["island_id"]: {
-            "video_watched": bool(row.get("video_watched")),
-            "explanation_read": bool(row.get("explanation_read")),
-            "quiz_passed": bool(row.get("quiz_passed")),
-            "challenge_completed": bool(row.get("challenge_completed")),
-        }
-        for row in result.data
-    }
+# ✅ HINWEIS: Die zweite Definition von get_all_island_progress() (ehemals Zeile 196)
+#             wurde entfernt. Die obige Version (mit @st.cache_data) ist die einzige.

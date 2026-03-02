@@ -75,6 +75,7 @@ def main():
         render_statistics()
 
 
+@st.fragment
 def render_user_roles():
     """Zeigt und verwaltet Benutzer-Rollen."""
 

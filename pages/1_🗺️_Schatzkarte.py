@@ -123,8 +123,14 @@ if not zeige_schatzkarte():
 # DATEN LADEN
 # ===============================================================
 
-def load_user_data():
-    """Laedt alle User-Daten fuer die React-Komponente."""
+@st.cache_data(ttl=30)
+def load_user_data(user_id):
+    """Laedt alle User-Daten fuer die React-Komponente.
+
+    OPTIMIERUNG: Gecacht mit TTL=30s. user_id als Parameter statt Outer-Scope-Referenz,
+    damit @st.cache_data die Funktion korrekt hashen kann.
+    Profitiert zusaetzlich vom Caching der aufgerufenen Sub-Funktionen.
+    """
     stats = get_user_stats(user_id)
 
     # XP und Level berechnen
@@ -157,8 +163,13 @@ def load_user_data():
         "collected_treasures": collected_treasures
     }
 
+@st.cache_data
 def convert_islands_for_react():
-    """Konvertiert die Insel-Daten ins React-Format."""
+    """Konvertiert die Insel-Daten ins React-Format.
+
+    OPTIMIERUNG: Gecacht ohne TTL — ISLANDS ist eine konstante Datenstruktur.
+    Spart unnoetige CPU-Arbeit bei jedem Render.
+    """
     react_islands = []
 
     for island_id, island in ISLANDS.items():
@@ -331,7 +342,7 @@ if not HAS_REACT_COMPONENT:
     st.stop()
 
 # Daten laden
-user_data = load_user_data()
+user_data = load_user_data(user_id)
 islands = convert_islands_for_react()
 hero_data = create_hero_data(user_data)
 unlocked_islands = get_unlocked_islands(user_id)

@@ -24,7 +24,8 @@ try:
     from utils.user_system import (
         is_logged_in, get_current_user, get_current_user_id,
         render_user_login, get_user_by_id, is_coach, try_auto_login,
-        get_all_students_list, reset_student_password, delete_user
+        get_all_students_list, reset_student_password, delete_user,
+        create_student_by_coach
     )
     from utils.lerngruppen_db import (
         create_group, get_group, get_coach_groups, update_group, delete_group,
@@ -129,6 +130,7 @@ def main():
 # TAB 1: MEINE GRUPPEN
 # ============================================
 
+@st.fragment
 def render_my_groups(coach_id: str):
     """Zeigt alle Gruppen des Coaches."""
     groups = get_coach_groups(coach_id)
@@ -174,6 +176,8 @@ def render_group_card(group: dict):
                 st.session_state[f"show_members_{group_id}"] = True
             if st.button("📨 Einladen", key=f"btn_invite_{group_id}", use_container_width=True):
                 st.session_state[f"show_invite_{group_id}"] = True
+            if st.button("➕ Schüler anlegen", key=f"btn_create_student_{group_id}", use_container_width=True):
+                st.session_state[f"show_create_student_{group_id}"] = True
             if st.button("🕐 Zeitzone", key=f"btn_tz_{group_id}", use_container_width=True):
                 st.session_state[f"show_tz_{group_id}"] = True
             if st.button("🗑️ Löschen", key=f"btn_delete_{group_id}", use_container_width=True, type="secondary"):
@@ -196,6 +200,10 @@ def render_group_card(group: dict):
         if st.session_state.get(f"show_invite_{group_id}"):
             st.markdown("---")
             render_invite_form(group_id, group['name'])
+
+        if st.session_state.get(f"show_create_student_{group_id}"):
+            st.markdown("---")
+            render_create_student_form(group_id, group['name'])
 
         if st.session_state.get(f"show_tz_{group_id}"):
             st.markdown("---")
@@ -363,10 +371,13 @@ def render_members_list(group_id: str, members: list):
             # Bestaetigungs-Dialog
             _render_password_reset_confirm(group_id, member)
 
-            # Temp-Passwort anzeigen (falls gerade generiert)
-            temp_pw_key = f"temp_pw_{group_id}_{member['user_id']}"
-            if st.session_state.get(temp_pw_key):
-                _render_temp_password_display(group_id, member, st.session_state[temp_pw_key])
+            # Temp-Passwort anzeigen: persistent aus DB (solange Schueler nicht geaendert hat)
+            temp_pw_db = member.get("temp_password_plain")
+            temp_pw_session = st.session_state.get(f"temp_pw_{group_id}_{member['user_id']}")
+            if temp_pw_db and member.get("must_change_password"):
+                _render_temp_password_display(group_id, member, temp_pw_db)
+            elif temp_pw_session:
+                _render_temp_password_display(group_id, member, temp_pw_session)
 
     st.markdown("---")
     if st.button("❌ Schließen", key=f"close_members_{group_id}"):
@@ -403,8 +414,24 @@ def _render_password_reset_confirm(group_id: str, member: dict):
 
 
 def _render_temp_password_display(group_id: str, member: dict, temp_pw: str):
-    """Zeigt das generierte temporaere Passwort an (einmalig sichtbar)."""
+    """Zeigt das temporaere Passwort an. Bleibt sichtbar bis Schueler es aendert."""
     name = member.get('display_name', 'Unbekannt')
+    is_from_db = member.get("must_change_password") and member.get("temp_password_plain")
+
+    # Kompakte Anzeige oder grosse Box (je nach Quelle)
+    hide_key = f"hide_temp_pw_{group_id}_{member['user_id']}"
+    if is_from_db and st.session_state.get(hide_key):
+        # Minimiert: nur kleiner Hinweis
+        col_hint, col_show = st.columns([4, 1])
+        with col_hint:
+            st.caption(f"🔑 Temp-Passwort aktiv für {name}")
+        with col_show:
+            if st.button("👁️ Zeigen", key=f"show_tp_{group_id}_{member['user_id']}",
+                         use_container_width=True):
+                st.session_state[hide_key] = False
+                st.rerun()
+        return
+
     st.markdown(f"""
     <div style="background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
                 border: 3px solid #f59e0b; border-radius: 12px; padding: 20px;
@@ -419,15 +446,18 @@ def _render_temp_password_display(group_id: str, member: dict, temp_pw: str):
         </div>
         <div style="font-size: 0.85em; color: #78350f; margin-top: 10px;">
             Bitte teile dieses Passwort mündlich oder per Chat mit.<br>
-            Der Schüler muss es beim nächsten Login ändern (gültig 48h).
+            {"Sichtbar bis der Schüler ein eigenes Passwort wählt." if is_from_db else "Der Schüler muss es beim nächsten Login ändern (gültig 48h)."}
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-    if st.button("✅ Verstanden, schließen",
-                  key=f"close_temp_pw_{group_id}_{member['user_id']}",
+    btn_label = "🔽 Minimieren" if is_from_db else "✅ Verstanden, schließen"
+    if st.button(btn_label, key=f"close_temp_pw_{group_id}_{member['user_id']}",
                   type="primary"):
-        del st.session_state[f"temp_pw_{group_id}_{member['user_id']}"]
+        if is_from_db:
+            st.session_state[hide_key] = True
+        else:
+            st.session_state.pop(f"temp_pw_{group_id}_{member['user_id']}", None)
         st.rerun()
 
 
@@ -503,6 +533,72 @@ Viel Spaß beim Lernen! 🎉
                 if st.button("🗑️", key=f"del_inv_{inv['token']}", help="Einladung löschen"):
                     delete_invitation(inv['token'])
                     st.rerun()
+
+
+def render_create_student_form(group_id: str = None, group_name: str = None, groups: list = None):
+    """Formular zum Anlegen eines neuen Schuelers durch den Coach."""
+    st.markdown("### ➕ Neuen Schüler anlegen")
+
+    form_key = f"create_student_{group_id or 'tab4'}"
+    student_name = st.text_input(
+        "Name des Kindes:",
+        placeholder="z.B. Max Mustermann",
+        key=f"student_name_{form_key}"
+    )
+
+    age_options = {
+        "Grundschule (6-10)": "grundschule",
+        "Unterstufe (10-12)": "unterstufe",
+        "Mittelstufe (12-15)": "mittelstufe",
+        "Oberstufe (15-18)": "oberstufe",
+    }
+    age_label = st.selectbox("Altersstufe:", list(age_options.keys()), key=f"age_{form_key}")
+    age_group = age_options[age_label]
+
+    # Gruppen-Auswahl nur wenn keine feste Gruppe vorgegeben
+    selected_group_id = group_id
+    selected_group_name = group_name
+    if not group_id and groups:
+        group_options = {g['name']: g['group_id'] for g in groups}
+        selected_name = st.selectbox("Gruppe:", list(group_options.keys()), key=f"group_select_{form_key}")
+        selected_group_id = group_options[selected_name]
+        selected_group_name = selected_name
+
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("✅ Schüler anlegen", type="primary", key=f"btn_create_{form_key}", use_container_width=True):
+            if not student_name or not student_name.strip():
+                st.error("Bitte einen Namen eingeben.")
+            else:
+                result = create_student_by_coach(
+                    coach_id=get_current_user_id(),
+                    display_name=student_name.strip(),
+                    age_group=age_group,
+                    group_id=selected_group_id
+                )
+                if result is None:
+                    st.error("❌ Der Name ist bereits vergeben. Bitte einen anderen Namen wählen.")
+                else:
+                    st.session_state[f"created_student_{form_key}"] = result
+    with col2:
+        if group_id and st.button("❌ Schließen", key=f"close_create_{form_key}", use_container_width=True):
+            st.session_state[f"show_create_student_{group_id}"] = False
+            st.session_state.pop(f"created_student_{form_key}", None)
+            st.rerun()
+
+    # Erfolgs-Anzeige (erscheint im selben Render-Zyklus ohne rerun)
+    created = st.session_state.get(f"created_student_{form_key}")
+    if created:
+        user = created["user"]
+        temp_pw = created["temp_password"]
+        st.success(f"✅ Schüler **{user.get('display_name', '')}** wurde erstellt!")
+        if created["added_to_group"]:
+            st.info(f"📋 Wurde der Gruppe **{selected_group_name or 'gewählt'}** zugewiesen.")
+        st.warning(f"🔑 **Temporäres Passwort:** `{temp_pw}`")
+        st.caption("Bitte dieses Passwort an das Kind weitergeben. Beim ersten Login muss ein eigenes Passwort gewählt werden.")
+        if st.button("🔄 Weiteren Schüler anlegen", key=f"reset_{form_key}"):
+            del st.session_state[f"created_student_{form_key}"]
+            st.rerun()
 
 
 # ============================================
@@ -903,6 +999,7 @@ def render_schedule_meeting(group_id: str, coach_id: str, coach_tz: str):
 # TAB 4: TEILNEHMER ZUWEISEN
 # ============================================
 
+@st.fragment
 def render_assign_members(coach_id: str):
     """Zeigt alle registrierten Schueler und erlaubt Zuweisung zu Coach-Gruppen."""
     st.markdown("### 👤 Teilnehmer verwalten")
@@ -911,6 +1008,9 @@ def render_assign_members(coach_id: str):
     if not groups:
         st.info("📭 Erstelle zuerst eine Lerngruppe, bevor du Teilnehmer zuweisen kannst.")
         return
+
+    with st.expander("➕ Neuen Schüler anlegen"):
+        render_create_student_form(groups=groups)
 
     students = get_all_students_list()
     if not students:

@@ -13,6 +13,7 @@ Features:
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
 import json
+import streamlit as st
 
 from utils.database import get_db
 
@@ -88,6 +89,15 @@ def update_user_stats(user_id: str, xp_delta: int, streak: int) -> Dict[str, Any
         "longest_streak": longest,
         "last_activity_date": today
     }).eq("user_id", user_id).execute()
+
+    # ✅ Cache invalidieren nach Write
+    get_user_stats.clear()
+    # Auch get_user_by_id invalidieren (XP/Level haben sich geaendert)
+    try:
+        from utils.user_system import get_user_by_id
+        get_user_by_id.clear()
+    except ImportError:
+        pass
 
     return update_result.data[0]
 
@@ -207,6 +217,10 @@ def complete_challenge(challenge_id: int, actual_result: int,
     # User-Stats updaten
     user = update_user_stats(user_id, xp_earned, new_streak)
 
+    # ✅ Cache invalidieren (update_user_stats macht das schon,
+    #    aber get_user_stats braucht auch ein clear wegen der Challenge-Daten)
+    get_user_stats.clear()
+
     # Alte XP für Level-Up Check
     old_level = calculate_level(user['xp_total'] - xp_earned)
 
@@ -275,8 +289,13 @@ def get_open_challenges(user_id: str) -> List[Dict]:
 # STATISTICS
 # ============================================
 
+@st.cache_data(ttl=60)
 def get_user_stats(user_id: str) -> Dict[str, Any]:
-    """Holt umfassende Statistiken eines Users."""
+    """Holt umfassende Statistiken eines Users.
+
+    OPTIMIERUNG: Gecacht mit TTL=60s. Wird 1x pro Render aufgerufen.
+    Spart ~2 REST-Calls pro Render (users + challenges).
+    """
     db = get_db()
 
     # Basis-User-Daten

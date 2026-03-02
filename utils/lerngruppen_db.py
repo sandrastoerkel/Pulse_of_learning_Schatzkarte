@@ -324,6 +324,8 @@ def add_member(group_id: str, user_id: str) -> bool:
             "user_id": user_id,
             "status": "active"
         }).execute()
+        # ✅ Cache invalidieren nach Write
+        get_user_group.clear()
         return True
     except Exception as e:
         print(f"User already in a group or error: {e}")
@@ -338,6 +340,8 @@ def remove_member(group_id: str, user_id: str) -> bool:
             .eq("group_id", group_id) \
             .eq("user_id", user_id) \
             .execute()
+        # ✅ Cache invalidieren nach Write
+        get_user_group.clear()
         return len(result.data) > 0
     except Exception as e:
         print(f"Error removing member: {e}")
@@ -345,7 +349,12 @@ def remove_member(group_id: str, user_id: str) -> bool:
 
 
 def get_group_members(group_id: str) -> List[Dict]:
-    """Alle aktiven Mitglieder mit User-Details. Sortiert nach display_name."""
+    """Alle aktiven Mitglieder mit User-Details. Sortiert nach display_name.
+
+    OPTIMIERUNG: N+1 Query gefixt. Vorher: 1 + N Queries (bei 10 Mitgliedern = 11).
+    Jetzt: 2 Queries (members + batch user lookup via .in_()).
+    Spart ~8-9 REST-Calls bei einer typischen 10er-Gruppe.
+    """
     db = get_db()
     members_result = db.table("group_members") \
         .select("*") \
@@ -353,23 +362,43 @@ def get_group_members(group_id: str) -> List[Dict]:
         .eq("status", "active") \
         .execute()
 
+    if not members_result.data:
+        return []
+
+    # ✅ Batch-Query statt N+1
+    user_ids = [gm["user_id"] for gm in members_result.data]
+    try:
+        users_result = db.table("users") \
+            .select("user_id, display_name, age_group, level, xp_total, current_streak, must_change_password, temp_password_plain") \
+            .in_("user_id", user_ids) \
+            .execute()
+    except Exception:
+        # Fallback: Spalten existieren noch nicht (Migration ausstehend)
+        users_result = db.table("users") \
+            .select("user_id, display_name, age_group, level, xp_total, current_streak") \
+            .in_("user_id", user_ids) \
+            .execute()
+    user_map = {u["user_id"]: u for u in users_result.data}
+
     members = []
     for gm in members_result.data:
-        user_result = db.table("users") \
-            .select("display_name, age_group, level, xp_total, current_streak") \
-            .eq("user_id", gm["user_id"]) \
-            .execute()
         member = {**gm}
-        if user_result.data:
-            member.update(user_result.data[0])
+        user_data = user_map.get(gm["user_id"])
+        if user_data:
+            member.update(user_data)
         members.append(member)
 
     members.sort(key=lambda m: (m.get("display_name") or "").lower())
     return members
 
 
+@st.cache_data(ttl=60)
 def get_user_group(user_id: str) -> Optional[Dict]:
-    """Holt die Gruppe eines Users. User kann nur in einer Gruppe sein."""
+    """Holt die Gruppe eines Users. User kann nur in einer Gruppe sein.
+
+    OPTIMIERUNG: Gecacht mit TTL=60s. Wird 2-7x pro Render aufgerufen.
+    Spart ~3-12 REST-Calls pro Render.
+    """
     db = get_db()
     member_result = db.table("group_members") \
         .select("group_id, joined_at") \

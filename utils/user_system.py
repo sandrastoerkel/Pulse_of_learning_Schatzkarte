@@ -309,6 +309,8 @@ def update_user_avatar(user_id: str, avatar_settings: Dict) -> bool:
     """Aktualisiert die Avatar-Einstellungen eines Users."""
     try:
         get_db().table("users").update({"avatar_settings": json.dumps(avatar_settings)}).eq("user_id", user_id).execute()
+        # ✅ Cache invalidieren nach Write
+        get_user_by_id.clear()
         return True
     except Exception as e:
         print(f"Error updating avatar: {e}")
@@ -318,13 +320,20 @@ def update_user_age_group(user_id: str, age_group: str) -> bool:
     """Aktualisiert die Altersstufe eines Users."""
     try:
         get_db().table("users").update({"age_group": age_group}).eq("user_id", user_id).execute()
+        # ✅ Cache invalidieren nach Write
+        get_user_by_id.clear()
         return True
     except Exception as e:
         print(f"Error updating age group: {e}")
         return False
 
+@st.cache_data(ttl=60)
 def get_user_by_id(user_id: str) -> Optional[Dict[str, Any]]:
-    """Holt einen User anhand der ID."""
+    """Holt einen User anhand der ID.
+
+    OPTIMIERUNG: Gecacht mit TTL=60s. Wird 2-3x pro Render aufgerufen.
+    Spart ~2-3 REST-Calls pro Render.
+    """
     result = get_db().table("users").select("*").eq("user_id", user_id).execute()
     return result.data[0] if result.data else None
 
@@ -416,6 +425,9 @@ def login_user(display_name: str, age_group: str = None, avatar_style: str = Non
     # wird beim naechsten normalen Render in render_user_login() gesetzt.
     token = _create_login_token(user['user_id'])
     st.session_state._pending_login_cookie = token
+
+    # ✅ Cache invalidieren nach Login (User-Daten haben sich geaendert: last_login)
+    get_user_by_id.clear()
 
     # Registrierungs-State aufräumen (verhindert Login-Loop auf Schatzkarte)
     for key in ["registration_step", "registration_name", "registration_age", "registration_password"]:
@@ -1057,17 +1069,70 @@ def reset_student_password(coach_id: str, student_id: str) -> Optional[str]:
     temp_pw = generate_temp_password()
     pw_hash = hash_password(temp_pw)
 
+    update_data = {
+        "password_hash": pw_hash,
+        "must_change_password": True,
+        "temp_password_created_at": datetime.now().isoformat(),
+        "password_reset_by": coach_id,
+        "temp_password_plain": temp_pw,
+    }
     try:
-        get_db().table("users").update({
-            "password_hash": pw_hash,
-            "must_change_password": True,
-            "temp_password_created_at": datetime.now().isoformat(),
-            "password_reset_by": coach_id,
-        }).eq("user_id", student_id).execute()
+        get_db().table("users").update(update_data).eq("user_id", student_id).execute()
         return temp_pw
-    except Exception as e:
-        print(f"Error resetting password: {e}")
+    except Exception:
+        # Fallback ohne temp_password_plain (Spalte existiert noch nicht)
+        update_data.pop("temp_password_plain", None)
+        try:
+            get_db().table("users").update(update_data).eq("user_id", student_id).execute()
+            return temp_pw
+        except Exception as e:
+            print(f"Error resetting password: {e}")
+            return None
+
+
+def create_student_by_coach(coach_id: str, display_name: str, age_group: str, group_id: str = None) -> Optional[Dict]:
+    """
+    Erstellt einen neuen Schueler-Account (durch Coach) mit Temp-Passwort.
+    Optional direkte Gruppenzuweisung.
+    Gibt {"user": user, "temp_password": str, "added_to_group": bool} zurueck oder None bei Fehler.
+    """
+    from utils.lerngruppen_db import add_member
+
+    if is_name_taken(display_name):
         return None
+
+    temp_pw = generate_temp_password()
+    user = get_or_create_user_by_name(display_name, age_group, password=temp_pw)
+
+    if not user:
+        return None
+
+    # must_change_password setzen
+    update_data = {
+        "must_change_password": True,
+        "temp_password_created_at": datetime.now().isoformat(),
+        "password_reset_by": coach_id,
+        "temp_password_plain": temp_pw,
+    }
+    try:
+        get_db().table("users").update(update_data).eq("user_id", user["user_id"]).execute()
+    except Exception:
+        # Fallback ohne temp_password_plain (Spalte existiert noch nicht)
+        update_data.pop("temp_password_plain", None)
+        try:
+            get_db().table("users").update(update_data).eq("user_id", user["user_id"]).execute()
+        except Exception as e:
+            print(f"Error setting must_change_password: {e}")
+
+    added_to_group = False
+    if group_id:
+        try:
+            add_member(group_id, user["user_id"])
+            added_to_group = True
+        except Exception as e:
+            print(f"Error adding student to group: {e}")
+
+    return {"user": user, "temp_password": temp_pw, "added_to_group": added_to_group}
 
 
 def check_must_change_password(user_id: str) -> bool:
@@ -1095,11 +1160,17 @@ def check_must_change_password(user_id: str) -> bool:
             now = datetime.now(created.tzinfo) if created.tzinfo else datetime.now()
             if (now - created).total_seconds() > 48 * 3600:
                 # Abgelaufen — Flag zuruecksetzen
-                get_db().table("users").update({
+                expire_data = {
                     "must_change_password": False,
                     "temp_password_created_at": None,
                     "password_reset_by": None,
-                }).eq("user_id", user_id).execute()
+                    "temp_password_plain": None,
+                }
+                try:
+                    get_db().table("users").update(expire_data).eq("user_id", user_id).execute()
+                except Exception:
+                    expire_data.pop("temp_password_plain", None)
+                    get_db().table("users").update(expire_data).eq("user_id", user_id).execute()
                 return False
         except (ValueError, TypeError):
             pass
@@ -1109,17 +1180,28 @@ def check_must_change_password(user_id: str) -> bool:
 
 def change_password(user_id: str, new_password: str) -> bool:
     """Setzt ein neues Passwort und cleart das must_change_password Flag."""
+    update_data = {
+        "password_hash": hash_password(new_password),
+        "must_change_password": False,
+        "temp_password_created_at": None,
+        "password_reset_by": None,
+        "temp_password_plain": None,
+    }
     try:
-        get_db().table("users").update({
-            "password_hash": hash_password(new_password),
-            "must_change_password": False,
-            "temp_password_created_at": None,
-            "password_reset_by": None,
-        }).eq("user_id", user_id).execute()
+        get_db().table("users").update(update_data).eq("user_id", user_id).execute()
+        # ✅ Cache invalidieren nach Write
+        get_user_by_id.clear()
         return True
-    except Exception as e:
-        print(f"Error changing password: {e}")
-        return False
+    except Exception:
+        # Fallback ohne temp_password_plain
+        update_data.pop("temp_password_plain", None)
+        try:
+            get_db().table("users").update(update_data).eq("user_id", user_id).execute()
+            get_user_by_id.clear()
+            return True
+        except Exception as e:
+            print(f"Error changing password: {e}")
+            return False
 
 
 def render_force_password_change(user_id: str):

@@ -37,8 +37,19 @@ BEGIN
     END IF;
 END $$;
 
+-- temp_password_plain: Klartext-Temp-Passwort, sichtbar fuer Coach bis Schueler es aendert
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'users' AND column_name = 'temp_password_plain'
+    ) THEN
+        ALTER TABLE users ADD COLUMN temp_password_plain TEXT NULL;
+    END IF;
+END $$;
+
 -- ============================================
 -- Fertig! Teste mit:
--- SELECT user_id, must_change_password, temp_password_created_at, password_reset_by
+-- SELECT user_id, must_change_password, temp_password_created_at, password_reset_by, temp_password_plain
 -- FROM users LIMIT 5;
 -- ============================================
