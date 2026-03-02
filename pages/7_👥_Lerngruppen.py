@@ -23,7 +23,8 @@ from zoneinfo import ZoneInfo
 try:
     from utils.user_system import (
         is_logged_in, get_current_user, get_current_user_id,
-        render_user_login, get_user_by_id, is_coach, try_auto_login
+        render_user_login, get_user_by_id, is_coach, try_auto_login,
+        get_all_students_list, reset_student_password, delete_user
     )
     from utils.lerngruppen_db import (
         create_group, get_group, get_coach_groups, update_group, delete_group,
@@ -107,8 +108,9 @@ def main():
     """, unsafe_allow_html=True)
 
     # Tabs
-    tab1, tab2, tab3, tab4 = st.tabs([
-        "📋 Meine Gruppen", "➕ Neue Gruppe", "📹 Video-Treffen", "🔗 Einladung prüfen"
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+        "📋 Meine Gruppen", "➕ Neue Gruppe", "📹 Video-Treffen",
+        "👤 Teilnehmer", "🔗 Einladung prüfen"
     ])
 
     with tab1:
@@ -118,6 +120,8 @@ def main():
     with tab3:
         render_video_meetings(user_id)
     with tab4:
+        render_assign_members(user_id)
+    with tab5:
         render_check_invitation()
 
 
@@ -342,7 +346,7 @@ def render_members_list(group_id: str, members: list):
         st.info("Noch keine Mitglieder. Lade Kinder per Einladungslink ein!")
     else:
         for member in members:
-            col1, col2, col3, col4 = st.columns([3, 1, 1, 1])
+            col1, col2, col3, col4, col5 = st.columns([3, 1, 1, 1, 0.7])
             with col1:
                 st.markdown(f"**{member.get('display_name', 'Unbekannt')}**")
             with col2:
@@ -351,10 +355,79 @@ def render_members_list(group_id: str, members: list):
                 st.markdown(f"⭐ {member.get('xp_total', 0):,}")
             with col4:
                 st.markdown(f"🔥 {member.get('current_streak', 0)}")
+            with col5:
+                if st.button("🔑", key=f"reset_pw_{group_id}_{member['user_id']}",
+                             help="Passwort zurücksetzen"):
+                    st.session_state[f"confirm_reset_{group_id}_{member['user_id']}"] = True
+
+            # Bestaetigungs-Dialog
+            _render_password_reset_confirm(group_id, member)
+
+            # Temp-Passwort anzeigen (falls gerade generiert)
+            temp_pw_key = f"temp_pw_{group_id}_{member['user_id']}"
+            if st.session_state.get(temp_pw_key):
+                _render_temp_password_display(group_id, member, st.session_state[temp_pw_key])
 
     st.markdown("---")
     if st.button("❌ Schließen", key=f"close_members_{group_id}"):
         st.session_state[f"show_members_{group_id}"] = False
+        st.rerun()
+
+
+def _render_password_reset_confirm(group_id: str, member: dict):
+    """Bestaetigungs-Dialog fuer Passwort-Reset."""
+    confirm_key = f"confirm_reset_{group_id}_{member['user_id']}"
+    if not st.session_state.get(confirm_key):
+        return
+
+    name = member.get('display_name', 'Unbekannt')
+    st.warning(f"🔑 Passwort von **{name}** wirklich zurücksetzen?")
+    st.caption("Ein temporäres Passwort wird generiert. Der Schüler muss es beim nächsten Login ändern.")
+
+    col_yes, col_no = st.columns(2)
+    with col_yes:
+        if st.button("✅ Ja, zurücksetzen", key=f"yes_reset_{group_id}_{member['user_id']}",
+                      type="primary"):
+            coach_id = get_current_user_id()
+            temp_pw = reset_student_password(coach_id, member['user_id'])
+            st.session_state[confirm_key] = False
+            if temp_pw:
+                st.session_state[f"temp_pw_{group_id}_{member['user_id']}"] = temp_pw
+                st.rerun()
+            else:
+                st.error("Fehler beim Zurücksetzen. Ist der Schüler in deiner Gruppe?")
+    with col_no:
+        if st.button("❌ Abbrechen", key=f"no_reset_{group_id}_{member['user_id']}"):
+            st.session_state[confirm_key] = False
+            st.rerun()
+
+
+def _render_temp_password_display(group_id: str, member: dict, temp_pw: str):
+    """Zeigt das generierte temporaere Passwort an (einmalig sichtbar)."""
+    name = member.get('display_name', 'Unbekannt')
+    st.markdown(f"""
+    <div style="background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+                border: 3px solid #f59e0b; border-radius: 12px; padding: 20px;
+                margin: 10px 0; text-align: center;">
+        <div style="font-size: 1em; color: #92400e; margin-bottom: 8px;">
+            Temporäres Passwort für <strong>{name}</strong>:
+        </div>
+        <div style="font-size: 2em; font-weight: bold; font-family: monospace;
+                    background: white; padding: 12px 24px; border-radius: 8px;
+                    display: inline-block; letter-spacing: 2px; color: #1a1a2e;">
+            {temp_pw}
+        </div>
+        <div style="font-size: 0.85em; color: #78350f; margin-top: 10px;">
+            Bitte teile dieses Passwort mündlich oder per Chat mit.<br>
+            Der Schüler muss es beim nächsten Login ändern (gültig 48h).
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    if st.button("✅ Verstanden, schließen",
+                  key=f"close_temp_pw_{group_id}_{member['user_id']}",
+                  type="primary"):
+        del st.session_state[f"temp_pw_{group_id}_{member['user_id']}"]
         st.rerun()
 
 
@@ -827,7 +900,154 @@ def render_schedule_meeting(group_id: str, coach_id: str, coach_tz: str):
 
 
 # ============================================
-# TAB 4: EINLADUNG PRÜFEN
+# TAB 4: TEILNEHMER ZUWEISEN
+# ============================================
+
+def render_assign_members(coach_id: str):
+    """Zeigt alle registrierten Schueler und erlaubt Zuweisung zu Coach-Gruppen."""
+    st.markdown("### 👤 Teilnehmer verwalten")
+
+    groups = get_coach_groups(coach_id)
+    if not groups:
+        st.info("📭 Erstelle zuerst eine Lerngruppe, bevor du Teilnehmer zuweisen kannst.")
+        return
+
+    students = get_all_students_list()
+    if not students:
+        st.info("📭 Noch keine Schüler registriert.")
+        return
+
+    # Gruppen-Zuordnung fuer jeden Schueler laden
+    group_map = {}  # user_id -> {group_id, group_name}
+    for g in groups:
+        members = get_group_members(g['group_id'])
+        for m in members:
+            group_map[m['user_id']] = {
+                'group_id': g['group_id'],
+                'group_name': g['name']
+            }
+
+    # Suchfeld und Filter
+    col_search, col_filter = st.columns([2, 1])
+    with col_search:
+        search = st.text_input("🔍 Suche nach Name:", key="assign_search", placeholder="Name eingeben...")
+    with col_filter:
+        filter_opt = st.selectbox("Filter:", ["Alle", "Ohne Gruppe", "In Gruppe"], key="assign_filter")
+
+    # Filtern
+    filtered = students
+    if search:
+        search_lower = search.lower()
+        filtered = [s for s in filtered if search_lower in s.get('display_name', '').lower()]
+    if filter_opt == "Ohne Gruppe":
+        filtered = [s for s in filtered if s['user_id'] not in group_map]
+    elif filter_opt == "In Gruppe":
+        filtered = [s for s in filtered if s['user_id'] in group_map]
+
+    st.caption(f"{len(filtered)} von {len(students)} Schüler(n)")
+
+    if not filtered:
+        st.info("Keine Schüler gefunden.")
+        return
+
+    # Tabellen-Header
+    header_cols = st.columns([3, 1, 1, 2, 2, 0.5])
+    header_cols[0].markdown("**Name**")
+    header_cols[1].markdown("**Level**")
+    header_cols[2].markdown("**XP**")
+    header_cols[3].markdown("**Gruppe**")
+    header_cols[4].markdown("**Aktion**")
+    st.divider()
+
+    # Gruppen-Optionen fuer Selectbox
+    group_options = {g['name']: g['group_id'] for g in groups}
+    group_names = list(group_options.keys())
+
+    for student in filtered:
+        uid = student['user_id']
+        name = student.get('display_name', 'Unbekannt')
+        level = student.get('level', 1)
+        xp = student.get('xp_total', 0)
+        assignment = group_map.get(uid)
+
+        cols = st.columns([3, 1, 1, 2, 2, 0.5])
+        cols[0].markdown(f"**{name}**")
+        cols[1].markdown(str(level))
+        cols[2].markdown(f"{xp:,}")
+
+        # Loeschen-Button (letzte Spalte)
+        with cols[5]:
+            if st.button("🗑️", key=f"del_user_{uid}", help=f"{name} löschen"):
+                st.session_state[f"confirm_delete_user_{uid}"] = True
+
+        if assignment:
+            # Schueler ist in einer Coach-Gruppe
+            cols[3].markdown(f"✅ {assignment['group_name']}")
+            with cols[4]:
+                if st.button("✕ Entfernen", key=f"remove_{uid}", type="secondary"):
+                    st.session_state[f"confirm_remove_{uid}"] = True
+
+            if st.session_state.get(f"confirm_remove_{uid}"):
+                st.warning(f"**{name}** wirklich aus **{assignment['group_name']}** entfernen?")
+                c_yes, c_no = st.columns(2)
+                with c_yes:
+                    if st.button("✅ Ja", key=f"yes_rem_{uid}", type="primary"):
+                        if remove_member(assignment['group_id'], uid):
+                            st.toast(f"{name} wurde entfernt.")
+                            st.session_state.pop(f"confirm_remove_{uid}", None)
+                            st.rerun()
+                        else:
+                            st.error("Fehler beim Entfernen.")
+                with c_no:
+                    if st.button("❌ Nein", key=f"no_rem_{uid}"):
+                        st.session_state.pop(f"confirm_remove_{uid}", None)
+                        st.rerun()
+        else:
+            # Schueler hat keine Gruppe — pruefen ob in fremder Gruppe
+            other_group = get_user_group(uid)
+            if other_group:
+                cols[3].markdown(f"🔒 {other_group.get('name', 'Andere')}")
+                cols[4].caption("Anderer Coach")
+            else:
+                cols[3].markdown("—")
+                with cols[4]:
+                    sel_key = f"grp_select_{uid}"
+                    if len(group_names) == 1:
+                        chosen = group_names[0]
+                    else:
+                        chosen = st.selectbox(
+                            "Gruppe", group_names, key=sel_key,
+                            label_visibility="collapsed"
+                        )
+                    if st.button("＋ Zuweisen", key=f"assign_{uid}"):
+                        target_gid = group_options[chosen]
+                        if add_member(target_gid, uid):
+                            st.toast(f"{name} → {chosen}")
+                            st.rerun()
+                        else:
+                            st.error("Fehler — evtl. bereits in einer Gruppe.")
+
+        # Bestaetigungs-Dialog fuer User-Loeschung
+        if st.session_state.get(f"confirm_delete_user_{uid}"):
+            st.error(f"⚠️ **{name}** wirklich komplett löschen? Alle Daten (XP, Badges, Gruppen-Mitgliedschaft) gehen verloren!")
+            c_yes, c_no = st.columns(2)
+            with c_yes:
+                if st.button("🗑️ Ja, endgültig löschen", key=f"yes_del_user_{uid}", type="primary"):
+                    result = delete_user(uid)
+                    if result:
+                        st.toast(f"{name} wurde gelöscht.")
+                        st.session_state.pop(f"confirm_delete_user_{uid}", None)
+                        st.rerun()
+                    else:
+                        st.error(f"Fehler beim Löschen von {name} (ID: {uid}). Siehe Terminal-Log.")
+            with c_no:
+                if st.button("❌ Abbrechen", key=f"no_del_user_{uid}"):
+                    st.session_state.pop(f"confirm_delete_user_{uid}", None)
+                    st.rerun()
+
+
+# ============================================
+# TAB 5: EINLADUNG PRÜFEN
 # ============================================
 
 def render_check_invitation():

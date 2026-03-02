@@ -8,6 +8,18 @@ Version: 2.2 - Kombiniert Hattie-Features mit Ressourcen-Links
 """
 
 import streamlit as st
+
+st.set_page_config(
+    page_title="Deine Auswertung",
+    page_icon="📊",
+    layout="wide"
+)
+
+from utils.feature_flags import ENABLE_PISA
+if not ENABLE_PISA:
+    st.info("PISA-Analyse ist derzeit deaktiviert. Aktiviere ENABLE_PISA in utils/feature_flags.py")
+    st.stop()
+
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
@@ -27,16 +39,6 @@ from utils.evidence_integration import (
     format_pisa_badge
 )
 from utils.page_config import get_page_path
-
-# ============================================
-# PAGE CONFIG
-# ============================================
-
-st.set_page_config(
-    page_title="Deine Auswertung",
-    page_icon="📊",
-    layout="wide"
-)
 
 # ============================================
 # CONSTANTS

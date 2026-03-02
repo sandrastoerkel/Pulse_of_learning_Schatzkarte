@@ -24,6 +24,7 @@ import hmac
 import time
 import base64
 import json
+import random
 import streamlit.components.v1 as components
 
 from utils.database import get_db
@@ -336,6 +337,48 @@ def get_all_users() -> list:
         .execute()
     return result.data
 
+
+def delete_user(user_id: str) -> bool:
+    """Loescht einen User und alle zugehoerigen Daten."""
+    db = get_db()
+    print(f"[delete_user] Start: {user_id}")
+
+    # Zeilen loeschen wo User referenziert ist
+    for table, column in [
+        ("group_members", "user_id"),
+        ("group_messages", "sender_id"),
+        ("meeting_participants", "user_id"),
+        ("challenges", "user_id"),
+        ("user_badges", "user_id"),
+        ("polarstern_goals", "user_id"),
+    ]:
+        try:
+            db.table(table).delete().eq(column, user_id).execute()
+            print(f"[delete_user]   DELETE {table}.{column}: OK")
+        except Exception as e:
+            print(f"[delete_user]   DELETE {table}.{column}: {e}")
+
+    # FK-Spalten nullen statt loeschen (Referenz-Daten bleiben erhalten)
+    for table, column in [
+        ("group_messages", "recipient_id"),
+        ("group_messages", "deleted_by"),
+        ("group_invitations", "used_by"),
+    ]:
+        try:
+            db.table(table).update({column: None}).eq(column, user_id).execute()
+            print(f"[delete_user]   NULL {table}.{column}: OK")
+        except Exception as e:
+            print(f"[delete_user]   NULL {table}.{column}: {e}")
+
+    # User selbst loeschen
+    try:
+        db.table("users").delete().eq("user_id", user_id).execute()
+        print(f"[delete_user]   DELETE users: OK")
+        return True
+    except Exception as e:
+        print(f"[delete_user]   DELETE users: FEHLER -> {e}")
+        return False
+
 # ============================================
 # SESSION STATE MANAGEMENT
 # ============================================
@@ -426,6 +469,12 @@ def render_user_login(show_stats: bool = True, show_info_bar: bool = True):
     if is_logged_in():
         user = get_current_user()
         if user:
+            # Erzwungener Passwortwechsel (Temp-Passwort vom Coach)
+            if check_must_change_password(user["user_id"]):
+                render_force_password_change(user["user_id"])
+                st.stop()
+                return
+
             if show_info_bar:
                 render_logged_in_view(user, show_stats)
         else:
@@ -599,6 +648,7 @@ def render_login_form():
                     st.error(f"Der Name **{name}** ist nicht registriert. Bitte melde dich zuerst im Tab 'Neu anmelden' an.")
                 elif not verify_password(user_id, login_pw):
                     st.error("Falsches Passwort. Bitte versuche es erneut.")
+                    st.caption("Falls du dein Passwort vergessen hast, kann dein Coach dir ein neues geben.")
                 else:
                     user = login_user(name)
                     st.success(f"🎉 Willkommen zurück, {user['display_name']}!")
@@ -961,4 +1011,155 @@ def get_all_students_list() -> list:
         .order("display_name") \
         .execute()
     return result.data
+
+
+# ============================================
+# PASSWORT-RESET (Coach → Schueler)
+# ============================================
+
+TEMP_PASSWORD_WORDS = [
+    "Stern", "Mond", "Tiger", "Rakete", "Drache",
+    "Wolke", "Blitz", "Fuchs", "Adler", "Panda",
+    "Sonne", "Feuer", "Ozean", "Ritter", "Pirat",
+    "Kompass", "Anker", "Schatz", "Diamant", "Kristall",
+    "Falke", "Loewe", "Kobra", "Delfin", "Phoenix",
+    "Donner", "Sturm", "Flamme", "Komet", "Planet",
+]
+
+
+def generate_temp_password() -> str:
+    """Generiert ein kinderfreundliches temporaeres Passwort (z.B. 'Stern4527')."""
+    word = random.choice(TEMP_PASSWORD_WORDS)
+    digits = random.randint(1000, 9999)
+    return f"{word}{digits}"
+
+
+def reset_student_password(coach_id: str, student_id: str) -> Optional[str]:
+    """
+    Setzt das Passwort eines Schuelers zurueck.
+    Prueft ob der Schueler in einer Gruppe des Coaches ist.
+    Gibt das Klartext-Passwort einmalig zurueck (oder None bei Fehler).
+    """
+    from utils.lerngruppen_db import get_coach_groups, get_group_members
+
+    # Autorisierung: Schueler muss in einer Gruppe des Coaches sein
+    groups = get_coach_groups(coach_id)
+    authorized = False
+    for group in groups:
+        members = get_group_members(group['group_id'])
+        if any(m['user_id'] == student_id for m in members):
+            authorized = True
+            break
+
+    if not authorized:
+        return None
+
+    temp_pw = generate_temp_password()
+    pw_hash = hash_password(temp_pw)
+
+    try:
+        get_db().table("users").update({
+            "password_hash": pw_hash,
+            "must_change_password": True,
+            "temp_password_created_at": datetime.now().isoformat(),
+            "password_reset_by": coach_id,
+        }).eq("user_id", student_id).execute()
+        return temp_pw
+    except Exception as e:
+        print(f"Error resetting password: {e}")
+        return None
+
+
+def check_must_change_password(user_id: str) -> bool:
+    """Prueft ob der User sein Passwort aendern muss. Setzt Flag nach 48h zurueck."""
+    try:
+        result = get_db().table("users") \
+            .select("must_change_password, temp_password_created_at") \
+            .eq("user_id", user_id).execute()
+    except Exception:
+        # Spalten existieren noch nicht (Migration nicht ausgefuehrt)
+        return False
+
+    if not result.data:
+        return False
+
+    user = result.data[0]
+    if not user.get("must_change_password"):
+        return False
+
+    # 48h-Ablauf pruefen
+    created_at = user.get("temp_password_created_at")
+    if created_at:
+        try:
+            created = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
+            now = datetime.now(created.tzinfo) if created.tzinfo else datetime.now()
+            if (now - created).total_seconds() > 48 * 3600:
+                # Abgelaufen — Flag zuruecksetzen
+                get_db().table("users").update({
+                    "must_change_password": False,
+                    "temp_password_created_at": None,
+                    "password_reset_by": None,
+                }).eq("user_id", user_id).execute()
+                return False
+        except (ValueError, TypeError):
+            pass
+
+    return True
+
+
+def change_password(user_id: str, new_password: str) -> bool:
+    """Setzt ein neues Passwort und cleart das must_change_password Flag."""
+    try:
+        get_db().table("users").update({
+            "password_hash": hash_password(new_password),
+            "must_change_password": False,
+            "temp_password_created_at": None,
+            "password_reset_by": None,
+        }).eq("user_id", user_id).execute()
+        return True
+    except Exception as e:
+        print(f"Error changing password: {e}")
+        return False
+
+
+def render_force_password_change(user_id: str):
+    """Rendert das erzwungene Passwortwechsel-Formular."""
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+                color: #333; padding: 25px; border-radius: 15px; margin: 20px 0;
+                text-align: center; border: 3px solid #f59e0b;">
+        <div style="font-size: 2.5em; margin-bottom: 10px;">🔑</div>
+        <h2 style="margin: 0 0 10px 0; color: #92400e;">Neues Passwort wählen</h2>
+        <p style="margin: 0; font-size: 1.1em;">
+            Dein Coach hat dir ein neues Passwort gegeben.<br>
+            Bitte wähle jetzt dein eigenes Passwort!
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    new_pw = st.text_input(
+        "Neues Passwort:",
+        type="password",
+        placeholder="Mindestens 6 Zeichen",
+        key="force_pw_new"
+    )
+    confirm_pw = st.text_input(
+        "Passwort bestätigen:",
+        type="password",
+        placeholder="Passwort nochmal eingeben",
+        key="force_pw_confirm"
+    )
+
+    if st.button("✅ Passwort speichern", type="primary", use_container_width=True, key="force_pw_submit"):
+        if not new_pw or len(new_pw) < 6:
+            st.error("Das Passwort muss mindestens 6 Zeichen lang sein.")
+        elif new_pw != confirm_pw:
+            st.error("Die Passwörter stimmen nicht überein.")
+        else:
+            if change_password(user_id, new_pw):
+                st.balloons()
+                st.success("🎉 Passwort erfolgreich geändert! Du kannst jetzt weiterlernen.")
+                st.rerun()
+            else:
+                st.error("Fehler beim Speichern. Bitte versuche es erneut.")
 

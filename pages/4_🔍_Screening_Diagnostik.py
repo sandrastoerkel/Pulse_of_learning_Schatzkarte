@@ -9,6 +9,18 @@ Basierend auf XGBoost-Analyse und Interventionsfähigkeit
 """
 
 import streamlit as st
+
+st.set_page_config(
+    page_title="Screening-Diagnostik",
+    page_icon="🔍",
+    layout="wide"
+)
+
+from utils.feature_flags import ENABLE_PISA
+if not ENABLE_PISA:
+    st.info("PISA-Analyse ist derzeit deaktiviert. Aktiviere ENABLE_PISA in utils/feature_flags.py")
+    st.stop()
+
 import pandas as pd
 import json
 from datetime import datetime
@@ -92,16 +104,6 @@ INTERVENTION_MAPPING = {
         'high': 'Komplexe mathematische Projekte'
     }
 }
-
-# ============================================
-# PAGE CONFIG
-# ============================================
-
-st.set_page_config(
-    page_title="Screening-Diagnostik",
-    page_icon="🔍",
-    layout="wide"
-)
 
 # ============================================
 # SESSION STATE

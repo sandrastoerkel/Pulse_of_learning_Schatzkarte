@@ -8,6 +8,18 @@ Basiert auf: PISA 2022 Deutschland (N=6.116 Schüler)
 """
 
 import streamlit as st
+
+st.set_page_config(
+    page_title="PISA-Forschungsgrundlage",
+    page_icon="📖",
+    layout="wide"
+)
+
+from utils.feature_flags import ENABLE_PISA
+if not ENABLE_PISA:
+    st.info("PISA-Analyse ist derzeit deaktiviert. Aktiviere ENABLE_PISA in utils/feature_flags.py")
+    st.stop()
+
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
@@ -16,16 +28,6 @@ import sys
 sys.path.append('..')
 
 from utils.scale_info import get_scale_info, SCALE_CATEGORIES
-
-# ============================================
-# PAGE CONFIG
-# ============================================
-
-st.set_page_config(
-    page_title="PISA-Forschungsgrundlage",
-    page_icon="📖",
-    layout="wide"
-)
 
 # ============================================
 # HELPER FUNCTIONS
