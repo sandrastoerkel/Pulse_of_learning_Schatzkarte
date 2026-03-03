@@ -1,5 +1,123 @@
 # Pulse of Learning - Schatzkarte
-## Dokumentation Stand 28. Februar 2026
+## Dokumentation Stand 2. Maerz 2026
+
+---
+
+# ÄNDERUNGEN (2. Maerz 2026)
+
+## Schueler anlegen: Coach kann Kinder direkt erstellen
+
+### Zweck
+Coaches koennen neue Schueler-Accounts direkt anlegen, ohne dass das Kind sich vorher selbst registriert. Ein kinderfreundliches Temp-Passwort wird generiert und dem Coach angezeigt.
+
+### Ablauf
+1. Coach gibt **Name + Altersstufe** ein
+2. System generiert Temp-Passwort (z.B. "Tiger4527", "Ozean6044")
+3. Schueler wird erstellt und optional direkt einer Gruppe zugewiesen
+4. Temp-Passwort bleibt fuer den Coach sichtbar, bis das Kind ein eigenes waehlt
+5. Kind muss beim ersten Login ein eigenes Passwort setzen (`must_change_password`)
+
+### Zugang
+- **Tab 1 ("Meine Gruppen"):** Button "➕ Schüler anlegen" pro Gruppe — Gruppe ist fest vorgegeben
+- **Tab 4 ("Teilnehmer"):** Expander "➕ Neuen Schüler anlegen" — Gruppe per Selectbox waehlbar
+
+### Neue Funktion: `create_student_by_coach()` (`utils/user_system.py`)
+```
+create_student_by_coach(coach_id, display_name, age_group, group_id=None)
+├── is_name_taken() prueft Duplikat
+├── generate_temp_password() erzeugt z.B. "Loewe1959"
+├── get_or_create_user_by_name() erstellt User mit Passwort
+├── UPDATE users SET must_change_password=True, temp_password_plain=...
+└── add_member() optional Gruppenzuweisung
+→ Returns: {"user": {...}, "temp_password": "...", "added_to_group": bool}
+```
+
+### Persistentes Temp-Passwort
+| Aspekt | Loesung |
+|--------|---------|
+| **Speicherung** | Neue Spalte `temp_password_plain` in `users` (Klartext, temporaer) |
+| **Sichtbarkeit** | Coach sieht es in der Mitgliederliste, solange `must_change_password=True` |
+| **Loeschung** | Automatisch bei `change_password()` (Kind waehlt eigenes PW) und nach 48h Ablauf |
+| **Migration** | `sql/02_migration_password_reset.sql` (erweitert) |
+| **Fallback** | Code funktioniert auch ohne Spalte (try/except mit Fallback-Query) |
+
+### Anzeige in der Mitgliederliste
+- Grosse Passwort-Box mit orange/gold-Gradient (wie beim Passwort-Reset)
+- "Sichtbar bis der Schüler ein eigenes Passwort wählt"
+- Minimierbar auf `🔑 Temp-Passwort aktiv fuer [Name]` mit "👁️ Zeigen"-Button
+- Verschwindet automatisch wenn Kind Passwort aendert
+
+### Neue UI-Funktion: `render_create_student_form()` (`pages/7_👥_Lerngruppen.py`)
+- Name-Eingabe, Altersstufe-Selectbox, optionale Gruppen-Selectbox
+- Erfolgsanzeige ohne `st.rerun()` (erscheint im selben Render-Zyklus)
+- "Weiteren Schüler anlegen"-Button zum Zuruecksetzen
+
+### Geaenderte Dateien
+
+| Datei | Aenderung |
+|-------|-----------|
+| `utils/user_system.py` | `create_student_by_coach()`, `temp_password_plain` in reset/change/check |
+| `pages/7_👥_Lerngruppen.py` | `render_create_student_form()`, Button in Tab 1, Expander in Tab 4, persistente PW-Anzeige in Mitgliederliste |
+| `utils/lerngruppen_db.py` | `get_group_members()` laedt `must_change_password` + `temp_password_plain` |
+| `sql/02_migration_password_reset.sql` | Neue Spalte `temp_password_plain TEXT NULL` |
+
+---
+
+## Performance-Optimierung: Caching + Batch-Queries
+
+### @st.cache_data auf haeufig aufgerufene Funktionen
+| Funktion | TTL | Ersparnis |
+|----------|-----|-----------|
+| `get_user_by_id()` | 60s | ~2-3 REST-Calls/Render |
+| `get_user_stats()` | 60s | ~2 REST-Calls/Render |
+| `get_user_group()` | 60s | ~3-12 REST-Calls/Render |
+| `get_collected_treasures()` | 60s | ~1 REST-Call/Render |
+| `get_all_island_progress()` | 60s | ~1 REST-Call/Render |
+| `load_user_data()` (Schatzkarte) | 30s | Alle Sub-Queries gecacht |
+| `convert_islands_for_react()` | ∞ | Konstante Daten, nie neu berechnet |
+
+### Batch-Query: `get_group_members()`
+Vorher: 1 + N Queries (bei 10 Mitgliedern = 11 REST-Calls)
+Jetzt: 2 Queries (members + batch user lookup via `.in_()`)
+
+### Cache-Invalidierung
+Jede Write-Operation ruft `.clear()` auf den betroffenen Caches auf:
+- `update_user_stats()` → `get_user_stats.clear()` + `get_user_by_id.clear()`
+- `save_treasure_collected()` → `get_collected_treasures.clear()`
+- `complete_island_action()` → `get_all_island_progress.clear()`
+- `add_member()` / `remove_member()` → `get_user_group.clear()`
+- `login_user()` / `change_password()` / `update_user_avatar()` → `get_user_by_id.clear()`
+
+### Doppelte Funktion entfernt
+`get_all_island_progress()` war doppelt definiert (Zeile 123 + 196 in `map_db.py`). Die obere Version (mit mehr Feldern) bleibt, die untere wurde entfernt.
+
+### Geaenderte Dateien
+
+| Datei | Aenderung |
+|-------|-----------|
+| `pages/1_🗺️_Schatzkarte.py` | `load_user_data(user_id)` + `convert_islands_for_react()` gecacht |
+| `schatzkarte/map_db.py` | Caching + Invalidierung + doppelte Funktion entfernt |
+| `utils/gamification_db.py` | `get_user_stats()` gecacht, Invalidierung bei Writes |
+| `utils/lerngruppen_db.py` | `get_user_group()` gecacht, Batch-Query, Invalidierung |
+| `utils/user_system.py` | `get_user_by_id()` gecacht, Invalidierung bei Writes |
+
+---
+
+## Tab-Navigation Fix: @st.fragment verhindert Seiten-Reset
+
+### Problem
+`st.rerun()` innerhalb von Tabs hat die gesamte Seite neu gerendert — Tab-Auswahl, Scroll-Position und offene Panels gingen verloren.
+
+### Loesung: @st.fragment
+Dekoriert Tab-Inhalte als Fragmente. `st.rerun()` innerhalb eines Fragments rendert nur den Fragment-Inhalt neu, nicht die ganze Seite.
+
+| Datei | Funktion | Tab |
+|-------|----------|-----|
+| `pages/7_👥_Lerngruppen.py` | `render_my_groups()` | Tab 1: Meine Gruppen |
+| `pages/7_👥_Lerngruppen.py` | `render_assign_members()` | Tab 4: Teilnehmer |
+| `pages/8_🔐_Admin.py` | `render_user_roles()` | Tab 1: Benutzer-Rollen |
+
+**Nicht geaendert:** Tab 3 (Video-Treffen) — @st.fragment wuerde eingebettetes Jitsi-Widget bei jedem Fragment-Rerun neu laden.
 
 ---
 
@@ -1756,9 +1874,10 @@ Pulse_of_learning_Schatzkarte/
 │   └── map_styles.py           # (Legacy)
 ├── utils/
 │   ├── database.py             # Zentrales Supabase-Verbindungsmodul
-│   ├── user_system.py          # Login, Rollen, Preview
-│   ├── gamification_db.py      # XP, Level, Streaks
-│   ├── lerngruppen_db.py       # Coach-Gruppen
+│   ├── user_system.py          # Login, Rollen, Preview, Schueler-Erstellung
+│   ├── gamification_db.py      # XP, Level, Streaks (mit @st.cache_data)
+│   ├── lerngruppen_db.py       # Coach-Gruppen (mit Batch-Queries + Caching)
+│   ├── nachrichten_db.py       # Chat/Nachrichten-System
 │   ├── coaching_db.py          # Schueler-Management
 │   └── ressourcen/             # Content fuer Ressourcen-Seite
 └── data/
@@ -2131,6 +2250,19 @@ Coaches stehen nur in `learning_groups.coach_id`, nicht in `group_members`. `loa
 - [ ] Quiz-Content fuer fehlende Stufen erstellen (Festung MS, Werkzeuge US/MS, Faeden alle)
 - [ ] Hintergrundbilder fuer restliche 11 Inseln
 
+### Erledigt (02.03.2026)
+- [x] Schueler anlegen durch Coach (Name + Altersstufe → Temp-Passwort)
+- [x] Persistentes Temp-Passwort (sichtbar bis Kind eigenes PW waehlt)
+- [x] Performance-Optimierung: @st.cache_data + Batch-Queries + Cache-Invalidierung
+- [x] Tab-Navigation Fix: @st.fragment verhindert Tab-Reset bei st.rerun()
+- [x] Doppelte get_all_island_progress() in map_db.py entfernt
+
+### Erledigt (28.02.2026)
+- [x] Nachrichtenboard: WhatsApp-Style Chat fuer Lerngruppen
+- [x] Supabase Realtime fuer Live-Chat-Updates
+- [x] Gruppen-Wechsler fuer Coaches mit mehreren Gruppen
+- [x] Chat-Widget mit Resize + Drag
+
 ### Erledigt (26.02.2026)
 - [x] Login-Loop auf der Schatzkarte gefixt (Deferred Cookie Pattern)
 - [x] JaaS fuer Kinder auf Meine Lernreise (8x8.vc statt meet.jit.si)
@@ -2145,6 +2277,6 @@ Coaches stehen nur in `learning_groups.coach_id`, nicht in `group_members`. `loa
 
 ---
 
-**Letzte Bearbeitung:** 26. Februar 2026
-**Letzter Meilenstein:** Video-System komplett (JaaS fuer Coach + Kinder, persistentes Widget, Login-Loop gefixt)
+**Letzte Bearbeitung:** 2. Maerz 2026
+**Letzter Meilenstein:** Coach kann Schueler direkt anlegen + Performance-Optimierung + Tab-Fix
 **Naechster Meilenstein:** Streamlit Cloud Deployment mit JaaS + End-to-End Tests
