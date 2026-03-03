@@ -151,8 +151,24 @@ function RPGSchatzkarteContent({
   const [unlockedIslands, setUnlockedIslands] = useState<string[]>(initialUnlockedIslands);
   const [ageGroup, setAgeGroup] = useState<AgeGroup>(initialAgeGroup);
   const [playerLevel, setPlayerLevel] = useState(heroData.level);
-  const [selectedIsland, setSelectedIsland] = useState<Island | null>(null);
-  const [showQuestModal, setShowQuestModal] = useState(false);
+  // selectedIsland + showQuestModal: aus sessionStorage wiederherstellen falls Component
+  // remountet (z.B. durch Widget-Tree-Aenderung in Streamlit)
+  const [selectedIsland, setSelectedIsland] = useState<Island | null>(() => {
+    try {
+      const savedId = sessionStorage.getItem('_sk_selectedIslandId');
+      if (savedId) {
+        const island = islands.find(i => i.id === savedId);
+        if (island) return island;
+      }
+    } catch {}
+    return null;
+  });
+  const [showQuestModal, setShowQuestModal] = useState(() => {
+    try {
+      return sessionStorage.getItem('_sk_showQuestModal') === 'true';
+    } catch {}
+    return false;
+  });
   const [initialIslandPhase, setInitialIslandPhase] = useState<string | null>(null);  // Phase für Auto-Open
   const [showBanduraModal, setShowBanduraModal] = useState(false);
   const [showHattieModal, setShowHattieModal] = useState(false);
@@ -249,6 +265,28 @@ function RPGSchatzkarteContent({
     }
   });
 
+
+  // selectedIsland/showQuestModal in sessionStorage persistieren
+  // damit der State nach einem Iframe-Remount wiederhergestellt werden kann
+  useEffect(() => {
+    try {
+      if (selectedIsland) {
+        sessionStorage.setItem('_sk_selectedIslandId', selectedIsland.id);
+      } else {
+        sessionStorage.removeItem('_sk_selectedIslandId');
+      }
+    } catch {}
+  }, [selectedIsland]);
+
+  useEffect(() => {
+    try {
+      if (showQuestModal) {
+        sessionStorage.setItem('_sk_showQuestModal', 'true');
+      } else {
+        sessionStorage.removeItem('_sk_showQuestModal');
+      }
+    } catch {}
+  }, [showQuestModal]);
 
   // Zeige Avatar Creator automatisch beim ersten Besuch (kein Avatar vorhanden)
   // NICHT im Preview-Modus - dort soll man direkt die Karte sehen

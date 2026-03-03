@@ -62,6 +62,10 @@ st.set_page_config(
 # USER-AUTHENTIFIZIERUNG
 # ===============================================================
 
+# Navigations-Flag von Home.py zuruecksetzen (verhindert Endlos-Loop
+# wenn Home.py nochmal rendert und der Component-Wert noch gespeichert ist)
+st.session_state.pop("_nav_to_schatzkarte", None)
+
 # Preview-Modus hat Vorrang (braucht keinen echten Login)
 if is_preview_mode():
     user_id = st.session_state.get("current_user_id", "preview_user")

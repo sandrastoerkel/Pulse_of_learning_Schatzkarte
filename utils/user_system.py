@@ -120,6 +120,22 @@ def try_auto_login() -> bool:
     if st.session_state.get("_just_logged_out"):
         del st.session_state["_just_logged_out"]
         _delete_cookie_js(COOKIE_NAME)
+        # Persistentes Flag: Cookie wurde logisch geloescht,
+        # aber der Browser hat es evtl. noch (JS-Loesung ist async).
+        # Verhindert Relogin-Loop bis Cookie tatsaechlich weg ist.
+        st.session_state._cookie_invalidated = True
+        return False
+
+    # Cookie wurde logisch geloescht — nicht erneut auto-einloggen
+    # bis der Browser das Cookie tatsaechlich entfernt hat
+    if st.session_state.get("_cookie_invalidated"):
+        try:
+            cookie_still_exists = bool(st.context.cookies.get(COOKIE_NAME))
+        except Exception:
+            cookie_still_exists = False
+        if not cookie_still_exists:
+            # Cookie ist endlich weg — Flag aufheben
+            del st.session_state["_cookie_invalidated"]
         return False
 
     try:
@@ -140,6 +156,9 @@ def try_auto_login() -> bool:
         # DB-Verbindung fehlgeschlagen - Cookie ignorieren, kein Crash
         return False
     if not user:
+        # User existiert nicht mehr in DB — Cookie loeschen
+        _delete_cookie_js(COOKIE_NAME)
+        st.session_state._cookie_invalidated = True
         return False
 
     # Session State wiederherstellen
@@ -147,8 +166,12 @@ def try_auto_login() -> bool:
     st.session_state.current_user_name = user["display_name"]
     st.session_state.current_user_age_group = user.get("age_group", "grundschule")
 
-    # Admin/Coach-Status wiederherstellen
+    # Rolle cachen (verhindert DB-Roundtrip in render_age_switcher_overlay)
     user_role = user.get("role", "student")
+    st.session_state._cached_user_role = user_role
+    st.session_state._cached_user_role_id = user["user_id"]
+
+    # Admin/Coach-Status wiederherstellen
     if user_role in ["coach", "admin", "paedagoge", "pädagoge"]:
         st.session_state.show_admin_user_list = True
 
@@ -415,8 +438,12 @@ def login_user(display_name: str, age_group: str = None, avatar_style: str = Non
     st.session_state.current_user_name = user['display_name']
     st.session_state.current_user_age_group = user.get('age_group', 'grundschule')
 
-    # Admin/Coach-Status für Quick-Login-Liste merken
+    # Rolle cachen (verhindert DB-Roundtrip in render_age_switcher_overlay)
     user_role = user.get('role', 'student')
+    st.session_state._cached_user_role = user_role
+    st.session_state._cached_user_role_id = user['user_id']
+
+    # Admin/Coach-Status für Quick-Login-Liste merken
     if user_role in ['coach', 'admin', 'paedagoge', 'pädagoge']:
         st.session_state.show_admin_user_list = True
 
@@ -430,7 +457,8 @@ def login_user(display_name: str, age_group: str = None, avatar_style: str = Non
     get_user_by_id.clear()
 
     # Registrierungs-State aufräumen (verhindert Login-Loop auf Schatzkarte)
-    for key in ["registration_step", "registration_name", "registration_age", "registration_password"]:
+    for key in ["registration_step", "registration_name", "registration_age", "registration_password",
+                "_cookie_invalidated", "_nav_to_schatzkarte"]:
         if key in st.session_state:
             del st.session_state[key]
 
@@ -448,7 +476,7 @@ def logout_user():
     # Admin-Status NICHT löschen, damit Quick-Login-Liste sichtbar bleibt
     keys_to_delete = ["current_user_id", "current_user_name", "current_user_age_group",
                       "registration_step", "registration_name", "registration_age",
-                      "registration_password"]
+                      "registration_password", "_cached_user_role", "_cached_user_role_id"]
     for key in keys_to_delete:
         if key in st.session_state:
             del st.session_state[key]
@@ -490,8 +518,13 @@ def render_user_login(show_stats: bool = True, show_info_bar: bool = True):
             if show_info_bar:
                 render_logged_in_view(user, show_stats)
         else:
-            # User nicht gefunden, ausloggen
-            logout_user()
+            # User nicht gefunden (DB-Timeout, User geloescht, etc.)
+            # WICHTIG: Nicht logout_user() aufrufen — dessen _delete_cookie_js()
+            # erzeugt einen components.html()-Iframe der Rerun-Loops ausloesen kann.
+            # Stattdessen Session leise bereinigen und Cookie als ungueltig markieren.
+            for key in ["current_user_id", "current_user_name", "current_user_age_group"]:
+                st.session_state.pop(key, None)
+            st.session_state._cookie_invalidated = True
             render_login_form()
     else:
         render_login_form()
@@ -965,11 +998,34 @@ ROLE_ADMIN = 'admin'
 
 
 def get_user_role(user_id: str) -> str:
-    """Gibt die Rolle eines Users zurueck."""
-    result = get_db().table("users").select("role").eq("user_id", user_id).execute()
-    if result.data and result.data[0].get("role"):
-        return result.data[0]["role"]
-    return ROLE_STUDENT
+    """Gibt die Rolle eines Users zurueck (mit Session-Cache).
+
+    WICHTIG: Gecacht in session_state um DB-Roundtrips bei jedem Render zu vermeiden.
+    Ohne Cache fuehrt ein DB-Timeout dazu, dass ROLE_STUDENT zurueckgegeben wird —
+    das aendert den Widget-Tree (Selectbox verschwindet) und zerstoert das React-Iframe.
+    """
+    # Schneller Pfad: Rolle aus Session-State
+    cached_role = st.session_state.get("_cached_user_role")
+    cached_for = st.session_state.get("_cached_user_role_id")
+    if cached_role and cached_for == user_id:
+        return cached_role
+
+    try:
+        result = get_db().table("users").select("role").eq("user_id", user_id).execute()
+        if result.data and result.data[0].get("role"):
+            role = result.data[0]["role"]
+        else:
+            role = ROLE_STUDENT
+    except Exception:
+        # DB-Fehler: Falls gecachte Rolle vorhanden, diese verwenden
+        if cached_role and cached_for == user_id:
+            return cached_role
+        return ROLE_STUDENT
+
+    # In Session-State cachen
+    st.session_state._cached_user_role = role
+    st.session_state._cached_user_role_id = user_id
+    return role
 
 
 def set_user_role(user_id: str, role: str) -> bool:
@@ -978,6 +1034,9 @@ def set_user_role(user_id: str, role: str) -> bool:
         return False
     try:
         get_db().table("users").update({"role": role}).eq("user_id", user_id).execute()
+        # Cache invalidieren
+        st.session_state.pop("_cached_user_role", None)
+        st.session_state.pop("_cached_user_role_id", None)
         return True
     except Exception as e:
         print(f"Error setting role: {e}")

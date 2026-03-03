@@ -414,29 +414,51 @@ export default function FloatingChatWidget({ chatData, onAction }: FloatingChatW
   }, [messages, isOpen]);
 
   // Ungelesen zuruecksetzen wenn Chat geoeffnet wird
+  // Direkt via Supabase — KEIN onAction/Streamlit-Rerun
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && supabaseRef.current) {
       setUnreadCount(0);
-      onAction({
-        action: 'chat_seen' as any,
-        groupId: activeGroupId
-      });
+      // last_seen_chat in group_members aktualisieren
+      supabaseRef.current
+        .from('group_members')
+        .update({ last_seen_chat: new Date().toISOString() })
+        .eq('group_id', activeGroupId)
+        .eq('user_id', userId)
+        .then(() => {});
+      // Fuer Coaches: auch in learning_groups.settings speichern
+      if (userRole === 'coach') {
+        supabaseRef.current
+          .from('learning_groups')
+          .select('settings')
+          .eq('group_id', activeGroupId)
+          .single()
+          .then(({ data }: any) => {
+            const settings = data?.settings || {};
+            settings.coach_last_seen_chat = new Date().toISOString();
+            supabaseRef.current
+              .from('learning_groups')
+              .update({ settings })
+              .eq('group_id', activeGroupId)
+              .then(() => {});
+          });
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, activeGroupId, userId, userRole]);
 
   // ============================================
   // HANDLERS
   // ============================================
 
-  const handleSend = useCallback(() => {
+  const handleSend = useCallback(async () => {
     const text = inputText.trim();
-    if (!text || sendingMessage) return;
+    if (!text || sendingMessage || !supabaseRef.current) return;
 
     setSendingMessage(true);
 
     // Optimistic Update: Nachricht sofort anzeigen
+    const tempId = `temp-${Date.now()}`;
     const optimisticMsg: ChatMessage = {
-      id: `temp-${Date.now()}`,
+      id: tempId,
       senderId: userId,
       senderName: userName,
       recipientId: dmTarget?.userId || null,
@@ -448,29 +470,45 @@ export default function FloatingChatWidget({ chatData, onAction }: FloatingChatW
     setInputText('');
     setShowEmojis(false);
 
-    // An Python senden (schreibt in DB → Realtime Event)
-    if (dmTarget) {
-      onAction({
-        action: 'message_send_dm' as any,
-        messageText: text,
-        groupId: activeGroupId,
-        recipientId: dmTarget.userId
-      } as any);
-    } else {
-      onAction({
-        action: 'message_send' as any,
-        messageText: text,
-        groupId: activeGroupId
-      } as any);
+    // Direkt in Supabase einfuegen — KEIN Streamlit-Rerun!
+    try {
+      const { data, error } = await supabaseRef.current
+        .from('group_messages')
+        .insert({
+          group_id: activeGroupId,
+          sender_id: userId,
+          sender_name: userName,
+          recipient_id: dmTarget?.userId || null,
+          message_text: text,
+          message_type: 'text'
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Temp-Nachricht durch echte ersetzen (mit richtiger DB-ID)
+      if (data) {
+        setMessages(prev => prev.map(m =>
+          m.id === tempId ? { ...m, id: data.id, createdAt: data.created_at } : m
+        ));
+      }
+    } catch (err) {
+      console.error('Error sending message:', err);
+      // Bei Fehler: Temp-Nachricht entfernen
+      setMessages(prev => prev.filter(m => m.id !== tempId));
     }
 
-    setTimeout(() => setSendingMessage(false), 500);
+    setSendingMessage(false);
     inputRef.current?.focus();
-  }, [inputText, userId, userName, dmTarget, activeGroupId, onAction, sendingMessage]);
+  }, [inputText, userId, userName, dmTarget, activeGroupId, sendingMessage]);
 
-  const handleEmojiSend = useCallback((emoji: string) => {
+  const handleEmojiSend = useCallback(async (emoji: string) => {
+    if (!supabaseRef.current) return;
+
+    const tempId = `temp-${Date.now()}`;
     const optimisticMsg: ChatMessage = {
-      id: `temp-${Date.now()}`,
+      id: tempId,
       senderId: userId,
       senderName: userName,
       recipientId: dmTarget?.userId || null,
@@ -481,31 +519,52 @@ export default function FloatingChatWidget({ chatData, onAction }: FloatingChatW
     setMessages(prev => [...prev, optimisticMsg]);
     setShowEmojis(false);
 
-    if (dmTarget) {
-      onAction({
-        action: 'message_send_dm' as any,
-        messageText: emoji,
-        groupId: activeGroupId,
-        recipientId: dmTarget.userId
-      } as any);
-    } else {
-      onAction({
-        action: 'message_send' as any,
-        messageText: emoji,
-        groupId: activeGroupId
-      } as any);
-    }
-  }, [userId, userName, dmTarget, activeGroupId, onAction]);
+    // Direkt in Supabase einfuegen — KEIN Streamlit-Rerun!
+    try {
+      const { data, error } = await supabaseRef.current
+        .from('group_messages')
+        .insert({
+          group_id: activeGroupId,
+          sender_id: userId,
+          sender_name: userName,
+          recipient_id: dmTarget?.userId || null,
+          message_text: emoji,
+          message_type: 'emoji'
+        })
+        .select()
+        .single();
 
-  const handleDelete = useCallback((messageId: string) => {
+      if (error) throw error;
+
+      if (data) {
+        setMessages(prev => prev.map(m =>
+          m.id === tempId ? { ...m, id: data.id, createdAt: data.created_at } : m
+        ));
+      }
+    } catch (err) {
+      console.error('Error sending emoji:', err);
+      setMessages(prev => prev.filter(m => m.id !== tempId));
+    }
+  }, [userId, userName, dmTarget, activeGroupId]);
+
+  const handleDelete = useCallback(async (messageId: string) => {
+    if (!supabaseRef.current) return;
+
     // Optimistic: sofort entfernen
     setMessages(prev => prev.filter(m => m.id !== messageId));
-    onAction({
-      action: 'message_delete' as any,
-      messageId,
-      groupId: activeGroupId
-    } as any);
-  }, [activeGroupId, onAction]);
+
+    // Direkt in Supabase soft-deleten — KEIN Streamlit-Rerun!
+    try {
+      const { error } = await supabaseRef.current
+        .from('group_messages')
+        .update({ is_deleted: true, deleted_by: userId })
+        .eq('id', messageId);
+
+      if (error) throw error;
+    } catch (err) {
+      console.error('Error deleting message:', err);
+    }
+  }, [activeGroupId, userId]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -779,8 +838,8 @@ export default function FloatingChatWidget({ chatData, onAction }: FloatingChatW
                   {msg.recipientId && (
                     <span style={styles.dmBadge}>DM</span>
                   )}
-                  {/* Coach kann loeschen */}
-                  {userRole === 'coach' && !isOwn && !msg.id.startsWith('temp-') && (
+                  {/* Coach kann alle loeschen, jeder kann eigene loeschen */}
+                  {(userRole === 'coach' || isOwn) && !msg.id.startsWith('temp-') && (
                     <button
                       onClick={() => handleDelete(msg.id)}
                       style={styles.deleteBtn}

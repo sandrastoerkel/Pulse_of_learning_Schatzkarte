@@ -81,9 +81,20 @@ result = landing_page(
     key="landing_page"
 )
 
+# Wenn User von der Schatzkarte zurueckkehrt: Navigations-Flag zuruecksetzen
+# damit der naechste Klick auf "Zur Karte" wieder funktioniert
+if not result:
+    st.session_state.pop("_nav_to_schatzkarte", None)
+
 # Navigation zur Schatzkarte wenn User klickt
 if result:
     action = result.get("action", "") if isinstance(result, dict) else ""
+
+    # Guard: Verhindert endlose st.switch_page()-Aufrufe wenn der Component-Wert
+    # in der Session bestehen bleibt (Race-Condition beim Seitenwechsel)
+    if st.session_state.get("_nav_to_schatzkarte"):
+        st.stop()
+
     # Pfad zur Schatzkarte ermitteln (mit Fallback)
     schatzkarte_path = get_page_path("schatzkarte")
     if not schatzkarte_path:
@@ -92,8 +103,10 @@ if result:
 
     if action == "go_to_map":
         # Zur Schatzkarte navigieren (normaler Login-Flow)
+        st.session_state._nav_to_schatzkarte = True
         st.switch_page(schatzkarte_path)
     elif action == "start_preview":
         # Demo-Modus: Preview starten und direkt zur Schatzkarte
+        st.session_state._nav_to_schatzkarte = True
         start_preview_mode("unterstufe")
         st.switch_page(schatzkarte_path)

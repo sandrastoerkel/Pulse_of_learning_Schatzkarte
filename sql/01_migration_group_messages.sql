@@ -43,16 +43,16 @@ CREATE POLICY "Anon kann Nachrichten lesen"
     TO anon
     USING (true);
 
--- INSERT: nur service_role (Python-Backend)
-CREATE POLICY "Service kann Nachrichten erstellen"
+-- INSERT: anon darf Nachrichten erstellen (App nutzt anon key)
+CREATE POLICY "Anon kann Nachrichten erstellen"
     ON group_messages FOR INSERT
-    TO service_role
+    TO anon
     WITH CHECK (true);
 
--- UPDATE: nur service_role (fuer Soft-Delete durch Coach)
-CREATE POLICY "Service kann Nachrichten updaten"
+-- UPDATE: anon darf Nachrichten updaten (Soft-Delete durch Coach)
+CREATE POLICY "Anon kann Nachrichten updaten"
     ON group_messages FOR UPDATE
-    TO service_role
+    TO anon
     USING (true);
 
 -- ============================================
