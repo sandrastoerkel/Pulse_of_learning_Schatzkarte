@@ -105,10 +105,14 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
 
   const isVideoView = view === 'small' || view === 'large';
 
-  // Force join from external trigger (Header-Button)
+  // Force join from external trigger (Header-Button) — startet direkt im Large-Modus
   useEffect(() => {
     if (forceJoin && view === 'join-button' && meetingData.canJoin) {
-      setView('small');
+      const lw = Math.round(window.innerWidth * 0.6);
+      const lh = Math.round(window.innerHeight * 0.7);
+      setSize({ width: lw, height: lh });
+      setPos({ x: Math.round((window.innerWidth - lw) / 2), y: Math.round((window.innerHeight - lh) / 2) });
+      setView('large');
       setJitsiActive(true);
     }
   }, [forceJoin]);

@@ -12,9 +12,7 @@ Features:
 - Ablauf-Ueberblick (12 Wochen)
 """
 
-import json
 import streamlit as st
-import streamlit.components.v1 as components
 from datetime import datetime
 
 try:
@@ -26,8 +24,7 @@ try:
         get_group, get_user_group,
         get_invitation, use_invitation,
         get_next_meeting, get_group_meetings,
-        get_group_week, get_meeting_access,
-        generate_jaas_jwt, record_meeting_join,
+        get_group_week,
         send_welcome_email,
     )
 except ImportError as e:
@@ -238,10 +235,10 @@ def main():
     st.markdown("")
     _render_next_meeting_countdown(group_id)
 
-    # Buttons: Schatzkarte + Video-Treffen
+    # Button: Schatzkarte
     st.markdown("")
     st.markdown("---")
-    _render_action_buttons(group_id, user_id)
+    _render_action_buttons()
 
     # Ablauf-Ueberblick
     st.markdown("")
@@ -329,10 +326,19 @@ def _render_group_info(group: dict):
                 padding: 20px; margin-top: 10px;">
         <h4 style="color: #854d0e; margin: 0 0 10px 0;">So funktioniert's</h4>
         <p><strong>1.</strong> Oeffne die <strong>Schatzkarte</strong> — dort lernst du mit Inseln und Abenteuern</p>
-        <p><strong>2.</strong> Beim Treffen oeffnest du den <strong>Video-Chat</strong> — dort triffst du deinen Coach und die anderen Kinder</p>
+        <p><strong>2.</strong> Beim Treffen drueckst du oben auf der Schatzkarte auf
+            <span style="display: inline-flex; align-items: center; gap: 6px;
+                         background: linear-gradient(135deg, #fbbf24, #f59e0b);
+                         color: #78350f; font-weight: 600; font-size: 0.85em;
+                         padding: 3px 10px; border-radius: 8px; vertical-align: middle;
+                         box-shadow: 0 1px 3px rgba(0,0,0,0.15);">
+                <span>📹</span><span>Video starten</span>
+            </span>
+        </p>
+        <p><strong>3.</strong> Ueber den <strong>💬 Chat</strong> kannst du jederzeit mit deiner Gruppe schreiben</p>
         <p style="margin-top: 12px; padding: 10px; background: white; border-radius: 8px;">
-            <strong>Tipp:</strong> Oeffne beides in eigenen Browser-Tabs, damit du die Schatzkarte
-            UND den Video-Chat gleichzeitig nutzen kannst!
+            <strong>Alles an einem Ort:</strong> Video, Chat und Schatzkarte laufen gleichzeitig —
+            du brauchst nur einen Tab!
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -384,117 +390,11 @@ def _render_next_meeting_countdown(group_id: str):
     """, unsafe_allow_html=True)
 
 
-def _render_action_buttons(group_id: str, user_id: str):
-    """Schatzkarte-Button (immer aktiv) + Video-Treffen-Button (JaaS eingebettet / ausgegraut)."""
-    access = get_meeting_access(group_id, user_id, 'kind')
-    meeting_active = access.get("canJoin", False)
-    room_name = access.get("roomName")
-    meeting = access.get("meeting")
+def _render_action_buttons():
+    """Schatzkarte-Button."""
+    if st.button("Zur Schatzkarte", type="primary", use_container_width=True):
+        st.switch_page("pages/1_🗺️_Schatzkarte.py")
 
-    col_a, col_b = st.columns(2)
-
-    with col_a:
-        if st.button("Zur Schatzkarte", type="primary", use_container_width=True):
-            st.switch_page("pages/1_🗺️_Schatzkarte.py")
-
-    with col_b:
-        if meeting_active and room_name:
-            # Goldener Button zum Beitreten
-            if st.button("📹 Video-Treffen beitreten", use_container_width=True,
-                         key="join_meeting_btn", type="secondary"):
-                st.session_state["show_jitsi_kid"] = True
-        else:
-            # Kein Meeting — Button ausgegraut
-            st.markdown("""
-            <div style="display: block; text-align: center; padding: 14px 20px;
-                        background: #e5e7eb; color: #9ca3af; font-size: 18px;
-                        font-weight: bold; border-radius: 12px; cursor: not-allowed;">
-                Video-Treffen beitreten
-            </div>
-            """, unsafe_allow_html=True)
-            reason = access.get("timeStatus", {}).get("reason", "")
-            if reason == "too_early":
-                minutes = access["timeStatus"].get("minutesUntilStart", "?")
-                st.caption(f"Noch {minutes} Minuten bis zum Treffen")
-            else:
-                st.caption("Kein Treffen gerade aktiv")
-
-    # Eingebetteter JaaS-Videochat (unterhalb der Buttons)
-    if meeting_active and room_name and st.session_state.get("show_jitsi_kid"):
-        _render_jitsi_kid(room_name, meeting, group_id, user_id)
-
-
-def _render_jitsi_kid(room_name: str, meeting: dict, group_id: str, user_id: str):
-    """Rendert den eingebetteten Jitsi-Videochat fuer Kinder via JaaS."""
-    user = get_current_user()
-    display_name = user.get('display_name', 'Kind')
-
-    try:
-        jaas_cfg = st.secrets["jaas"]
-        app_id = jaas_cfg["app_id"]
-    except (KeyError, AttributeError):
-        st.error("Video-Konfiguration fehlt.")
-        return
-
-    jwt_token = generate_jaas_jwt(
-        user_name=display_name,
-        user_id=user_id,
-        is_moderator=False,  # Kind = Teilnehmer, kein Moderator
-        room=room_name,
-        user_email=''
-    )
-    if not jwt_token:
-        st.error("Video-Verbindung fehlgeschlagen.")
-        return
-
-    # Teilnahme tracken
-    meeting_id = meeting.get('id', '')
-    join_key = f"joined_{meeting_id}_{user_id}"
-    if not st.session_state.get(join_key):
-        record_meeting_join(meeting_id, user_id, display_name, 'kind')
-        st.session_state[join_key] = True
-
-    full_room_name = f"{app_id}/{room_name}"
-    config = json.dumps({
-        "startWithAudioMuted": True,
-        "startWithVideoMuted": False,
-        "prejoinPageEnabled": True,
-        "disableDeepLinking": True,
-        "defaultLanguage": "de",
-    })
-    interface_config = json.dumps({
-        "SHOW_JITSI_WATERMARK": False,
-        "SHOW_BRAND_WATERMARK": False,
-        "SHOW_POWERED_BY": False,
-        "MOBILE_APP_PROMO": False,
-        "TOOLBAR_ALWAYS_VISIBLE": True,
-    })
-    display_name_js = json.dumps(display_name)
-
-    jitsi_html = f"""
-    <div id="jitsi-container" style="width: 100%; height: 500px; border-radius: 12px;
-         overflow: hidden; border: 2px solid #e2e8f0; background: #1a1a2e;"></div>
-
-    <script src="https://8x8.vc/{app_id}/external_api.js"></script>
-    <script>
-    (function() {{
-        var api = new JitsiMeetExternalAPI("8x8.vc", {{
-            roomName: "{full_room_name}",
-            jwt: "{jwt_token}",
-            parentNode: document.querySelector('#jitsi-container'),
-            configOverwrite: {config},
-            interfaceConfigOverwrite: {interface_config},
-            userInfo: {{
-                displayName: {display_name_js}
-            }}
-        }});
-    }})();
-    </script>
-    """
-
-    st.markdown("---")
-    st.markdown("### 📹 Video-Treffen")
-    components.html(jitsi_html, height=520)
 
 
 def _render_ablauf_ueberblick(current_week: int):
