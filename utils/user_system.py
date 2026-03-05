@@ -566,7 +566,7 @@ def render_login_form():
         if st.button("👁️ App nur ansehen (Preview-Modus)", use_container_width=True, type="secondary"):
             start_preview_mode("unterstufe")
             st.rerun()
-        st.caption("Teste alle Funktionen ohne Anmeldung. Altersstufe jederzeit wechselbar.")
+        st.caption("Teste alle Funktionen ohne Anmeldung (Unterstufe).")
     st.markdown("---")
 
     # === Zwei Tabs: Neu anmelden / Einloggen ===
@@ -637,18 +637,26 @@ def render_login_form():
                 ("oberstufe", "🎓", "Oberstufe", "Klasse 11-13", col4),
             ]
 
+            # TEMPORAER: Nur Unterstufe aktiv, Rest deaktiviert
+            TEMP_DISABLED_AGE_GROUPS = {"grundschule", "mittelstufe", "oberstufe"}
+
             for age_key, icon, label, desc, col in age_buttons:
+                is_disabled = age_key in TEMP_DISABLED_AGE_GROUPS
                 with col:
+                    opacity = "0.4" if is_disabled else "1"
                     st.markdown(f"""
                     <div style="text-align: center; padding: 10px; background: #f8f9fa;
-                                border-radius: 10px; margin-bottom: 10px;">
+                                border-radius: 10px; margin-bottom: 10px; opacity: {opacity};">
                         <div style="font-size: 2em;">{icon}</div>
                         <div style="font-weight: bold;">{label}</div>
                         <div style="font-size: 0.8em; color: #666;">{desc}</div>
+                        {f'<div style="font-size: 0.7em; color: #e74c3c; margin-top: 4px;">Bald verfügbar</div>' if is_disabled else ''}
                     </div>
                     """, unsafe_allow_html=True)
 
-                    if st.button(f"Wählen", key=f"age_{age_key}", use_container_width=True):
+                    if is_disabled:
+                        st.button(f"Wählen", key=f"age_{age_key}", use_container_width=True, disabled=True)
+                    elif st.button(f"Wählen", key=f"age_{age_key}", use_container_width=True):
                         name = st.session_state.registration_name
                         pw = st.session_state.get("registration_password")
                         user = login_user(name, age_key, password=pw)
@@ -948,12 +956,13 @@ def render_age_switcher_overlay():
     """, unsafe_allow_html=True)
 
     # Altersstufen-Optionen
+    # TEMPORAER: Nur Unterstufe aktiv, Rest deaktiviert
     age_options = {
-        "grundschule": "🎒 Grundschule",
         "unterstufe": "📚 Unterstufe",
-        "mittelstufe": "🎯 Mittelstufe",
-        "oberstufe": "🎓 Oberstufe",
-        "paedagogen": "👩‍🏫 Pädagogen",
+        # "grundschule": "🎒 Grundschule",       # TEMPORAER deaktiviert
+        # "mittelstufe": "🎯 Mittelstufe",       # TEMPORAER deaktiviert
+        # "oberstufe": "🎓 Oberstufe",           # TEMPORAER deaktiviert
+        # "paedagogen": "👩‍🏫 Pädagogen",         # TEMPORAER deaktiviert
     }
 
     # Selectbox für Altersstufe (schließt automatisch nach Auswahl)

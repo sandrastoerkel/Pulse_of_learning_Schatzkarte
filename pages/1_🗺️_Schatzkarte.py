@@ -351,10 +351,9 @@ islands = convert_islands_for_react()
 hero_data = create_hero_data(user_data)
 unlocked_islands = get_unlocked_islands(user_id)
 
-# Demo-Modus: Nur erste 5 Inseln freischalten (für öffentliche Demo)
+# Demo-Modus: TEMPORAER nur 3 Inseln freischalten (Basiscamp, Mental Stark, Cleverer Lernen)
 if is_preview_mode() or user_id == "preview_user":
-    # Erste 5 Inseln: start, festung, werkzeuge, bruecken, faeden
-    DEMO_ISLANDS = ["start", "festung", "werkzeuge", "bruecken", "faeden"]
+    DEMO_ISLANDS = ["start", "festung", "werkzeuge"]
     unlocked_islands = [i for i in unlocked_islands if i in DEMO_ISLANDS]
     # Falls weniger freigeschaltet, alle Demo-Inseln freischalten
     if len(unlocked_islands) < len(DEMO_ISLANDS):
