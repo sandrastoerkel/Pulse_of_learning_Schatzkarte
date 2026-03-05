@@ -164,10 +164,10 @@ def try_auto_login() -> bool:
     # Session State wiederherstellen
     st.session_state.current_user_id = user["user_id"]
     st.session_state.current_user_name = user["display_name"]
-    st.session_state.current_user_age_group = user.get("age_group", "grundschule")
+    st.session_state.current_user_age_group = user.get("age_group", "grundschule").lower()
 
     # Rolle cachen (verhindert DB-Roundtrip in render_age_switcher_overlay)
-    user_role = user.get("role", "student")
+    user_role = user.get("role", "student").lower()
     st.session_state._cached_user_role = user_role
     st.session_state._cached_user_role_id = user["user_id"]
 
@@ -436,10 +436,10 @@ def login_user(display_name: str, age_group: str = None, avatar_style: str = Non
     user = get_or_create_user_by_name(display_name, age_group, avatar_style, password=password)
     st.session_state.current_user_id = user['user_id']
     st.session_state.current_user_name = user['display_name']
-    st.session_state.current_user_age_group = user.get('age_group', 'grundschule')
+    st.session_state.current_user_age_group = user.get('age_group', 'grundschule').lower()
 
     # Rolle cachen (verhindert DB-Roundtrip in render_age_switcher_overlay)
-    user_role = user.get('role', 'student')
+    user_role = user.get('role', 'student').lower()
     st.session_state._cached_user_role = user_role
     st.session_state._cached_user_role_id = user['user_id']
 
@@ -795,7 +795,7 @@ def render_user_stats_card(user: Dict):
 # Diese Altersstufen sehen die Schatzkarte (gamifiziert)
 # RPG-Elemente funktionieren auch bei aelteren Schuelern gut!
 # Paedagogen/Coaches koennen sie auch sehen (zum Testen/Demonstrieren)
-SCHATZKARTE_ALTERSSTUFEN = ["grundschule", "unterstufe", "mittelstufe", "paedagoge", "coach"]
+SCHATZKARTE_ALTERSSTUFEN = ["grundschule", "unterstufe", "mittelstufe", "oberstufe", "paedagoge", "coach"]
 
 def zeige_schatzkarte() -> bool:
     """
@@ -805,7 +805,7 @@ def zeige_schatzkarte() -> bool:
     Mittelstufe, Oberstufe, Pädagogen: Klassische Ressourcen-Seite
     """
     age_group = st.session_state.get("current_user_age_group", "grundschule")
-    return age_group in SCHATZKARTE_ALTERSSTUFEN
+    return age_group.lower() in SCHATZKARTE_ALTERSSTUFEN
 
 
 # ============================================

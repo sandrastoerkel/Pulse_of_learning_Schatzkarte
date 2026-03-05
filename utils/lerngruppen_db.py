@@ -691,20 +691,21 @@ def send_welcome_email(
 # WÖCHENTLICHE INSEL-AUSWAHL
 # ============================================
 
-FLEXIBLE_ISLANDS = [
+CHOOSABLE_ISLANDS = [
+    "festung", "werkzeuge", "faeden", "bruecken",
     "spiegel_see", "vulkan", "ruhe_oase", "ausdauer_gipfel",
     "fokus_leuchtturm", "wachstum_garten", "lehrer_turm",
     "wohlfuehl_dorf", "schutz_burg"
 ]
-# 9 verfügbar, Coach wählt 7 für Wochen 5-11
-# Feste Inseln (Wochen 1-4): Festung der Stärke, 7 Werkzeuge, Brücken, Fäden
+# 13 verfügbar, Coach wählt 11 für Wochen 1-11
+FLEXIBLE_ISLANDS = CHOOSABLE_ISLANDS  # Rückwärtskompatibilität
 
 
 def activate_weekly_island(group_id: str, week_number: int, island_id: str, notes: str = None) -> bool:
-    """Aktiviert eine Insel für Wochen 5-11."""
-    if week_number < 5 or week_number > 11:
+    """Aktiviert eine Insel für Wochen 1-11."""
+    if week_number < 1 or week_number > 11:
         return False
-    if island_id not in FLEXIBLE_ISLANDS:
+    if island_id not in CHOOSABLE_ISLANDS:
         return False
 
     db = get_db()
@@ -735,10 +736,10 @@ def get_activated_islands(group_id: str) -> List[Dict]:
 
 
 def get_available_islands(group_id: str) -> List[str]:
-    """Gibt die noch verfügbaren flexiblen Inseln zurück."""
+    """Gibt die noch verfügbaren wählbaren Inseln zurück."""
     activated = get_activated_islands(group_id)
     activated_ids = {i['island_id'] for i in activated}
-    return [i for i in FLEXIBLE_ISLANDS if i not in activated_ids]
+    return [i for i in CHOOSABLE_ISLANDS if i not in activated_ids]
 
 
 def get_current_island(group_id: str, week_number: int) -> Optional[str]:

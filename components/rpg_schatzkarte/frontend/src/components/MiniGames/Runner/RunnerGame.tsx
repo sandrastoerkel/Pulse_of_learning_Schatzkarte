@@ -1,53 +1,227 @@
 // ============================================
-// RUNNER GAME - HAUPTKOMPONENTE
-// Verbindet alle Teile des Spiels
+// BRICK BREAKER – MAIN COMPONENT
+// Dateiname RunnerGame.tsx bleibt für App-Kompatibilität
+// Props-Interface UNVERÄNDERT
 // ============================================
 
-import React, { 
-  useState, 
-  useEffect, 
-  useRef, 
-  useCallback 
-} from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-// Eigene Imports
-import { AgeGroup, DIFFICULTY_CONFIGS } from './RunnerAssets';
-import {
-  GameState,
-  GameResult,
-  RunnerEngine
-} from './RunnerEngine';
-import { 
-  AvatarSprites, 
-  createAvatarSprites 
-} from './RunnerAvatarRenderer';
-import { 
-  getSoundManager, 
-  initializeSound 
-} from './RunnerSoundManager';
-import { RunnerBettingPhase } from './RunnerBettingPhase';
 import type { CustomAvatar } from '../../../types';
-
-// Styles
+import { RunnerEngine, GameResult } from './RunnerEngine';
+import { RunnerBettingPhase } from './RunnerBettingPhase';
+import { RunnerSoundManager } from './RunnerSoundManager';
 import './runner-game.css';
 
-// === PROPS ===
+// === PROPS (DARF NICHT GEÄNDERT WERDEN) ===
 
 interface RunnerGameProps {
   playerXP: number;
   playerGold: number;
   playerAvatar: CustomAvatar;
-  playerAgeGroup: AgeGroup;
+  playerAgeGroup: 'grundschule' | 'unterstufe' | 'mittelstufe';
   onGameEnd: (result: GameResult) => void;
   onClose: () => void;
 }
 
-// === GAME PHASES ===
+type Phase = 'betting' | 'playing' | 'result';
 
-type GamePhase = 'betting' | 'loading' | 'playing' | 'result';
+// ── RESULT SCREEN ────────────────────────────
 
-// === KOMPONENTE ===
+const ResultScreen: React.FC<{
+  result: GameResult;
+  onPlayAgain: () => void;
+  onClose: () => void;
+}> = ({ result, onPlayAgain, onClose }) => {
+  const { won, xpBet, xpWon, goldWon, distance, multiplier,
+          coinsCollected, starsCollected, diamondsCollected } = result;
+
+  return (
+    <motion.div
+      className="bb-result"
+      initial={{ opacity: 0, scale: 0.88 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ type: 'spring', damping: 18 }}
+    >
+      {/* Confetti-like particles for win */}
+      {won && (
+        <div className="bb-result-sparkles" aria-hidden="true">
+          {Array.from({ length: 16 }).map((_, i) => (
+            <span key={i} className="bb-sparkle" style={{ '--i': i } as React.CSSProperties} />
+          ))}
+        </div>
+      )}
+
+      <div className={`bb-result-icon ${won ? 'won' : 'lost'}`}>
+        {won ? '🏆' : '💀'}
+      </div>
+
+      <h2 className={`bb-result-title ${won ? 'won' : 'lost'}`}>
+        {won ? 'Gewonnen!' : 'Verloren!'}
+      </h2>
+
+      {/* XP Result */}
+      <div className={`bb-result-xp ${xpWon >= 0 ? 'positive' : 'negative'}`}>
+        {xpWon >= 0 ? '+' : ''}{xpWon} XP
+      </div>
+
+      {/* Stats */}
+      <div className="bb-result-stats">
+        <div className="bb-stat-row">
+          <span>Einsatz</span>
+          <span className="bb-stat-val">{xpBet} XP</span>
+        </div>
+        <div className="bb-stat-row">
+          <span>Bricks zerstört</span>
+          <span className="bb-stat-val">{distance}</span>
+        </div>
+        <div className="bb-stat-row">
+          <span>Multiplikator</span>
+          <span className="bb-stat-val bb-stat-mult">×{multiplier.toFixed(1)}</span>
+        </div>
+        {goldWon > 0 && (
+          <div className="bb-stat-row">
+            <span>Gold</span>
+            <span className="bb-stat-val bb-stat-gold">+{goldWon} 🪙</span>
+          </div>
+        )}
+      </div>
+
+      {/* Collectibles */}
+      {(coinsCollected + starsCollected + diamondsCollected) > 0 && (
+        <div className="bb-result-collectibles">
+          {coinsCollected  > 0 && <span>🪙 ×{coinsCollected}</span>}
+          {starsCollected  > 0 && <span>⭐ ×{starsCollected}</span>}
+          {diamondsCollected > 0 && <span>💎 ×{diamondsCollected}</span>}
+        </div>
+      )}
+
+      {!won && (
+        <p className="bb-result-tip">
+          💡 Tipp: {multiplier === 0
+            ? 'Zerstöre mehr Bricks um deinen Einsatz zurückzubekommen!'
+            : 'Nächstes Mal noch weiter kommen für höheren Multiplikator!'}
+        </p>
+      )}
+
+      <div className="bb-result-buttons">
+        <motion.button
+          className="bb-btn bb-btn-secondary"
+          onClick={onPlayAgain}
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.96 }}
+        >
+          🔁 Nochmal
+        </motion.button>
+        <motion.button
+          className="bb-btn bb-btn-primary"
+          onClick={onClose}
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.96 }}
+        >
+          ✅ Fertig
+        </motion.button>
+      </div>
+    </motion.div>
+  );
+};
+
+// ── HUD (ingame) ─────────────────────────────
+
+const GameHUD: React.FC<{
+  score: number;
+  lives: number;
+  maxLives: number;
+  level: number;
+  bricksDestroyed: number;
+  ageGroup: 'grundschule' | 'unterstufe' | 'mittelstufe';
+  isMuted: boolean;
+  isPaused: boolean;
+  onToggleMute: () => void;
+  onTogglePause: () => void;
+  onQuit: () => void;
+}> = ({ score, lives, maxLives, level, bricksDestroyed, ageGroup, isMuted, isPaused, onToggleMute, onTogglePause, onQuit }) => {
+
+  const DIFFICULTY_CONFIGS = {
+    grundschule: { brickMultipliers: { 10:1.0,20:1.5,35:2.0,48:3.0 } },
+    unterstufe:  { brickMultipliers: { 12:1.0,24:1.5,42:2.0,56:3.0 } },
+    mittelstufe: { brickMultipliers: { 15:1.0,30:1.5,50:2.0,65:3.0 } },
+  };
+
+  const thresholds = Object.keys(DIFFICULTY_CONFIGS[ageGroup].brickMultipliers).map(Number).sort((a,b)=>a-b);
+  const nextThreshold = thresholds.find(t => bricksDestroyed < t);
+  const pct = nextThreshold
+    ? (bricksDestroyed / nextThreshold) * 100
+    : 100;
+
+  return (
+    <div className="bb-hud">
+      <div className="bb-hud-left">
+        <div className="bb-hud-score">{score.toLocaleString()}</div>
+        <div className="bb-hud-label">SCORE</div>
+      </div>
+
+      <div className="bb-hud-center">
+        <div className="bb-hud-progress-bar">
+          <div className="bb-hud-progress-fill" style={{ width: `${pct}%` }} />
+        </div>
+        {nextThreshold && (
+          <div className="bb-hud-progress-label">
+            {bricksDestroyed}/{nextThreshold} Bricks
+          </div>
+        )}
+        <div className="bb-hud-level">LVL {level}</div>
+      </div>
+
+      <div className="bb-hud-right">
+        <div className="bb-hud-lives">
+          {Array.from({ length: maxLives }).map((_, i) => (
+            <span key={i} className={i < lives ? 'bb-life-full' : 'bb-life-empty'}>
+              {i < lives ? '❤️' : '🖤'}
+            </span>
+          ))}
+        </div>
+        <div className="bb-hud-controls">
+          <button className="bb-hud-btn" onClick={onToggleMute} title={isMuted ? 'Ton an' : 'Ton aus'}>
+            {isMuted ? '🔇' : '🔊'}
+          </button>
+          <button className="bb-hud-btn" onClick={onTogglePause} title="Pause">
+            {isPaused ? '▶' : '⏸'}
+          </button>
+          <button className="bb-hud-btn bb-hud-quit" onClick={onQuit} title="Beenden">✕</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ── TOUCH CONTROLS ───────────────────────────
+
+const TouchControls: React.FC<{
+  onLeft: () => void;
+  onRight: () => void;
+  onStop: () => void;
+}> = ({ onLeft, onRight, onStop }) => (
+  <div className="bb-touch-controls">
+    <button
+      className="bb-touch-btn"
+      onTouchStart={onLeft}
+      onTouchEnd={onStop}
+      onMouseDown={onLeft}
+      onMouseUp={onStop}
+      aria-label="Links"
+    >◀</button>
+    <button
+      className="bb-touch-btn"
+      onTouchStart={onRight}
+      onTouchEnd={onStop}
+      onMouseDown={onRight}
+      onMouseUp={onStop}
+      aria-label="Rechts"
+    >▶</button>
+  </div>
+);
+
+// ── MAIN COMPONENT ───────────────────────────
 
 export const RunnerGame: React.FC<RunnerGameProps> = ({
   playerXP,
@@ -55,323 +229,121 @@ export const RunnerGame: React.FC<RunnerGameProps> = ({
   playerAvatar,
   playerAgeGroup,
   onGameEnd,
-  onClose
+  onClose,
 }) => {
-  // === STATE ===
-  const [phase, setPhase] = useState<GamePhase>('betting');
-  const [gameState, setGameState] = useState<GameState | null>(null);
-  const [gameResult, setGameResult] = useState<GameResult | null>(null);
-  const [isMuted, setIsMuted] = useState(false);
-  const [countdown, setCountdown] = useState<number | null>(null);
-  const [avatarSprites, setAvatarSprites] = useState<AvatarSprites | null>(null);
-  const [betAmount, setBetAmount] = useState<number>(0);
-  const [canvasReady, setCanvasReady] = useState(false);
+  const [phase, setPhase]         = useState<Phase>('betting');
+  const [betAmount, setBetAmount] = useState(0);
+  const [result, setResult]       = useState<GameResult | null>(null);
+  const [score, setScore]         = useState(0);
+  const [lives, setLives]         = useState(3);
+  const [level, setLevel]         = useState(1);
+  const [bricksDestroyed, setBD]  = useState(0);
+  const [isMuted, setMuted]       = useState(false);
+  const [isPaused, setPausedUI]   = useState(false);
+  const [isMobile, setMobile]     = useState(false);
 
-  // === DERIVED VALUES ===
-  const config = DIFFICULTY_CONFIGS[playerAgeGroup];
+  const canvasRef  = useRef<HTMLCanvasElement | null>(null);
+  const engineRef  = useRef<RunnerEngine | null>(null);
+  const soundRef   = useRef<RunnerSoundManager>(new RunnerSoundManager());
+  const betRef     = useRef(0);    // Stabile Referenz fuer Callback-Ref
 
-  // === REFS ===
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const engineRef = useRef<RunnerEngine | null>(null);
-  const soundManager = getSoundManager();
-
-  // Callback ref für Canvas - wird aufgerufen wenn Canvas ins DOM eingefügt wird
-  const canvasCallbackRef = useCallback((node: HTMLCanvasElement | null) => {
-    console.log('[RunnerGame] Canvas callback ref called:', !!node);
-    if (node) {
-      (canvasRef as React.MutableRefObject<HTMLCanvasElement | null>).current = node;
-      setCanvasReady(true);
-    } else {
-      setCanvasReady(false);
-    }
+  // Detect touch device
+  useEffect(() => {
+    setMobile('ontouchstart' in window || navigator.maxTouchPoints > 0);
   }, []);
 
-  // === AVATAR SPRITES LADEN ===
-  useEffect(() => {
-    console.log('[RunnerGame] Loading avatar sprites...');
-    const loadSprites = async () => {
-      try {
-        const sprites = await createAvatarSprites(playerAvatar);
-        console.log('[RunnerGame] Avatar sprites loaded successfully:', sprites);
-        setAvatarSprites(sprites);
-      } catch (error) {
-        console.error('[RunnerGame] Failed to load avatar sprites:', error);
-      }
-    };
-    loadSprites();
-  }, [playerAvatar]);
-
-  // === KEYBOARD CONTROLS ===
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!engineRef.current || phase !== 'playing') return;
-
-      switch (e.code) {
-        case 'Space':
-        case 'ArrowUp':
-        case 'KeyW':
-          e.preventDefault();
-          engineRef.current.jump();
-          break;
-        case 'ArrowDown':
-        case 'KeyS':
-          e.preventDefault();
-          engineRef.current.duck();
-          break;
-        case 'Escape':
-        case 'KeyP':
-          e.preventDefault();
-          if (gameState?.status === 'playing') {
-            engineRef.current.pause();
-          } else if (gameState?.status === 'paused') {
-            engineRef.current.resume();
-          }
-          break;
-      }
-    };
-
-    const handleKeyUp = (e: KeyboardEvent) => {
-      if (!engineRef.current || phase !== 'playing') return;
-
-      if (e.code === 'ArrowDown' || e.code === 'KeyS') {
-        engineRef.current.stopDuck();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
-  }, [phase, gameState?.status]);
-
-  // === TOUCH CONTROLS ===
-  const handleJump = useCallback(() => {
-    if (engineRef.current && phase === 'playing') {
-      engineRef.current.jump();
-    }
-  }, [phase]);
-
-  const handleDuckStart = useCallback(() => {
-    if (engineRef.current && phase === 'playing') {
-      engineRef.current.duck();
-    }
-  }, [phase]);
-
-  const handleDuckEnd = useCallback(() => {
-    if (engineRef.current && phase === 'playing') {
-      engineRef.current.stopDuck();
-    }
-  }, [phase]);
-
-  // Canvas Touch
-  const handleCanvasTouch = useCallback((e: React.TouchEvent) => {
-    e.preventDefault();
-    handleJump();
-  }, [handleJump]);
-
-  // === GAME START ===
+  // Start game after bet
   const handleStartGame = useCallback(async (bet: number) => {
-    // Sprites müssen geladen sein
-    if (!avatarSprites) {
-      console.warn('Avatar sprites not loaded yet');
-      return;
-    }
-
     setBetAmount(bet);
-    // Erst zu 'playing' wechseln damit das Canvas gerendert wird
+    betRef.current = bet;
     setPhase('playing');
-  }, [avatarSprites]);
+    setScore(0);
+    setLives(DIFFICULTY_CONFIGS_LIVES[playerAgeGroup]);
+    setLevel(1);
+    setBD(0);
+    setPausedUI(false);
+    await soundRef.current.initialize();
+  }, [playerAgeGroup]);
 
-  // === ENGINE INITIALISIERUNG (nach Canvas-Render) ===
-  useEffect(() => {
-    console.log('[RunnerGame] useEffect triggered:', {
-      phase,
-      canvasReady,
-      hasCanvas: !!canvasRef.current,
-      hasAvatarSprites: !!avatarSprites,
-      hasEngine: !!engineRef.current
-    });
+  // Callback-Ref: wird aufgerufen wenn Canvas tatsaechlich im DOM ist
+  // (umgeht das AnimatePresence mode="wait" Timing-Problem)
+  const canvasCallbackRef = useCallback((canvas: HTMLCanvasElement | null) => {
+    canvasRef.current = canvas;
 
-    // Nur initialisieren wenn phase='playing', canvas ready, sprites geladen und Engine noch nicht erstellt
-    if (phase !== 'playing' || !canvasReady || !canvasRef.current || !avatarSprites || engineRef.current) {
-      console.log('[RunnerGame] Skipping init - conditions not met');
-      return;
-    }
-
-    console.log('[RunnerGame] All conditions met! Starting game initialization...');
-
-    const initGame = async () => {
-      try {
-        // Sound initialisieren
-        console.log('[RunnerGame] Initializing sound...');
-        await initializeSound();
-        console.log('[RunnerGame] Sound initialized');
-
-        // Canvas sollte jetzt definitiv existieren
-        if (!canvasRef.current) {
-          console.error('[RunnerGame] Canvas unexpectedly null!');
-          return;
-        }
-        console.log('[RunnerGame] Canvas confirmed:', canvasRef.current);
-
-        // Engine erstellen
-        console.log('[RunnerGame] Creating RunnerEngine...');
-        const engine = new RunnerEngine(
-          canvasRef.current,
-          avatarSprites,
-          playerAgeGroup,
-          betAmount
-        );
-        console.log('[RunnerGame] RunnerEngine created');
-
-        // Callbacks setzen
-        engine.setCallbacks(
-          (state) => {
-            setGameState(state);
-          },
-          (result) => {
-            console.log('[RunnerGame] Game ended:', result);
-            setGameResult(result);
-            setPhase('result');
-          }
-        );
-
-        engineRef.current = engine;
-
-        // Countdown starten
-        console.log('[RunnerGame] Starting countdown...');
-        setCountdown(3);
-        const countdownInterval = setInterval(() => {
-          setCountdown(prev => {
-            if (prev === null || prev <= 1) {
-              clearInterval(countdownInterval);
-              return null;
-            }
-            return prev - 1;
-          });
-        }, 1000);
-
-        // Spiel starten
-        console.log('[RunnerGame] Calling engine.start()...');
-        engine.start();
-        console.log('[RunnerGame] engine.start() called');
-      } catch (error) {
-        console.error('[RunnerGame] Error during init:', error);
-      }
-    };
-
-    initGame();
-  }, [phase, canvasReady, avatarSprites, playerAgeGroup, betAmount]);
-
-  // === PAUSE/RESUME ===
-  const handlePause = useCallback(() => {
-    if (engineRef.current && gameState?.status === 'playing') {
-      engineRef.current.pause();
-    }
-  }, [gameState?.status]);
-
-  const handleResume = useCallback(() => {
-    if (engineRef.current && gameState?.status === 'paused') {
-      engineRef.current.resume();
-    }
-  }, [gameState?.status]);
-
-  // === SOUND TOGGLE ===
-  const handleToggleSound = useCallback(() => {
-    const newMuted = soundManager.toggleMute();
-    setIsMuted(newMuted);
-  }, [soundManager]);
-
-  // === QUIT GAME ===
-  const handleQuit = useCallback(() => {
+    // Cleanup alter Engine
     if (engineRef.current) {
       engineRef.current.destroy();
       engineRef.current = null;
+    }
+
+    if (!canvas) return;
+
+    // 1 Frame warten damit Flex-Layout berechnet ist
+    requestAnimationFrame(() => {
+      if (!canvasRef.current) return;
+
+      const handleResult = (r: GameResult) => {
+        setResult(r);
+        setPhase('result');
+        soundRef.current.play(r.won ? 'victory' : 'gameOver');
+      };
+
+      const engine = new RunnerEngine(
+        canvasRef.current,
+        playerAgeGroup,
+        betRef.current,
+        handleResult,
+        (l) => setLives(l),
+        (s) => { setScore(s); setBD(prev => prev + 1); },
+        (lv) => setLevel(lv),
+      );
+      engineRef.current = engine;
+      engine.start();
+      soundRef.current.play('start');
+    });
+  }, [playerAgeGroup]);
+
+  // Sync mute
+  useEffect(() => {
+    soundRef.current.setMuted(isMuted);
+  }, [isMuted]);
+
+  const handleTogglePause = () => {
+    const next = !isPaused;
+    setPausedUI(next);
+    engineRef.current?.setPaused(next);
+  };
+
+  const handleQuit = () => {
+    engineRef.current?.destroy();
+    engineRef.current = null;
+    onClose();
+  };
+
+  const handlePlayAgain = () => {
+    setResult(null);
+    setPhase('betting');
+  };
+
+  const handleFinish = () => {
+    if (result) {
+      onGameEnd(result);
     }
     onClose();
-  }, [onClose]);
-
-  // === PLAY AGAIN ===
-  const handlePlayAgain = useCallback(() => {
-    if (engineRef.current) {
-      engineRef.current.destroy();
-      engineRef.current = null;
-    }
-    setGameState(null);
-    setGameResult(null);
-    setCanvasReady(false);
-    setPhase('betting');
-  }, []);
-
-  // === FINISH (Ergebnis speichern und schließen) ===
-  const handleFinish = useCallback(() => {
-    if (gameResult) {
-      onGameEnd(gameResult);
-    }
-    handleQuit();
-  }, [gameResult, onGameEnd, handleQuit]);
-
-  // === CLEANUP ===
-  useEffect(() => {
-    return () => {
-      if (engineRef.current) {
-        engineRef.current.destroy();
-      }
-    };
-  }, []);
-
-  // === RENDER HELPERS ===
-
-  const renderLives = () => {
-    if (!gameState) return null;
-    
-    const hearts = [];
-    for (let i = 0; i < gameState.maxLives; i++) {
-      const isFilled = i < gameState.lives;
-      hearts.push(
-        <span 
-          key={i} 
-          className={`heart ${isFilled ? '' : 'empty'}`}
-        >
-          ❤️
-        </span>
-      );
-    }
-    return hearts;
   };
-
-  const calculateProgress = () => {
-    if (!gameState || !gameState.nextMilestone) return 100;
-    
-    const milestones = Object.keys(
-      DIFFICULTY_CONFIGS[playerAgeGroup].distanceMultipliers
-    ).map(Number).sort((a, b) => a - b);
-    
-    const currentMilestoneIndex = milestones.findIndex(m => m === gameState.nextMilestone);
-    const prevMilestone = currentMilestoneIndex > 0 ? milestones[currentMilestoneIndex - 1] : 0;
-    
-    const progressInSegment = gameState.distance - prevMilestone;
-    const segmentLength = gameState.nextMilestone - prevMilestone;
-    
-    return Math.min((progressInSegment / segmentLength) * 100, 100);
-  };
-
-  // === RENDER ===
 
   return (
-    <div className="runner-game-container">
+    <div className="bb-game-modal">
       <AnimatePresence mode="wait">
-        {/* BETTING PHASE */}
+
+        {/* ── BETTING PHASE ── */}
         {phase === 'betting' && (
           <motion.div
             key="betting"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.3 }}
+            className="bb-phase-wrap"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
           >
             <RunnerBettingPhase
               playerXP={playerXP}
@@ -382,310 +354,83 @@ export const RunnerGame: React.FC<RunnerGameProps> = ({
           </motion.div>
         )}
 
-        {/* LOADING PHASE */}
-        {phase === 'loading' && (
-          <motion.div
-            key="loading"
-            className="loading-screen"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <div className="loading-spinner">🏃</div>
-            <p>Spiel wird geladen...</p>
-          </motion.div>
-        )}
-
-        {/* PLAYING PHASE */}
-        {(phase === 'playing' || phase === 'result') && (
+        {/* ── PLAYING PHASE ── */}
+        {phase === 'playing' && (
           <motion.div
             key="playing"
-            className="runner-game-wrapper"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-          >
-            {/* Game Header */}
-            <div className="game-header">
-              <div className="game-stats">
-                {/* Distanz */}
-                <div className="stat-item">
-                  <span className="stat-icon">📏</span>
-                  <span className="stat-value distance">
-                    {gameState?.distance || 0}m
-                  </span>
-                </div>
-
-                {/* Einsatz */}
-                <div className="stat-item">
-                  <span className="stat-icon">⭐</span>
-                  <span className="stat-value">
-                    {betAmount} XP
-                  </span>
-                </div>
-
-                {/* Leben */}
-                <div className="stat-item lives-display">
-                  {renderLives()}
-                </div>
-              </div>
-
-              <div className="game-controls">
-                <button
-                  className={`control-button ${isMuted ? 'muted' : ''}`}
-                  onClick={handleToggleSound}
-                  title={isMuted ? 'Ton an' : 'Ton aus'}
-                >
-                  {isMuted ? '🔇' : '🔊'}
-                </button>
-                <button
-                  className="control-button"
-                  onClick={handlePause}
-                  title="Pause"
-                >
-                  ⏸️
-                </button>
-              </div>
-            </div>
-
-            {/* Canvas Container */}
-            <div className="canvas-container">
-              <canvas
-                ref={canvasCallbackRef}
-                className="runner-canvas"
-                onTouchStart={handleCanvasTouch}
-              />
-
-              {/* Countdown Overlay */}
-              <AnimatePresence>
-                {countdown !== null && (
-                  <motion.div
-                    className="countdown-overlay"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                  >
-                    <motion.div
-                      key={countdown}
-                      className={countdown > 0 ? 'countdown-number' : 'countdown-go'}
-                      initial={{ scale: 0.5, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      exit={{ scale: 1.5, opacity: 0 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      {countdown > 0 ? countdown : 'LOS!'}
-                    </motion.div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Pause Overlay */}
-              <AnimatePresence>
-                {gameState?.status === 'paused' && (
-                  <motion.div
-                    className="pause-overlay"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                  >
-                    <div className="pause-title">
-                      <span>⏸️</span>
-                      <span>Pause</span>
-                    </div>
-                    <div className="pause-buttons">
-                      <button 
-                        className="pause-button resume"
-                        onClick={handleResume}
-                      >
-                        ▶️ Weiterspielen
-                      </button>
-                      <button 
-                        className="pause-button quit"
-                        onClick={handleQuit}
-                      >
-                        🚪 Beenden
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-            </div>
-
-            {/* Controls Legend - immer sichtbar */}
-            <div className="controls-legend">
-              <div className="control-hint">
-                <span className="key">⬆️</span>
-                <span>Springen</span>
-              </div>
-              <div className="control-hint">
-                <span className="key">⬇️</span>
-                <span>Ducken</span>
-              </div>
-            </div>
-
-            {/* Game Footer */}
-            <div className="game-footer">
-              <div className="collected-items">
-                <div className="collected-item">
-                  <span className="icon">🪙</span>
-                  <span>{gameState?.goldEarned || 0}</span>
-                </div>
-                <div className="collected-item">
-                  <span className="icon">⭐</span>
-                  <span>+{gameState?.xpEarned || 0}</span>
-                </div>
-                {(gameState?.diamondsCollected || 0) > 0 && (
-                  <div className="collected-item">
-                    <span className="icon">💎</span>
-                    <span>{gameState?.diamondsCollected}</span>
-                  </div>
-                )}
-              </div>
-
-              <div className="milestone-progress">
-                {gameState?.currentMultiplier !== undefined && gameState.currentMultiplier > 0 && (
-                  <span className="multiplier-badge">
-                    ×{gameState.currentMultiplier.toFixed(1)}
-                  </span>
-                )}
-                <div className="progress-bar">
-                  <div 
-                    className="progress-fill"
-                    style={{ width: `${calculateProgress()}%` }}
-                  />
-                </div>
-                {gameState?.nextMilestone && (
-                  <span className="next-milestone">
-                    Nächstes Ziel: {gameState.nextMilestone}m
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Touch Controls (nur auf Touch-Geräten sichtbar) */}
-            <div className="touch-controls">
-              <button 
-                className="touch-button jump"
-                onTouchStart={handleJump}
-              >
-                ⬆️ Springen
-              </button>
-              <button 
-                className="touch-button duck"
-                onTouchStart={handleDuckStart}
-                onTouchEnd={handleDuckEnd}
-              >
-                ⬇️ Ducken
-              </button>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Result Overlay - außerhalb des Canvas Containers für korrektes Layout */}
-        {phase === 'result' && gameResult && (
-          <motion.div
-            className="result-overlay"
+            className="bb-phase-wrap bb-game-wrap"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <motion.div
-              className="result-content"
-              initial={{ scale: 0.8, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              transition={{ delay: 0.2, type: 'spring' }}
-            >
-              <h2 className={`result-title ${gameResult.won ? 'won' : 'lost'}`}>
-                {gameResult.won ? '🎉 Geschafft!' : '💥 Game Over!'}
-              </h2>
+            <GameHUD
+              score={score}
+              lives={lives}
+              maxLives={DIFFICULTY_CONFIGS_LIVES[playerAgeGroup]}
+              level={level}
+              bricksDestroyed={bricksDestroyed}
+              ageGroup={playerAgeGroup}
+              isMuted={isMuted}
+              isPaused={isPaused}
+              onToggleMute={() => setMuted(m => !m)}
+              onTogglePause={handleTogglePause}
+              onQuit={handleQuit}
+            />
 
-              <p className="result-distance">
-                Du bist {gameResult.distance}m gelaufen
-              </p>
-
-              <div className="result-stats">
-                {/* Einsatz */}
-                <div className="result-stat">
-                  <span className="label">Einsatz</span>
-                  <span className="value">{gameResult.xpBet} XP</span>
+            <div className="bb-canvas-wrap">
+              <canvas
+                ref={canvasCallbackRef}
+                className="bb-canvas"
+                style={{ width: '100%', height: '100%', display: 'block' }}
+              />
+              {isPaused && (
+                <div className="bb-pause-overlay">
+                  <div className="bb-pause-text">⏸ PAUSE</div>
+                  <button
+                    className="bb-btn bb-btn-primary"
+                    onClick={handleTogglePause}
+                  >▶ Weiter</button>
                 </div>
+              )}
+            </div>
 
-                {/* Multiplikator */}
-                <div className="result-stat">
-                  <span className="label">Multiplikator</span>
-                  <span className="value">
-                    {gameResult.multiplier > 0
-                      ? `×${gameResult.multiplier.toFixed(1)}`
-                      : '×0'
-                    }
-                  </span>
-                </div>
-
-                {/* Gesammelte Items */}
-                {gameResult.coinsCollected > 0 && (
-                  <div className="result-stat">
-                    <span className="label">🪙 Münzen</span>
-                    <span className="value positive">
-                      +{gameResult.coinsCollected * 10} Gold
-                    </span>
-                  </div>
-                )}
-
-                {gameResult.diamondsCollected > 0 && (
-                  <div className="result-stat">
-                    <span className="label">💎 Diamanten</span>
-                    <span className="value positive">
-                      +{gameResult.diamondsCollected * 100} Gold
-                    </span>
-                  </div>
-                )}
-
-                {gameResult.starsCollected > 0 && (
-                  <div className="result-stat">
-                    <span className="label">⭐ Sterne</span>
-                    <span className="value positive">
-                      +{gameResult.starsCollected * 25} XP
-                    </span>
-                  </div>
-                )}
-
-                {/* Gesamt */}
-                <div className="result-stat result-total">
-                  <span className="label">XP Gewinn</span>
-                  <span className={`value ${gameResult.xpWon >= 0 ? 'positive' : 'negative'}`}>
-                    {gameResult.xpWon >= 0 ? '+' : ''}{gameResult.xpWon} XP
-                  </span>
-                </div>
-
-                <div className="result-stat result-total">
-                  <span className="label">Gold Gewinn</span>
-                  <span className="value positive">
-                    +{gameResult.goldWon} Gold
-                  </span>
-                </div>
-              </div>
-
-              <div className="result-buttons">
-                <button
-                  className="result-button primary"
-                  onClick={handlePlayAgain}
-                >
-                  🔄 Nochmal spielen
-                </button>
-                <button
-                  className="result-button secondary"
-                  onClick={handleFinish}
-                >
-                  ✓ Fertig
-                </button>
-              </div>
-            </motion.div>
+            {isMobile && (
+              <TouchControls
+                onLeft={() => engineRef.current?.handleTouchLeft()}
+                onRight={() => engineRef.current?.handleTouchRight()}
+                onStop={() => engineRef.current?.handleTouchStop()}
+              />
+            )}
           </motion.div>
         )}
+
+        {/* ── RESULT PHASE ── */}
+        {phase === 'result' && result && (
+          <motion.div
+            key="result"
+            className="bb-phase-wrap bb-result-wrap"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <ResultScreen
+              result={result}
+              onPlayAgain={handlePlayAgain}
+              onClose={handleFinish}
+            />
+          </motion.div>
+        )}
+
       </AnimatePresence>
     </div>
   );
+};
+
+// Lives per age group (also used in HUD without importing full config)
+const DIFFICULTY_CONFIGS_LIVES: Record<string, number> = {
+  grundschule: 5,
+  unterstufe:  3,
+  mittelstufe: 2,
 };
 
 export default RunnerGame;

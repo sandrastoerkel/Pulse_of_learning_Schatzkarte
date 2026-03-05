@@ -772,8 +772,8 @@ function RPGSchatzkarteContent({
         xpEarned: result.xpWon,
         goldEarned: result.goldWon,
         description: result.won
-          ? `Runner gewonnen! +${result.xpWon} XP, ${result.distance}m gelaufen`
-          : `Runner verloren. -${result.xpBet} XP`
+          ? `Brick Breaker gewonnen! +${result.xpWon} XP, ${result.distance} Bricks`
+          : `Brick Breaker verloren. -${result.xpBet} XP`
       });
     }
   }, [onAction]);
@@ -1409,7 +1409,7 @@ function RPGSchatzkarteContent({
             title="Memory spielen"
           >
             <span className="bottom-action-bar__icon">🧠</span>
-            <span className="bottom-action-bar__label">Memory</span>
+            <span className="bottom-action-bar__label">Memory Game</span>
             <span className="bottom-action-bar__sub">{playerXP} XP</span>
           </button>
 
@@ -1429,10 +1429,10 @@ function RPGSchatzkarteContent({
             <button
               className="bottom-action-bar__btn bottom-action-bar__btn--runner"
               onClick={() => setShowRunnerGame(true)}
-              title="Runner spielen"
+              title="Brick Breaker spielen"
             >
-              <span className="bottom-action-bar__icon">🏃</span>
-              <span className="bottom-action-bar__label">Runner</span>
+              <span className="bottom-action-bar__icon">🕹️</span>
+              <span className="bottom-action-bar__label">Breaker Game</span>
               <span className="bottom-action-bar__sub">{playerXP} XP</span>
             </button>
           )}

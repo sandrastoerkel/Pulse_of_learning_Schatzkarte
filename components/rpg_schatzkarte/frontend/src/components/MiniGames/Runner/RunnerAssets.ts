@@ -1,11 +1,7 @@
 // ============================================
-// RUNNER GAME ASSETS
-// Hindernisse, Collectibles, Hintergründe, Sounds
+// BRICK BREAKER – ASSETS & CONFIG
+// Ersetzt RunnerAssets.ts – Dateiname bleibt für App-Kompatibilität
 // ============================================
-
-// === RARITY ===
-
-export type Rarity = 'common' | 'rare' | 'epic' | 'legendary';
 
 // === ALTERSSTUFEN ===
 
@@ -14,184 +10,143 @@ export type AgeGroup = 'grundschule' | 'unterstufe' | 'mittelstufe';
 // === SCHWIERIGKEITS-KONFIGURATION ===
 
 export interface DifficultyConfig {
-  // Geschwindigkeit
-  initialSpeed: number;        // Pixel pro Frame
-  maxSpeed: number;
-  speedIncrement: number;      // Pro 100m
-  
-  // Leben
   startLives: number;
-  maxLives: number;
-  
-  // Spawning
-  minObstacleGap: number;      // Mindestabstand zwischen Hindernissen
-  maxObstacleGap: number;
-  collectibleDensity: number;  // 0-1, wie oft Collectibles spawnen
-  heartSpawnRate: number;      // 0-1, Wahrscheinlichkeit für Herzen
-  
-  // Distanz-Multiplikatoren
-  distanceMultipliers: Record<number, number>;
-  
-  // Timing
-  reactionBuffer: number;      // Zusätzliche Pixel vor Hindernissen
+  ballSpeed: number;          // Basis-Ballgeschwindigkeit px/frame
+  paddleWidth: number;        // Paddle-Breite in px (von Canvas-Breite)
+  paddleWidthPct: number;     // als Prozent (0–1) für responsive
+  brickRows: number;
+  brickHpMax: number;         // Max HP einer Brick (obere Reihen)
+  powerUpRate: number;        // 0–1 Wahrscheinlichkeit PowerUp aus Brick
+  ballSpeedIncrement: number; // Pro Level
+  // Distanz-Äquivalent: Anzahl zerstörter Bricks → Multiplikator
+  brickMultipliers: Record<number, number>;
 }
 
 export const DIFFICULTY_CONFIGS: Record<AgeGroup, DifficultyConfig> = {
   grundschule: {
-    initialSpeed: 3,
-    maxSpeed: 8,
-    speedIncrement: 0.3,
     startLives: 5,
-    maxLives: 7,
-    minObstacleGap: 400,
-    maxObstacleGap: 600,
-    collectibleDensity: 0.7,
-    heartSpawnRate: 0.08,
-    distanceMultipliers: {
-      50: 1.0,
-      100: 1.5,
-      200: 2.0,
-      400: 3.0
+    ballSpeed: 4.5,
+    paddleWidth: 110,
+    paddleWidthPct: 0.28,
+    brickRows: 5,
+    brickHpMax: 1,
+    powerUpRate: 0.18,
+    ballSpeedIncrement: 0.25,
+    brickMultipliers: {
+      10:  1.0,
+      20:  1.5,
+      35:  2.0,
+      48:  3.0,
     },
-    reactionBuffer: 100
   },
   unterstufe: {
-    initialSpeed: 4,
-    maxSpeed: 12,
-    speedIncrement: 0.4,
-    startLives: 4,
-    maxLives: 6,
-    minObstacleGap: 300,
-    maxObstacleGap: 500,
-    collectibleDensity: 0.5,
-    heartSpawnRate: 0.05,
-    distanceMultipliers: {
-      100: 1.0,
-      250: 1.5,
-      500: 2.0,
-      1000: 3.0
+    startLives: 3,
+    ballSpeed: 5.5,
+    paddleWidth: 90,
+    paddleWidthPct: 0.23,
+    brickRows: 6,
+    brickHpMax: 2,
+    powerUpRate: 0.12,
+    ballSpeedIncrement: 0.35,
+    brickMultipliers: {
+      12:  1.0,
+      24:  1.5,
+      42:  2.0,
+      56:  3.0,
     },
-    reactionBuffer: 80
   },
   mittelstufe: {
-    initialSpeed: 5,
-    maxSpeed: 16,
-    speedIncrement: 0.5,
-    startLives: 3,
-    maxLives: 5,
-    minObstacleGap: 250,
-    maxObstacleGap: 400,
-    collectibleDensity: 0.4,
-    heartSpawnRate: 0.03,
-    distanceMultipliers: {
-      150: 1.0,
-      300: 1.5,
-      600: 2.0,
-      1200: 3.0
+    startLives: 2,
+    ballSpeed: 6.5,
+    paddleWidth: 75,
+    paddleWidthPct: 0.19,
+    brickRows: 7,
+    brickHpMax: 3,
+    powerUpRate: 0.08,
+    ballSpeedIncrement: 0.5,
+    brickMultipliers: {
+      15:  1.0,
+      30:  1.5,
+      50:  2.0,
+      65:  3.0,
     },
-    reactionBuffer: 60
-  }
+  },
 };
 
-// === HINDERNIS-TYPEN ===
+// === BRICK-REIHEN KONFIGURATION ===
 
-export type ObstacleType = 'rock' | 'cactus' | 'box' | 'beam' | 'gap' | 'monster' | 'bird';
-
-export type AvoidMethod = 'jump' | 'duck' | 'both';
-
-export interface ObstacleDefinition {
-  type: ObstacleType;
-  width: number;
-  height: number;
-  avoidBy: AvoidMethod;
-  emoji: string;
-  color: string;              // Fallback-Farbe
-  spawnY: 'ground' | 'air';
-  animated?: boolean;
-  minDistance?: number;       // Ab welcher Distanz spawnt dieses Hindernis
-  rarity: number;             // 0-1, je niedriger desto seltener
+export interface BrickRowConfig {
+  color: string;
+  glowColor: string;
+  basePoints: number;
+  emoji: string;       // Dekorativ auf der Brick
 }
 
-export const OBSTACLE_DEFINITIONS: Record<ObstacleType, ObstacleDefinition> = {
-  rock: {
-    type: 'rock',
-    width: 45,
-    height: 40,
-    avoidBy: 'jump',
-    emoji: '🪨',
-    color: '#6B7280',
-    spawnY: 'ground',
-    minDistance: 0,
-    rarity: 0.3
+// 7 mögliche Reihen – je nach Schwierigkeit werden die oberen genutzt
+export const BRICK_ROW_CONFIGS: BrickRowConfig[] = [
+  { color: '#c084fc', glowColor: 'rgba(192,132,252,.7)', basePoints: 50, emoji: '💎' },
+  { color: '#f87171', glowColor: 'rgba(248,113,113,.7)', basePoints: 40, emoji: '❤️' },
+  { color: '#fb923c', glowColor: 'rgba(251,146,60,.7)',  basePoints: 30, emoji: '🔥' },
+  { color: '#fbbf24', glowColor: 'rgba(251,191,36,.7)',  basePoints: 25, emoji: '⭐' },
+  { color: '#4ade80', glowColor: 'rgba(74,222,128,.7)',  basePoints: 20, emoji: '🌿' },
+  { color: '#22d3ee', glowColor: 'rgba(34,211,238,.7)',  basePoints: 15, emoji: '💧' },
+  { color: '#818cf8', glowColor: 'rgba(129,140,248,.7)', basePoints: 10, emoji: '🌀' },
+];
+
+// === POWER-UP TYPEN ===
+
+export type PowerUpType = 'wide' | 'multiball' | 'laser' | 'slow' | 'fireball';
+
+export interface PowerUpDefinition {
+  type: PowerUpType;
+  emoji: string;
+  color: string;
+  label: string;
+  duration: number;   // Frames (60 = 1s)
+  spawnWeight: number;
+}
+
+export const POWERUP_DEFINITIONS: Record<PowerUpType, PowerUpDefinition> = {
+  wide: {
+    type: 'wide',
+    emoji: '↔️',
+    color: '#22d3ee',
+    label: 'Breites Paddle',
+    duration: 600,
+    spawnWeight: 0.35,
   },
-  cactus: {
-    type: 'cactus',
-    width: 35,
-    height: 65,
-    avoidBy: 'jump',
-    emoji: '🌵',
-    color: '#22C55E',
-    spawnY: 'ground',
-    minDistance: 0,
-    rarity: 0.25
-  },
-  box: {
-    type: 'box',
-    width: 50,
-    height: 50,
-    avoidBy: 'both',
-    emoji: '📦',
-    color: '#D97706',
-    spawnY: 'ground',
-    minDistance: 100,
-    rarity: 0.2
-  },
-  beam: {
-    type: 'beam',
-    width: 90,
-    height: 25,
-    avoidBy: 'duck',
+  multiball: {
+    type: 'multiball',
     emoji: '⚡',
-    color: '#FBBF24',
-    spawnY: 'air',
-    minDistance: 150,
-    rarity: 0.15
+    color: '#fbbf24',
+    label: 'Multi-Ball!',
+    duration: 999,   // Bis Leben verloren
+    spawnWeight: 0.20,
   },
-  gap: {
-    type: 'gap',
-    width: 70,
-    height: 150,
-    avoidBy: 'jump',
-    emoji: '🕳️',
-    color: '#1F2937',
-    spawnY: 'ground',
-    minDistance: 200,
-    rarity: 0.1
+  laser: {
+    type: 'laser',
+    emoji: '🔫',
+    color: '#f87171',
+    label: 'Laser!',
+    duration: 480,
+    spawnWeight: 0.20,
   },
-  monster: {
-    type: 'monster',
-    width: 55,
-    height: 55,
-    avoidBy: 'jump',
-    emoji: '👾',
-    color: '#8B5CF6',
-    spawnY: 'ground',
-    animated: true,
-    minDistance: 300,
-    rarity: 0.1
+  slow: {
+    type: 'slow',
+    emoji: '🐢',
+    color: '#4ade80',
+    label: 'Zeitlupe',
+    duration: 360,
+    spawnWeight: 0.15,
   },
-  bird: {
-    type: 'bird',
-    width: 45,
-    height: 35,
-    avoidBy: 'duck',
-    emoji: '🦅',
-    color: '#78350F',
-    spawnY: 'air',
-    animated: true,
-    minDistance: 250,
-    rarity: 0.1
-  }
+  fireball: {
+    type: 'fireball',
+    emoji: '🔥',
+    color: '#fb923c',
+    label: 'Feuerball!',
+    duration: 300,
+    spawnWeight: 0.10,
+  },
 };
 
 // === COLLECTIBLE-TYPEN ===
@@ -204,397 +159,125 @@ export interface CollectibleDefinition {
   color: string;
   glowColor: string;
   size: number;
-  value: {
-    gold?: number;
-    xp?: number;
-    lives?: number;
-  };
-  spawnWeight: number;        // Relative Spawn-Häufigkeit
-  rarity: Rarity;
+  value: { gold?: number; xp?: number; lives?: number };
+  spawnWeight: number;
 }
 
 export const COLLECTIBLE_DEFINITIONS: Record<CollectibleType, CollectibleDefinition> = {
-  coin: {
-    type: 'coin',
-    emoji: '🪙',
-    color: 'var(--fb-reward)',
-    glowColor: 'rgba(255, 215, 0, 0.5)',
-    size: 32,
-    value: { gold: 10 },
-    spawnWeight: 0.55,
-    rarity: 'common'
-  },
-  star: {
-    type: 'star',
-    emoji: '⭐',
-    color: '#FCD34D',
-    glowColor: 'rgba(252, 211, 77, 0.6)',
-    size: 36,
-    value: { xp: 25 },
-    spawnWeight: 0.25,
-    rarity: 'rare'
-  },
-  diamond: {
-    type: 'diamond',
-    emoji: '💎',
-    color: '#60A5FA',
-    glowColor: 'rgba(96, 165, 250, 0.6)',
-    size: 38,
-    value: { gold: 100 },
-    spawnWeight: 0.08,
-    rarity: 'epic'
-  },
-  heart: {
-    type: 'heart',
-    emoji: '❤️',
-    color: '#EF4444',
-    glowColor: 'rgba(239, 68, 68, 0.6)',
-    size: 34,
-    value: { lives: 1 },
-    spawnWeight: 0.05,        // Wird durch heartSpawnRate überschrieben
-    rarity: 'legendary'
-  }
+  coin:    { type:'coin',    emoji:'🪙', color:'#fbbf24', glowColor:'rgba(251,191,36,.6)',   size:24, value:{gold:10},   spawnWeight:0.55 },
+  star:    { type:'star',    emoji:'⭐', color:'#fde68a', glowColor:'rgba(253,230,138,.6)',  size:26, value:{xp:15},    spawnWeight:0.25 },
+  diamond: { type:'diamond', emoji:'💎', color:'#60a5fa', glowColor:'rgba(96,165,250,.6)',   size:28, value:{gold:100}, spawnWeight:0.08 },
+  heart:   { type:'heart',   emoji:'❤️', color:'#f87171', glowColor:'rgba(248,113,113,.6)',  size:26, value:{lives:1},  spawnWeight:0.05 },
 };
 
-// === POWER-UP TYPEN ===
+// === SOUND-DEFINITIONEN (bleiben für SoundManager-Kompatibilität) ===
 
-export type PowerUpType = 'shield' | 'magnet' | 'doubleXP' | 'slowmo';
-
-export interface PowerUpDefinition {
-  type: PowerUpType;
-  emoji: string;
-  color: string;
-  glowColor: string;
-  size: number;
-  duration: number;           // Dauer in Frames (60 = 1 Sekunde)
-  description: string;
-  spawnWeight: number;
-  minDistance: number;        // Ab welcher Distanz spawnt dieses Power-Up
-}
-
-export const POWERUP_DEFINITIONS: Record<PowerUpType, PowerUpDefinition> = {
-  shield: {
-    type: 'shield',
-    emoji: '🛡️',
-    color: '#3B82F6',
-    glowColor: 'rgba(59, 130, 246, 0.6)',
-    size: 40,
-    duration: 300,            // 5 Sekunden
-    description: 'Unverwundbar!',
-    spawnWeight: 0.3,
-    minDistance: 100
-  },
-  magnet: {
-    type: 'magnet',
-    emoji: '🧲',
-    color: '#EF4444',
-    glowColor: 'rgba(239, 68, 68, 0.6)',
-    size: 38,
-    duration: 360,            // 6 Sekunden
-    description: 'Münzmagnet!',
-    spawnWeight: 0.35,
-    minDistance: 50
-  },
-  doubleXP: {
-    type: 'doubleXP',
-    emoji: '✨',
-    color: '#A855F7',
-    glowColor: 'rgba(168, 85, 247, 0.6)',
-    size: 36,
-    duration: 300,            // 5 Sekunden
-    description: '2x XP!',
-    spawnWeight: 0.25,
-    minDistance: 150
-  },
-  slowmo: {
-    type: 'slowmo',
-    emoji: '⏱️',
-    color: '#06B6D4',
-    glowColor: 'rgba(6, 182, 212, 0.6)',
-    size: 36,
-    duration: 180,            // 3 Sekunden
-    description: 'Zeitlupe!',
-    spawnWeight: 0.1,
-    minDistance: 200
-  }
-};
-
-/**
- * Wählt einen zufälligen Power-Up-Typ
- */
-export function getRandomPowerUpType(distance: number): PowerUpType | null {
-  const available = Object.values(POWERUP_DEFINITIONS)
-    .filter(p => distance >= p.minDistance);
-
-  if (available.length === 0) return null;
-
-  const totalWeight = available.reduce((sum, p) => sum + p.spawnWeight, 0);
-  let random = Math.random() * totalWeight;
-
-  for (const powerUp of available) {
-    random -= powerUp.spawnWeight;
-    if (random <= 0) {
-      return powerUp.type;
-    }
-  }
-
-  return 'magnet'; // Fallback
-}
-
-// === HINTERGRUND-LAYER (Parallax) ===
-
-export interface BackgroundLayer {
-  id: string;
-  speedMultiplier: number;    // Relativ zur Spielgeschwindigkeit
-  yPosition: number;          // Von oben (0 = Himmel)
-  elements: BackgroundElement[];
-  color?: string;             // Optionale Hintergrundfarbe
-}
-
-export interface BackgroundElement {
-  emoji: string;
-  width: number;
-  height: number;
-  yOffset: number;            // Offset innerhalb des Layers
-  frequency: number;          // Wie oft spawnen (0-1)
-  animated?: boolean;
-}
-
-export const BACKGROUND_LAYERS: BackgroundLayer[] = [
-  {
-    id: 'sky',
-    speedMultiplier: 0,
-    yPosition: 0,
-    color: 'linear-gradient(180deg, #1e3a5f 0%, #3b5998 50%, #87CEEB 100%)',
-    elements: []
-  },
-  {
-    id: 'clouds-far',
-    speedMultiplier: 0.1,
-    yPosition: 20,
-    elements: [
-      { emoji: '☁️', width: 80, height: 40, yOffset: 0, frequency: 0.3 },
-      { emoji: '☁️', width: 60, height: 30, yOffset: 20, frequency: 0.2 }
-    ]
-  },
-  {
-    id: 'mountains',
-    speedMultiplier: 0.2,
-    yPosition: 80,
-    elements: [
-      { emoji: '🏔️', width: 120, height: 80, yOffset: 0, frequency: 0.15 },
-      { emoji: '⛰️', width: 100, height: 60, yOffset: 10, frequency: 0.2 }
-    ]
-  },
-  {
-    id: 'trees-far',
-    speedMultiplier: 0.4,
-    yPosition: 270,
-    elements: [
-      { emoji: '🌲', width: 40, height: 60, yOffset: 0, frequency: 0.4 },
-      { emoji: '🌳', width: 50, height: 55, yOffset: 5, frequency: 0.3 }
-    ]
-  },
-  {
-    id: 'trees-near',
-    speedMultiplier: 0.6,
-    yPosition: 310,
-    elements: [
-      { emoji: '🌲', width: 50, height: 70, yOffset: -10, frequency: 0.25 },
-      { emoji: '🌴', width: 45, height: 75, yOffset: -15, frequency: 0.15 }
-    ]
-  }
-];
-
-// === BODEN-KONFIGURATION ===
-
-export interface GroundConfig {
-  color: string;
-  patternColor: string;
-  height: number;
-  lineSpacing: number;
-}
-
-export const GROUND_CONFIG: GroundConfig = {
-  color: '#4A5D23',
-  patternColor: '#3D4F1C',
-  height: 60,
-  lineSpacing: 40
-};
-
-// === SOUND-DEFINITIONEN ===
-
-export type SoundType = 
-  | 'jump' 
-  | 'coin' 
-  | 'star' 
-  | 'diamond' 
-  | 'heart' 
-  | 'hit' 
-  | 'gameOver' 
-  | 'victory' 
-  | 'milestone'
-  | 'countdown'
-  | 'start';
+export type SoundType =
+  | 'bounce_wall' | 'bounce_paddle' | 'brick_hit' | 'brick_break'
+  | 'powerup' | 'coin' | 'star' | 'diamond' | 'heart'
+  | 'levelup' | 'gameOver' | 'victory' | 'countdown' | 'start';
 
 export interface SoundDefinition {
   id: SoundType;
-  frequency?: number;         // Für generierte Sounds
+  frequency?: number;
   duration?: number;
   type?: OscillatorType;
   volume: number;
-  // Für komplexere Sounds
-  notes?: Array<{
-    frequency: number;
-    duration: number;
-    delay: number;
-  }>;
+  notes?: Array<{ frequency: number; duration: number; delay: number }>;
 }
 
-// Generierte Sounds (keine externen Dateien nötig)
 export const SOUND_DEFINITIONS: Record<SoundType, SoundDefinition> = {
-  jump: {
-    id: 'jump',
-    frequency: 300,
-    duration: 0.15,
-    type: 'sine',
-    volume: 0.3,
+  bounce_wall: {
+    id: 'bounce_wall', type:'square', frequency:220, duration:.06, volume:.15
+  },
+  bounce_paddle: {
+    id: 'bounce_paddle', volume:.25,
     notes: [
-      { frequency: 300, duration: 0.08, delay: 0 },
-      { frequency: 450, duration: 0.1, delay: 0.05 }
+      {frequency:330, duration:.06, delay:0},
+      {frequency:440, duration:.08, delay:.05},
     ]
   },
-  coin: {
-    id: 'coin',
-    volume: 0.4,
+  brick_hit: {
+    id: 'brick_hit', type:'sine', frequency:300, duration:.07, volume:.2
+  },
+  brick_break: {
+    id: 'brick_break', volume:.3,
     notes: [
-      { frequency: 987, duration: 0.1, delay: 0 },
-      { frequency: 1319, duration: 0.15, delay: 0.1 }
+      {frequency:440, duration:.07, delay:0},
+      {frequency:554, duration:.07, delay:.06},
+      {frequency:659, duration:.12, delay:.12},
     ]
   },
-  star: {
-    id: 'star',
-    volume: 0.4,
+  powerup: {
+    id: 'powerup', volume:.45,
     notes: [
-      { frequency: 523, duration: 0.1, delay: 0 },
-      { frequency: 659, duration: 0.1, delay: 0.08 },
-      { frequency: 784, duration: 0.1, delay: 0.16 },
-      { frequency: 1047, duration: 0.2, delay: 0.24 }
+      {frequency:523, duration:.1, delay:0},
+      {frequency:659, duration:.1, delay:.08},
+      {frequency:784, duration:.1, delay:.16},
+      {frequency:1047,duration:.2, delay:.24},
     ]
   },
-  diamond: {
-    id: 'diamond',
-    volume: 0.5,
-    notes: [
-      { frequency: 880, duration: 0.15, delay: 0 },
-      { frequency: 1108, duration: 0.15, delay: 0.1 },
-      { frequency: 1318, duration: 0.15, delay: 0.2 },
-      { frequency: 1760, duration: 0.3, delay: 0.3 }
-    ]
-  },
-  heart: {
-    id: 'heart',
-    volume: 0.5,
-    notes: [
-      { frequency: 392, duration: 0.15, delay: 0 },
-      { frequency: 523, duration: 0.15, delay: 0.12 },
-      { frequency: 659, duration: 0.2, delay: 0.24 }
-    ]
-  },
-  hit: {
-    id: 'hit',
-    frequency: 150,
-    duration: 0.2,
-    type: 'sawtooth',
-    volume: 0.4,
-    notes: [
-      { frequency: 200, duration: 0.1, delay: 0 },
-      { frequency: 100, duration: 0.15, delay: 0.08 }
+  coin:    { id:'coin',    volume:.3, notes:[{frequency:987,duration:.08,delay:0},{frequency:1319,duration:.12,delay:.08}] },
+  star:    { id:'star',    volume:.35,notes:[{frequency:659,duration:.08,delay:0},{frequency:784,duration:.08,delay:.07},{frequency:1047,duration:.15,delay:.14}] },
+  diamond: { id:'diamond', volume:.4, notes:[{frequency:880,duration:.1,delay:0},{frequency:1108,duration:.1,delay:.09},{frequency:1318,duration:.1,delay:.18},{frequency:1760,duration:.25,delay:.27}] },
+  heart:   { id:'heart',   volume:.4, notes:[{frequency:392,duration:.1,delay:0},{frequency:523,duration:.1,delay:.1},{frequency:659,duration:.18,delay:.2}] },
+  levelup: {
+    id:'levelup', volume:.5,
+    notes:[
+      {frequency:523, duration:.12,delay:0},
+      {frequency:659, duration:.12,delay:.1},
+      {frequency:784, duration:.12,delay:.2},
+      {frequency:1047,duration:.25,delay:.3},
     ]
   },
   gameOver: {
-    id: 'gameOver',
-    volume: 0.5,
-    notes: [
-      { frequency: 392, duration: 0.3, delay: 0 },
-      { frequency: 349, duration: 0.3, delay: 0.25 },
-      { frequency: 330, duration: 0.3, delay: 0.5 },
-      { frequency: 262, duration: 0.5, delay: 0.75 }
+    id:'gameOver', volume:.4,
+    notes:[
+      {frequency:392, duration:.25,delay:0},
+      {frequency:349, duration:.25,delay:.22},
+      {frequency:330, duration:.25,delay:.44},
+      {frequency:262, duration:.4, delay:.66},
     ]
   },
   victory: {
-    id: 'victory',
-    volume: 0.5,
-    notes: [
-      { frequency: 523, duration: 0.15, delay: 0 },
-      { frequency: 659, duration: 0.15, delay: 0.12 },
-      { frequency: 784, duration: 0.15, delay: 0.24 },
-      { frequency: 1047, duration: 0.15, delay: 0.36 },
-      { frequency: 784, duration: 0.15, delay: 0.48 },
-      { frequency: 1047, duration: 0.4, delay: 0.6 }
+    id:'victory', volume:.5,
+    notes:[
+      {frequency:523, duration:.12,delay:0},
+      {frequency:659, duration:.12,delay:.1},
+      {frequency:784, duration:.12,delay:.2},
+      {frequency:1047,duration:.12,delay:.3},
+      {frequency:784, duration:.12,delay:.4},
+      {frequency:1047,duration:.35,delay:.5},
     ]
   },
-  milestone: {
-    id: 'milestone',
-    volume: 0.4,
-    notes: [
-      { frequency: 659, duration: 0.12, delay: 0 },
-      { frequency: 784, duration: 0.12, delay: 0.1 },
-      { frequency: 1047, duration: 0.25, delay: 0.2 }
-    ]
-  },
-  countdown: {
-    id: 'countdown',
-    frequency: 440,
-    duration: 0.15,
-    type: 'sine',
-    volume: 0.3
-  },
-  start: {
-    id: 'start',
-    volume: 0.4,
-    notes: [
-      { frequency: 523, duration: 0.1, delay: 0 },
-      { frequency: 659, duration: 0.1, delay: 0.08 },
-      { frequency: 784, duration: 0.2, delay: 0.16 }
-    ]
-  }
+  countdown: { id:'countdown', type:'sine', frequency:440, duration:.15, volume:.25 },
+  start:     { id:'start', volume:.35, notes:[{frequency:523,duration:.08,delay:0},{frequency:659,duration:.08,delay:.07},{frequency:784,duration:.18,delay:.14}] },
 };
 
 // === CANVAS-KONFIGURATION ===
 
 export interface CanvasConfig {
-  width: number;
-  height: number;
-  groundY: number;            // Y-Position des Bodens
-  playerX: number;            // Feste X-Position des Spielers
-  gravity: number;
-  jumpForce: number;
+  designWidth: number;    // Referenzbreite für Skalierung
+  designHeight: number;
+  brickCols: number;
+  brickGap: number;
+  brickPadH: number;      // Horizontaler Rand
+  brickTopOffset: number; // Abstand von oben bis zur ersten Brick-Reihe
+  brickHeight: number;
+  paddleY: number;        // Paddle Y als Anteil der Höhe (0–1)
+  ballRadius: number;
 }
 
 export const CANVAS_CONFIG: CanvasConfig = {
-  width: 800,
-  height: 400,
-  groundY: 340,               // Boden bei y=340
-  playerX: 120,               // Spieler steht links
-  gravity: 0.8,
-  jumpForce: 15
-};
-
-// === SPIELER-KONFIGURATION ===
-
-export interface PlayerConfig {
-  width: number;
-  height: number;
-  duckHeight: number;         // Höhe beim Ducken
-  hitboxPadding: number;      // Hitbox kleiner als Sprite
-}
-
-export const PLAYER_CONFIG: PlayerConfig = {
-  width: 60,
-  height: 80,
-  duckHeight: 45,
-  hitboxPadding: 8
+  designWidth: 420,
+  designHeight: 640,
+  brickCols: 8,
+  brickGap: 5,
+  brickPadH: 14,
+  brickTopOffset: 72,
+  brickHeight: 20,
+  paddleY: 0.91,
+  ballRadius: 8,
 };
 
 // === EINSATZ-OPTIONEN ===
@@ -606,106 +289,52 @@ export interface BetOption {
 }
 
 export const BET_OPTIONS: BetOption[] = [
-  { amount: 25, label: '25 XP' },
-  { amount: 50, label: '50 XP' },
+  { amount: 25,  label: '25 XP'  },
+  { amount: 50,  label: '50 XP'  },
   { amount: 100, label: '100 XP' },
-  { amount: -1, label: 'All-In! 🎰', isAllIn: true }
+  { amount: -1,  label: 'All-In! 🎰', isAllIn: true },
 ];
 
 // === HELPER FUNKTIONEN ===
 
 /**
- * Berechnet den Multiplikator basierend auf Distanz und Altersstufe
+ * Multiplikator basierend auf zerstörten Bricks (analog zu Distanz beim Runner)
  */
-export function calculateMultiplier(distance: number, ageGroup: AgeGroup): number {
+export function calculateMultiplier(bricksDestroyed: number, ageGroup: AgeGroup): number {
   const config = DIFFICULTY_CONFIGS[ageGroup];
-  const milestones = Object.keys(config.distanceMultipliers)
+  const thresholds = Object.keys(config.brickMultipliers)
     .map(Number)
     .sort((a, b) => b - a);
-  
-  for (const milestone of milestones) {
-    if (distance >= milestone) {
-      return config.distanceMultipliers[milestone];
-    }
+  for (const t of thresholds) {
+    if (bricksDestroyed >= t) return config.brickMultipliers[t];
   }
-  return 0; // Unter dem ersten Milestone = Einsatz verloren
+  return 0;
 }
 
 /**
- * Gibt das nächste Distanz-Ziel zurück
+ * Nächster Meilenstein (analog zu getNextMilestone beim Runner)
  */
-export function getNextMilestone(distance: number, ageGroup: AgeGroup): number | null {
+export function getNextMilestone(bricksDestroyed: number, ageGroup: AgeGroup): number | null {
   const config = DIFFICULTY_CONFIGS[ageGroup];
-  const milestones = Object.keys(config.distanceMultipliers)
+  const thresholds = Object.keys(config.brickMultipliers)
     .map(Number)
     .sort((a, b) => a - b);
-  
-  for (const milestone of milestones) {
-    if (distance < milestone) {
-      return milestone;
-    }
+  for (const t of thresholds) {
+    if (bricksDestroyed < t) return t;
   }
-  return null; // Alle Milestones erreicht
+  return null;
 }
 
 /**
- * Wählt einen zufälligen Hindernis-Typ basierend auf Distanz
+ * Zufälliger PowerUp-Typ nach Gewichtung
  */
-export function getRandomObstacleType(distance: number): ObstacleType {
-  const available = Object.values(OBSTACLE_DEFINITIONS)
-    .filter(obs => obs.minDistance === undefined || distance >= obs.minDistance);
-  
-  const totalWeight = available.reduce((sum, obs) => sum + obs.rarity, 0);
-  let random = Math.random() * totalWeight;
-  
-  for (const obs of available) {
-    random -= obs.rarity;
-    if (random <= 0) {
-      return obs.type;
-    }
+export function getRandomPowerUpType(): PowerUpType {
+  const defs = Object.values(POWERUP_DEFINITIONS);
+  const total = defs.reduce((s, d) => s + d.spawnWeight, 0);
+  let r = Math.random() * total;
+  for (const d of defs) {
+    r -= d.spawnWeight;
+    if (r <= 0) return d.type;
   }
-  
-  return 'rock'; // Fallback
-}
-
-/**
- * Wählt einen zufälligen Collectible-Typ
- */
-export function getRandomCollectibleType(heartSpawnRate: number): CollectibleType {
-  // Herz-Spawn-Rate separat behandeln
-  if (Math.random() < heartSpawnRate) {
-    return 'heart';
-  }
-  
-  // Andere Collectibles ohne Herz
-  const available = Object.values(COLLECTIBLE_DEFINITIONS)
-    .filter(c => c.type !== 'heart');
-  
-  const totalWeight = available.reduce((sum, c) => sum + c.spawnWeight, 0);
-  let random = Math.random() * totalWeight;
-  
-  for (const collectible of available) {
-    random -= collectible.spawnWeight;
-    if (random <= 0) {
-      return collectible.type;
-    }
-  }
-  
-  return 'coin'; // Fallback
-}
-
-/**
- * Berechnet die Spawn-Distanz basierend auf Geschwindigkeit und Schwierigkeit
- */
-export function calculateObstacleGap(
-  speed: number, 
-  config: DifficultyConfig
-): number {
-  const baseGap = config.minObstacleGap + 
-    Math.random() * (config.maxObstacleGap - config.minObstacleGap);
-  
-  // Bei höherer Geschwindigkeit etwas mehr Abstand
-  const speedAdjustment = speed * 5;
-  
-  return baseGap + speedAdjustment;
+  return 'wide';
 }

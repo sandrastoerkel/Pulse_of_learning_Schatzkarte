@@ -25,7 +25,7 @@ try:
         is_logged_in, get_current_user, get_current_user_id,
         render_user_login, get_user_by_id, is_coach, try_auto_login,
         get_all_students_list, reset_student_password, delete_user,
-        create_student_by_coach
+        create_student_by_coach, update_user_age_group
     )
     from utils.lerngruppen_db import (
         create_group, get_group, get_coach_groups, update_group, delete_group,
@@ -165,7 +165,7 @@ def render_group_card(group: dict):
             | 👥 Mitglieder | {progress.get('member_count', 0)} |
             | ⭐ Gesamt-XP | {progress.get('total_xp', 0):,} |
             | 📈 Ø Level | {progress.get('avg_level', 1)} |
-            | 🏝️ Aktivierte Inseln | {len(progress.get('activated_islands', []))} / 7 |
+            | 🏝️ Aktivierte Inseln | {len(progress.get('activated_islands', []))} / 11 |
             """)
 
         with col2:
@@ -270,28 +270,20 @@ def render_island_selector(group_id: str, current_week: int):
         ])
         st.markdown(activated_html)
 
-    # Nächste flexible Woche berechnen
-    next_flexible_week = 5
+    # Nächste Woche berechnen
+    next_week = 1
     for a in activated:
-        if a['week_number'] >= next_flexible_week:
-            next_flexible_week = a['week_number'] + 1
+        if a['week_number'] >= next_week:
+            next_week = a['week_number'] + 1
 
-    if next_flexible_week > 11:
-        st.success("🎉 Alle flexiblen Inseln wurden bereits gewählt!")
+    if next_week > 11:
+        st.success("🎉 Alle Inseln für Wochen 1-11 wurden bereits gewählt!")
         if st.button("❌ Schließen", key=f"close_island_done_{group_id}"):
             st.session_state[f"show_island_{group_id}"] = False
             st.rerun()
         return
 
-    if current_week < 4:
-        st.info(f"🕐 Die flexible Insel-Auswahl beginnt ab Woche 5. Aktuell: Woche {current_week}")
-        st.markdown("**Wochen 1-4 sind fest:** 💪 Festung der Stärke → 🔧 Insel der 7 Werkzeuge → 🌉 Insel der Brücken → 🧵 Insel der Fäden")
-        if st.button("❌ Schließen", key=f"close_island_early_{group_id}"):
-            st.session_state[f"show_island_{group_id}"] = False
-            st.rerun()
-        return
-
-    st.markdown(f"**🎯 Wähle die Insel für Woche {next_flexible_week}:**")
+    st.markdown(f"**🎯 Wähle die Insel für Woche {next_week}:**")
     available = get_available_islands(group_id)
     if not available:
         st.warning("Keine Inseln mehr verfügbar!")
@@ -325,8 +317,8 @@ def render_island_selector(group_id: str, current_week: int):
         col1, col2 = st.columns(2)
         with col1:
             if st.button("✅ Bestätigen", type="primary", key=f"confirm_island_{group_id}", use_container_width=True):
-                if activate_weekly_island(group_id, next_flexible_week, selected, notes):
-                    st.success(f"🎉 {selected_info['name']} für Woche {next_flexible_week} aktiviert!")
+                if activate_weekly_island(group_id, next_week, selected, notes):
+                    st.success(f"🎉 {selected_info['name']} für Woche {next_week} aktiviert!")
                     st.session_state.pop(f"selected_island_{group_id}", None)
                     st.session_state[f"show_island_{group_id}"] = False
                     st.rerun()
@@ -353,17 +345,34 @@ def render_members_list(group_id: str, members: list):
     if not members:
         st.info("Noch keine Mitglieder. Lade Kinder per Einladungslink ein!")
     else:
+        age_group_options = ["Grundschule", "Unterstufe", "Mittelstufe", "Oberstufe"]
+        age_group_lower = [a.lower() for a in age_group_options]
         for member in members:
-            col1, col2, col3, col4, col5 = st.columns([3, 1, 1, 1, 0.7])
+            col1, col2, col3, col4, col5, col6 = st.columns([3, 2, 1, 1, 1, 0.7])
             with col1:
                 st.markdown(f"**{member.get('display_name', 'Unbekannt')}**")
             with col2:
-                st.markdown(f"Level {member.get('level', 1)}")
+                current_age = member.get("age_group", "unterstufe").lower()
+                current_idx = age_group_lower.index(current_age) if current_age in age_group_lower else 1
+                new_age = st.selectbox(
+                    "Altersstufe",
+                    age_group_options,
+                    index=current_idx,
+                    key=f"age_group_{group_id}_{member['user_id']}",
+                    label_visibility="collapsed",
+                )
+                new_age_lower = new_age.lower()
+                if new_age_lower != current_age:
+                    if update_user_age_group(member["user_id"], new_age_lower):
+                        st.toast(f"Altersstufe von {member.get('display_name', '?')} → {new_age}")
+                        st.rerun()
             with col3:
-                st.markdown(f"⭐ {member.get('xp_total', 0):,}")
+                st.markdown(f"Level {member.get('level', 1)}")
             with col4:
-                st.markdown(f"🔥 {member.get('current_streak', 0)}")
+                st.markdown(f"⭐ {member.get('xp_total', 0):,}")
             with col5:
+                st.markdown(f"🔥 {member.get('current_streak', 0)}")
+            with col6:
                 if st.button("🔑", key=f"reset_pw_{group_id}_{member['user_id']}",
                              help="Passwort zurücksetzen"):
                     st.session_state[f"confirm_reset_{group_id}_{member['user_id']}"] = True
@@ -1051,17 +1060,21 @@ def render_assign_members(coach_id: str):
         return
 
     # Tabellen-Header
-    header_cols = st.columns([3, 1, 1, 2, 2, 0.5])
+    header_cols = st.columns([3, 2, 1, 1, 2, 2, 0.5])
     header_cols[0].markdown("**Name**")
-    header_cols[1].markdown("**Level**")
-    header_cols[2].markdown("**XP**")
-    header_cols[3].markdown("**Gruppe**")
-    header_cols[4].markdown("**Aktion**")
+    header_cols[1].markdown("**Altersstufe**")
+    header_cols[2].markdown("**Level**")
+    header_cols[3].markdown("**XP**")
+    header_cols[4].markdown("**Gruppe**")
+    header_cols[5].markdown("**Aktion**")
     st.divider()
 
     # Gruppen-Optionen fuer Selectbox
     group_options = {g['name']: g['group_id'] for g in groups}
     group_names = list(group_options.keys())
+
+    age_group_options_tab = ["Grundschule", "Unterstufe", "Mittelstufe", "Oberstufe"]
+    age_group_lower_tab = [a.lower() for a in age_group_options_tab]
 
     for student in filtered:
         uid = student['user_id']
@@ -1070,20 +1083,38 @@ def render_assign_members(coach_id: str):
         xp = student.get('xp_total', 0)
         assignment = group_map.get(uid)
 
-        cols = st.columns([3, 1, 1, 2, 2, 0.5])
+        cols = st.columns([3, 2, 1, 1, 2, 2, 0.5])
         cols[0].markdown(f"**{name}**")
-        cols[1].markdown(str(level))
-        cols[2].markdown(f"{xp:,}")
+
+        # Altersstufe-Selectbox
+        with cols[1]:
+            current_age = student.get("age_group", "unterstufe").lower()
+            current_idx = age_group_lower_tab.index(current_age) if current_age in age_group_lower_tab else 1
+            new_age = st.selectbox(
+                "Altersstufe",
+                age_group_options_tab,
+                index=current_idx,
+                key=f"age_group_tab_{uid}",
+                label_visibility="collapsed",
+            )
+            new_age_lower = new_age.lower()
+            if new_age_lower != current_age:
+                if update_user_age_group(uid, new_age_lower):
+                    st.toast(f"Altersstufe von {name} → {new_age}")
+                    st.rerun()
+
+        cols[2].markdown(str(level))
+        cols[3].markdown(f"{xp:,}")
 
         # Loeschen-Button (letzte Spalte)
-        with cols[5]:
+        with cols[6]:
             if st.button("🗑️", key=f"del_user_{uid}", help=f"{name} löschen"):
                 st.session_state[f"confirm_delete_user_{uid}"] = True
 
         if assignment:
             # Schueler ist in einer Coach-Gruppe
-            cols[3].markdown(f"✅ {assignment['group_name']}")
-            with cols[4]:
+            cols[4].markdown(f"✅ {assignment['group_name']}")
+            with cols[5]:
                 if st.button("✕ Entfernen", key=f"remove_{uid}", type="secondary"):
                     st.session_state[f"confirm_remove_{uid}"] = True
 
@@ -1106,11 +1137,11 @@ def render_assign_members(coach_id: str):
             # Schueler hat keine Gruppe — pruefen ob in fremder Gruppe
             other_group = get_user_group(uid)
             if other_group:
-                cols[3].markdown(f"🔒 {other_group.get('name', 'Andere')}")
-                cols[4].caption("Anderer Coach")
+                cols[4].markdown(f"🔒 {other_group.get('name', 'Andere')}")
+                cols[5].caption("Anderer Coach")
             else:
-                cols[3].markdown("—")
-                with cols[4]:
+                cols[4].markdown("—")
+                with cols[5]:
                     sel_key = f"grp_select_{uid}"
                     if len(group_names) == 1:
                         chosen = group_names[0]

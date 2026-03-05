@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Freischaltungs-Logik fuer die Schatzkarte."""
 import streamlit as st
-from .map_data import ISLANDS, FIXED_ISLANDS, FLEXIBLE_ISLANDS
+from .map_data import ISLANDS, CHOOSABLE_ISLANDS
 
 def is_preview_mode():
     """Prueft ob Preview-Modus aktiv."""
@@ -28,24 +28,16 @@ def get_unlocked_islands(user_id, current_week=None):
     # Woche bestimmen
     week = get_preview_week() if is_preview_mode() else (current_week or 0)
     
-    # Inseln sammeln (Basiscamp + Mental stark immer offen)
-    unlocked = ["start", "festung"]
+    # Inseln sammeln (Basiscamp immer offen)
+    unlocked = ["start"]
 
-    # Feste Inseln (Woche 2-4, festung ist schon drin)
-    for i, island_id in enumerate(FIXED_ISLANDS):
-        if island_id == "festung":
-            continue  # bereits freigeschaltet
+    # Alle wählbaren Inseln progressiv freischalten (Woche 1-11)
+    for i, island_id in enumerate(CHOOSABLE_ISLANDS):
         if week >= (i + 1):
             unlocked.append(island_id)
-    
-    # Flexible Inseln (Woche 5-13)
-    if week >= 5:
-        for i, island_id in enumerate(FLEXIBLE_ISLANDS):
-            if week >= (5 + i):
-                unlocked.append(island_id)
-    
-    # Finale (Woche 14)
-    if week >= 14:
+
+    # Finale (Woche 12)
+    if week >= 12:
         unlocked.append("meister_berg")
     
     return unlocked

@@ -1,15 +1,19 @@
 # -*- coding: utf-8 -*-
 """Insel-Daten für die Schatzkarte - ERWEITERT mit Polarstern."""
 
-# Feste Inseln (Woche 1-4)
-FIXED_ISLANDS = ["festung", "werkzeuge", "faeden", "bruecken"]
-
-# Flexible Inseln (Woche 5-13)
-FLEXIBLE_ISLANDS = [
+# Alle wählbaren Inseln (Coach wählt 11 aus 13 für Wochen 1-11)
+CHOOSABLE_ISLANDS = [
+    # Ehemals feste Inseln (Wochen 1-4)
+    "festung", "werkzeuge", "faeden", "bruecken",
+    # Flexible Inseln
     "spiegel_see", "vulkan", "ruhe_oase", "ausdauer_gipfel",
     "fokus_leuchtturm", "wachstum_garten", "lehrer_turm",
     "wohlfuehl_dorf", "schutz_burg"
 ]
+
+# Rückwärtskompatibilität
+FIXED_ISLANDS = []
+FLEXIBLE_ISLANDS = CHOOSABLE_ISLANDS
 
 # Finale Insel (Woche 14)
 FINALE_ISLAND = "meister_berg"

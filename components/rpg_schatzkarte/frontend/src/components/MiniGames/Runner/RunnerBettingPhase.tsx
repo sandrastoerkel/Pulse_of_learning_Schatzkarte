@@ -1,17 +1,15 @@
 // ============================================
-// RUNNER BETTING PHASE
-// XP-Einsatz Auswahl UI
+// BRICK BREAKER – BETTING PHASE
+// XP-Einsatz Auswahl (ersetzt RunnerBettingPhase)
 // ============================================
 
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  AgeGroup, 
-  DIFFICULTY_CONFIGS, 
-  BET_OPTIONS 
+import {
+  AgeGroup,
+  DIFFICULTY_CONFIGS,
+  BET_OPTIONS,
 } from './RunnerAssets';
-
-// === PROPS ===
 
 interface RunnerBettingPhaseProps {
   playerXP: number;
@@ -20,237 +18,192 @@ interface RunnerBettingPhaseProps {
   onClose: () => void;
 }
 
-// === AGE GROUP LABELS ===
-
-const AGE_GROUP_LABELS: Record<AgeGroup, string> = {
+const AGE_LABELS: Record<AgeGroup, string> = {
   grundschule: 'Grundschule',
-  unterstufe: 'Unterstufe',
-  mittelstufe: 'Mittelstufe'
+  unterstufe:  'Unterstufe',
+  mittelstufe: 'Mittelstufe',
 };
-
-const AGE_GROUP_ICONS: Record<AgeGroup, string> = {
+const AGE_ICONS: Record<AgeGroup, string> = {
   grundschule: '🌱',
-  unterstufe: '🌿',
-  mittelstufe: '🌳'
+  unterstufe:  '🌿',
+  mittelstufe: '🌳',
 };
-
-// === KOMPONENTE ===
 
 export const RunnerBettingPhase: React.FC<RunnerBettingPhaseProps> = ({
   playerXP,
   ageGroup,
   onStartGame,
-  onClose
+  onClose,
 }) => {
   const [selectedBet, setSelectedBet] = useState<number | null>(null);
-  const [isHovering, setIsHovering] = useState<number | null>(null);
 
-  const config = DIFFICULTY_CONFIGS[ageGroup];
-  const milestones = Object.entries(config.distanceMultipliers)
-    .map(([distance, multiplier]) => ({ 
-      distance: parseInt(distance), 
-      multiplier 
-    }))
-    .sort((a, b) => a.distance - b.distance);
+  const cfg = DIFFICULTY_CONFIGS[ageGroup];
 
-  // Verfügbare Einsätze basierend auf Spieler-XP
-  const availableBets = useMemo(() => {
-    return BET_OPTIONS.map(bet => ({
-      ...bet,
-      actualAmount: bet.isAllIn ? playerXP : bet.amount,
-      isAvailable: bet.isAllIn ? playerXP > 0 : playerXP >= bet.amount
-    }));
-  }, [playerXP]);
+  const milestones = useMemo(() =>
+    Object.entries(cfg.brickMultipliers)
+      .map(([bricks, mult]) => ({ bricks: parseInt(bricks), mult }))
+      .sort((a, b) => a.bricks - b.bricks),
+    [cfg]
+  );
 
-  // Potentieller Gewinn berechnen
-  const calculatePotentialWin = (bet: number, multiplier: number): number => {
-    return Math.floor(bet * multiplier);
-  };
+  const availableBets = useMemo(() =>
+    BET_OPTIONS.map(b => ({
+      ...b,
+      actual: b.isAllIn ? playerXP : b.amount,
+      canAfford: b.isAllIn ? playerXP > 0 : playerXP >= b.amount,
+    })),
+    [playerXP]
+  );
 
-  const handleBetSelect = (betOption: typeof availableBets[0]) => {
-    if (betOption.isAvailable) {
-      setSelectedBet(betOption.actualAmount);
-    }
-  };
+  const potWin = (bet: number, mult: number) => Math.floor(bet * mult);
 
   const handleStart = () => {
-    if (selectedBet !== null && selectedBet > 0) {
-      onStartGame(selectedBet);
-    }
+    if (selectedBet !== null && selectedBet > 0) onStartGame(selectedBet);
   };
 
   return (
-    <div className="runner-betting-phase">
+    <div className="bb-betting">
+
       {/* Header */}
-      <div className="betting-header">
-        <button className="close-button" onClick={onClose}>
-          ✕
-        </button>
-        <div className="game-title">
-          <span className="game-icon">🏃</span>
-          <h2>Endless Runner</h2>
+      <div className="bb-bet-header">
+        <button className="bb-close-btn" onClick={onClose} aria-label="Schließen">✕</button>
+        <div className="bb-bet-title-wrap">
+          <span className="bb-bet-game-icon">🧱</span>
+          <span className="bb-bet-game-name">Brick Breaker</span>
         </div>
-        <div className="difficulty-badge">
-          <span className="age-icon">{AGE_GROUP_ICONS[ageGroup]}</span>
-          <span className="age-label">{AGE_GROUP_LABELS[ageGroup]}</span>
+        <div className="bb-difficulty-badge">
+          <span>{AGE_ICONS[ageGroup]}</span>
+          <span>{AGE_LABELS[ageGroup]}</span>
         </div>
       </div>
 
-      {/* XP-Anzeige */}
-      <motion.div 
-        className="xp-display"
-        initial={{ scale: 0.9, opacity: 0 }}
+      {/* XP Display */}
+      <motion.div
+        className="bb-xp-display"
+        initial={{ scale: 0.88, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.1 }}
+        transition={{ delay: 0.08 }}
       >
-        <span className="xp-label">Deine XP</span>
-        <span className="xp-value">
-          <span className="xp-icon">⭐</span>
-          {playerXP.toLocaleString()}
-        </span>
+        <span className="bb-xp-label">Deine XP</span>
+        <span className="bb-xp-value">⭐ {playerXP.toLocaleString()}</span>
       </motion.div>
 
-      {/* Einsatz-Auswahl */}
-      <div className="betting-section">
-        <h3>Wähle deinen Einsatz</h3>
-        <p className="betting-hint">
-          Setze XP für höhere Belohnungen! Je weiter du läufst, desto mehr gewinnst du.
-        </p>
-
-        <div className="bet-options">
-          {availableBets.map((bet, index) => (
+      {/* Bet selection */}
+      <div className="bb-section">
+        <h3 className="bb-section-title">Wähle deinen Einsatz</h3>
+        <p className="bb-section-hint">Je mehr Bricks du zerstörst, desto höher dein Gewinn!</p>
+        <div className="bb-bet-grid">
+          {availableBets.map((bet, i) => (
             <motion.button
               key={bet.label}
-              className={`bet-option ${selectedBet === bet.actualAmount ? 'selected' : ''} ${!bet.isAvailable ? 'disabled' : ''}`}
-              onClick={() => handleBetSelect(bet)}
-              disabled={!bet.isAvailable}
-              initial={{ opacity: 0, y: 20 }}
+              className={[
+                'bb-bet-btn',
+                selectedBet === bet.actual ? 'selected' : '',
+                !bet.canAfford ? 'disabled' : '',
+              ].join(' ')}
+              onClick={() => bet.canAfford && setSelectedBet(bet.actual)}
+              disabled={!bet.canAfford}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 + index * 0.05 }}
-              whileHover={bet.isAvailable ? { scale: 1.05 } : undefined}
-              whileTap={bet.isAvailable ? { scale: 0.95 } : undefined}
-              onMouseEnter={() => bet.isAvailable && setIsHovering(bet.actualAmount)}
-              onMouseLeave={() => setIsHovering(null)}
+              transition={{ delay: 0.12 + i * 0.05 }}
+              whileHover={bet.canAfford ? { scale: 1.06 } : undefined}
+              whileTap={bet.canAfford ? { scale: 0.95 } : undefined}
             >
-              <span className="bet-amount">
+              <span className="bb-bet-amount">
                 {bet.isAllIn ? `${playerXP} XP` : bet.label}
               </span>
-              {bet.isAllIn && (
-                <span className="allin-badge">All-In!</span>
-              )}
-              {!bet.isAvailable && (
-                <span className="not-enough">Nicht genug XP</span>
-              )}
+              {bet.isAllIn && <span className="bb-allin-tag">ALL-IN</span>}
+              {!bet.canAfford && <span className="bb-noxp-tag">Zu wenig XP</span>}
             </motion.button>
           ))}
         </div>
       </div>
 
-      {/* Distanz-Ziele */}
-      <div className="milestones-section">
-        <h3>Distanz-Ziele</h3>
-        <div className="milestones-list">
-          {milestones.map((milestone, index) => {
-            const potentialWin = selectedBet 
-              ? calculatePotentialWin(selectedBet, milestone.multiplier)
-              : 0;
-            const isHighlighted = isHovering !== null || selectedBet !== null;
-
-            return (
-              <motion.div
-                key={milestone.distance}
-                className={`milestone-item ${index === milestones.length - 1 ? 'legendary' : ''}`}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 + index * 0.05 }}
-              >
-                <div className="milestone-distance">
-                  <span className="distance-value">{milestone.distance}m</span>
-                  {index === milestones.length - 1 && <span className="star-badge">⭐</span>}
-                </div>
-                <div className="milestone-multiplier">
-                  ×{milestone.multiplier.toFixed(1)}
-                </div>
-                <AnimatePresence>
-                  {isHighlighted && selectedBet && (
-                    <motion.div
-                      className="potential-win"
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                    >
-                      +{potentialWin} XP
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            );
-          })}
+      {/* Milestones */}
+      <div className="bb-section">
+        <h3 className="bb-section-title">Brick-Ziele & Multiplikatoren</h3>
+        <div className="bb-milestones">
+          {milestones.map((m, i) => (
+            <motion.div
+              key={m.bricks}
+              className={['bb-milestone', i === milestones.length - 1 ? 'legendary' : ''].join(' ')}
+              initial={{ opacity: 0, x: -16 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.18 + i * 0.05 }}
+            >
+              <span className="bb-ms-icon">
+                {i === 0 ? '🥉' : i === 1 ? '🥈' : i === 2 ? '🥇' : '💎'}
+              </span>
+              <span className="bb-ms-bricks">{m.bricks} Bricks</span>
+              <span className="bb-ms-mult">×{m.mult.toFixed(1)}</span>
+              <AnimatePresence>
+                {selectedBet !== null && (
+                  <motion.span
+                    className="bb-ms-win"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    +{potWin(selectedBet, m.mult) - selectedBet} XP
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          ))}
         </div>
-        <p className="milestone-hint">
-          Erreiche mindestens {milestones[0]?.distance}m um deinen Einsatz zurück zu bekommen!
+        <p className="bb-section-hint">
+          Mindestens {milestones[0]?.bricks} Bricks → Einsatz zurück!
         </p>
       </div>
 
-      {/* Spielinfo */}
-      <div className="game-info-section">
-        <h3>So funktioniert's</h3>
-        <div className="info-grid">
-          <div className="info-item">
-            <span className="info-icon">👆</span>
-            <span className="info-text">Tippen oder Leertaste = Springen</span>
-          </div>
-          <div className="info-item">
-            <span className="info-icon">👇</span>
-            <span className="info-text">Wischen oder S-Taste = Ducken</span>
-          </div>
-          <div className="info-item">
-            <span className="info-icon">🪙</span>
-            <span className="info-text">Sammle Münzen für Gold</span>
-          </div>
-          <div className="info-item">
-            <span className="info-icon">⭐</span>
-            <span className="info-text">Sammle Sterne für Bonus-XP</span>
-          </div>
-          <div className="info-item">
-            <span className="info-icon">❤️</span>
-            <span className="info-text">{config.startLives} Leben - bei 0 ist Game Over!</span>
-          </div>
-          <div className="info-item">
-            <span className="info-icon">💎</span>
-            <span className="info-text">Seltene Diamanten = 100 Gold!</span>
-          </div>
+      {/* Power-ups info */}
+      <div className="bb-section bb-powerups-info">
+        <h3 className="bb-section-title">Power-Ups im Spiel</h3>
+        <div className="bb-pu-grid">
+          {[
+            ['↔️','Breites Paddle'],
+            ['⚡','Multi-Ball'],
+            ['🔫','Laser-Paddel'],
+            ['🐢','Zeitlupe'],
+            ['🔥','Feuerball'],
+          ].map(([emoji, label]) => (
+            <div key={label} className="bb-pu-item">
+              <span className="bb-pu-emoji">{emoji}</span>
+              <span className="bb-pu-label">{label}</span>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Start-Button */}
+      {/* Controls */}
+      <div className="bb-section bb-controls-info">
+        <div className="bb-ctrl-grid">
+          <div className="bb-ctrl">🖱️ <span>Maus / Touch → Paddle bewegen</span></div>
+          <div className="bb-ctrl">← → <span>Pfeiltasten</span></div>
+          <div className="bb-ctrl">⏸ <span>ESC = Pause</span></div>
+        </div>
+      </div>
+
+      {/* Start button */}
       <motion.button
-        className={`start-button ${selectedBet === null ? 'disabled' : ''}`}
+        className={['bb-start-btn', selectedBet === null ? 'disabled' : ''].join(' ')}
         onClick={handleStart}
         disabled={selectedBet === null}
-        whileHover={selectedBet !== null ? { scale: 1.05 } : undefined}
-        whileTap={selectedBet !== null ? { scale: 0.95 } : undefined}
+        whileHover={selectedBet !== null ? { scale: 1.04 } : undefined}
+        whileTap={selectedBet !== null ? { scale: 0.96 } : undefined}
       >
-        <span className="button-icon">🎮</span>
-        <span className="button-text">
-          {selectedBet === null 
-            ? 'Wähle einen Einsatz' 
-            : `Los geht's mit ${selectedBet} XP!`
-          }
+        <span>🎮</span>
+        <span>
+          {selectedBet === null
+            ? 'Wähle einen Einsatz'
+            : `Spielen mit ${selectedBet} XP!`}
         </span>
       </motion.button>
 
-      {/* Warnung bei niedrigen XP */}
       {playerXP < 25 && (
-        <motion.div
-          className="low-xp-warning"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-        >
-          <span className="warning-icon">⚠️</span>
-          <span>Du hast nur wenig XP. Sammle mehr durch Lern-Aktivitäten!</span>
-        </motion.div>
+        <motion.p className="bb-lowxp-warning" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          ⚠️ Du hast wenig XP – sammle mehr durch Lernaktivitäten!
+        </motion.p>
       )}
     </div>
   );

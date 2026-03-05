@@ -179,10 +179,10 @@ export class RunnerSoundManager {
   }
 
   /**
-   * Spielt Milestone-Sound
+   * Spielt Milestone-Sound (mapped auf levelup im Brick-Breaker)
    */
   playMilestone(): void {
-    this.play('milestone');
+    this.play('levelup');
   }
 
   /**
