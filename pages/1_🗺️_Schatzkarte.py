@@ -631,9 +631,9 @@ if result:
             st.session_state.polarstern_source_island = source_island
         st.rerun()
 
-    # Header-Button: Login anzeigen
-    if action == "show_login":
-        # Preview-Modus beenden und zur Login-Seite
+    # Header-Button: Login anzeigen (nur wenn tatsaechlich im Preview-Modus,
+    # sonst Endlosschleife weil Component-Result bei jedem Rerun erneut feuert)
+    if action == "show_login" and is_preview_mode():
         end_preview_mode()
         st.rerun()
 
