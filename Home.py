@@ -1,18 +1,19 @@
 """
 🚀 Pulse of Learning - Landing Page
-React-basierte Landing Page mit Schatzkarte-Design
+HTML-basierte Landing Page aus docs/index.html
 
-Stand: Januar 2025
+Stand: Maerz 2026
 """
 
 import streamlit as st
+import streamlit.components.v1 as components
 import sys
+import os
 
 sys.path.append('.')
 
 from utils.page_config import get_page_path
 from utils.user_system import start_preview_mode
-from components.rpg_schatzkarte import landing_page
 
 # ============================================
 # PAGE CONFIG
@@ -26,6 +27,24 @@ st.set_page_config(
 )
 
 # ============================================
+# NAVIGATION: Query-Parameter abfangen
+# ============================================
+
+action = st.query_params.get("action", "")
+if action:
+    st.query_params.clear()
+
+    schatzkarte_path = get_page_path("schatzkarte")
+    if not schatzkarte_path:
+        schatzkarte_path = "pages/1_🗺️_Schatzkarte.py"
+
+    if action == "go_to_map":
+        st.switch_page(schatzkarte_path)
+    elif action == "start_preview":
+        start_preview_mode("unterstufe")
+        st.switch_page(schatzkarte_path)
+
+# ============================================
 # CUSTOM CSS - Streamlit UI ausblenden
 # ============================================
 
@@ -36,14 +55,9 @@ st.markdown("""
     footer {visibility: hidden;}
     header {visibility: hidden;}
 
-    /* Full-width iframe for landing page - 100vh für sticky elements */
-    .stCustomComponentV1 {
+    /* Full-width iframe for landing page */
+    iframe {
         width: 100% !important;
-        height: 100vh !important;
-    }
-    .stCustomComponentV1 > iframe {
-        width: 100% !important;
-        height: 100vh !important;
         border: none !important;
     }
 
@@ -72,41 +86,38 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ============================================
-# LANDING PAGE COMPONENT
+# LANDING PAGE aus HTML-Datei laden
 # ============================================
 
-# React Landing Page rendern (100vh für sticky action bar)
-result = landing_page(
-    height=800,  # Wird per CSS auf 100vh überschrieben
-    key="landing_page"
+html_path = os.path.join(os.path.dirname(__file__), "docs", "index.html")
+
+with open(html_path, "r", encoding="utf-8") as f:
+    html_content = f.read()
+
+# Links direkt im HTML ersetzen + Script fuer Navigation injizieren
+# "Jetzt kostenlos erkunden" → start_preview (Gastmodus)
+html_content = html_content.replace(
+    '>🚀 Jetzt kostenlos erkunden</a>',
+    ' data-action="start_preview">🚀 Jetzt kostenlos erkunden</a>'
 )
 
-# Wenn User von der Schatzkarte zurueckkehrt: Navigations-Flag zuruecksetzen
-# damit der naechste Klick auf "Zur Karte" wieder funktioniert
-if not result:
-    st.session_state.pop("_nav_to_schatzkarte", None)
+nav_script = """
+<script>
+document.addEventListener('click', function(e) {
+  var link = e.target.closest('a[href*="learnerspulse"]');
+  if (!link) return;
+  e.preventDefault();
+  e.stopPropagation();
+  var action = link.getAttribute('data-action') || 'go_to_map';
+  // Verschiedene Methoden probieren um aus dem iframe auszubrechen
+  try { window.top.location.href = '/?action=' + action; } catch(err1) {
+    try { window.parent.location.href = '/?action=' + action; } catch(err2) {
+      window.location.href = '/?action=' + action;
+    }
+  }
+}, true);
+</script>
+"""
+html_content = html_content.replace('</body>', nav_script + '</body>')
 
-# Navigation zur Schatzkarte wenn User klickt
-if result:
-    action = result.get("action", "") if isinstance(result, dict) else ""
-
-    # Guard: Verhindert endlose st.switch_page()-Aufrufe wenn der Component-Wert
-    # in der Session bestehen bleibt (Race-Condition beim Seitenwechsel)
-    if st.session_state.get("_nav_to_schatzkarte"):
-        st.stop()
-
-    # Pfad zur Schatzkarte ermitteln (mit Fallback)
-    schatzkarte_path = get_page_path("schatzkarte")
-    if not schatzkarte_path:
-        # Fallback: Direkter Pfad
-        schatzkarte_path = "pages/1_🗺️_Schatzkarte.py"
-
-    if action == "go_to_map":
-        # Zur Schatzkarte navigieren (normaler Login-Flow)
-        st.session_state._nav_to_schatzkarte = True
-        st.switch_page(schatzkarte_path)
-    elif action == "start_preview":
-        # Demo-Modus: Preview starten und direkt zur Schatzkarte
-        st.session_state._nav_to_schatzkarte = True
-        start_preview_mode("unterstufe")
-        st.switch_page(schatzkarte_path)
+components.html(html_content, height=5000, scrolling=True)
