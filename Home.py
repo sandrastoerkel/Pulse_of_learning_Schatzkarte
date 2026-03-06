@@ -32,16 +32,16 @@ st.set_page_config(
 
 action = st.query_params.get("action", "")
 if action:
-    st.query_params.clear()
-
     schatzkarte_path = get_page_path("schatzkarte")
     if not schatzkarte_path:
         schatzkarte_path = "pages/1_🗺️_Schatzkarte.py"
 
     if action == "go_to_map":
+        st.query_params.clear()
         st.switch_page(schatzkarte_path)
     elif action == "start_preview":
         start_preview_mode("unterstufe")
+        st.query_params.clear()
         st.switch_page(schatzkarte_path)
 
 # ============================================

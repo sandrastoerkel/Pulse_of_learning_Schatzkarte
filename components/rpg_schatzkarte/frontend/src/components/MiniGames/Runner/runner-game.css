@@ -351,6 +351,26 @@
   padding: 0 20px 16px;
 }
 
+/* Zurück-Button */
+.bb-back-btn {
+  margin: 8px 20px 20px;
+  padding: 12px 16px;
+  background: none;
+  border: 1px solid var(--bb-border);
+  border-radius: var(--bb-radius-sm);
+  color: var(--bb-muted);
+  font-family: var(--bb-font-body);
+  font-size: .82rem;
+  cursor: pointer;
+  transition: color var(--bb-transition), border-color var(--bb-transition), background var(--bb-transition);
+  width: calc(100% - 40px);
+}
+.bb-back-btn:hover {
+  color: var(--bb-text);
+  border-color: var(--bb-muted);
+  background: rgba(255,255,255,.04);
+}
+
 /* ── GAME PHASE ──────────────────────────────── */
 .bb-game-wrap {
   max-width: 100%;

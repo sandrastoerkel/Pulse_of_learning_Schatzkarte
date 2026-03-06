@@ -205,6 +205,17 @@ export const RunnerBettingPhase: React.FC<RunnerBettingPhaseProps> = ({
           ⚠️ Du hast wenig XP – sammle mehr durch Lernaktivitäten!
         </motion.p>
       )}
+
+      {/* Zurück-Button */}
+      <motion.button
+        className="bb-back-btn"
+        onClick={onClose}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+      >
+        🗺️ Zurück zur Schatzkarte
+      </motion.button>
     </div>
   );
 };
