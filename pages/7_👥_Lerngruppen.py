@@ -32,8 +32,9 @@ try:
         add_member, remove_member, get_group_members, get_user_group,
         create_invitation, get_invitation_url, get_group_invitations,
         delete_invitation, send_invitation_email,
-        activate_weekly_island, get_activated_islands, get_available_islands,
-        get_current_island, get_group_week, get_group_progress,
+        activate_weekly_island, deactivate_weekly_island,
+        get_activated_islands, get_available_islands,
+        get_current_island, get_current_islands, get_group_week, get_group_progress,
         FLEXIBLE_ISLANDS,
         # Zeitzonen
         get_group_timezone, set_group_timezone, convert_meeting_time_display,
@@ -259,75 +260,102 @@ def _render_timezone_selector(group_id: str):
 # ============================================
 
 def render_island_selector(group_id: str, current_week: int):
-    st.markdown("### 🏝️ Insel für diese Woche wählen")
+    st.markdown("### 🏝️ Inseln pro Woche wählen")
 
     activated = get_activated_islands(group_id)
+
+    # Aktivierte Inseln nach Woche gruppiert anzeigen
     if activated:
         st.markdown("**✅ Bereits aktiviert:**")
-        activated_html = " → ".join([
-            f"W{a['week_number']}: {get_island_info(a['island_id'])['icon']} {get_island_info(a['island_id'])['name']}"
-            for a in activated
-        ])
-        st.markdown(activated_html)
+        by_week = {}
+        for a in activated:
+            w = a['week_number']
+            if w not in by_week:
+                by_week[w] = []
+            by_week[w].append(a)
 
-    # Nächste Woche berechnen
-    next_week = 1
-    for a in activated:
-        if a['week_number'] >= next_week:
-            next_week = a['week_number'] + 1
+        for w in sorted(by_week.keys()):
+            islands_str = ", ".join([
+                f"{get_island_info(a['island_id'])['icon']} {get_island_info(a['island_id'])['name']}"
+                for a in by_week[w]
+            ])
+            st.markdown(f"**Woche {w}:** {islands_str}")
 
-    if next_week > 11:
-        st.success("🎉 Alle Inseln für Wochen 1-11 wurden bereits gewählt!")
+    # Woche wählen
+    # Standard: nächste freie Woche oder letzte belegte Woche (zum Ergänzen)
+    used_weeks = sorted(set(a['week_number'] for a in activated)) if activated else []
+    default_week = (used_weeks[-1] if used_weeks else 0) + 1
+    if default_week > 11:
+        default_week = used_weeks[-1] if used_weeks else 1
+
+    target_week = st.number_input(
+        "📅 Woche wählen (1-11):",
+        min_value=1, max_value=11, value=min(default_week, 11),
+        key=f"week_input_{group_id}"
+    )
+
+    # Bereits in dieser Woche aktivierte Inseln
+    week_islands = get_current_islands(group_id, target_week)
+    if week_islands:
+        st.info(f"Woche {target_week} hat bereits: " + ", ".join([
+            f"{get_island_info(iid)['icon']} {get_island_info(iid)['name']}" for iid in week_islands
+        ]))
+
+    # Verfügbare Inseln (noch nicht in irgendeiner Woche aktiviert)
+    available = get_available_islands(group_id)
+    if not available and not week_islands:
+        st.success("🎉 Alle Inseln wurden bereits zugewiesen!")
         if st.button("❌ Schließen", key=f"close_island_done_{group_id}"):
             st.session_state[f"show_island_{group_id}"] = False
             st.rerun()
         return
 
-    st.markdown(f"**🎯 Wähle die Insel für Woche {next_week}:**")
-    available = get_available_islands(group_id)
-    if not available:
-        st.warning("Keine Inseln mehr verfügbar!")
-        return
-
-    # Insel-Grid
-    cols = st.columns(3)
-    for idx, island_id in enumerate(available):
-        info = get_island_info(island_id)
-        with cols[idx % 3]:
-            st.markdown(f"""
-            <div style="background: {info['color']}22; border: 2px solid {info['color']};
-                        border-radius: 10px; padding: 15px; margin: 5px 0; text-align: center;">
-                <div style="font-size: 2em;">{info['icon']}</div>
-                <div style="font-weight: bold;">{info['name']}</div>
-            </div>
-            """, unsafe_allow_html=True)
-            if st.button("Wählen", key=f"choose_{group_id}_{island_id}", use_container_width=True):
-                st.session_state[f"selected_island_{group_id}"] = island_id
-
-    selected = st.session_state.get(f"selected_island_{group_id}")
-    if selected:
-        selected_info = get_island_info(selected)
-        st.markdown("---")
-        st.markdown(f"**Ausgewählt:** {selected_info['icon']} {selected_info['name']}")
-        notes = st.text_area(
-            "📝 Notizen (optional):",
-            placeholder="z.B. 'Viele Kinder haben von Prüfungsangst berichtet...'",
-            key=f"notes_{group_id}"
+    # Multiselect für Inseln
+    if available:
+        st.markdown(f"**🎯 Inseln für Woche {target_week} hinzufügen:**")
+        island_options = {
+            f"{get_island_info(iid)['icon']} {get_island_info(iid)['name']}": iid
+            for iid in available
+        }
+        selected_labels = st.multiselect(
+            "Inseln auswählen:",
+            options=list(island_options.keys()),
+            key=f"multiselect_islands_{group_id}"
         )
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("✅ Bestätigen", type="primary", key=f"confirm_island_{group_id}", use_container_width=True):
-                if activate_weekly_island(group_id, next_week, selected, notes):
-                    st.success(f"🎉 {selected_info['name']} für Woche {next_week} aktiviert!")
-                    st.session_state.pop(f"selected_island_{group_id}", None)
+
+        if selected_labels:
+            notes = st.text_area(
+                "📝 Notizen (optional):",
+                placeholder="z.B. 'Viele Kinder haben von Prüfungsangst berichtet...'",
+                key=f"notes_{group_id}"
+            )
+            if st.button("✅ Bestätigen", type="primary", key=f"confirm_islands_{group_id}", use_container_width=True):
+                success_count = 0
+                for label in selected_labels:
+                    island_id = island_options[label]
+                    if activate_weekly_island(group_id, target_week, island_id, notes):
+                        success_count += 1
+                if success_count > 0:
+                    st.success(f"🎉 {success_count} Insel(n) für Woche {target_week} aktiviert!")
                     st.session_state[f"show_island_{group_id}"] = False
                     st.rerun()
                 else:
                     st.error("Fehler beim Aktivieren.")
-        with col2:
-            if st.button("❌ Abbrechen", key=f"cancel_island_{group_id}", use_container_width=True):
-                st.session_state.pop(f"selected_island_{group_id}", None)
-                st.rerun()
+
+    # Inseln aus aktueller Woche entfernen
+    if week_islands:
+        st.markdown("---")
+        st.markdown(f"**🗑️ Inseln aus Woche {target_week} entfernen:**")
+        for iid in week_islands:
+            info = get_island_info(iid)
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                st.markdown(f"{info['icon']} {info['name']}")
+            with col2:
+                if st.button("Entfernen", key=f"remove_{group_id}_{target_week}_{iid}", use_container_width=True):
+                    if deactivate_weekly_island(group_id, target_week, iid):
+                        st.success(f"{info['name']} entfernt!")
+                        st.rerun()
 
     st.markdown("---")
     if st.button("❌ Schließen", key=f"close_island_{group_id}"):

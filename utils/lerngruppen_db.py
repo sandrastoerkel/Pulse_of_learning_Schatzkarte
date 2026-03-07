@@ -702,7 +702,7 @@ FLEXIBLE_ISLANDS = CHOOSABLE_ISLANDS  # Rückwärtskompatibilität
 
 
 def activate_weekly_island(group_id: str, week_number: int, island_id: str, notes: str = None) -> bool:
-    """Aktiviert eine Insel für Wochen 1-11."""
+    """Aktiviert eine Insel für eine Woche (mehrere pro Woche moeglich)."""
     if week_number < 1 or week_number > 11:
         return False
     if island_id not in CHOOSABLE_ISLANDS:
@@ -716,13 +716,32 @@ def activate_weekly_island(group_id: str, week_number: int, island_id: str, note
             "island_id": island_id,
             "coach_notes": notes
         }).execute()
+        # current_week auf Maximum der aktivierten Wochen setzen
+        activated = get_activated_islands(group_id)
+        max_week = max(a['week_number'] for a in activated) if activated else week_number
         db.table("learning_groups") \
-            .update({"current_week": week_number}) \
+            .update({"current_week": max_week}) \
             .eq("group_id", group_id) \
             .execute()
         return True
     except Exception as e:
         print(f"Island activation conflict: {e}")
+        return False
+
+
+def deactivate_weekly_island(group_id: str, week_number: int, island_id: str) -> bool:
+    """Entfernt eine Insel aus einer Woche."""
+    db = get_db()
+    try:
+        db.table("group_weekly_islands") \
+            .delete() \
+            .eq("group_id", group_id) \
+            .eq("week_number", week_number) \
+            .eq("island_id", island_id) \
+            .execute()
+        return True
+    except Exception as e:
+        print(f"Island deactivation error: {e}")
         return False
 
 
@@ -743,13 +762,19 @@ def get_available_islands(group_id: str) -> List[str]:
 
 
 def get_current_island(group_id: str, week_number: int) -> Optional[str]:
-    """Holt die aktivierte Insel für eine bestimmte Woche."""
+    """Holt die erste aktivierte Insel für eine bestimmte Woche (Rueckwaertskompatibilitaet)."""
+    result = get_current_islands(group_id, week_number)
+    return result[0] if result else None
+
+
+def get_current_islands(group_id: str, week_number: int) -> List[str]:
+    """Holt alle aktivierten Inseln für eine bestimmte Woche."""
     result = get_db().table("group_weekly_islands") \
         .select("island_id") \
         .eq("group_id", group_id) \
         .eq("week_number", week_number) \
         .execute()
-    return result.data[0]["island_id"] if result.data else None
+    return [r["island_id"] for r in result.data] if result.data else []
 
 
 def get_group_week(group_id: str, start_date: str = None) -> int:
