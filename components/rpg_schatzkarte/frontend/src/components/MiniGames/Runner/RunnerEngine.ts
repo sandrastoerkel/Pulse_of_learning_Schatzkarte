@@ -175,6 +175,9 @@ export class RunnerEngine {
   // Animation frame
   private rafId = 0;
 
+  // Cached background
+  private bgCanvas: HTMLCanvasElement | null = null;
+
   // Ball color cycling
   private ballColorIndex = 0;
   private readonly BALL_COLORS = ['#22d3ee','#c084fc','#fbbf24','#f87171','#4ade80'];
@@ -549,7 +552,7 @@ export class RunnerEngine {
   private updateBall(ball: Ball) {
     // Trail
     ball.trail.unshift({ ...ball.pos });
-    if (ball.trail.length > 14) ball.trail.pop();
+    if (ball.trail.length > 6) ball.trail.pop();
 
     ball.pos.x += ball.vel.x;
     ball.pos.y += ball.vel.y;
@@ -764,7 +767,7 @@ export class RunnerEngine {
   // ── PARTICLES / EFFECTS ─────────────────────
 
   private mkStars() {
-    this.stars = Array.from({ length: 90 }, () => ({
+    this.stars = Array.from({ length: 40 }, () => ({
       x: Math.random() * this.W,
       y: Math.random() * this.H,
       r: Math.random() * 1.4 + 0.2,
@@ -777,33 +780,33 @@ export class RunnerEngine {
 
   private spawnBrickParticles(bk: Brick) {
     const cx = bk.x + bk.w / 2, cy = bk.y + bk.h / 2;
-    for (let i = 0; i < 12; i++) {
-      const a = (Math.PI * 2 * i / 12) + Math.random() * 0.5;
+    for (let i = 0; i < 6; i++) {
+      const a = (Math.PI * 2 * i / 6) + Math.random() * 0.5;
       const s = this.s(1.8 + Math.random() * 3.5);
       this.particles.push({
         x: cx, y: cy, vx: Math.cos(a) * s, vy: Math.sin(a) * s - this.s(0.5),
         r: this.s(2.5 + Math.random() * 2.5), maxR: this.s(3),
-        color: bk.color, life: 0, maxLife: 40 + Math.random() * 20,
+        color: bk.color, life: 0, maxLife: 30 + Math.random() * 15,
         gravity: this.s(0.06), spark: false,
       });
     }
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 2; i++) {
       this.particles.push({
         x: cx + (Math.random() - 0.5) * bk.w,
         y: cy + (Math.random() - 0.5) * bk.h,
         vx: (Math.random() - 0.5) * this.s(2),
         vy: -this.s(1.5 + Math.random() * 2),
         r: this.s(1.5), maxR: this.s(1.5),
-        color: '#fff', life: 0, maxLife: 18 + Math.random() * 8,
+        color: '#fff', life: 0, maxLife: 14 + Math.random() * 6,
         gravity: this.s(0.05), spark: true,
       });
     }
     this.shakeMag = Math.max(this.shakeMag, 4);
-    if (this.particles.length > 300) this.particles.splice(0, this.particles.length - 260);
+    if (this.particles.length > 120) this.particles.splice(0, this.particles.length - 80);
   }
 
   private spawnPaddleSparks(bx: number, py: number, color: string) {
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 2; i++) {
       this.particles.push({
         x: bx + (Math.random() - 0.5) * this.s(20),
         y: py,
@@ -816,7 +819,7 @@ export class RunnerEngine {
   }
 
   private spawnCollectParticles(x: number, y: number, color: string) {
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 4; i++) {
       const a = Math.random() * Math.PI * 2;
       const s = this.s(1.5 + Math.random() * 3);
       this.particles.push({
@@ -828,7 +831,7 @@ export class RunnerEngine {
   }
 
   private spawnDeathParticles(x: number, y: number) {
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 10; i++) {
       const a = Math.random() * Math.PI * 2;
       const s = this.s(1 + Math.random() * 4);
       this.particles.push({
@@ -840,7 +843,7 @@ export class RunnerEngine {
   }
 
   private spawnLevelUpParticles() {
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 15; i++) {
       const colors = ['#fbbf24','#c084fc','#22d3ee','#4ade80','#f87171'];
       const a = Math.random() * Math.PI * 2;
       const s = this.s(1.5 + Math.random() * 5);
@@ -933,24 +936,32 @@ export class RunnerEngine {
   }
 
   private drawBackground() {
-    const ctx = this.ctx;
-    const grad = ctx.createLinearGradient(0, 0, 0, this.H);
-    grad.addColorStop(0, '#030316');
-    grad.addColorStop(1, '#04030f');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, this.W, this.H);
+    // Hintergrund einmal rendern und cachen
+    if (!this.bgCanvas) {
+      this.bgCanvas = document.createElement('canvas');
+      this.bgCanvas.width = this.W;
+      this.bgCanvas.height = this.H;
+      const bgCtx = this.bgCanvas.getContext('2d')!;
 
-    // Nebulae
-    const neb = [
-      [this.W * 0.25, this.H * 0.28, this.W * 0.4, 'rgba(80,30,180,.07)'],
-      [this.W * 0.8,  this.H * 0.55, this.W * 0.35, 'rgba(0,90,170,.07)'],
-      [this.W * 0.5,  this.H * 0.85, this.W * 0.2,  'rgba(251,191,36,.04)'],
-    ] as Array<[number,number,number,string]>;
-    for (const [nx, ny, nr, nc] of neb) {
-      const ng = ctx.createRadialGradient(nx, ny, 0, nx, ny, nr);
-      ng.addColorStop(0, nc); ng.addColorStop(1, 'transparent');
-      ctx.fillStyle = ng; ctx.fillRect(0, 0, this.W, this.H);
+      const grad = bgCtx.createLinearGradient(0, 0, 0, this.H);
+      grad.addColorStop(0, '#030316');
+      grad.addColorStop(1, '#04030f');
+      bgCtx.fillStyle = grad;
+      bgCtx.fillRect(0, 0, this.W, this.H);
+
+      // Nebulae
+      const neb = [
+        [this.W * 0.25, this.H * 0.28, this.W * 0.4, 'rgba(80,30,180,.07)'],
+        [this.W * 0.8,  this.H * 0.55, this.W * 0.35, 'rgba(0,90,170,.07)'],
+        [this.W * 0.5,  this.H * 0.85, this.W * 0.2,  'rgba(251,191,36,.04)'],
+      ] as Array<[number,number,number,string]>;
+      for (const [nx, ny, nr, nc] of neb) {
+        const ng = bgCtx.createRadialGradient(nx, ny, 0, nx, ny, nr);
+        ng.addColorStop(0, nc); ng.addColorStop(1, 'transparent');
+        bgCtx.fillStyle = ng; bgCtx.fillRect(0, 0, this.W, this.H);
+      }
     }
+    this.ctx.drawImage(this.bgCanvas, 0, 0);
   }
 
   private drawStars() {
@@ -990,29 +1001,8 @@ export class RunnerEngine {
 
       const flashing = bk.hitFlash > 0;
 
-      // Glow
-      ctx.shadowColor = flashing ? '#fff' : bk.glowColor;
-      ctx.shadowBlur  = flashing ? 18 : 8;
-
-      // Brick-Koerper — simple fillRect + gradient
-      if (bh > 3) {
-        try {
-          const grad = ctx.createLinearGradient(bx, by, bx, by + bh);
-          if (flashing) {
-            grad.addColorStop(0, '#fff');
-            grad.addColorStop(1, '#ddd');
-          } else {
-            grad.addColorStop(0, this.lighten(bk.color, 40));
-            grad.addColorStop(0.5, bk.color);
-            grad.addColorStop(1, this.darken(bk.color, 30));
-          }
-          ctx.fillStyle = grad;
-        } catch {
-          ctx.fillStyle = flashing ? '#fff' : bk.color;
-        }
-      } else {
-        ctx.fillStyle = flashing ? '#fff' : bk.color;
-      }
+      // Brick-Koerper — flat color (schneller als Gradient pro Frame)
+      ctx.fillStyle = flashing ? '#fff' : bk.color;
 
       // Rounded rect mit Canvas-nativem roundRect (besser als custom rrect)
       const rad = Math.min(this.s(4), bw / 2, bh / 2);
@@ -1026,7 +1016,6 @@ export class RunnerEngine {
       ctx.fill();
 
       // Top highlight
-      ctx.shadowBlur = 0;
       ctx.globalAlpha = 0.35;
       ctx.fillStyle = '#fff';
       const hlH = Math.min(this.s(3), bh * 0.3);
@@ -1053,16 +1042,14 @@ export class RunnerEngine {
   private drawLasers() {
     const ctx = this.ctx;
     for (const lb of this.laserBeams) {
-      ctx.save();
-      ctx.shadowColor = '#f87171'; ctx.shadowBlur = this.s(12);
       const a = 1 - lb.life / lb.maxLife;
       ctx.globalAlpha = a;
       ctx.fillStyle = '#fca5a5';
       ctx.fillRect(lb.x - this.s(2), lb.y, this.s(4), this.s(14));
       ctx.fillStyle = '#fff';
       ctx.fillRect(lb.x - this.s(1), lb.y + this.s(2), this.s(2), this.s(10));
-      ctx.restore();
     }
+    ctx.globalAlpha = 1;
   }
 
   private drawFallingItems() {
@@ -1074,7 +1061,6 @@ export class RunnerEngine {
       ctx.save();
       ctx.translate(it.x, it.y);
       ctx.rotate(it.rotation);
-      ctx.shadowColor = it.color; ctx.shadowBlur = this.s(12);
       // Background glow circle
       ctx.globalAlpha = 0.3;
       ctx.fillStyle = it.color;
@@ -1094,12 +1080,8 @@ export class RunnerEngine {
     for (const p of this.particles) {
       const a = (1 - p.life / p.maxLife) * 0.88;
       ctx.globalAlpha = a;
-      if (!p.spark) {
-        ctx.save(); ctx.shadowColor = p.color; ctx.shadowBlur = this.s(8);
-      }
       ctx.fillStyle = p.color;
       ctx.beginPath(); ctx.arc(p.x, p.y, Math.max(0.2, p.r), 0, Math.PI * 2); ctx.fill();
-      if (!p.spark) ctx.restore();
     }
     ctx.globalAlpha = 1;
   }
@@ -1119,14 +1101,12 @@ export class RunnerEngine {
       }
       ctx.globalAlpha = 1;
 
-      // Outer glow
+      // Outer glow (ohne shadowBlur — groesserer transluzenter Kreis)
       ctx.save();
-      ctx.shadowColor = ball.fireball ? '#fb923c' : ball.glowColor;
-      ctx.shadowBlur = this.s(ball.fireball ? 30 : 20);
-      ctx.globalAlpha = 0.22;
+      ctx.globalAlpha = 0.18;
       ctx.fillStyle = ball.fireball ? '#fb923c' : ball.glowColor;
       ctx.beginPath();
-      ctx.arc(ball.pos.x, ball.pos.y, ball.radius + this.s(5), 0, Math.PI * 2);
+      ctx.arc(ball.pos.x, ball.pos.y, ball.radius + this.s(8), 0, Math.PI * 2);
       ctx.fill();
       ctx.globalAlpha = 1;
 
@@ -1150,8 +1130,6 @@ export class RunnerEngine {
     const ctx = this.ctx;
     const pd = this.paddle;
     ctx.save();
-    ctx.shadowColor = pd.laser ? '#f87171' : '#fbbf24';
-    ctx.shadowBlur = this.s(22);
 
     const grad = ctx.createLinearGradient(pd.x, pd.y, pd.x, pd.y + pd.h);
     if (pd.laser) {
@@ -1182,7 +1160,6 @@ export class RunnerEngine {
     ctx.font = `700 ${this.s(12)}px 'Orbitron', 'Courier New', monospace`;
     for (const t of this.floatTexts) {
       ctx.globalAlpha = t.alpha;
-      ctx.shadowColor = t.color; ctx.shadowBlur = this.s(10);
       ctx.fillStyle = t.color;
       ctx.fillText(t.text, t.x, t.y);
     }
@@ -1218,10 +1195,8 @@ export class RunnerEngine {
       // Progress bar
       ctx.globalAlpha = 0.85;
       ctx.fillStyle = def.color;
-      ctx.shadowColor = def.color; ctx.shadowBlur = this.s(6);
       this.rrect(ctx, x - this.s(20), y - this.s(12), this.s(40) * prog, this.s(14), this.s(4));
       ctx.fill();
-      ctx.shadowBlur = 0;
       ctx.globalAlpha = 1;
       ctx.fillStyle = '#fff';
       ctx.fillText(`${def.emoji}`, x, y);
@@ -1240,7 +1215,6 @@ export class RunnerEngine {
       ctx.fillRect(0, 0, this.W, this.H);
       ctx.globalAlpha = pulse;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.shadowColor = '#fbbf24'; ctx.shadowBlur = this.s(40);
       ctx.font = `900 ${this.s(90)}px 'Orbitron','Courier New',monospace`;
       ctx.fillStyle = '#fbbf24';
       ctx.fillText(`${val}`, this.W / 2, this.H / 2);
@@ -1254,11 +1228,9 @@ export class RunnerEngine {
       ctx.fillRect(0, 0, this.W, this.H);
       ctx.globalAlpha = pulse;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.shadowColor = '#c084fc'; ctx.shadowBlur = this.s(35);
       ctx.font = `900 ${this.s(22)}px 'Orbitron','Courier New',monospace`;
       ctx.fillStyle = '#c084fc';
       ctx.fillText('LEVEL COMPLETE!', this.W / 2, this.H / 2 - this.s(15));
-      ctx.shadowColor = '#fbbf24'; ctx.shadowBlur = this.s(18);
       ctx.font = `700 ${this.s(14)}px 'Orbitron','Courier New',monospace`;
       ctx.fillStyle = '#fbbf24';
       ctx.fillText(`→ LEVEL ${this.level + 1}`, this.W / 2, this.H / 2 + this.s(18));

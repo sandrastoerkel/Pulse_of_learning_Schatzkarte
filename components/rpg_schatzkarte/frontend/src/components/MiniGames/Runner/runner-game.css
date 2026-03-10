@@ -40,9 +40,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,.88);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: rgba(0,0,0,.92);
   padding: 12px;
   overflow-y: auto;
   font-family: var(--bb-font-body);
@@ -494,9 +492,7 @@
   align-items: center;
   justify-content: center;
   gap: 20px;
-  background: rgba(0,0,0,.75);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(0,0,0,.85);
 }
 .bb-pause-text {
   font-family: var(--bb-font);
