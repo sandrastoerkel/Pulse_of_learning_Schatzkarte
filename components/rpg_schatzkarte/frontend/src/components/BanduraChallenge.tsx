@@ -6,6 +6,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Confetti from 'react-confetti';
+import { VoiceButton } from './VoiceTextInput';
 
 // ============================================
 // TYPES
@@ -549,16 +550,23 @@ export function BanduraChallenge({
                     <strong>Beispiele:</strong> {BANDURA_SOURCES[selectedSource].examples.join(' • ')}
                   </p>
 
-                  <motion.textarea
-                    className="entry-textarea"
-                    placeholder="Beschreibe deine Erfahrung..."
-                    value={description}
-                    onChange={e => setDescription(e.target.value)}
-                    rows={4}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                  />
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+                    <motion.textarea
+                      className="entry-textarea"
+                      placeholder="Beschreibe deine Erfahrung..."
+                      value={description}
+                      onChange={e => setDescription(e.target.value)}
+                      rows={4}
+                      style={{ flex: 1 }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.2 }}
+                    />
+                    <VoiceButton
+                      onResult={(text) => setDescription(description + (description && !description.endsWith(' ') ? ' ' : '') + text)}
+                      size="medium"
+                    />
+                  </div>
 
                   <div className="form-footer">
                     <span className="char-count">

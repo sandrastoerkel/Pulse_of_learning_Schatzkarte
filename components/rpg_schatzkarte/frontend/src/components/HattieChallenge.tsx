@@ -6,6 +6,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Confetti from 'react-confetti';
+import { VoiceButton } from './VoiceTextInput';
 import { HattieWaageIcon } from './icons';
 
 import type {
@@ -530,16 +531,23 @@ export function HattieChallenge({
 
       <div className="hattie-form-group">
         <label>Prüfung / Test / Aufgabe:</label>
-        <motion.textarea
-          className="hattie-textarea"
-          placeholder="z.B. 'Mathe-Klassenarbeit Brüche', 'Englisch-Vokabeltest Unit 5', 'Diktat'..."
-          value={formState.task}
-          onChange={(e) => setFormState(prev => ({ ...prev, task: e.target.value }))}
-          rows={3}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        />
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+          <motion.textarea
+            className="hattie-textarea"
+            placeholder="z.B. 'Mathe-Klassenarbeit Brüche', 'Englisch-Vokabeltest Unit 5', 'Diktat'..."
+            value={formState.task}
+            onChange={(e) => setFormState(prev => ({ ...prev, task: e.target.value }))}
+            rows={3}
+            style={{ flex: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          />
+          <VoiceButton
+            onResult={(text) => setFormState(prev => ({ ...prev, task: prev.task + (prev.task && !prev.task.endsWith(' ') ? ' ' : '') + text }))}
+            size="medium"
+          />
+        </div>
       </div>
 
       <div className="hattie-form-group">
@@ -803,13 +811,20 @@ export function HattieChallenge({
 
           <div className="hattie-form-group reflection-group">
             <label>💭 Reflexion (optional):</label>
-            <motion.textarea
-              className="hattie-textarea reflection-textarea"
-              placeholder="Was lief gut? Was könntest du verbessern?"
-              value={formState.reflection}
-              onChange={(e) => setFormState(prev => ({ ...prev, reflection: e.target.value }))}
-              rows={2}
-            />
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+              <motion.textarea
+                className="hattie-textarea reflection-textarea"
+                placeholder="Was lief gut? Was könntest du verbessern?"
+                value={formState.reflection}
+                onChange={(e) => setFormState(prev => ({ ...prev, reflection: e.target.value }))}
+                rows={2}
+                style={{ flex: 1 }}
+              />
+              <VoiceButton
+                onResult={(text) => setFormState(prev => ({ ...prev, reflection: prev.reflection + (prev.reflection && !prev.reflection.endsWith(' ') ? ' ' : '') + text }))}
+                size="medium"
+              />
+            </div>
           </div>
 
           <div className="step-actions">
