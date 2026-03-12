@@ -2349,7 +2349,7 @@ function DiagnoseBoss({ onComplete }) {
     const finalScore = score; // score is set before we get here
     const level = calcDifficulty(finalScore);
     return (
-      <div style={{ minHeight: "100vh", background: "linear-gradient(160deg, #0a0315 0%, #150828 100%)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "'Outfit', sans-serif" }}>
+      <div style={{ minHeight: "100%", background: "linear-gradient(160deg, #0a0315 0%, #150828 100%)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "'Outfit', sans-serif" }}>
         <div style={{ maxWidth: 480, width: "100%", textAlign: "center" }}>
           <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 11, color: "#a78bfa", marginBottom: 20, lineHeight: 1.8 }}>
             PRÜFUNG<br/>ABGESCHLOSSEN
@@ -2385,7 +2385,7 @@ function DiagnoseBoss({ onComplete }) {
 
   // ── INTRO ──
   if (phase === "intro") return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(160deg, #0a0315 0%, #150828 100%)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Outfit', sans-serif" }}>
+    <div style={{ minHeight: "100%", background: "linear-gradient(160deg, #0a0315 0%, #150828 100%)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Outfit', sans-serif" }}>
       <div style={{ textAlign: "center", padding: 24 }}>
         <div style={{ fontSize: 80, animation: "bounce 0.8s ease-out", marginBottom: 16 }}>🔮</div>
         <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 12, color: "#a78bfa", lineHeight: 2 }}>DER PRÜFER<br/><span style={{ fontSize: 8, color: "#64748b" }}>erscheint…</span></div>
@@ -2395,7 +2395,7 @@ function DiagnoseBoss({ onComplete }) {
 
   // ── BATTLE ──
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(160deg, #0a0315 0%, #150828 100%)", display: "flex", flexDirection: "column", fontFamily: "'Outfit', sans-serif" }}>
+    <div style={{ minHeight: "100%", background: "linear-gradient(160deg, #0a0315 0%, #150828 100%)", display: "flex", flexDirection: "column", fontFamily: "'Outfit', sans-serif" }}>
       {/* Top bar */}
       <div style={{ background: "rgba(0,0,0,0.5)", borderBottom: "1px solid #1e293b", padding: "10px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 9, color: "#a78bfa" }}>DER PRÜFER</span>
@@ -2497,7 +2497,7 @@ function DifficultyPanel({ autoLevel, onConfirm }) {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(160deg, #030712 0%, #0d1333 100%)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "'Outfit', sans-serif" }}>
+    <div style={{ minHeight: "100%", background: "linear-gradient(160deg, #030712 0%, #0d1333 100%)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "'Outfit', sans-serif" }}>
       <div style={{ maxWidth: 500, width: "100%" }}>
         <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 10, color: "#fbbf24", marginBottom: 20, textAlign: "center", lineHeight: 2 }}>
           SCHWIERIGKEIT<br/><span style={{ fontSize: 7, color: "#64748b" }}>FEIN EINSTELLEN</span>
@@ -2571,7 +2571,7 @@ function DifficultyPanel({ autoLevel, onConfirm }) {
 /* ─── WORLD MAP ──────────────────────────────────────────────────────────── */
 function WorldMap({ onBattle, defeatedIds, xp, difficulty, onChangeDifficulty, onReset }) {
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(180deg, #030712 0%, #0a0a1a 100%)", padding: "24px 16px", fontFamily: "'Outfit', sans-serif" }}>
+    <div style={{ minHeight: "100%", background: "linear-gradient(180deg, #030712 0%, #0a0a1a 100%)", padding: "24px 16px", fontFamily: "'Outfit', sans-serif" }}>
       <div style={{ maxWidth: 560, margin: "0 auto" }}>
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: 32 }}>
@@ -2602,7 +2602,7 @@ function WorldMap({ onBattle, defeatedIds, xp, difficulty, onChangeDifficulty, o
 
         {/* Lore */}
         <div style={{ background: "#0d1333", border: "1px solid #1e293b", borderRadius: 14, padding: "16px 20px", marginBottom: 28, color: "#64748b", fontSize: 13, lineHeight: 1.7 }}>
-          🗺️ <strong style={{ color: "#94a3b8" }}>Die Angstmonster</strong> leben in deinem Kopf – überall dort, wo du unsicher bist beim Schreiben. Aber du kannst sie besiegen! Jede richtige Antwort ist ein Treffer. Jeder besiegte Monster macht dich stärker.
+          🗺️ <strong style={{ color: "#94a3b8" }}>Die Angstmonster</strong> leben in deinem Kopf – überall dort, wo du unsicher bist beim Schreiben. Aber du kannst sie besiegen! Jede richtige Antwort ist ein Treffer. Jedes besiegte Monster macht dich stärker.
         </div>
 
         {/* Monster list */}
@@ -2824,7 +2824,7 @@ function BattleScreen({ monster, onVictory, onDefeat, onBack, addXP, difficulty 
   if (phase === "victory") {
     const earned = monster.level * 30;
     return (
-      <div style={{ ...bgStyle, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "'Outfit', sans-serif" }}>
+      <div style={{ ...bgStyle, minHeight: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "'Outfit', sans-serif" }}>
         <div style={{ maxWidth: 480, width: "100%", textAlign: "center" }}>
           <div style={{ fontSize: 64, marginBottom: 16, animation: "bounce 0.6s ease-out" }}>🏆</div>
           <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 12, color: "#fbbf24", marginBottom: 12, lineHeight: 1.8 }}>SIEG!</div>
@@ -2843,7 +2843,7 @@ function BattleScreen({ monster, onVictory, onDefeat, onBack, addXP, difficulty 
   }
 
   if (phase === "defeat") return (
-    <div style={{ ...bgStyle, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "'Outfit', sans-serif" }}>
+    <div style={{ ...bgStyle, minHeight: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "'Outfit', sans-serif" }}>
       <div style={{ maxWidth: 480, width: "100%", textAlign: "center" }}>
         <div style={{ fontSize: 64, marginBottom: 16 }}>💪</div>
         <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 11, color: "#f87171", marginBottom: 12, lineHeight: 1.8 }}>NICHT AUFGEBEN!</div>
@@ -2863,7 +2863,7 @@ function BattleScreen({ monster, onVictory, onDefeat, onBack, addXP, difficulty 
   );
 
   return (
-    <div style={{ ...bgStyle, minHeight: "100vh", display: "flex", flexDirection: "column", fontFamily: "'Outfit', sans-serif" }}>
+    <div style={{ ...bgStyle, minHeight: "100%", display: "flex", flexDirection: "column", fontFamily: "'Outfit', sans-serif" }}>
       {/* Top bar */}
       <div style={{ background: "rgba(0,0,0,0.5)", borderBottom: "1px solid #1e293b", padding: "10px 16px", display: "flex", alignItems: "center", gap: 12 }}>
         <button onClick={onBack} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: 20 }}>‹</button>
@@ -2955,8 +2955,8 @@ function BattleScreen({ monster, onVictory, onDefeat, onBack, addXP, difficulty 
 
 /* ─── CSS ─────────────────────────────────────────────────────────────────── */
 const css = `
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #030712; }
+  .wortschmiede-root, .wortschmiede-root * { box-sizing: border-box; margin: 0; padding: 0; }
+  .wortschmiede-root { background: #030712; }
 
   /* ── Sprite wrappers: anchor at bottom ── */
   .sprite-wrap {
@@ -3164,7 +3164,7 @@ export default function WortschmiedeBattle({ onClose, onXPEarned }) {
   }
 
   return (
-    <>
+    <div className="wortschmiede-root" style={{ width: "100%", minHeight: "100%", background: "#030712" }}>
       <style dangerouslySetInnerHTML={{ __html: css }} />
       <FontLink />
       {/* Zurueck-Button oben links */}
@@ -3172,7 +3172,7 @@ export default function WortschmiedeBattle({ onClose, onXPEarned }) {
         <button
           onClick={onClose}
           style={{
-            position: "fixed", top: 12, left: 12, zIndex: 99999,
+            position: "sticky", top: 12, left: 12, zIndex: 99999, float: "left",
             background: "rgba(0,0,0,0.7)", border: "1px solid #475569",
             borderRadius: 10, padding: "8px 16px",
             color: "#e2e8f0", fontSize: 14, fontWeight: 700,
@@ -3210,6 +3210,6 @@ export default function WortschmiedeBattle({ onClose, onXPEarned }) {
           difficulty={difficulty}
         />
       )}
-    </>
+    </div>
   );
 }

@@ -1271,7 +1271,7 @@ function RPGSchatzkarteContent({
 
       {/* Wortschmiede Modal */}
       {showWortschmiede && (
-        <div className="memory-game-modal">
+        <div className="memory-game-modal" style={{ overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
           <WortschmiedeBattle
             onClose={() => setShowWortschmiede(false)}
             onXPEarned={handleWortschmiedeXP}
