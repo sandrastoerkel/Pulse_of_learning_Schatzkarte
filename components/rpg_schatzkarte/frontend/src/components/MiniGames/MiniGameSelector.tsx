@@ -6,7 +6,7 @@ import './reward-modal.css';
 // TYPES
 // ============================================
 
-type MiniGameType = 'memory' | 'runner';
+type MiniGameType = 'memory' | 'runner' | 'wortschmiede';
 
 type RewardTrigger = 
   | 'bandura_complete' 
@@ -73,6 +73,12 @@ const GAME_CARDS: Record<MiniGameType, GameCardInfo> = {
     name: 'Runner',
     description: 'Renne so weit du kannst und sammle Münzen!',
     color: '#3498db'
+  },
+  wortschmiede: {
+    icon: '⚔️',
+    name: 'Wortschmiede',
+    description: 'Besiege Angstmonster mit Rechtschreibung!',
+    color: '#f59e0b'
   }
 };
 

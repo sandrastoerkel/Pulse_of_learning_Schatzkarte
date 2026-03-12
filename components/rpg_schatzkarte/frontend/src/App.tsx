@@ -49,6 +49,7 @@ import { MemoryGame, RewardModal, MiniGameSelector } from './components/MiniGame
 import { LootLernkarten } from './components/LootLernkarten';
 import { EinmaleinsArena } from './components/EinmaleinsArena';
 import { RunnerGame } from './components/MiniGames/Runner/RunnerGame';
+import WortschmiedeBattle from './components/MiniGames/Wortschmiede/WortschmiedeBattle';
 import { TestPanel } from './components/TestPanel';
 import FloatingJitsiWidget from './components/VideoChat/FloatingJitsiWidget';
 import type { MeetingData } from './components/VideoChat/FloatingJitsiWidget';
@@ -246,6 +247,8 @@ function RPGSchatzkarteContent({
   const [showMemoryGame, setShowMemoryGame] = useState(false);
   // Runner Game State
   const [showRunnerGame, setShowRunnerGame] = useState(false);
+  // Wortschmiede State
+  const [showWortschmiede, setShowWortschmiede] = useState(false);
   const [playerXP, setPlayerXP] = useState(heroData.xp);
   const [playerGold, setPlayerGold] = useState(heroData.gold);
 
@@ -780,6 +783,20 @@ function RPGSchatzkarteContent({
     }
   }, [onAction]);
 
+  // Wortschmiede XP Handler
+  const handleWortschmiedeXP = useCallback((earned: number) => {
+    setPlayerXP(prev => prev + earned);
+    if (onAction) {
+      onAction({
+        action: 'minigame_completed',
+        islandId: 'wortschmiede',
+        xpEarned: earned,
+        goldEarned: 0,
+        description: `Wortschmiede: +${earned} XP`
+      });
+    }
+  }, [onAction]);
+
   // Avatar Shop Handlers
   const handleShopPurchase = useCallback((item: ShopItem) => {
     if (playerGold < item.price) return;
@@ -1252,6 +1269,16 @@ function RPGSchatzkarteContent({
         </div>
       )}
 
+      {/* Wortschmiede Modal */}
+      {showWortschmiede && (
+        <div className="memory-game-modal">
+          <WortschmiedeBattle
+            onClose={() => setShowWortschmiede(false)}
+            onXPEarned={handleWortschmiedeXP}
+          />
+        </div>
+      )}
+
       {/* Avatar Shop Modal */}
       {showAvatarShop && customAvatar && (
         <div className="avatar-shop-modal">
@@ -1301,14 +1328,16 @@ function RPGSchatzkarteContent({
       <MiniGameSelector
         isOpen={showMiniGameSelector}
         trigger="bandura_complete"
-        availableGames={['memory', 'runner']}
+        availableGames={['memory', 'runner', 'wortschmiede']}
         bonusMultiplier={1.5}
         onSelectGame={(game) => {
           setShowMiniGameSelector(false);
           if (game === 'memory') {
             setShowMemoryGame(true);
-          } else {
+          } else if (game === 'runner') {
             setShowRunnerGame(true);
+          } else if (game === 'wortschmiede') {
+            setShowWortschmiede(true);
           }
         }}
         onSelectShop={() => {
@@ -1357,7 +1386,7 @@ function RPGSchatzkarteContent({
       )}
 
       {/* Zurück zur Schatzkarte Button - erscheint wenn ein Modal offen ist */}
-      {(showQuestModal || showBanduraModal || showHattieModal || showTagebuch || showLerntechnikenModal || showZertifikat || showCompanionSelector || showAvatarCreator || showMemoryGame || showRunnerGame || showAvatarShop || showPolarsternModal || showLootModal || showSchatzkammer) && !showEinmaleinsArena && (
+      {(showQuestModal || showBanduraModal || showHattieModal || showTagebuch || showLerntechnikenModal || showZertifikat || showCompanionSelector || showAvatarCreator || showMemoryGame || showRunnerGame || showAvatarShop || showPolarsternModal || showLootModal || showSchatzkammer) && !showEinmaleinsArena && !showWortschmiede && (
         <button
           className="back-to-map-button"
           onClick={() => {
@@ -1373,6 +1402,7 @@ function RPGSchatzkarteContent({
             setShowAvatarCreator(false);
             setShowMemoryGame(false);
             setShowRunnerGame(false);
+            setShowWortschmiede(false);
             setShowAvatarShop(false);
             setShowPolarsternModal(false);
             setShowLootModal(false);
@@ -1388,7 +1418,7 @@ function RPGSchatzkarteContent({
       {/* Avatar Edit Widget - jetzt im linken Panel integriert */}
 
       {/* Bottom Action Bar - Memory, Shop, Runner */}
-      {!showQuestModal && !showBanduraModal && !showHattieModal && !showMemoryGame && !showRunnerGame && !showAvatarShop && !showAvatarCreator && !showEinmaleinsArena && (
+      {!showQuestModal && !showBanduraModal && !showHattieModal && !showMemoryGame && !showRunnerGame && !showWortschmiede && !showAvatarShop && !showAvatarCreator && !showEinmaleinsArena && (
         <div className="bottom-action-bar">
           <button
             className="bottom-action-bar__btn bottom-action-bar__btn--memory"
@@ -1425,11 +1455,20 @@ function RPGSchatzkarteContent({
           )}
 
           <button
+            className="bottom-action-bar__btn bottom-action-bar__btn--wortschmiede"
+            onClick={() => setShowWortschmiede(true)}
+            title="Wortschmiede spielen"
+          >
+            <span className="bottom-action-bar__icon">⚔️</span>
+            <span className="bottom-action-bar__label">Wortschmiede</span>
+          </button>
+
+          <button
             className="bottom-action-bar__btn bottom-action-bar__btn--arena"
             onClick={handleArenaClick}
             title="1×1 Arena"
           >
-            <span className="bottom-action-bar__icon">⚔️</span>
+            <span className="bottom-action-bar__icon">🧮</span>
             <span className="bottom-action-bar__label">1×1 Arena</span>
           </button>
         </div>
