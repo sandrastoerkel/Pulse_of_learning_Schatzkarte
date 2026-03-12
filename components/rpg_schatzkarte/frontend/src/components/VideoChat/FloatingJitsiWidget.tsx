@@ -29,6 +29,13 @@ export interface MeetingData {
   userRole: 'coach' | 'kind';
   jwt?: string | null;
   appId?: string;
+  allMeetings?: MeetingGroupEntry[];
+}
+
+export interface MeetingGroupEntry {
+  groupId: string;
+  groupName: string;
+  meetingData: MeetingData;
 }
 
 type WidgetView = 'join-button' | 'small' | 'large' | 'minimized' | 'waiting';
@@ -77,14 +84,27 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
   onAction,
   forceJoin
 }) => {
+  // Active meeting: fuer Coaches mit mehreren Gruppen umschaltbar
+  const [activeMeeting, setActiveMeeting] = useState<MeetingData>(meetingData);
+  const activeMeetingRef = useRef<MeetingData>(meetingData);
+  const [activeGroupName, setActiveGroupName] = useState<string>(() => {
+    const all = meetingData.allMeetings;
+    if (all && all.length > 0) {
+      const match = all.find(m => m.meetingData.meetingId === meetingData.meetingId);
+      return match?.groupName || all[0].groupName;
+    }
+    return '';
+  });
+  const [showMeetingPicker, setShowMeetingPicker] = useState(false);
+
   const apiRef = useRef<any>(null);
   const hasJoinedRef = useRef(false);
   const isLeavingRef = useRef(false); // Flag: nur true wenn X-Button geklickt
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetRef = useRef<HTMLDivElement>(null);
   const [view, setView] = useState<WidgetView>(() => {
-    if (!meetingData.canJoin && meetingData.timeStatus?.reason === 'too_early') {
-      const mins = meetingData.timeStatus.minutesUntilStart ?? 999;
+    if (!activeMeeting.canJoin && activeMeeting.timeStatus?.reason === 'too_early') {
+      const mins = activeMeeting.timeStatus.minutesUntilStart ?? 999;
       return mins <= 30 ? 'waiting' : 'join-button';
     }
     return 'join-button';
@@ -93,7 +113,7 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
   const [jitsiActive, setJitsiActive] = useState(false);
   const [jitsiLoaded, setJitsiLoaded] = useState(false);
   const [minutesUntil, setMinutesUntil] = useState(
-    meetingData.timeStatus?.minutesUntilStart ?? 0
+    activeMeeting.timeStatus?.minutesUntilStart ?? 0
   );
 
   // --- Drag & Resize state ---
@@ -105,9 +125,29 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
 
   const isVideoView = view === 'small' || view === 'large';
 
+  // Keep ref in sync
+  useEffect(() => {
+    activeMeetingRef.current = activeMeeting;
+  }, [activeMeeting]);
+
   // Force join from external trigger (Header-Button) — startet direkt im Large-Modus
   useEffect(() => {
-    if (forceJoin && view === 'join-button' && meetingData.canJoin) {
+    if (!forceJoin) return;
+    if (view !== 'join-button' && view !== 'waiting') return;
+
+    // Falls aktives Meeting nicht joinbar, zum ersten joinbaren wechseln
+    let meetingToJoin = activeMeeting;
+    if (!activeMeeting.canJoin && allMeetings) {
+      const joinable = allMeetings.find(m => m.meetingData.canJoin);
+      if (joinable) {
+        meetingToJoin = joinable.meetingData;
+        setActiveMeeting(meetingToJoin);
+        activeMeetingRef.current = meetingToJoin;
+        setActiveGroupName(joinable.groupName);
+      }
+    }
+
+    if (meetingToJoin.canJoin) {
       const lw = Math.round(window.innerWidth * 0.6);
       const lh = Math.round(window.innerHeight * 0.7);
       setSize({ width: lw, height: lh });
@@ -191,28 +231,29 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
     e.stopPropagation();
   }, [size]);
 
-  // Load Jitsi ONCE when jitsiActive becomes true — never dispose on view changes
+  // Load Jitsi when jitsiActive becomes true — uses ref for current activeMeeting
   useEffect(() => {
     if (!jitsiActive) return;
     if (apiRef.current) return; // Already loaded
-    if (!meetingData.appId || !meetingData.roomName) return;
+    const m = activeMeetingRef.current;
+    if (!m.appId || !m.roomName) return;
 
-    const fullRoomName = `${meetingData.appId}/${meetingData.roomName}`;
+    const fullRoomName = `${m.appId}/${m.roomName}`;
 
-    loadJaaSApi(meetingData.appId)
+    loadJaaSApi(m.appId)
       .then((JitsiMeetExternalAPI) => {
         if (!containerRef.current) return;
 
         const api = new JitsiMeetExternalAPI('8x8.vc', {
           roomName: fullRoomName,
-          jwt: meetingData.jwt || undefined,
+          jwt: m.jwt || undefined,
           configOverwrite: {
-            ...meetingData.config,
+            ...m.config,
             desktopSharingEnabled: true
           },
-          interfaceConfigOverwrite: meetingData.interfaceConfig,
+          interfaceConfigOverwrite: m.interfaceConfig,
           userInfo: {
-            displayName: meetingData.displayName,
+            displayName: m.displayName,
             email: ''
           },
           parentNode: containerRef.current
@@ -233,7 +274,6 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
 
         api.addListener('videoConferenceJoined', () => {
           hasJoinedRef.current = true;
-          // Style iframe again after join (it may have been recreated)
           const iframe = containerRef.current?.querySelector('iframe');
           if (iframe) {
             iframe.style.height = '100%';
@@ -244,16 +284,15 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
           if (onAction) {
             onAction({
               action: 'meeting_join',
-              meetingId: meetingData.meetingId,
+              meetingId: activeMeetingRef.current.meetingId,
               islandId: 'jitsi_meeting'
             });
           }
         });
 
-        // Nur bei echtem Leave (X-Button) reagieren, nicht bei Minimize/Resize
         api.addListener('videoConferenceLeft', () => {
           if (!hasJoinedRef.current) return;
-          if (!isLeavingRef.current) return; // Ignorieren wenn nicht explizit verlassen
+          if (!isLeavingRef.current) return;
           doLeaveCleanup();
         });
 
@@ -306,11 +345,11 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
     if (onAction) {
       onAction({
         action: 'meeting_leave',
-        meetingId: meetingData.meetingId,
+        meetingId: activeMeetingRef.current.meetingId,
         islandId: 'jitsi_meeting'
       });
     }
-  }, [meetingData.meetingId, onAction]);
+  }, [onAction]);
 
   // Join the meeting (switch to small view)
   const handleJoin = useCallback(() => {
@@ -320,15 +359,15 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
 
   // Open in a new tab
   const handleOpenInNewTab = useCallback(() => {
-    if (meetingData.roomName && meetingData.appId) {
-      const jwtParam = meetingData.jwt ? `?jwt=${meetingData.jwt}` : '';
+    if (activeMeeting.roomName && activeMeeting.appId) {
+      const jwtParam = activeMeeting.jwt ? `?jwt=${activeMeeting.jwt}` : '';
       window.open(
-        `https://8x8.vc/${meetingData.appId}/${meetingData.roomName}${jwtParam}`,
+        `https://8x8.vc/${activeMeeting.appId}/${activeMeeting.roomName}${jwtParam}`,
         '_blank',
         'noopener,noreferrer'
       );
     }
-  }, [meetingData.roomName, meetingData.jwt, meetingData.appId]);
+  }, [activeMeeting.roomName, activeMeeting.jwt, activeMeeting.appId]);
 
   // Toggle between small and large — Jitsi bleibt aktiv!
   const handleToggleSize = useCallback(() => {
@@ -379,8 +418,98 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
     }
   }, [doLeaveCleanup]);
 
+  // Switch to a different meeting (dispose old Jitsi, start new)
+  const handleSwitchMeeting = useCallback((entry: MeetingGroupEntry) => {
+    setShowMeetingPicker(false);
+    const newMeeting = entry.meetingData;
+
+    // Altes Jitsi disposen falls aktiv
+    if (apiRef.current) {
+      try { apiRef.current.dispose(); } catch {}
+      apiRef.current = null;
+    }
+
+    // State zuruecksetzen
+    setJitsiLoaded(false);
+    hasJoinedRef.current = false;
+    isLeavingRef.current = false;
+
+    // Neues Meeting setzen
+    setActiveMeeting(newMeeting);
+    activeMeetingRef.current = newMeeting;
+    setActiveGroupName(entry.groupName);
+
+    // Wenn Jitsi schon aktiv war, direkt neu starten
+    if (jitsiActive) {
+      setJitsiActive(false);
+      // Kleiner Delay damit useEffect den Reset sieht
+      setTimeout(() => setJitsiActive(true), 100);
+    } else {
+      // View + Countdown fuer neues Meeting anpassen
+      if (newMeeting.canJoin) {
+        setView('join-button');
+      } else if (newMeeting.timeStatus?.reason === 'too_early') {
+        const mins = newMeeting.timeStatus.minutesUntilStart ?? 0;
+        setMinutesUntil(mins);
+        setView(mins <= 30 ? 'waiting' : 'join-button');
+      }
+    }
+  }, [jitsiActive]);
+
+  // Close picker on outside click
+  useEffect(() => {
+    if (!showMeetingPicker) return;
+    const handleClick = (e: MouseEvent) => {
+      if (!(e.target as HTMLElement).closest('.fjw__meeting-picker')) {
+        setShowMeetingPicker(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [showMeetingPicker]);
+
+  const allMeetings = meetingData.allMeetings;
+  const hasMultipleMeetings = allMeetings && allMeetings.length > 1;
+
+  // Meeting-Picker Dropdown: sortiert aktive zuerst, dann nach Zeit
+  const renderMeetingPicker = () => {
+    if (!allMeetings) return null;
+    const sorted = [...allMeetings].sort((a, b) => {
+      // Aktive (canJoin) zuerst
+      if (a.meetingData.canJoin && !b.meetingData.canJoin) return -1;
+      if (!a.meetingData.canJoin && b.meetingData.canJoin) return 1;
+      // Dann nach minutesUntilStart
+      const aMin = a.meetingData.timeStatus?.minutesUntilStart ?? 999;
+      const bMin = b.meetingData.timeStatus?.minutesUntilStart ?? 999;
+      return aMin - bMin;
+    });
+
+    return (
+      <div className="fjw__meeting-picker-dropdown">
+        {sorted.map(entry => {
+          const isActive = entry.meetingData.meetingId === activeMeeting.meetingId;
+          const isLive = entry.meetingData.canJoin;
+          const mins = entry.meetingData.timeStatus?.minutesUntilStart;
+          return (
+            <button
+              key={entry.groupId}
+              className={`fjw__meeting-picker-item ${isActive ? 'fjw__meeting-picker-item--active' : ''}`}
+              onClick={() => !isActive && handleSwitchMeeting(entry)}
+            >
+              <span className="fjw__meeting-picker-name">{entry.groupName}</span>
+              {isLive && <span className="fjw__meeting-live-badge">LIVE</span>}
+              {!isLive && mins != null && mins > 0 && (
+                <span className="fjw__meeting-picker-time">in {mins} Min</span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    );
+  };
+
   // Don't render if no meeting or ended
-  if (!meetingData.roomName || meetingData.timeStatus?.reason === 'ended' || meetingData.timeStatus?.reason === 'no_meeting') {
+  if (!activeMeeting.roomName || activeMeeting.timeStatus?.reason === 'ended' || activeMeeting.timeStatus?.reason === 'no_meeting') {
     return null;
   }
 
@@ -388,9 +517,21 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
   if (view === 'waiting') {
     return (
       <div className="fjw fjw--waiting">
+        {hasMultipleMeetings && (
+          <div className="fjw__meeting-picker" style={{ position: 'relative' }}>
+            <button
+              className="fjw__meeting-picker-btn fjw__meeting-picker-btn--pill"
+              onClick={() => setShowMeetingPicker(!showMeetingPicker)}
+              title="Meeting wechseln"
+            >
+              {activeGroupName || 'Gruppe'} &#9660;
+            </button>
+            {showMeetingPicker && renderMeetingPicker()}
+          </div>
+        )}
         <span className="fjw__waiting-icon">&#9203;</span>
         <span className="fjw__waiting-text">
-          Treffen in {minutesUntil} Min
+          {!hasMultipleMeetings && 'Treffen '}in {minutesUntil} Min
         </span>
       </div>
     );
@@ -398,13 +539,25 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
 
   // === JOIN BUTTON STATE (Video-Start ist jetzt im Header) ===
   if (view === 'join-button') {
-    if (!meetingData.canJoin && meetingData.timeStatus?.reason === 'too_early') {
-      const mins = meetingData.timeStatus.minutesUntilStart ?? 0;
+    if (!activeMeeting.canJoin && activeMeeting.timeStatus?.reason === 'too_early') {
+      const mins = activeMeeting.timeStatus.minutesUntilStart ?? 0;
       return (
         <div className="fjw fjw--waiting">
+          {hasMultipleMeetings && (
+            <div className="fjw__meeting-picker" style={{ position: 'relative' }}>
+              <button
+                className="fjw__meeting-picker-btn fjw__meeting-picker-btn--pill"
+                onClick={() => setShowMeetingPicker(!showMeetingPicker)}
+                title="Meeting wechseln"
+              >
+                {activeGroupName || 'Gruppe'} &#9660;
+              </button>
+              {showMeetingPicker && renderMeetingPicker()}
+            </div>
+          )}
           <span className="fjw__waiting-icon">&#9203;</span>
           <span className="fjw__waiting-text">
-            Treffen in {mins} Min
+            {!hasMultipleMeetings && 'Treffen '}in {mins} Min
           </span>
         </div>
       );
@@ -457,8 +610,20 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
         onTouchStart={onDragStart}
       >
         <span className="fjw__controls-title">
-          {meetingData.meetingTitle || 'Video-Treffen'}
+          {activeGroupName ? `${activeGroupName}` : (activeMeeting.meetingTitle || 'Video-Treffen')}
         </span>
+        {hasMultipleMeetings && (
+          <div className="fjw__meeting-picker" style={{ position: 'relative' }}>
+            <button
+              className="fjw__meeting-picker-btn"
+              onClick={() => setShowMeetingPicker(!showMeetingPicker)}
+              title="Meeting wechseln"
+            >
+              &#9660;
+            </button>
+            {showMeetingPicker && renderMeetingPicker()}
+          </div>
+        )}
         <div className="fjw__controls-buttons">
           <button
             className="fjw__ctrl-btn"

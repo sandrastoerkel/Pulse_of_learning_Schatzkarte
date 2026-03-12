@@ -14,9 +14,9 @@ export default defineConfig({
     rollupOptions: {
       output: {
         format: 'iife',
-        entryFileNames: 'index.js',
-        chunkFileNames: '[name].js',
-        assetFileNames: '[name].[ext]',
+        entryFileNames: 'index.[hash].js',
+        chunkFileNames: '[name].[hash].js',
+        assetFileNames: '[name].[hash].[ext]',
         inlineDynamicImports: true
       }
     }

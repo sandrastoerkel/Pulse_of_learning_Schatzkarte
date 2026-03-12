@@ -92,7 +92,7 @@
 
 .fjw--waiting {
   bottom: 24px;
-  right: 24px;
+  left: 24px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -314,6 +314,139 @@
 }
 
 /* ========================================
+   MEETING PICKER (multi-group coach)
+   ======================================== */
+
+.fjw__meeting-picker {
+  display: inline-flex;
+  align-items: center;
+}
+
+.fjw__meeting-picker-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #FFD700;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 6px;
+  font-size: 0.65rem;
+  cursor: pointer;
+  transition: background 0.12s ease;
+  margin-left: 4px;
+}
+
+.fjw__meeting-picker-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.fjw__meeting-picker-btn--small {
+  width: 22px;
+  height: 22px;
+  font-size: 0.55rem;
+  background: rgba(255, 215, 0, 0.2);
+  border-color: rgba(255, 215, 0, 0.4);
+}
+
+.fjw__meeting-picker-btn--pill {
+  width: auto;
+  height: auto;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  margin-left: 0;
+  margin-right: 6px;
+  background: rgba(255, 215, 0, 0.15);
+  border-color: rgba(255, 215, 0, 0.4);
+}
+
+.fjw__meeting-picker-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 6px;
+  min-width: 200px;
+  background: linear-gradient(135deg, #1a237e 0%, #0d1b3e 100%);
+  border: 2px solid rgba(255, 215, 0, 0.4);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  z-index: 20;
+  overflow: hidden;
+}
+
+.fjw__meeting-picker-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  color: #e0e0e0;
+  border: none;
+  border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.12s ease;
+  text-align: left;
+}
+
+.fjw__meeting-picker-item:last-child {
+  border-bottom: none;
+}
+
+.fjw__meeting-picker-item:hover {
+  background: rgba(255, 215, 0, 0.1);
+}
+
+.fjw__meeting-picker-item--active {
+  background: rgba(255, 215, 0, 0.15);
+  color: #FFD700;
+  font-weight: 600;
+  cursor: default;
+}
+
+.fjw__meeting-picker-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 8px;
+}
+
+.fjw__meeting-live-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #22c55e;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 10px;
+  letter-spacing: 0.5px;
+  animation: fjw-live-pulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes fjw-live-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(34, 197, 94, 0);
+  }
+}
+
+.fjw__meeting-picker-time {
+  font-size: 0.75rem;
+  color: rgba(255, 215, 0, 0.7);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ========================================
    RESPONSIVE / TABLET
    ======================================== */
 
@@ -328,7 +461,11 @@
     font-size: 0.95rem;
   }
 
-  .fjw--waiting,
+  .fjw--waiting {
+    bottom: 16px;
+    left: 16px;
+  }
+
   .fjw--minimized {
     bottom: 16px;
     right: 16px;

@@ -1063,6 +1063,44 @@
 }
 
 /* ========================================
+   EINMALEINS-ARENA WIDGET
+   ======================================== */
+.arena-widget-illustrated {
+  position: absolute;
+  right: 2%;
+  top: 72%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  z-index: 20;
+  transition: filter 0.2s ease;
+}
+
+.arena-widget-illustrated:hover {
+  filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.8));
+}
+
+.arena-widget-illustrated .arena-widget-icon {
+  font-size: 44px;
+  filter: drop-shadow(0 0 12px rgba(139, 92, 246, 0.7))
+          drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+}
+
+.arena-widget-illustrated .arena-widget-label {
+  background: var(--ui-surface);
+  color: var(--ui-text);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font-ui);
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  margin-top: 4px;
+  border: 1px solid var(--ui-border);
+  white-space: nowrap;
+}
+
+/* ========================================
    COMPANION WIDGET (Lernbegleiter)
    Redesigned: Unified bottom nav style
    ======================================== */
@@ -1223,6 +1261,12 @@
     transform: scale(0.85);
   }
 
+  .arena-widget-illustrated {
+    right: 1%;
+    top: 67%;
+    transform: scale(0.85);
+  }
+
   .tagebuch-widget-illustrated {
     transform: scale(0.85);
   }
@@ -1301,6 +1345,16 @@
   }
 
   .schatzkammer-widget-illustrated .schatzkammer-widget-label {
+    display: none;
+  }
+
+  .arena-widget-illustrated {
+    transform: scale(0.7);
+    right: 1%;
+    top: 63%;
+  }
+
+  .arena-widget-illustrated .arena-widget-label {
     display: none;
   }
 

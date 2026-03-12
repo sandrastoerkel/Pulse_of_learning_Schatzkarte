@@ -61,6 +61,7 @@ def rpg_schatzkarte(
     auto_open_phase: str = None,
     meeting_data: dict = None,
     chat_data: dict = None,
+    arena_data: dict = None,
     height: int = 700,
     key: str = None
 ) -> dict:
@@ -121,6 +122,7 @@ def rpg_schatzkarte(
         autoOpenPhase=auto_open_phase,
         meetingData=meeting_data,
         chatData=chat_data,
+        arenaData=arena_data,
         key=key,
         default=None,
     )

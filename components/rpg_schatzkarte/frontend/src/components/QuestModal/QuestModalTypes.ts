@@ -42,6 +42,8 @@ export interface QuestModalProps {
   // Lernkarten und Schatzkammer öffnen (für Werkzeuge/Lernpfad)
   onOpenLernkarten?: () => void;
   onOpenSchatzkammer?: () => void;
+  // Einmaleins-Arena öffnen
+  onOpenArena?: () => void;
   // Polarstern-Widget öffnen (für Starthafen)
   onPolarsternClick?: () => void;
   // Lernbegleiter auswählen (für Starthafen)

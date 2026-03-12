@@ -74,6 +74,8 @@ interface WorldMapIllustratedProps {
   lootDueCount?: number;           // Anzahl fälliger Lernkarten
   // Schatzkammer Props
   onSchatzkammerClick?: () => void; // Schatzkammer (Loci-System)
+  // Einmaleins-Arena Props
+  onArenaClick?: () => void;       // Einmaleins-Arena (Multiplikations-Trainer)
   // Superhelden-Tagebuch Props
   ageGroup?: AgeGroup;
   tagebuchEntries?: TagebuchEintrag[];
@@ -544,6 +546,7 @@ export function WorldMapIllustrated({
   onLootClick,
   lootDueCount = 0,
   onSchatzkammerClick,
+  onArenaClick,
   ageGroup,
   tagebuchEntries = [],
   onTagebuchToggle,
@@ -788,6 +791,8 @@ export function WorldMapIllustrated({
               <span className="schatzkammer-widget-label">Schatzkammer</span>
             </motion.div>
           )}
+
+          {/* Einmaleins-Arena Widget — verschoben in bottom-action-bar */}
 
           {/* Lernbegleiter Widget - Rechts oben auf der Karte */}
           {onCompanionClick && (

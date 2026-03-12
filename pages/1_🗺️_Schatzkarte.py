@@ -234,54 +234,68 @@ def create_hero_data(user_data):
         "titles": []  # TODO: Titel-System implementieren
     }
 
+def _build_meeting_dict(access, uid, display_name, user_role):
+    """Hilfsfunktion: Erzeugt ein MeetingData-Dict aus einem access-Objekt."""
+    meeting = access["meeting"]
+    room_name = access.get("roomName")
+
+    jaas_jwt = None
+    jaas_app_id = ""
+    try:
+        jaas_cfg = st.secrets.get("jaas", {})
+        jaas_app_id = jaas_cfg.get("app_id", "")
+        if jaas_app_id and room_name:
+            jaas_jwt = generate_jaas_jwt(
+                user_name=display_name,
+                user_id=uid,
+                is_moderator=(user_role == "coach"),
+                room=room_name
+            )
+    except Exception as e:
+        print(f"JaaS JWT generation failed: {e}")
+
+    return {
+        "canJoin": access.get("canJoin", False),
+        "roomName": room_name,
+        "config": access.get("config", {}),
+        "interfaceConfig": access.get("interfaceConfig", {}),
+        "displayName": display_name,
+        "meetingId": meeting.get("id"),
+        "meetingTitle": meeting.get("title", "Schatzkarten-Treffen"),
+        "timeStatus": access.get("timeStatus", {}),
+        "userRole": user_role,
+        "jwt": jaas_jwt,
+        "appId": jaas_app_id
+    }
+
+
 def load_meeting_data(uid):
     """Laedt Meeting-Daten fuer das Floating Jitsi Widget.
-    Sucht als Mitglied UND als Coach nach aktiven Meetings."""
+    Sucht als Mitglied UND als Coach nach aktiven Meetings.
+    Bei Coaches mit mehreren Gruppen: allMeetings-Array mit allen Meetings + JWTs."""
     try:
-        from utils.database import get_db
+        from utils.lerngruppen_db import get_coach_groups
 
-        # Alle relevanten Gruppen-IDs sammeln
-        group_ids = []
+        # Gleicher Ansatz wie load_chat_data: is_coach(uid) + get_coach_groups()
+        group_entries = []  # [{group_id, name}]
+        seen_ids = set()
 
-        # Als Mitglied
+        if is_coach(uid):
+            coach_groups = get_coach_groups(uid) or []
+            for cg in coach_groups:
+                group_entries.append({"group_id": cg["group_id"], "name": cg.get("name", "Gruppe")})
+                seen_ids.add(cg["group_id"])
+
+        # Auch als Mitglied pruefen (falls nicht schon als Coach-Gruppe)
         group = get_user_group(uid)
-        if group:
-            group_ids.append(group["group_id"])
+        if group and group["group_id"] not in seen_ids:
+            group_entries.append({"group_id": group["group_id"], "name": group.get("name", "Meine Gruppe")})
+            seen_ids.add(group["group_id"])
 
-        # Als Coach (alle aktiven Gruppen)
-        if is_coach():
-            db = get_db()
-            coach_groups = db.table("learning_groups") \
-                .select("group_id") \
-                .eq("coach_id", uid) \
-                .eq("is_active", 1) \
-                .execute()
-            for cg in coach_groups.data:
-                if cg["group_id"] not in group_ids:
-                    group_ids.append(cg["group_id"])
-
-        if not group_ids:
+        if not group_entries:
             return None
 
-        # Beste Meeting-Daten finden (erste Gruppe mit aktivem Meeting)
-        best_access = None
-        best_group_id = None
-        for gid in group_ids:
-            access = get_meeting_access(gid, uid, "coach" if is_coach() else "kind")
-            if access and access.get("canJoin"):
-                best_access = access
-                best_group_id = gid
-                break
-            # Falls kein aktives, nimm das naechste geplante
-            if access and access.get("meeting") and not best_access:
-                best_access = access
-                best_group_id = gid
-
-        if not best_access or not best_access.get("meeting"):
-            return None
-
-        user_role = "coach" if is_coach() else "kind"
-        access = best_access
+        user_role = "coach" if is_coach(uid) else "kind"
 
         # User-Name fuer Jitsi
         u = get_current_user()
@@ -289,38 +303,43 @@ def load_meeting_data(uid):
         if u:
             display_name = u.get("name", u.get("username", "Lern-Held"))
 
-        meeting = access["meeting"]
-        room_name = access.get("roomName")
+        # Alle Meetings sammeln (fuer Multi-Gruppen-Picker)
+        all_meetings = []
+        best_access = None
+        best_group_entry = None
 
-        # JaaS JWT generieren
-        jaas_jwt = None
-        jaas_app_id = ""
-        try:
-            jaas_cfg = st.secrets.get("jaas", {})
-            jaas_app_id = jaas_cfg.get("app_id", "")
-            if jaas_app_id and room_name:
-                jaas_jwt = generate_jaas_jwt(
-                    user_name=display_name,
-                    user_id=uid,
-                    is_moderator=(user_role == "coach"),
-                    room=room_name
-                )
-        except Exception as e:
-            print(f"JaaS JWT generation failed: {e}")
+        for entry in group_entries:
+            gid = entry["group_id"]
+            access = get_meeting_access(gid, uid, user_role)
+            if not access or not access.get("meeting"):
+                continue
 
-        return {
-            "canJoin": access.get("canJoin", False),
-            "roomName": room_name,
-            "config": access.get("config", {}),
-            "interfaceConfig": access.get("interfaceConfig", {}),
-            "displayName": display_name,
-            "meetingId": meeting.get("id"),
-            "meetingTitle": meeting.get("title", "Schatzkarten-Treffen"),
-            "timeStatus": access.get("timeStatus", {}),
-            "userRole": user_role,
-            "jwt": jaas_jwt,
-            "appId": jaas_app_id
-        }
+            meeting_dict = _build_meeting_dict(access, uid, display_name, user_role)
+            all_meetings.append({
+                "groupId": gid,
+                "groupName": entry["name"],
+                "meetingData": meeting_dict
+            })
+
+            # Bestes Meeting: canJoin hat Vorrang, sonst erstes geplantes
+            if access.get("canJoin") and (not best_access or not best_access.get("canJoin")):
+                best_access = access
+                best_group_entry = entry
+            elif not best_access:
+                best_access = access
+                best_group_entry = entry
+
+        if not best_access or not best_access.get("meeting"):
+            return None
+
+        # Top-Level-Dict = bestes Meeting (Abwaertskompatibilitaet)
+        result = _build_meeting_dict(best_access, uid, display_name, user_role)
+
+        # allMeetings nur wenn mind. 2 Gruppen Meetings haben
+        if len(all_meetings) >= 2:
+            result["allMeetings"] = all_meetings
+
+        return result
     except Exception as e:
         print(f"Error loading meeting data: {e}")
         return None
@@ -596,6 +615,31 @@ if not is_preview_mode():
     except Exception:
         chat_data = None
 
+# Arena-Daten laden (Supabase-Credentials fuer Einmaleins-Arena)
+arena_data = None
+if not is_preview_mode():
+    try:
+        group = get_user_group(user_id)
+        coach_group_ids = []
+        if is_coach():
+            from utils.database import get_db
+            db = get_db()
+            coach_groups = db.table("learning_groups") \
+                .select("group_id") \
+                .eq("coach_id", user_id) \
+                .eq("is_active", 1) \
+                .execute()
+            coach_group_ids = [cg["group_id"] for cg in (coach_groups.data or [])]
+        arena_data = {
+            "userId": user_id,
+            "supabaseUrl": st.secrets["SUPABASE_URL"],
+            "supabaseAnonKey": st.secrets["SUPABASE_KEY"],
+            "isCoach": bool(is_coach()),
+            "groupIds": coach_group_ids if is_coach() else ([group["group_id"]] if group else []),
+        }
+    except Exception:
+        arena_data = None
+
 result = rpg_schatzkarte(
     islands=islands,
     user_progress=user_data.get("progress", {}),
@@ -610,6 +654,7 @@ result = rpg_schatzkarte(
     auto_open_phase=auto_open_phase,  # Phase für die Insel (z.B. 'ready' für Base Camp)
     meeting_data=meeting_data,  # Floating Jitsi Widget
     chat_data=chat_data,  # Floating Chat Widget (Nachrichtenboard)
+    arena_data=arena_data,  # Einmaleins-Arena Supabase-Anbindung
     height=900,  # Basis-Hoehe, wird per CSS auf calc(100vh - 60px) ueberschrieben
     key="rpg_schatzkarte"
 )

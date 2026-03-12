@@ -33,6 +33,7 @@ import { AvatarDisplay } from './components/AvatarDisplay';
 import { AvatarShop } from './components/AvatarShop';
 import { CustomAvatar, ShopItem, ItemSlot } from './types';
 import { DEFAULT_AVATAR_VISUALS } from './components/AvatarParts';
+import { useAvatarPersistence, AvatarPersistenceCredentials } from './hooks/useAvatarPersistence';
 // Design Tokens MUST be imported first
 import './styles/design-tokens.css';
 import './styles/rpg-theme.css';
@@ -46,6 +47,7 @@ import { Brainy } from './components/Brainy';
 import { LandingPageV5 } from './components/LandingPageV5';
 import { MemoryGame, RewardModal, MiniGameSelector } from './components/MiniGames';
 import { LootLernkarten } from './components/LootLernkarten';
+import { EinmaleinsArena } from './components/EinmaleinsArena';
 import { RunnerGame } from './components/MiniGames/Runner/RunnerGame';
 import { TestPanel } from './components/TestPanel';
 import FloatingJitsiWidget from './components/VideoChat/FloatingJitsiWidget';
@@ -126,6 +128,7 @@ function RPGSchatzkarteContent({
   autoOpenPhase,
   meetingData,
   chatData,
+  arenaData,
   onVideoStart
 }: {
   islands: Island[];
@@ -144,6 +147,7 @@ function RPGSchatzkarteContent({
   autoOpenPhase?: string | null;
   meetingData?: MeetingData | null;
   chatData?: ChatData | null;
+  arenaData?: any;
   onVideoStart?: () => void;
 }) {
   // Lokaler State für TestPanel-Manipulationen
@@ -215,6 +219,9 @@ function RPGSchatzkarteContent({
   // Schatzkammer Modal State
   const [showSchatzkammer, setShowSchatzkammer] = useState(false);
 
+  // Einmaleins-Arena Modal State
+  const [showEinmaleinsArena, setShowEinmaleinsArena] = useState(false);
+
   // Companion Selector State
   const [showCompanionSelector, setShowCompanionSelector] = useState(false);
   const [selectedCompanion, setSelectedCompanion] = useState<CompanionType | undefined>(heroData.companion);
@@ -222,22 +229,18 @@ function RPGSchatzkarteContent({
 
   // Avatar Creator State
   const [showAvatarCreator, setShowAvatarCreator] = useState(false);
-  const [customAvatar, setCustomAvatar] = useState<CustomAvatar | null>(() => {
-    // Lade gespeicherten Avatar aus localStorage
-    try {
-      const saved = localStorage.getItem('schatzkarte_custom_avatar');
-      return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
-    }
-  });
-  const [heroNameFromAvatar, setHeroNameFromAvatar] = useState<string>(() => {
-    try {
-      return localStorage.getItem('schatzkarte_hero_name') || '';
-    } catch {
-      return '';
-    }
-  });
+
+  // Avatar Persistence (Dual-Write: localStorage + Supabase)
+  const avatarCredentials: AvatarPersistenceCredentials | null =
+    arenaData?.supabaseUrl && arenaData?.supabaseAnonKey && arenaData?.userId
+      ? { userId: arenaData.userId, supabaseUrl: arenaData.supabaseUrl, supabaseAnonKey: arenaData.supabaseAnonKey }
+      : chatData?.supabaseUrl && chatData?.supabaseAnonKey && chatData?.userId
+        ? { userId: chatData.userId, supabaseUrl: chatData.supabaseUrl, supabaseAnonKey: chatData.supabaseAnonKey }
+        : null;
+  const {
+    customAvatar, heroName: heroNameFromAvatar, ownedItems,
+    saveAvatar, saveOwnedItems, saveEquipped,
+  } = useAvatarPersistence(avatarCredentials);
 
   // Memory Game State
   const [showMemoryGame, setShowMemoryGame] = useState(false);
@@ -256,14 +259,6 @@ function RPGSchatzkarteContent({
 
   // Avatar Shop State
   const [showAvatarShop, setShowAvatarShop] = useState(false);
-  const [ownedItems, setOwnedItems] = useState<string[]>(() => {
-    try {
-      const saved = localStorage.getItem('schatzkarte_owned_items');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
 
 
   // selectedIsland/showQuestModal in sessionStorage persistieren
@@ -534,6 +529,23 @@ function RPGSchatzkarteContent({
     console.log('Schatzkammer XP earned:', xp);
   }, []);
 
+  // Einmaleins-Arena Click Handler
+  const handleArenaClick = useCallback(() => {
+    setShowEinmaleinsArena(true);
+    console.log('Einmaleins-Arena clicked');
+  }, []);
+
+  // Arena XP/Coins earned handlers
+  const handleArenaXPEarned = useCallback((xp: number) => {
+    setPlayerXP(prev => prev + xp);
+    console.log('Arena XP earned:', xp);
+  }, []);
+
+  const handleArenaCoinsEarned = useCallback((coins: number) => {
+    setPlayerGold(prev => prev + coins);
+    console.log('Arena coins earned:', coins);
+  }, []);
+
   // Loot XP/Coins earned handlers
   const handleLootXPEarned = useCallback((xp: number) => {
     setPlayerXP(prev => prev + xp);
@@ -705,20 +717,10 @@ function RPGSchatzkarteContent({
 
   // Avatar Creator Handler
   const handleAvatarSave = useCallback((avatar: CustomAvatar, name: string) => {
-    setCustomAvatar(avatar);
-    setHeroNameFromAvatar(name);
+    saveAvatar(avatar, name);
     setShowAvatarCreator(false);
-
-    // Speichere in localStorage
-    try {
-      localStorage.setItem('schatzkarte_custom_avatar', JSON.stringify(avatar));
-      localStorage.setItem('schatzkarte_hero_name', name);
-    } catch (e) {
-      console.warn('Could not save avatar to localStorage:', e);
-    }
-
     console.log('Avatar saved:', { avatar, name });
-  }, []);
+  }, [saveAvatar]);
 
   // Memory Game Handler
   const handleMemoryGameEnd = useCallback((result: GameResult) => {
@@ -783,66 +785,33 @@ function RPGSchatzkarteContent({
     if (playerGold < item.price) return;
 
     setPlayerGold(prev => prev - item.price);
-    setOwnedItems(prev => {
-      const newOwned = [...prev, item.id];
-      // Speichere in localStorage
-      try {
-        localStorage.setItem('schatzkarte_owned_items', JSON.stringify(newOwned));
-      } catch (e) {
-        console.warn('Could not save owned items to localStorage:', e);
-      }
-      return newOwned;
-    });
+    saveOwnedItems([...ownedItems, item.id]);
     console.log('Item purchased:', item);
-  }, [playerGold]);
+  }, [playerGold, ownedItems, saveOwnedItems]);
 
   const handleShopEquip = useCallback((itemId: string, slot: ItemSlot) => {
     if (!customAvatar) return;
 
-    setCustomAvatar(prev => {
-      if (!prev) return prev;
-      const updated: CustomAvatar = {
-        ...prev,
-        equipped: {
-          ...prev.equipped,
-          [slot]: itemId
-        },
-        updatedAt: new Date().toISOString()
-      };
-      // Speichere in localStorage
-      try {
-        localStorage.setItem('schatzkarte_custom_avatar', JSON.stringify(updated));
-      } catch (e) {
-        console.warn('Could not save avatar to localStorage:', e);
-      }
-      return updated;
-    });
+    const updated: CustomAvatar = {
+      ...customAvatar,
+      equipped: { ...customAvatar.equipped, [slot]: itemId },
+      updatedAt: new Date().toISOString()
+    };
+    saveEquipped(updated);
     console.log('Item equipped:', itemId, slot);
-  }, [customAvatar]);
+  }, [customAvatar, saveEquipped]);
 
   const handleShopUnequip = useCallback((slot: ItemSlot) => {
     if (!customAvatar) return;
 
-    setCustomAvatar(prev => {
-      if (!prev) return prev;
-      const updated: CustomAvatar = {
-        ...prev,
-        equipped: {
-          ...prev.equipped,
-          [slot]: null
-        },
-        updatedAt: new Date().toISOString()
-      };
-      // Speichere in localStorage
-      try {
-        localStorage.setItem('schatzkarte_custom_avatar', JSON.stringify(updated));
-      } catch (e) {
-        console.warn('Could not save avatar to localStorage:', e);
-      }
-      return updated;
-    });
+    const updated: CustomAvatar = {
+      ...customAvatar,
+      equipped: { ...customAvatar.equipped, [slot]: null },
+      updatedAt: new Date().toISOString()
+    };
+    saveEquipped(updated);
     console.log('Item unequipped:', slot);
-  }, [customAvatar]);
+  }, [customAvatar, saveEquipped]);
 
   // Handler für Powertechniken-Fortschritt (wird von QuestModal aufgerufen)
   const handlePowertechnikenComplete = useCallback((techniqueKey: TechniqueKey, application?: string) => {
@@ -1055,7 +1024,10 @@ function RPGSchatzkarteContent({
                   <span className="header-btn__icon">🚪</span>
                   <span className="header-btn__text">Logout</span>
                 </button>
-                {meetingData && meetingData.canJoin && meetingData.roomName && onVideoStart && (
+                {meetingData && meetingData.roomName && onVideoStart && (
+                  meetingData.canJoin ||
+                  meetingData.allMeetings?.some(m => m.meetingData.canJoin)
+                ) && (
                   <button className="header-btn header-btn--video" onClick={onVideoStart}>
                     <span className="header-btn__icon">📹</span>
                     <span className="header-btn__text">Video starten</span>
@@ -1088,6 +1060,7 @@ function RPGSchatzkarteContent({
         onLootClick={handleLootClick}
         lootDueCount={lootDueCount}
         onSchatzkammerClick={handleSchatzkammerClick}
+        onArenaClick={handleArenaClick}
         ageGroup={ageGroup}
         tagebuchEntries={tagebuchEntries}
         onTagebuchToggle={handleTagebuchToggle}
@@ -1122,6 +1095,10 @@ function RPGSchatzkarteContent({
           onOpenSchatzkammer={() => {
             handleCloseModal();
             setTimeout(() => setShowSchatzkammer(true), 100);
+          }}
+          onOpenArena={() => {
+            handleCloseModal();
+            setTimeout(() => setShowEinmaleinsArena(true), 100);
           }}
           onPolarsternClick={handlePolarsternClick}
           onOpenCompanionSelector={() => setShowCompanionSelector(true)}
@@ -1191,6 +1168,15 @@ function RPGSchatzkarteContent({
         isOpen={showSchatzkammer}
         onClose={() => setShowSchatzkammer(false)}
         onXPEarned={handleSchatzkammerXPEarned}
+      />
+
+      {/* Einmaleins-Arena Modal */}
+      <EinmaleinsArena
+        isOpen={showEinmaleinsArena}
+        onClose={() => setShowEinmaleinsArena(false)}
+        onXPEarned={handleArenaXPEarned}
+        onCoinsEarned={handleArenaCoinsEarned}
+        arenaData={arenaData}
       />
 
       {/* Polarstern Modal - Ziele setzen */}
@@ -1371,7 +1357,7 @@ function RPGSchatzkarteContent({
       )}
 
       {/* Zurück zur Schatzkarte Button - erscheint wenn ein Modal offen ist */}
-      {(showQuestModal || showBanduraModal || showHattieModal || showTagebuch || showLerntechnikenModal || showZertifikat || showCompanionSelector || showAvatarCreator || showMemoryGame || showRunnerGame || showAvatarShop || showPolarsternModal || showLootModal || showSchatzkammer) && (
+      {(showQuestModal || showBanduraModal || showHattieModal || showTagebuch || showLerntechnikenModal || showZertifikat || showCompanionSelector || showAvatarCreator || showMemoryGame || showRunnerGame || showAvatarShop || showPolarsternModal || showLootModal || showSchatzkammer) && !showEinmaleinsArena && (
         <button
           className="back-to-map-button"
           onClick={() => {
@@ -1391,6 +1377,7 @@ function RPGSchatzkarteContent({
             setShowPolarsternModal(false);
             setShowLootModal(false);
             setShowSchatzkammer(false);
+            setShowEinmaleinsArena(false);
           }}
         >
           <span className="back-icon">🗺️</span>
@@ -1401,7 +1388,7 @@ function RPGSchatzkarteContent({
       {/* Avatar Edit Widget - jetzt im linken Panel integriert */}
 
       {/* Bottom Action Bar - Memory, Shop, Runner */}
-      {!showQuestModal && !showBanduraModal && !showHattieModal && !showMemoryGame && !showRunnerGame && !showAvatarShop && !showAvatarCreator && (
+      {!showQuestModal && !showBanduraModal && !showHattieModal && !showMemoryGame && !showRunnerGame && !showAvatarShop && !showAvatarCreator && !showEinmaleinsArena && (
         <div className="bottom-action-bar">
           <button
             className="bottom-action-bar__btn bottom-action-bar__btn--memory"
@@ -1436,6 +1423,15 @@ function RPGSchatzkarteContent({
               <span className="bottom-action-bar__sub">{playerXP} XP</span>
             </button>
           )}
+
+          <button
+            className="bottom-action-bar__btn bottom-action-bar__btn--arena"
+            onClick={handleArenaClick}
+            title="1×1 Arena"
+          >
+            <span className="bottom-action-bar__icon">⚔️</span>
+            <span className="bottom-action-bar__label">1×1 Arena</span>
+          </button>
         </div>
       )}
 
@@ -1475,6 +1471,7 @@ function RPGSchatzkarteStreamlit({ args }: ComponentProps) {
   const autoOpenPhase: string | null = args?.autoOpenPhase || null;
   const meetingData: MeetingData | null = args?.meetingData || null;
   const chatData: ChatData | null = args?.chatData || null;
+  const arenaData = args?.arenaData || null;
   const [videoForceJoin, setVideoForceJoin] = useState(false);
 
   // Streamlit-Höhe setzen
@@ -1542,6 +1539,7 @@ function RPGSchatzkarteStreamlit({ args }: ComponentProps) {
         autoOpenPhase={autoOpenPhase}
         meetingData={meetingData}
         chatData={chatData}
+        arenaData={arenaData}
         onVideoStart={() => setVideoForceJoin(true)}
       />
       {meetingData && meetingData.roomName && (
