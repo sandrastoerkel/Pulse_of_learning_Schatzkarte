@@ -116,20 +116,24 @@ const AVATAR_ITEMS: Record<string, AvatarItem[]> = {
 };
 
 const SPEED_RANKS = [
-  { name: 'Legende', maxTime: 1, color: '#ff4da6', emoji: '👑' },
-  { name: 'Meister', maxTime: 2, color: '#f5c842', emoji: '🏅' },
-  { name: 'Arena-Held', maxTime: 3, color: '#f97316', emoji: '🦸' },
-  { name: 'Champion', maxTime: 4, color: '#8b5cf6', emoji: '🏆' },
-  { name: 'Ritter', maxTime: 5, color: '#00e5ff', emoji: '⚔️' },
-  { name: 'Kaempfer', maxTime: 6, color: '#6ee7b7', emoji: '🤺' },
-  { name: 'Knappe', maxTime: 7, color: '#8892b0', emoji: '🗡️' },
-  { name: 'Lehrling', maxTime: 8, color: '#64748b', emoji: '📖' },
-  { name: 'Anfaenger', maxTime: 9, color: '#475569', emoji: '🌱' },
-  { name: 'Neuling', maxTime: 10, color: '#334155', emoji: '👶' },
-  { name: 'Unbekannt', maxTime: Infinity, color: '#1e293b', emoji: '❓' },
+  { name: 'Rockgott', maxTime: 1, color: '#22c55e', emoji: '🏆' },
+  { name: 'Musiklegende', maxTime: 2, color: '#4ade80', emoji: '⭐' },
+  { name: 'Buehnenstar', maxTime: 3, color: '#86efac', emoji: '🎸' },
+  { name: 'Hauptact', maxTime: 4, color: '#eab308', emoji: '🎤' },
+  { name: 'Vorband', maxTime: 5, color: '#f59e0b', emoji: '🎵' },
+  { name: 'Newcomer', maxTime: 6, color: '#f97316', emoji: '🎶' },
+  { name: 'Freier Kuenstler', maxTime: 7, color: '#fb923c', emoji: '📋' },
+  { name: 'Hobbyrocker', maxTime: 8, color: '#ef4444', emoji: '🎺' },
+  { name: 'Pflasterstein-Barde', maxTime: 9, color: '#dc2626', emoji: '🎷' },
+  { name: 'Kellerrocker', maxTime: 10, color: '#b91c1c', emoji: '🏚️' },
+  { name: 'Dusch-Rocker', maxTime: Infinity, color: '#991b1b', emoji: '😅' },
 ];
 
-function getSpeedRank(avgTime: number | null): typeof SPEED_RANKS[number] {
+const MIN_GAMES_FOR_RANK = 10;
+const FRISCHLING = { name: 'Frischling', maxTime: Infinity, color: '#64748b', emoji: '🆕' };
+
+function getSpeedRank(avgTime: number | null, gamesPlayed?: number): typeof SPEED_RANKS[number] {
+  if (gamesPlayed !== undefined && gamesPlayed < MIN_GAMES_FOR_RANK) return FRISCHLING as typeof SPEED_RANKS[number];
   if (avgTime === null) return SPEED_RANKS[SPEED_RANKS.length - 1];
   for (const rank of SPEED_RANKS) {
     if (avgTime <= rank.maxTime) return rank;
@@ -749,7 +753,7 @@ function HomeScreen({ state, onNavigate, onUpdate, isCoach }: {
   const levelInfo = getLevelFromXP(state.arenaXP);
   const levelRank = getRankForLevel(levelInfo.level);
   const levelProgress = (levelInfo.xpInLevel / levelInfo.xpNeeded) * 100;
-  const speedRank = getSpeedRank(state.studioSpeed);
+  const speedRank = getSpeedRank(state.studioSpeed, state.studioSpeeds.length);
   const av = state.avatar;
 
   return (
@@ -823,14 +827,16 @@ function HomeScreen({ state, onNavigate, onUpdate, isCoach }: {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem' }}>
           <span style={{ fontSize: '1.2rem' }}>{speedRank.emoji}</span>
           <span style={{ ...rockFont, color: speedRank.color, fontSize: '1rem' }}>{speedRank.name}</span>
-          {state.studioSpeed !== null && (
+          {state.studioSpeeds.length >= MIN_GAMES_FOR_RANK && state.studioSpeed !== null && (
             <span style={{ fontSize: '0.8rem', color: S.textDim }}>
               ⏱️ {state.studioSpeed.toFixed(1)}s
             </span>
           )}
         </div>
         <div style={{ fontSize: '0.72rem', color: S.textDim, marginTop: '0.15rem' }}>
-          60 Sek – Rang-Messung (∅ letzten {state.studioSpeeds.length || '?'} Spiele)
+          {state.studioSpeeds.length < MIN_GAMES_FOR_RANK
+            ? `Noch ${MIN_GAMES_FOR_RANK - state.studioSpeeds.length} Spiele bis zum Rang (${state.studioSpeeds.length}/${MIN_GAMES_FOR_RANK})`
+            : `60 Sek – Rang-Messung (∅ letzten ${state.studioSpeeds.length} Spiele)`}
         </div>
       </button>
 
@@ -1150,7 +1156,11 @@ function QuizGame({ state, mode, onBack, onComplete }: {
 
   const coinsEarned = Math.floor((correct + Math.floor(maxCombo / 3)) * cfg.coinMult);
   const accuracy = correct + wrong > 0 ? Math.round((correct / (correct + wrong)) * 100) : 0;
-  const avgSpeed = questionTimes.length > 0 ? questionTimes.reduce((a, b) => a + b, 0) / questionTimes.length : 0;
+  // Durchschnitt: Bei zeitbasierten Modi (Studio etc.) = Gesamtzeit / Anzahl Antworten
+  const totalAnswered = correct + wrong;
+  const avgSpeed = hasGlobalTimer && cfg.duration > 0 && totalAnswered > 0
+    ? cfg.duration / totalAnswered
+    : questionTimes.length > 0 ? questionTimes.reduce((a, b) => a + b, 0) / questionTimes.length : 0;
 
   // Ready Phase
   if (phase === 'ready') return (
@@ -1164,9 +1174,15 @@ function QuizGame({ state, mode, onBack, onComplete }: {
         {isStudio && state.studioSpeed !== null && (
           <div style={{ marginBottom: '1rem', padding: '0.5rem', background: `${S.gold}15`, borderRadius: 10, border: `1px solid ${S.gold}30` }}>
             <div style={{ fontSize: '0.8rem', color: S.textDim }}>Aktueller Rang</div>
-            <div style={{ ...rockFont, color: getSpeedRank(state.studioSpeed).color, fontSize: '1.1rem' }}>
-              {getSpeedRank(state.studioSpeed).emoji} {getSpeedRank(state.studioSpeed).name} ({state.studioSpeed.toFixed(1)}s)
-            </div>
+            {state.studioSpeeds.length < MIN_GAMES_FOR_RANK ? (
+              <div style={{ ...rockFont, color: FRISCHLING.color, fontSize: '1.1rem' }}>
+                {FRISCHLING.emoji} {FRISCHLING.name} ({state.studioSpeeds.length}/{MIN_GAMES_FOR_RANK} Spiele)
+              </div>
+            ) : (
+              <div style={{ ...rockFont, color: getSpeedRank(state.studioSpeed).color, fontSize: '1.1rem' }}>
+                {getSpeedRank(state.studioSpeed).emoji} {getSpeedRank(state.studioSpeed).name} ({state.studioSpeed.toFixed(1)}s)
+              </div>
+            )}
           </div>
         )}
 
@@ -1369,7 +1385,7 @@ function QuizGame({ state, mode, onBack, onComplete }: {
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && submitAnswer()}
               style={{
-                width: 130, textAlign: 'center', fontSize: '1.8rem', ...rockFont,
+                width: 130, textAlign: 'center', fontSize: '1.8rem', fontFamily: 'Nunito, sans-serif', fontWeight: 700,
                 background: 'rgba(255,255,255,0.05)',
                 border: `2px solid ${feedback === 'ok' ? S.green : feedback === 'bad' ? S.red : cfg.color}`,
                 borderRadius: 12, color: S.text, padding: '0.4rem', outline: 'none',
@@ -1429,125 +1445,98 @@ function QuizGame({ state, mode, onBack, onComplete }: {
 // ============================================
 
 function RankOverview({ currentSpeed, gamesPlayed }: { currentSpeed: number | null; gamesPlayed: number }) {
-  const currentRank = getSpeedRank(currentSpeed);
-  // Alle sichtbaren Raenge (ohne "Unbekannt"), von schnellstem (oben) zu langsamstem (unten)
+  const isFrischling = gamesPlayed < MIN_GAMES_FOR_RANK;
+  const currentRank = isFrischling ? FRISCHLING as typeof SPEED_RANKS[number] : getSpeedRank(currentSpeed);
+  // visibleRanks: Rockgott(0) ... Kellerrocker(9) — schnellster zuerst
   const visibleRanks = SPEED_RANKS.filter(r => r.maxTime !== Infinity);
-  const currentIdx = visibleRanks.findIndex(r => r.name === currentRank.name);
-  const nextRank = currentIdx > 0 ? visibleRanks[currentIdx - 1] : null;
+  const currentIdx = isFrischling ? -1 : visibleRanks.findIndex(r => r.name === currentRank.name);
+  // Fuellung: von unten (Kellerrocker) bis zum erreichten Rang, 0 bei Frischling
+  const reachedFromBottom = currentIdx === -1 ? 0 : visibleRanks.length - currentIdx;
+  const fillPct = (reachedFromBottom / visibleRanks.length) * 100;
 
-  // Fortschritt zum naechsten Rang berechnen
-  let progressToNext = 0;
-  if (nextRank && currentSpeed !== null && currentIdx < visibleRanks.length) {
-    const currentMax = visibleRanks[currentIdx].maxTime;
-    const nextMax = nextRank.maxTime;
-    progressToNext = Math.max(0, Math.min(1, (currentMax - currentSpeed) / (currentMax - nextMax)));
-  }
-
+  // Render-Reihenfolge: Legende oben, Neuling unten (= visibleRanks direkt)
   return (
     <div style={{ marginBottom: '0.75rem' }}>
-      <div style={{ fontSize: '0.78rem', color: S.textDim, marginBottom: '0.5rem', fontWeight: 700 }}>
-        Alle Raenge (∅ letzten {gamesPlayed} Spiele):
+      <div style={{ fontSize: '0.78rem', color: S.textDim, marginBottom: '0.6rem', fontWeight: 700 }}>
+        {isFrischling
+          ? `🆕 Frischling – noch ${MIN_GAMES_FOR_RANK - gamesPlayed} Studio-Spiele bis zum Rang (${gamesPlayed}/${MIN_GAMES_FOR_RANK})`
+          : `Dein Rang (∅ letzten ${gamesPlayed} Spiele):`}
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-        {visibleRanks.map((rank, idx) => {
-          const isCurrent = rank.name === currentRank.name;
-          const isNext = nextRank?.name === rank.name;
-          const isReached = idx > currentIdx;
-          const isLocked = idx < currentIdx && !isNext;
+      <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'stretch' }}>
+        {/* Thermometer-Balken */}
+        <div style={{ width: 28, flexShrink: 0, display: 'flex', flexDirection: 'column', position: 'relative' }}>
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'rgba(255,255,255,0.06)',
+            borderRadius: 14,
+            border: '1px solid rgba(255,255,255,0.08)',
+            overflow: 'hidden',
+          }}>
+            {/* Gefuellter Bereich von unten bis zum erreichten Rang */}
+            <div style={{
+              position: 'absolute', bottom: 0, left: 0, right: 0,
+              height: `${fillPct}%`,
+              background: 'linear-gradient(to top, #dc2626 0%, #ef4444 20%, #f97316 40%, #f59e0b 60%, #eab308 70%, #86efac 80%, #4ade80 90%, #22c55e 100%)',
+              borderRadius: '0 0 13px 13px',
+              transition: 'height 1s ease',
+              boxShadow: `0 0 12px ${currentRank.color}50`,
+            }} />
+          </div>
+        </div>
 
-          return (
-            <div key={rank.name} style={{
-              display: 'flex', alignItems: 'center', gap: '0.5rem',
-              padding: isCurrent ? '0.55rem 0.65rem' : '0.35rem 0.65rem',
-              borderRadius: 12,
-              background: isCurrent
-                ? `linear-gradient(135deg, ${rank.color}25, ${rank.color}10)`
-                : isNext
-                  ? `${rank.color}08`
-                  : isReached
-                    ? 'rgba(255,255,255,0.03)'
-                    : 'rgba(255,255,255,0.02)',
-              border: isCurrent
-                ? `2px solid ${rank.color}`
-                : isNext
-                  ? `1px dashed ${rank.color}60`
-                  : `1px solid rgba(255,255,255,0.05)`,
-              opacity: isLocked ? 0.4 : 1,
-              transform: isCurrent ? 'scale(1.03)' : 'scale(1)',
-              transition: 'all 0.3s ease',
-              position: 'relative',
-              overflow: 'hidden',
-              ...(isCurrent ? {
-                boxShadow: `0 0 16px ${rank.color}40, inset 0 0 16px ${rank.color}10`,
-                animation: 'rankPulse 2s ease-in-out infinite',
-              } : {}),
-            }}>
-              {/* Shimmer fuer naechsten Rang */}
-              {isNext && (
-                <div style={{
-                  position: 'absolute', inset: 0,
-                  background: `linear-gradient(90deg, transparent 0%, ${rank.color}15 50%, transparent 100%)`,
-                  animation: 'rankShimmer 2.5s ease-in-out infinite',
-                }} />
-              )}
+        {/* Rang-Labels: Legende oben, Neuling unten */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          {visibleRanks.map((rank, idx) => {
+            const isCurrent = rank.name === currentRank.name;
+            // Erreicht = idx >= currentIdx (aktueller und alle darunter/langsamer)
+            const isReached = currentIdx !== -1 && idx >= currentIdx;
 
-              {/* Emoji */}
-              <div style={{
-                fontSize: isCurrent ? '1.5rem' : '1.1rem',
-                width: '2rem', textAlign: 'center', flexShrink: 0,
-                filter: isLocked ? 'grayscale(0.8)' : 'none',
+            return (
+              <div key={rank.name} style={{
+                display: 'flex', alignItems: 'center', gap: '0.4rem',
+                padding: '0.2rem 0.5rem',
+                borderRadius: 8,
+                ...(isCurrent ? {
+                  background: `${rank.color}18`,
+                  boxShadow: `0 0 10px ${rank.color}30`,
+                } : {}),
               }}>
-                {rank.emoji}
-              </div>
-
-              {/* Name + Schwelle */}
-              <div style={{ flex: 1, textAlign: 'left', minWidth: 0 }}>
-                <div style={{
-                  ...rockFont,
-                  fontSize: isCurrent ? '1.05rem' : '0.85rem',
+                <span style={{
+                  fontSize: isCurrent ? '1.15rem' : '0.85rem',
+                  filter: isReached ? 'none' : 'grayscale(0.8)',
+                  opacity: isReached ? 1 : 0.4,
+                }}>
+                  {rank.emoji}
+                </span>
+                <span style={{
+                  fontFamily: 'Nunito, sans-serif',
+                  fontWeight: isCurrent ? 800 : 600,
+                  fontSize: isCurrent ? '0.88rem' : '0.75rem',
                   color: isCurrent ? rank.color : isReached ? S.text : S.textDim,
-                  lineHeight: 1.2,
+                  opacity: isReached ? 1 : 0.45,
                 }}>
                   {rank.name}
-                </div>
-                <div style={{
-                  fontSize: '0.65rem',
-                  color: isCurrent ? `${rank.color}cc` : S.textDim,
-                  opacity: isLocked ? 0.7 : 1,
+                </span>
+                <span style={{
+                  fontSize: '0.6rem',
+                  color: isCurrent ? `${rank.color}bb` : S.textDim,
+                  opacity: isReached ? 0.8 : 0.35,
                 }}>
-                  ≤ {rank.maxTime}s pro Antwort
-                </div>
-                {/* Fortschrittsbalken beim naechsten Rang */}
-                {isNext && currentSpeed !== null && (
-                  <div style={{ marginTop: '0.25rem' }}>
-                    <div style={{
-                      height: 5, background: 'rgba(255,255,255,0.1)', borderRadius: 3, overflow: 'hidden',
-                    }}>
-                      <div style={{
-                        width: `${progressToNext * 100}%`,
-                        height: '100%',
-                        background: `linear-gradient(90deg, ${currentRank.color}, ${rank.color})`,
-                        borderRadius: 3,
-                        transition: 'width 1s ease',
-                      }} />
-                    </div>
-                    <div style={{ fontSize: '0.6rem', color: rank.color, marginTop: '0.15rem' }}>
-                      {currentSpeed.toFixed(1)}s → brauchst ≤{rank.maxTime}s
-                    </div>
-                  </div>
+                  ≤{rank.maxTime}s
+                </span>
+                {isCurrent && (
+                  <span style={{
+                    marginLeft: 'auto', fontSize: '0.6rem', fontWeight: 800,
+                    color: '#0d1117', background: rank.color,
+                    padding: '0.1rem 0.4rem', borderRadius: 6,
+                  }}>
+                    DU
+                  </span>
                 )}
               </div>
-
-              {/* Status-Indikator */}
-              <div style={{ flexShrink: 0, fontSize: '0.8rem', textAlign: 'center', minWidth: '1.8rem' }}>
-                {isCurrent && <span style={{ ...rockFont, color: rank.color, fontSize: '0.7rem' }}>DU</span>}
-                {isReached && <span style={{ color: S.green }}>✓</span>}
-                {isNext && <span style={{ color: rank.color, fontSize: '1rem' }}>↑</span>}
-                {isLocked && <span style={{ opacity: 0.5 }}>🔒</span>}
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </div>
   );
@@ -1558,7 +1547,7 @@ function StudioResultScreen({ state, result, onDone }: {
   result: { correct: number; wrong: number; avgSpeed: number; sessionXP: number; coinsEarned: number; mode: string };
   onDone: () => void;
 }) {
-  const overallRank = getSpeedRank(state.studioSpeed);
+  const overallRank = getSpeedRank(state.studioSpeed, state.studioSpeeds.length);
   const sessionRank = getSpeedRank(result.avgSpeed);
   const totalAnswered = result.correct + result.wrong;
   const modeLabel = (QUIZ_MODES as Record<string, { label: string; duration: number; icon: string }>)[result.mode];
@@ -1573,9 +1562,15 @@ function StudioResultScreen({ state, result, onDone }: {
         <div style={{ fontSize: '0.82rem', color: S.textDim, marginBottom: '0.3rem' }}>{modeIcon} {modeName}</div>
         <div style={{ fontSize: '4rem', marginBottom: '0.3rem', animation: 'arena-float 3s ease-in-out infinite' }}>{overallRank.emoji}</div>
         <h2 style={{ ...rockFont, fontSize: '2.2rem', color: overallRank.color, marginBottom: '0.2rem' }}>{overallRank.name}</h2>
-        <p style={{ color: S.textDim, fontSize: '0.85rem', marginBottom: '0.75rem' }}>
-          ⏱️ {state.studioSpeed?.toFixed(1)}s pro Antwort (∅ letzten {state.studioSpeeds.length} Spiele)
-        </p>
+        {state.studioSpeeds.length < MIN_GAMES_FOR_RANK ? (
+          <p style={{ color: S.textDim, fontSize: '0.85rem', marginBottom: '0.75rem' }}>
+            Noch {MIN_GAMES_FOR_RANK - state.studioSpeeds.length} Studio-Spiele bis zur Rang-Vergabe ({state.studioSpeeds.length}/{MIN_GAMES_FOR_RANK})
+          </p>
+        ) : (
+          <p style={{ color: S.textDim, fontSize: '0.85rem', marginBottom: '0.75rem' }}>
+            ⏱️ {state.studioSpeed?.toFixed(1)}s pro Antwort (∅ letzten {state.studioSpeeds.length} Spiele)
+          </p>
+        )}
 
         {/* Diese Session: Aufgaben + Zeit */}
         <div style={{ ...cardStyle, padding: '0.75rem', marginBottom: '0.75rem', background: `${sessionRank.color}10`, border: `1px solid ${sessionRank.color}30` }}>
