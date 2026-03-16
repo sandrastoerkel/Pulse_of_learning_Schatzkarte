@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { createClient } from '@supabase/supabase-js';
 
 /* ─── FONTS ─────────────────────────────────────────────────────────────── */
 const FontLink = () => (
@@ -14,31 +15,54 @@ function getVoice(prefer = "any") {
 
   const de = voices.filter(v => v.lang?.startsWith("de"));
 
-  if (prefer === "clear") {
-    // Premium-Stimmen bevorzugen (macOS Enhanced/Premium > Standard)
-    const premium = de.filter(v => /premium|enhanced/i.test(v.name));
-    if (premium.length) return premium[0];
-    // Dann bekannte klare Stimmen
-    const priority = ["Petra", "Helena", "Anna", "Yannick", "Sandy", "Martin"];
-    for (const name of priority) {
-      const v = de.find(v => v.name.includes(name));
+  // Hilfsfunktion: erste Stimme finden, die einen der Namen enthält
+  const findByNames = (list, names) => {
+    for (const name of names) {
+      const v = list.find(v => v.name.includes(name));
       if (v) return v;
     }
+    return null;
+  };
+
+  if (prefer === "clear") {
+    // Premium/Enhanced-Stimmen bevorzugen (macOS, iOS, ChromeOS)
+    const premium = de.filter(v => /premium|enhanced|natural|neural/i.test(v.name));
+    if (premium.length) {
+      // Weibliche Premium bevorzugen (klarer für Wörter)
+      const femPremium = findByNames(premium, ["Anna", "Petra", "Helena", "Sandy"]);
+      if (femPremium) return femPremium;
+      return premium[0];
+    }
+    // Dann bekannte klare Stimmen (weiblich bevorzugt für Deutlichkeit)
+    const found = findByNames(de, ["Anna", "Petra", "Helena", "Sandy", "Yannick", "Martin"]);
+    if (found) return found;
+    return de[0] ?? voices[0] ?? null;
+  }
+
+  if (prefer === "monster") {
+    // Für Monster: tiefere männliche Stimme, Premium bevorzugt
+    const premium = de.filter(v => /premium|enhanced|natural|neural/i.test(v.name));
+    const malePremium = findByNames(premium, ["Markus", "Martin", "Yannick", "Stefan", "Thomas", "Hans"]);
+    if (malePremium) return malePremium;
+    // Dann jede Premium-Stimme
+    if (premium.length) return premium[0];
+    // Dann bekannte männliche Stimmen
+    const found = findByNames(de, ["Markus", "Martin", "Yannick", "Stefan", "Thomas", "Hans"]);
+    if (found) return found;
     return de[0] ?? voices[0] ?? null;
   }
 
   if (prefer === "deep") {
-    // For monster/dramatic: deepest male German voice
-    const malePriority = ["Stefan", "Thomas", "Hans", "Markus", "de-DE-Standard-B"];
-    for (const name of malePriority) {
-      const v = de.find(v => v.name.includes(name));
-      if (v) return v;
-    }
-    // Fallback: any male
+    // Für dramatisch: tiefste männliche deutsche Stimme
+    const found = findByNames(de, ["Stefan", "Thomas", "Hans", "Markus", "Martin"]);
+    if (found) return found;
     const male = voices.find(v => /male|man|stefan|thomas|hans/i.test(v.name));
     return male ?? de[0] ?? voices[0] ?? null;
   }
 
+  // "any": Premium > Standard
+  const premium = de.filter(v => /premium|enhanced|natural|neural/i.test(v.name));
+  if (premium.length) return premium[0];
   return de[0] ?? voices[0] ?? null;
 }
 
@@ -83,24 +107,26 @@ function speakSequence(items) {
 
 const tts = {
 
-  // SPELLING WORD: langsam und deutlich
-  word: (text) => speak(text, { rate: 1.00, pitch: 1.0, volume: 1.0, voiceType: "clear" }),
+  // SPELLING WORD: deutlich, natürliches Tempo
+  word: (text) => speak(text, { rate: 0.9, pitch: 1.0, volume: 1.0, voiceType: "clear" }),
 
-  // MONSTER BATTLECRY: etwas tiefer + langsamer, aber klar verstaendlich
+  // MONSTER BATTLECRY: tiefere Stimme, dramatisch aber verständlich
   monster: (text) => {
+    // Pausen bei Satzzeichen einfügen für natürlicheren Fluss
     const dramatic = text
-      .replace(/\.\.\./g, ", ")
+      .replace(/…/g, "... ")
+      .replace(/\.\.\./g, "... ")
       .replace(/!/g, "! ")
       .replace(/\?/g, "? ");
-    speak(dramatic, { rate: 0.75, pitch: 0.85, volume: 1.0, voiceType: "clear" });
+    speak(dramatic, { rate: 0.82, pitch: 0.7, volume: 1.0, voiceType: "monster" });
   },
 
-  // VICTORY / DEFEAT: emotional, triumphant or subdued
-  victory: (text) => speak(text, { rate: 0.78, pitch: 0.85, volume: 1.0, voiceType: "clear" }),
-  defeat:  (text) => speak(text, { rate: 0.72, pitch: 0.75, volume: 0.9, voiceType: "clear" }),
+  // VICTORY / DEFEAT: klar und verständlich
+  victory: (text) => speak(text, { rate: 0.85, pitch: 0.95, volume: 1.0, voiceType: "clear" }),
+  defeat:  (text) => speak(text, { rate: 0.80, pitch: 0.85, volume: 0.9, voiceType: "clear" }),
 
-  // NARRATOR (intro text, instructions)
-  narrate: (text) => speak(text, { rate: 0.78, pitch: 0.88, volume: 0.95, voiceType: "any" }),
+  // NARRATOR (Intro, Anweisungen)
+  narrate: (text) => speak(text, { rate: 0.85, pitch: 0.95, volume: 0.95, voiceType: "clear" }),
 };
 
 /* ─── SFX (Web Audio) ────────────────────────────────────────────────────── */
@@ -366,23 +392,23 @@ const W=[
 ["Ahnung",2,"Anung",3],
 ["ahnen",2,"anen",3],
 ["Ruhm",2,"Rum",4],
-["mähren",2,"mären",3],
+["mähen",2,"mäen",3],
 ["Mähne",2,"Mäne",3],
 ["dehnen",2,"denen",4],
 ["Dehnungs-h",2,"Denungs-h",4],
 ["mahnen",2,"manen",3],
 ["stählen",2,"stälen",3],
-["Pfahle",2,"Pfale",3],
+["Pfähle",2,"Pfäle",3],
 ["Pfahl",2,"Pfal",3],
 ["vorhaben",2,0,3],
-["Tahler",2,"Taler",3],
+["Taler",2,"Tahler",3],
 ["zahm",2,"zam",3],
 ["Ruhepause",2,"Ruepause",4],
 ["Uhrmacher",2,"Urmacher",3],
 ["Bahnsteig",2,"Bansteig",3],
 ["Jahreszeit",2,"Jareszeit",3],
 ["Hoheit",2,"Hoeit",4],
-["Roheit",2,"Roeit",4],
+["Rohheit",2,"Roheit",4],
 ["Frühjahr",2,"Früjar",4],
 ["Frühling",2,"Früling",3],
 ["Wohnort",2,"Wonort",3],
@@ -873,7 +899,7 @@ const W=[
 ["hervorheben",10,0,4],
 ["berücksichtigen",10,0,4],
 ["veranschaulichen",10,0,3],
-["schlussfolgerich",10,0,4],
+["schlussfolgern",10,0,4],
 ["charakterisieren",10,0,4],
 ["analysieren",10,0,4],
 ["formulieren",10,0,3],
@@ -944,7 +970,7 @@ const W=[
 ["Mohn",2,"Mon",3],
 ["Krönung",2,0,2],
 ["Söhne",2,"Söne",3],
-["Zöhne",2,"Zöne",3],
+["Zähne",2,"Zäne",3],
 ["Mahd",2,"Mad",4],
 ["nahm",2,"nam",3],
 ["zählte",2,"zälte",3],
@@ -960,7 +986,7 @@ const W=[
 ["Friedhof",1,0,4],
 ["Friedrich",1,"Fridrich",3],
 ["vielleicht",1,0,4],
-["wieviel",1,"wifiel",3],
+["wie viel",1,"wieviel",3],
 ["Wiederholung",1,"Widerholung",4],
 ["wiederholen",1,"widerholen",4],
 ["bestehlen",1,"bestelen",4],
@@ -987,7 +1013,7 @@ const W=[
 ["Zitter",5,"Ziter",3],
 ["zittern",5,"zitern",3],
 ["Otter",5,"Oter",3],
-["Utter",5,"Uter",3],
+["Euter",5,"Eutter",3],
 ["Flotte",5,"Flote",3],
 ["flott",5,"flot",3],
 ["Watte",5,"Wate",3],
@@ -1012,8 +1038,8 @@ const W=[
 ["Mappe",5,"Mape",3],
 ["Rappe",5,"Rape",3],
 ["Kappe",5,"Kape",3],
-["Happe",5,"Hape",3],
-["Seppe",5,"Sepe",3],
+["Pappe",5,"Pape",3],
+["Steppe",5,"Stepe",3],
 ["schlapp",5,"schlap",3],
 ["Krampf",5,0,2],
 ["Dummheit",5,"Dumheit",3],
@@ -1021,7 +1047,7 @@ const W=[
 ["Summe",5,"Sume",3],
 ["Klemme",5,"Kleme",3],
 ["Flamme",5,"Flame",3],
-["Nämme",5,"Näme",3],
+["Schwämme",5,"Schwäme",3],
 ["Grimm",5,"Grim",3],
 ["grimmig",5,"grimig",3],
 ["Schlamm",5,"Schlam",3],
@@ -1048,13 +1074,13 @@ const W=[
 ["Stand",7,"Stant",3],
 ["Strand",7,"Strant",3],
 ["Grund",7,"Grunt",3],
-["Wund",7,"Wunt",3],
+["Wunde",7,"Wunte",3],
 ["Herd",7,"Hert",3],
 ["Nord",7,"Nort",3],
 ["Süd",7,"Süt",3],
 ["Grad",7,"Grat",3],
 ["Leid",7,"Leit",3],
-["Meid",7,"Meit",3],
+["Maid",7,"Mait",3],
 ["Kleid",7,"Kleit",3],
 ["Bescheid",7,"Bescheit",3],
 ["Neid",7,"Neit",3],
@@ -1082,7 +1108,7 @@ const W=[
 ["knicken",6,"kniken",3],
 ["stricken",6,"striken",3],
 ["picken",6,"piken",3],
-["hicken",6,"hiken",3],
+["ticken",6,"tiken",3],
 ["hacken",6,"haken",3],
 ["knacken",6,"knaken",3],
 ["zwicken",6,"zwiken",3],
@@ -1166,7 +1192,7 @@ const W=[
 ["alles Gute",9,"alles gute",4],
 ["der Erste",9,"der erste",4],
 ["als Letztes",9,"als letztes",4],
-["aufs Gerate wohl",9,"...wohl",5],
+["aufs Geratewohl",9,"aufs geratewohl",5],
 ["in Bezug auf",9,"in bezug auf",5],
 ["mit Bezug auf",9,"mit bezug auf",5],
 ["enttäuschen",4,0,4],
@@ -1191,7 +1217,7 @@ const W=[
 ["anscheinend",4,0,3],
 ["ausreichend",4,0,3],
 ["ausgezeichnet",4,0,4],
-["umgebung",4,"Umgebung",3],
+["Umgebung",4,"umgebung",3],
 ["Misserfolg",4,"Miserfolg",4],
 ["misslingen",4,"mislingen",4],
 ["missverstehen",4,"misverstehen",5],
@@ -1315,7 +1341,7 @@ const W=[
 ["Beschreibung",10,0,3],
 ["Charakterisierung",10,0,4],
 ["Textanalyse",10,0,4],
-["Gedichtsinterpretation",10,0,5],
+["Gedichtinterpretation",10,0,5],
 ["Sprachkompetenz",10,0,4],
 ["Wortschatz",10,0,4],
 ["Grammatikfehler",10,0,4],
@@ -1480,7 +1506,7 @@ const W=[
 ["Phase",10,"Fase",3],
 ["Phrase",10,"Frase",4],
 ["Physik",10,"Fisik",4],
-["Photograph",10,"Fotograf",4],
+["Fotograf",10,"Photograph",4],
 ["Rhythmus",10,"Rithmus",5],
 ["Mathematik",10,"Matematik",3],
 ["Chemie",10,0,4],
@@ -1637,6 +1663,49 @@ function getWordsForMonster(monsterId, difficulty) {
   return pool;
 }
 
+// Baut eine 8-Runden-Queue, gewichtet nach fälligen SM-2-Wörtern pro Monster
+function buildSessionQueue(difficulty, wordStats) {
+  const today = new Date().toISOString().split("T")[0];
+
+  // Wie viele fällige/neue Wörter hat jedes Monster?
+  const scored = MONSTERS.map(m => {
+    const words = getWordsForMonster(m.id, difficulty);
+    const dueCount = words.filter(w => {
+      const s = wordStats[w[0]];
+      return !s || s.dueDate <= today;
+    }).length;
+    return { monster: m, dueCount: Math.max(dueCount, 1) }; // min 1 damit jedes Monster erreichbar bleibt
+  }).sort((a, b) => b.dueCount - a.dueCount);
+
+  // Verteile SESSION_ROUNDS Slots proportional zu dueCount
+  const totalDue = scored.reduce((s, x) => s + x.dueCount, 0);
+  const slots = scored.map(x => ({
+    monster: x.monster,
+    slots: Math.max(1, Math.round((x.dueCount / totalDue) * SESSION_ROUNDS)),
+  }));
+
+  // Normalisiere auf genau SESSION_ROUNDS
+  let total = slots.reduce((s, x) => s + x.slots, 0);
+  while (total > SESSION_ROUNDS) { slots[slots.length - 1].slots = Math.max(0, slots[slots.length - 1].slots - 1); total--; }
+  while (total < SESSION_ROUNDS) { slots[0].slots++; total++; }
+
+  // Erstelle Pool und mische
+  const pool = slots.flatMap(x => Array(x.slots).fill(x.monster));
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  // Keine zwei gleichen Monster hintereinander
+  for (let i = 1; i < pool.length; i++) {
+    if (pool[i].id === pool[i - 1].id) {
+      for (let j = i + 1; j < pool.length; j++) {
+        if (pool[j].id !== pool[i - 1].id) { [pool[i], pool[j]] = [pool[j], pool[i]]; break; }
+      }
+    }
+  }
+  return pool.slice(0, SESSION_ROUNDS);
+}
+
 function fisherYates(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -1644,6 +1713,74 @@ function fisherYates(arr) {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+
+/* ─── SM-2 SPACED REPETITION ─────────────────────────────────────────────── */
+// Basierend auf SuperMemo-2 Algorithmus (Wozniak 1990)
+// grade: 4 = korrekt, 1 = falsch (vereinfacht für Kinder-Kontext)
+function sm2Update(existingCard, correct) {
+  const today = new Date().toISOString().split('T')[0];
+  const card = existingCard || {
+    interval: 0,
+    repetition: 0,
+    efactor: 2.5,
+    dueDate: today,
+    totalCorrect: 0,
+    totalWrong: 0,
+  };
+
+  const grade = correct ? 4 : 1;
+  let { interval, repetition, efactor } = card;
+
+  if (grade >= 3) {
+    if (repetition === 0)      interval = 1;
+    else if (repetition === 1) interval = 6;
+    else                       interval = Math.round(interval * efactor);
+    repetition++;
+  } else {
+    // Falsch → morgen nochmal (wie Anki "Again")
+    interval = 1;
+    repetition = 0;
+  }
+
+  efactor = Math.max(1.3, efactor + 0.1 - (5 - grade) * (0.08 + (5 - grade) * 0.02));
+
+  const due = new Date();
+  due.setDate(due.getDate() + interval);
+  const dueDate = due.toISOString().split('T')[0];
+
+  return {
+    ...card,
+    interval,
+    repetition,
+    efactor,
+    dueDate,
+    totalCorrect: card.totalCorrect + (correct ? 1 : 0),
+    totalWrong:   card.totalWrong   + (correct ? 0 : 1),
+  };
+}
+
+// Wörter nach Fälligkeit sortieren: überfällig → neu → schon gekonnt
+function sortWordsByPriority(words, wordStats) {
+  const today = new Date().toISOString().split('T')[0];
+  return [...words].sort((a, b) => {
+    const sa = wordStats[a[0]];
+    const sb = wordStats[b[0]];
+
+    const getPrio = (s) => {
+      if (!s) return 1;                     // 1 = neu, hohe Priorität
+      if (s.dueDate <= today) return 0;     // 0 = fällig, höchste Priorität
+      return 2;                             // 2 = noch nicht fällig
+    };
+
+    const pa = getPrio(sa), pb = getPrio(sb);
+    if (pa !== pb) return pa - pb;
+
+    // Bei gleicher Prio: mehr Fehler zuerst
+    const errA = sa?.totalWrong ?? 0;
+    const errB = sb?.totalWrong ?? 0;
+    return errB - errA;
+  });
 }
 
 /* ─── ERROR GENERATOR ─────────────────────────────────────────────────────── */
@@ -1734,6 +1871,1432 @@ function generateErrors(word, catId, typicalError) {
   return result.length > 0 ? result : [word + word[word.length-1], word.slice(0,-1)];
 }
 
+/* ─── BEISPIELSÄTZE ──────────────────────────────────────────────────────── */
+// Jedes Wort bekommt einen Kontext-Satz, damit klar ist welches Wort gemeint ist.
+// Das Zielwort wird im ChallengePanel als ___ angezeigt.
+const SENTENCES = {
+  "der": "Das ist ___ Hund von nebenan.",
+  "die": "Heute kommt ___ Lehrerin.",
+  "das": "Ich lese ___ Buch zum zweiten Mal.",
+  "den": "Ich sehe ___ Vogel im Baum.",
+  "dem": "Ich gebe ___ Jungen das Buch.",
+  "des": "Das Dach ___ Hauses ist rot.",
+  "ein": "Da steht ___ Baum im Garten.",
+  "eine": "Ich habe ___ Katze gesehen.",
+  "einen": "Sie malt ___ Regenbogen.",
+  "einem": "Er wohnt in ___ kleinen Haus.",
+  "einer": "Das Geschenk ist von ___ Freundin.",
+  "ich": "Heute gehe ___ in die Schule.",
+  "du": "Kommst ___ morgen mit?",
+  "er": "Gestern war ___ im Schwimmbad.",
+  "sie": "Heute spielt ___ draußen Fußball.",
+  "es": "Heute Morgen hat ___ geregnet.",
+  "wir": "Morgen fahren ___ in den Urlaub.",
+  "ihr": "Kommt ___ auch zur Party?",
+  "mir": "Gibst du ___ bitte das Salz?",
+  "dir": "Ich schenke ___ ein Bild.",
+  "mich": "Der Hund hat ___ erschreckt.",
+  "dich": "Ich habe ___ überall gesucht.",
+  "ihn": "Ich sehe ___ jeden Tag in der Schule.",
+  "ihm": "Ich gebe ___ einen Apfel.",
+  "uns": "Kommst du zu ___?",
+  "euch": "Ich besuche ___ am Wochenende.",
+  "ihnen": "Wir danken ___ für die Hilfe.",
+  "mein": "Das ist ___ Fahrrad.",
+  "dein": "Wo ist ___ Rucksack?",
+  "sein": "Er hat ___ Heft vergessen.",
+  "unser": "Das ist ___ Klassenzimmer.",
+  "euer": "Ist das ___ Hund?",
+  "und": "Tom ___ Lisa spielen draußen.",
+  "aber": "Es regnet, ___ ich gehe trotzdem raus.",
+  "oder": "Möchtest du Tee ___ Kakao?",
+  "denn": "Ich bleibe zu Hause, ___ ich bin krank.",
+  "weil": "Ich freue mich, ___ morgen Ferien sind.",
+  "dass": "Ich weiß, ___ du das kannst!",
+  "wenn": "Wir bauen einen Schneemann, ___ es schneit.",
+  "ob": "Ich frage mich, ___ er kommt.",
+  "damit": "Ich übe täglich, ___ ich besser werde.",
+  "obwohl": "Er lacht, ___ ihm traurig ist.",
+  "sodass": "Es regnete stark, ___ die Straße überflutet war.",
+  "während": "Er hört Musik, ___ ich lese.",
+  "bevor": "Wasch dir die Hände, ___ du isst.",
+  "nachdem": "Wir gingen spazieren, ___ wir gegessen hatten.",
+  "seitdem": "Er geht oft raus, ___ er einen Hund hat.",
+  "als": "Ich hatte ein Meerschweinchen, ___ ich klein war.",
+  "wie": "Sie rennt so schnell ___ der Wind.",
+  "auch": "Ich komme ___ gerne mit.",
+  "nicht": "Heute scheint die Sonne ___.",
+  "noch": "Hast du ___ Hunger?",
+  "schon": "Bist du ___ fertig?",
+  "nur": "Ich habe ___ einen Euro dabei.",
+  "ja": "Kommst du mit? – ___!",
+  "nein": "Möchtest du Spinat? – ___!",
+  "doch": "Ich will ___ mitmachen!",
+  "mal": "Zeig ___ her, was du gebastelt hast.",
+  "zwar": "Es ist ___ kalt, aber sonnig.",
+  "bloß": "Pass ___ auf!",
+  "so": "Genau ___ macht man das richtig.",
+  "wo": "Weißt du, ___ er wohnt?",
+  "wann": "Ich frage, ___ die Schule anfängt.",
+  "warum": "Kannst du mir sagen, ___ du so müde bist?",
+  "hier": "Komm ___, setz dich zu mir.",
+  "da": "Der Spielplatz liegt ___ drüben.",
+  "dort": "Ein Eiswagen steht ___ an der Ecke.",
+  "heute": "Wir haben ___ frei.",
+  "morgen": "Wir schreiben ___ einen Test.",
+  "gestern": "Es hat ___ den ganzen Tag geregnet.",
+  "immer": "Er kommt ___ zu spät.",
+  "nie": "Sie vergisst ___ ihre Hausaufgaben.",
+  "oft": "Wir gehen ___ in den Park.",
+  "sehr": "Das Essen schmeckt ___ gut.",
+  "ganz": "Der Film war ___ spannend.",
+  "mehr": "Ich möchte ___ davon!",
+  "viel": "Er hat ___ zu erzählen.",
+  "wenig": "Ich habe heute ___ Zeit.",
+  "alle": "Auf dem Hof spielen ___ Kinder.",
+  "alles": "Zum Glück ist ___ gut gegangen.",
+  "nichts": "Hier gibt es ___ zu sehen.",
+  "etwas": "Möchtest du ___ trinken?",
+  "man": "Hier darf ___ nicht laut sein.",
+  "jemand": "Hat ___ meinen Stift gesehen?",
+  "niemand": "Als ich ankam, war ___ zu Hause.",
+  "selbst": "Das habe ich ___ gemacht!",
+  "jetzt": "Wir gehen ___ los.",
+  "dann": "Erst essen, ___ spielen.",
+  "deshalb": "Es regnet, ___ nehme ich den Schirm.",
+  "deswegen": "Er war krank, ___ fehlte er.",
+  "trotzdem": "Es ist kalt, ___ gehe ich raus.",
+  "außerdem": "Es ist spät, ___ bin ich müde.",
+  "zum": "Wir gehen ___ Bäcker.",
+  "zur": "Sie läuft ___ Schule.",
+  "vom": "Ich komme gerade ___ Arzt.",
+  "beim": "Er sitzt ___ Frühstück.",
+  "im": "Die Jacke hängt ___ Schrank.",
+  "am": "Wir treffen uns ___ Bahnhof.",
+  "ins": "Wir gehen ___ Kino.",
+  "ans": "Stell die Leiter ___ Fenster.",
+  "in": "Das Buch liegt ___ der Tasche.",
+  "an": "Das Bild hängt ___ der Wand.",
+  "auf": "Die Katze sitzt ___ dem Dach.",
+  "aus": "Er kommt ___ der Schule.",
+  "bei": "Wir bleiben drinnen, ___ Regen.",
+  "mit": "Ich fahre ___ dem Bus.",
+  "von": "Das Geschenk ist ___ Oma.",
+  "zu": "Ich gehe ___ meiner Freundin.",
+  "nach": "Wir gehen ___ dem Essen spazieren.",
+  "vor": "Der Hund steht ___ der Tür.",
+  "über": "Die Brücke führt ___ den Fluss.",
+  "unter": "Die Katze schläft ___ dem Bett.",
+  "zwischen": "Der Ball liegt ___ den Stühlen.",
+  "durch": "Wir laufen ___ den Wald.",
+  "gegen": "Er lehnt sich ___ die Wand.",
+  "ohne": "Ich gehe nicht los ___ Frühstück.",
+  "seit": "Ich bin erkältet ___ letztem Montag.",
+  "bis": "Wir warten ___ morgen.",
+  "um": "Der Zaun geht ___ den Garten.",
+  "ab": "Es ist Ferien ___ morgen!",
+  "außer": "Alle sind da, ___ Tom.",
+  "neben": "Ich sitze ___ meiner Freundin.",
+  "hinter": "Der Garten liegt ___ dem Haus.",
+  "wegen": "Sport fällt aus ___ des Regens.",
+  "trotz": "Wir gehen raus ___ der Kälte.",
+  "statt": "Ich trinke Tee ___ Kaffee.",
+  "laut": "Es wird sonnig, ___ Wetterbericht.",
+  "haben": "Wir ___ heute frei.",
+  "werden": "Die Tage ___ jetzt länger.",
+  "können": "Wir ___ das schaffen!",
+  "müssen": "Alle Kinder ___ zur Schule gehen.",
+  "sollen": "Wir ___ leise sein.",
+  "wollen": "Die Kinder ___ draußen spielen.",
+  "dürfen": "Hier ___ man nicht rennen.",
+  "mögen": "Viele Kinder ___ Schokolade.",
+  "lassen": "Lass mich das ___ !",
+  "ist": "Heute ___ ein schöner Tag.",
+  "war": "Gestern ___ es noch kalt.",
+  "hat": "Er ___ einen neuen Rucksack.",
+  "wird": "Es ___ bald dunkel.",
+  "gibt": "Hier ___ es leckeres Eis.",
+  "geht": "Wie ___ es dir?",
+  "macht": "Das ___ richtig Spaß!",
+  "kommt": "Sie ___ gleich nach Hause.",
+  "sagt": "Die Lehrerin ___ es noch einmal.",
+  "sieht": "Er ___ den Regenbogen am Himmel.",
+  "steht": "Das Fahrrad ___ vor der Tür.",
+  "heißt": "Mein Hund ___ Bello.",
+  "lässt": "Sie ___ ihren Bruder mitspielen.",
+  "bleibt": "Er ___ heute zu Hause.",
+  "weiß": "Ich ___ die Antwort!",
+  "nimmt": "Sie ___ das rote Buch.",
+  "hält": "Er ___ den Ball fest.",
+  "bringt": "Papa ___ Brötchen mit.",
+  "zeigt": "Die Lehrerin ___ uns ein Bild.",
+  "findet": "Er ___ seinen Schlüssel nicht.",
+  "liegt": "Das Heft ___ auf dem Tisch.",
+  "steigt": "Sie ___ in den Bus.",
+  "denkt": "Er ___ an seine Freunde.",
+  "spielt": "Das Kind ___ im Garten.",
+  "braucht": "Man ___ Geduld beim Lernen.",
+  "scheint": "Die Sonne ___ hell.",
+  "meint": "Was ___ du damit?",
+  "sucht": "Sie ___ ihre Brille.",
+  "kennt": "Jeder ___ dieses Lied.",
+  "nennt": "Man ___ ihn den Schnellsten.",
+  "rennt": "Der Hund ___ über die Wiese.",
+  "fällt": "Das Blatt ___ vom Baum.",
+  "stellt": "Sie ___ die Tasse auf den Tisch.",
+  "Bahn": "Der Zug fährt auf der ___.",
+  "Zahn": "Mir tut der ___ weh.",
+  "Kahn": "Der alte ___ liegt am Ufer.",
+  "Jahr": "Ein ___ hat zwölf Monate.",
+  "Uhr": "Die ___ zeigt schon halb drei.",
+  "fahren": "Wir ___ mit dem Zug nach Berlin.",
+  "Ruhe": "In der Bücherei braucht man ___.",
+  "nahe": "Der See liegt ganz ___ am Haus.",
+  "Höhe": "Aus dieser ___ sieht alles klein aus.",
+  "früh": "Morgen stehen wir ___ auf.",
+  "zählen": "Kannst du schon bis hundert ___?",
+  "Sohn": "Ihr ___ geht in die dritte Klasse.",
+  "Wahl": "Morgen ist die ___ zum Klassensprecher.",
+  "Zahl": "Schreibe die ___ an die Tafel.",
+  "Stahl": "Die Brücke ist aus ___.",
+  "Mehl": "Zum Backen braucht man ___.",
+  "Stuhl": "Setz dich auf den ___!",
+  "Schuh": "Mein linker ___ ist nass.",
+  "nehmen": "Soll ich den roten oder den blauen ___?",
+  "fehlen": "Heute ___ drei Kinder.",
+  "wohnen": "Wir ___ in einer kleinen Stadt.",
+  "Bohne": "Die ___ wächst am Zaun.",
+  "Sahne": "Möchtest du ___ auf den Kuchen?",
+  "Rahmen": "Das Bild hängt in einem goldenen ___.",
+  "Tier": "Im Zoo lebt ein großes ___.",
+  "Bier": "Mein Opa trinkt gerne ___.",
+  "Lied": "Wir singen ein schönes ___.",
+  "Spiel": "Das ___ dauert neunzig Minuten.",
+  "Ziel": "Das ___ ist die Kirche am Marktplatz.",
+  "Brief": "Ich schreibe einen ___ an Oma.",
+  "Stiefel": "Bei Regen trage ich ___.",
+  "Spiegel": "Ich schaue in den ___.",
+  "fliegen": "Die Vögel ___ nach Süden.",
+  "liegen": "Die Socken ___ auf dem Boden.",
+  "bieten": "Was können wir ___ ?",
+  "ziehen": "Wir ___ nächste Woche um.",
+  "Kreis": "Zeichne einen ___ auf das Blatt.",
+  "Reise": "Die ___ nach Hamburg war toll.",
+  "leise": "Sei bitte ___!",
+  "Stein": "Da liegt ein großer ___ im Weg.",
+  "Bein": "Mir tut das ___ weh.",
+  "klein": "Die Maus ist ganz ___.",
+  "Hund": "Unser ___ heißt Rex.",
+  "Wald": "Wir wandern durch den ___.",
+  "Geld": "Ich spare mein ___.",
+  "Kind": "Das ___ spielt im Sandkasten.",
+  "Freund": "Mein bester ___ heißt Tim.",
+  "Rad": "Ich fahre mit dem ___ zur Schule.",
+  "Bad": "Das ___ ist frisch geputzt.",
+  "Pferd": "Das ___ galoppiert über die Wiese.",
+  "Kleid": "Sie trägt ein rotes ___.",
+  "Berg": "Wir wandern auf den ___.",
+  "Zwerg": "Im Märchen lebt ein kleiner ___.",
+  "Tag": "Was für ein schöner ___!",
+  "Weg": "Der ___ führt durch den Park.",
+  "Zug": "Der ___ fährt um acht Uhr.",
+  "Straße": "Die ___ ist heute gesperrt.",
+  "Fuß": "Ich habe mir den ___ gestoßen.",
+  "groß": "Der Baum ist sehr ___.",
+  "Spaß": "Das Spiel macht ___!",
+  "heiß": "Der Tee ist noch zu ___.",
+  "Fluss": "Der ___ fließt durch die Stadt.",
+  "Schluss": "Jetzt ist ___!",
+  "nass": "Nach dem Regen ist alles ___.",
+  "Klasse": "Unsere ___ hat 25 Kinder.",
+  "Wasser": "Trink genug ___!",
+  "essen": "Wir ___ heute Pizza.",
+  "Schlüssel": "Wo ist mein ___?",
+  "kommen": "Wann ___ die Gäste?",
+  "Sonne": "Die ___ scheint hell.",
+  "Brille": "Ohne ___ kann ich nichts lesen.",
+  "Tasse": "Hol mir bitte eine ___ Tee.",
+  "Puppe": "Das Mädchen spielt mit der ___.",
+  "Treppe": "Geh vorsichtig die ___ hinauf.",
+  "rennen": "Die Kinder ___ über den Hof.",
+  "schwimmen": "Im Sommer ___ wir im See.",
+  "Butter": "Streich bitte ___ aufs Brot.",
+  "Blätter": "Im Herbst fallen die ___ von den Bäumen.",
+  "Mutter": "Meine ___ backt einen Kuchen.",
+  "Zimmer": "Mein ___ ist aufgeräumt.",
+  "Zucker": "Im Tee ist zu viel ___.",
+  "Rücken": "Mir tut der ___ weh.",
+  "Stück": "Ich hätte gerne ein ___ Kuchen.",
+  "Brücke": "Die ___ geht über den Fluss.",
+  "drücken": "Du musst den Knopf ___.",
+  "Katze": "Die ___ schläft auf dem Sofa.",
+  "Platz": "Auf dem ___ spielen Kinder.",
+  "Mütze": "Setz deine ___ auf, es ist kalt!",
+  "Schatz": "Du bist mein ___!",
+  "putzen": "Heute müssen wir die Fenster ___.",
+  "das Neue": "Hast du schon ___ gehört?",
+  "das Gute": "Was ist ___ daran?",
+  "das Beste": "Das ___ kommt bekanntlich zum Schluss.",
+  "im Freien": "Heute spielen wir ___.",
+  "ins Blaue": "Wir fahren einfach ___.",
+  "beim Lesen": "Man lernt viel ___ .",
+  "zum Spielen": "Kommst du ___ raus?",
+  "nichts Neues": "Es gibt ___ zu berichten.",
+  "etwas Schönes": "Ich habe ___ gefunden.",
+  "verstehen": "Ich ___ die Aufgabe nicht.",
+  "vergessen": "Hast du deine Jacke ___?",
+  "versprechen": "Ich ___ dir, pünktlich zu sein.",
+  "versuchen": "Wir ___ es noch einmal.",
+  "bekommen": "Zum Geburtstag ___ ich ein Buch.",
+  "beginnen": "Wann ___ die Ferien?",
+  "entdecken": "Forscher ___ neue Tierarten.",
+  "empfehlen": "Ich kann dieses Buch ___.",
+  "zerbrechen": "Vorsicht, das Glas könnte ___!",
+  "Vorfahrt": "An der Kreuzung hat er ___.",
+  "Feuer": "Im Kamin brennt ein ___.",
+  "Abenteuer": "Das war ein großes ___!",
+  "Freude": "Die Kinder tanzen vor ___.",
+  "Gebäude": "Das ___ hat fünf Stockwerke.",
+  "Fahrzeug": "Ein Fahrrad ist auch ein ___.",
+  "Zeugnis": "Morgen gibt es ___.",
+  "plötzlich": "Es fing ___ an zu regnen.",
+  "vielleicht": "Es klappt ___ beim nächsten Mal.",
+  "eigentlich": "Ich wollte ___ zu Hause bleiben.",
+  "ziemlich": "Das war ___ schwer.",
+  "nämlich": "Er fehlt, er ist ___ krank.",
+  "ungefähr": "Es dauert ___ eine Stunde.",
+  "vertrauen": "Du kannst mir ___.",
+  "Phantasie": "Kinder haben viel ___.",
+  "das Laufen": "Viele Kinder lieben ___ .",
+  "das Schreiben": "Das Kind übt täglich ___ .",
+  "das Lernen": "Mit Pausen fällt ___ leichter.",
+  "das Schöne": "Das ist ___ daran, dass wir gemeinsam üben.",
+  "etwas Interessantes": "Im Museum haben wir ___ entdeckt.",
+  "im Allgemeinen": "Das Wetter ist ___ im April wechselhaft.",
+  "auf Deutsch": "Erkläre das bitte ___!",
+  "auf Englisch": "Kannst du das ___ sagen?",
+  "morgen früh": "Wir fahren ___ in den Urlaub.",
+  "heute Abend": "Wir schauen ___ einen Film.",
+  "heute Morgen": "Die Straße war ___ vereist.",
+  "schuld sein": "Niemand will ___ an dem Missverständnis.",
+  "recht haben": "Am Ende hatte sie ___.",
+  "essen gehen": "Am Samstag wollen wir ___.",
+  "kennen lernen": "Beim Schulausflug konnte ich neue Leute ___.",
+  "die Freude": "Die Klasse jubelte vor ___ .",
+  "der Mut": "Ihm fehlte ___, auf die Bühne zu gehen.",
+  "die Stärke": "Seine ___ ist das genaue Beobachten.",
+  "zum Besten": "Der Clown gab alles, ___ der Kinder.",
+  "auf dem Laufenden": "Er hält uns immer ___ .",
+  "aufs Neue": "Sie versuchte es ___ .",
+  "fürs Erste": "Diese Erklärung reicht ___ .",
+  "im Nachhinein": "Die Entscheidung war ___ richtig.",
+  "eines Tages": "Es wird ___ alles einfacher.",
+  "abends": "Wir lesen ___ oft zusammen.",
+  "morgens": "Ich trinke ___ immer Kakao.",
+  "mittags": "Es gibt ___ warmes Essen in der Schule.",
+  "nachts": "Man kann ___ die Sterne gut sehen.",
+  "montags": "Wir haben ___ immer Sport.",
+  "ein bisschen": "Kannst du ___ lauter sprechen?",
+  "das Äußere": "Das ___ eines Menschen sagt nicht alles aus.",
+  "das Innere": "Im ___ des Baumes wachsen die Jahresringe.",
+  "etwas Wichtiges": "Sie hat mir ___ erzählt.",
+  "alles Gute": "Ich wünsche dir ___ zum Geburtstag!",
+  "der Erste": "Er war ___ in der Zieldurchfahrt.",
+  "als Letztes": "Er packt ___ seinen Rucksack.",
+  "aufs Geratewohl": "Sie wählte ___ eine Antwort.",
+  "in Bezug auf": "Es gibt eine Änderung ___ die Hausaufgaben.",
+  "mit Bezug auf": "Ich antworte ___ deinen Brief.",
+  "spielen": "Die Kinder ___ auf dem Schulhof.",
+  "lieb": "Sei ___ und hilf mir bitte.",
+  "lieben": "Wir ___ unsere Haustiere sehr.",
+  "Biene": "Die ___ sammelt Blütennektar.",
+  "Wiese": "Auf der ___ spielen Kinder Fußball.",
+  "Riese": "Im Märchen trifft das Kind einen freundlichen ___.",
+  "mieten": "Sie möchten eine Wohnung ___.",
+  "Miete": "Die ___ muss jeden Monat bezahlt werden.",
+  "riechen": "Die Rosen ___ wunderbar.",
+  "sieben": "Eine Woche hat ___ Tage.",
+  "Dieb": "Der ___ wurde von der Polizei gefasst.",
+  "Knie": "Er hat sich das ___ aufgeschlagen.",
+  "Vieh": "Der Bauer füttert jeden Morgen sein ___.",
+  "nieder": "Das Feuer brannte das Haus ___ .",
+  "Gebiet": "In diesem ___ gibt es viele seltene Tiere.",
+  "tief": "Der See ist hier sehr ___.",
+  "Dienstag": "Am ___ haben wir Kunstunterricht.",
+  "Fieber": "Das Kind hat ___ und muss im Bett bleiben.",
+  "fliehen": "Die Vögel ___ vor dem Sturm.",
+  "Kiefer": "Der Zahnarzt untersucht meinen ___.",
+  "Liebe": "Mit ___ und Geduld lernt sich alles leichter.",
+  "lieblich": "Das Tal sah ___ und friedlich aus.",
+  "Niederlage": "Nach der ___ war das Team traurig.",
+  "Riegel": "Sie schob den ___ vor die Tür.",
+  "Sieg": "Der ___ war verdient nach vielen Wochen Training.",
+  "siegen": "Wer fairerweise kämpft, kann ___.",
+  "Sieger": "Der ___ erhielt eine Goldmedaille.",
+  "fiel": "Das Buch ___ vom Regal.",
+  "blieb": "Er ___ ruhig, obwohl es laut war.",
+  "rief": "Sie ___ laut nach ihrer Schwester.",
+  "schief": "Das Bild hängt ___.",
+  "Diät": "Der Arzt empfiehlt eine gesunde ___.",
+  "zieht": "Im Herbst ___ die Familie in eine neue Stadt.",
+  "geschieht": "Was ___ hier eigentlich?",
+  "Tiger": "Der ___ ist das größte Raubtier Asiens.",
+  "Bilder": "An der Wand hängen bunte ___.",
+  "bitten": "Ich möchte dich um einen Gefallen ___.",
+  "Wille": "Mit starkem ___ erreicht man viel.",
+  "Lieferung": "Die ___ kommt morgen an.",
+  "liefern": "Der Bäcker kann frische Brötchen ___.",
+  "Niederlande": "In den ___ gibt es viele Tulpenfelder.",
+  "Dienst": "Der Arzt hat heute ___.",
+  "Dienstleistung": "Eine ___ ist Arbeit, die man für andere tut.",
+  "Friedhof": "Am ___ stehen alte, schattige Bäume.",
+  "Friedrich": "___ der Große war König von Preußen.",
+  "wie viel": "Weißt du, ___ das Eis kostet?",
+  "Wiederholung": "Die ___ hilft beim Auswendiglernen.",
+  "wiederholen": "Kannst du das bitte ___?",
+  "bestehlen": "Jemanden zu ___ ist eine Straftat.",
+  "Riemen": "Der ___ hält die Tasche zusammen.",
+  "Mieter": "Der ___ zahlt pünktlich seine Miete.",
+  "Vermieter": "Der ___ hat die Heizung reparieren lassen.",
+  "Bereich": "Im ___ Mathematik macht sie große Fortschritte.",
+  "Reich": "Das Römische ___ war sehr mächtig.",
+  "Zeitung": "Opa liest jeden Morgen die ___.",
+  "Beziehung": "Eine gute ___ braucht Vertrauen.",
+  "Spielzeug": "Das ___ liegt überall im Zimmer verteilt.",
+  "Stieglitz": "Der ___ ist ein bunter Singvogel.",
+  "Kieselstein": "Sie warf einen ___ in den See.",
+  "Mund": "Bitte mach den ___ beim Kauen zu.",
+  "Hand": "Reiche mir die ___ beim Überqueren der Straße.",
+  "Sand": "Am Strand spielen die Kinder im ___.",
+  "Band": "Ein buntes ___ hält ihr Haar zusammen.",
+  "Feld": "Der Bauer pflügt sein ___ im Frühling.",
+  "Held": "In dem Buch kämpft ein mutiger ___ gegen das Böse.",
+  "wild": "Der Hund läuft ___ durch den Garten.",
+  "Bild": "Sie hängte ein neues ___ an die Wand.",
+  "blind": "Die Katze ist auf einem Auge ___.",
+  "Pfad": "Der schmale ___ führt durch den Wald.",
+  "Abend": "Am ___ lesen wir noch ein Kapitel.",
+  "Stab": "Der Turner dreht sich um den ___.",
+  "Staub": "Auf dem Regal liegt viel ___.",
+  "Laub": "Im Herbst fegen wir das ___ zusammen.",
+  "Korb": "Die Äpfel liegen im ___.",
+  "Kalb": "Das ___ trinkt bei seiner Mutter.",
+  "halb": "In ___ einer Stunde sind wir fertig.",
+  "gelb": "Die Banane ist ___.",
+  "grob": "Seine Antwort war ziemlich ___.",
+  "taub": "Durch den lauten Lärm wurde er fast ___.",
+  "Flug": "Der ___ nach Hamburg dauert eine Stunde.",
+  "Burg": "Auf dem Berg steht eine alte ___.",
+  "klug": "Sie ist sehr ___ und löst Aufgaben schnell.",
+  "Krieg": "Im ___ leiden viele Menschen.",
+  "Zweig": "Der Vogel sitzt auf einem dünnen ___.",
+  "trägt": "Er ___ seinen Bruder auf dem Rücken.",
+  "fliegt": "Der Adler ___ hoch über den Bergen.",
+  "lebt": "Sie ___ seit vielen Jahren in München.",
+  "liebt": "Er ___ seine kleine Schwester sehr.",
+  "Rand": "Am ___ des Glases klebt Lippenstift.",
+  "Stand": "Am Markt gibt es einen ___ mit frischem Obst.",
+  "Strand": "Wir bauen eine Sandburg am ___.",
+  "Grund": "Aus welchem ___ bist du so traurig?",
+  "Wunde": "Die ___ wurde sorgfältig verbunden.",
+  "Herd": "Das Wasser kocht auf dem ___.",
+  "Nord": "Im ___ Deutschlands liegt Hamburg.",
+  "Süd": "Im ___ Deutschlands findet man die Alpen.",
+  "Grad": "Heute hat es dreißig ___ im Schatten.",
+  "Leid": "Es tut mir ___, dass ich zu spät komme.",
+  "Maid": "Die ___ pflückte Blumen auf der Wiese.",
+  "Bescheid": "Ich gebe dir ___, wenn ich ankomme.",
+  "Neid": "___ macht unglücklich.",
+  "Mord": "Der Detektiv löste den ___ im alten Haus.",
+  "Mond": "Bei Vollmond leuchtet der ___ sehr hell.",
+  "Pfund": "Für das Rezept brauche ich ein ___ Mehl.",
+  "Wand": "An der ___ hängt eine bunte Weltkarte.",
+  "rund": "Der Tisch ist ___ und hat Platz für sechs Personen.",
+  "gesund": "Viel Obst und Gemüse hält ___ .",
+  "sparsam": "Sie ist sehr ___ und spart jeden Monat etwas.",
+  "Druck": "Unter ___ macht er viele Fehler.",
+  "Glück": "Sie hatte ___ und fand noch einen Platz.",
+  "Fleck": "Der ___ auf dem Hemd geht nicht raus.",
+  "Block": "Der ___ Papier ist schon fast voll.",
+  "Stock": "Im dritten ___ wohnen unsere Nachbarn.",
+  "Blick": "Mit einem ___ sah sie, was los war.",
+  "Trick": "Kennst du den ___ mit dem Zauberwürfel?",
+  "Werk": "Dieses ___ hat der Künstler zehn Jahre gemalt.",
+  "stark": "Der Wind war so ___, dass die Bäume schwankten.",
+  "weich": "Das Kissen ist schön ___ .",
+  "süß": "Die Erdbeeren schmecken ___ und saftig.",
+  "außen": "Die Mauer ist ___ grau, innen aber bunt.",
+  "heißen": "Wie soll das Kätzchen ___?",
+  "reißen": "Das Papier lässt sich leicht ___.",
+  "beißen": "Der Hund wird nicht ___ .",
+  "schießen": "Der Spieler konnte das Tor nicht ___.",
+  "fließen": "Der Fluss beginnt, langsam zu ___.",
+  "gießen": "Vergiss nicht, die Blumen zu ___!",
+  "genießen": "Wir ___ die Ruhe am See.",
+  "stoßen": "Vorsicht, du könntest dich ___!",
+  "Maß": "Bitte halte beim Süßigkeitenessen ___.",
+  "Hass": "___ löst keine Probleme.",
+  "Schloss": "Wir besuchten ein altes ___ mit Burggraben.",
+  "Biss": "Der ___ der Mücke juckt sehr.",
+  "Riss": "In der Wand ist ein kleiner ___.",
+  "Kuss": "Mama gab ihm einen ___ auf die Wange.",
+  "reisen": "Im Sommer möchten wir nach Italien ___.",
+  "lesen": "Sie mag es, abends ein Buch zu ___.",
+  "Hose": "Die ___ hat ein Loch im Knie.",
+  "Nase": "Im Winter läuft mir die ___.",
+  "Weise": "Auf diese ___ löst man die Aufgabe am besten.",
+  "rasieren": "Papa muss sich jeden Morgen ___.",
+  "Maßnahme": "Eine wichtige ___ ist das Händewaschen.",
+  "Maßstab": "Der ___ der Karte ist 1:50000.",
+  "Ausmaß": "Das ___ des Schadens war riesig.",
+  "Übermaß": "Im ___ ist sogar Sport ungesund.",
+  "Abreißen": "___ des Plakats ist verboten.",
+  "Losreißen": "___ vom Handy fällt vielen schwer.",
+  "aufschließen": "Kannst du bitte die Tür ___?",
+  "abschließen": "Vergiss nicht, das Fahrrad ___!",
+  "einschließen": "Das Angebot schließt das Frühstück ___.",
+  "ausschließen": "Wir können einen Fehler nicht ___.",
+  "beschließen": "Die Klasse will gemeinsam ___, wohin die Reise geht.",
+  "Abschluss": "Nach dem ___ der Schule beginnt die Ausbildung.",
+  "Anschluss": "Der ___ an den Zug wurde knapp verpasst.",
+  "Aufschluss": "Die Analyse gibt ___ über die Ursache.",
+  "Zusammenschluss": "Der ___ beider Vereine war ein Erfolg.",
+  "Beschluss": "Der ___ wurde einstimmig gefasst.",
+  "Entschluss": "Sie fasste den ___, mehr Sport zu treiben.",
+  "Vorsatz": "Ihr ___ für das neue Jahr ist mehr Schlafen.",
+  "Grundsatz": "Ehrlichkeit ist ein wichtiger ___.",
+  "Leitspruch": "Ihr ___ lautet: Lieber langsam und sicher.",
+  "Süßigkeit": "Eine ___ gibt es nach dem Mittagessen.",
+  "Süßspeise": "Als ___ gibt es heute Pudding.",
+  "Fußball": "___ ist der beliebteste Sport in Deutschland.",
+  "Fußgänger": "Der ___ wartete an der roten Ampel.",
+  "Straßenbahn": "Wir fahren mit der ___ in die Innenstadt.",
+  "Gewissen": "Sein ___ ließ ihn nicht schlafen.",
+  "besessen": "Er ist von seiner Idee völlig ___.",
+  "Prozess": "Der ___ vor Gericht dauerte drei Wochen.",
+  "Adresse": "Hast du seine ___ aufgeschrieben?",
+  "Interesse": "Sie zeigt großes ___ an Tieren.",
+  "passieren": "Was kann auf dem Schulweg ___?",
+  "interessieren": "Geschichte beginnt mich sehr zu ___.",
+  "backen": "Oma möchte heute einen Kuchen ___.",
+  "Bäcker": "Vom ___ kaufen wir frisches Brot.",
+  "packen": "Ich muss noch meinen Koffer ___.",
+  "stecken": "Wo kann der Schlüssel ___?",
+  "wecken": "Das Vogelgezwitscher begann mich zu ___.",
+  "Decke": "Er zog die ___ bis unter das Kinn.",
+  "Socke": "Eine ___ hat ein Loch.",
+  "Rock": "Sie trägt einen bunten ___ zum Fest.",
+  "Sack": "Im ___ liegen die Kartoffeln.",
+  "Mücke": "Die ___ hat mich am Arm gestochen.",
+  "Lücke": "Im Text ist eine ___, die gefüllt werden muss.",
+  "Ecke": "An der ___ steht eine alte Laterne.",
+  "nicken": "Sie begann zu ___, um zuzustimmen.",
+  "zucken": "Beim lauten Knall begann er zu ___.",
+  "schlucken": "Die Tablette ist schwer zu ___.",
+  "Acker": "Der Bauer pflügt seinen ___ im Herbst.",
+  "Schnecke": "Die ___ kriecht langsam über den Weg.",
+  "hocken": "Die Kinder ___ um das Lagerfeuer.",
+  "locken": "Der Duft des Essens beginnt mich zu ___.",
+  "Jacke": "Zieh deine ___ an, es ist kalt!",
+  "Recke": "Als tapferer ___ kämpfte er für sein Volk.",
+  "Hitze": "Bei der großen ___ bleiben wir drinnen.",
+  "Netz": "Der Fischer wirft sein ___ ins Wasser.",
+  "Satz": "Schreibe jeden ___ mit einem Großbuchstaben.",
+  "Schutz": "Der Helm bietet ___ beim Fahrradfahren.",
+  "Witz": "Er erzählte einen lustigen ___.",
+  "Blitz": "Ein ___ fuhr in den alten Baum.",
+  "Gesetz": "Das ___ gilt für alle gleich.",
+  "sitzen": "Wir ___ zusammen am Tisch.",
+  "setzen": "Bitte ___ Sie sich!",
+  "schätzen": "Ich ___ deinen Rat sehr.",
+  "nützen": "Das Lernen wird dir später viel ___.",
+  "verletzen": "Beim Spielen kann man sich leicht ___.",
+  "ersetzen": "Das alte Teil muss man bald ___.",
+  "flicken": "Kannst du das Loch in der Hose ___?",
+  "kleckern": "Pass auf, dass du nicht ___!",
+  "lecken": "Die Katze beginnt ihre Pfoten zu ___.",
+  "recken": "Er ___ sich morgens lang und ausgiebig.",
+  "knicken": "Beim Fallen drohte er das Knie zu ___.",
+  "stricken": "Oma kann wunderschöne Socken ___.",
+  "picken": "Die Hühner ___ Körner vom Boden.",
+  "ticken": "Die alte Uhr beginnt wieder zu ___.",
+  "hacken": "Papa muss noch Holz ___.",
+  "knacken": "Das Eis beginnt unter unseren Schritten zu ___.",
+  "zwicken": "Die enge Hose beginnt zu ___.",
+  "schicken": "Ich möchte Oma eine Karte ___.",
+  "blicken": "Sie ___ neugierig durch das Schlüsselloch.",
+  "Brocken": "Ein großer ___ Eis fiel von der Wand.",
+  "Hacke": "Er bearbeitet den Garten mit der ___.",
+  "Lückentext": "Füllt den ___ mit passenden Wörtern aus!",
+  "Rucksack": "Ich packe meinen ___ für die Wanderung.",
+  "abknicken": "Pass auf, der Stift könnte ___!",
+  "erschrecken": "Das laute Geräusch konnte mich ___.",
+  "überbrücken": "Wie kann man eine lange Wartezeit ___?",
+  "entrücken": "Musik kann uns aus dem Alltag ___.",
+  "Abkürzung": "Durch den Park gibt es eine ___.",
+  "abkürzen": "Wir können den Weg durch den Wald ___.",
+  "besetzen": "Die Schüler ___ alle Plätze im Bus.",
+  "aussetzen": "Das Training muss er wegen Krankheit ___.",
+  "einsetzen": "Die Feuerwehr kann Drohnen ___.",
+  "umsetzen": "Gute Ideen muss man auch ___.",
+  "einschätzen": "Die Lage ist schwer zu ___.",
+  "unterschätzen": "Man sollte seinen Gegner nie ___.",
+  "überschätzen": "Du neigst dazu, dich selbst zu ___.",
+  "Sitzung": "Die ___ des Gemeinderats dauerte zwei Stunden.",
+  "Besetzung": "Die ___ der Hauptrolle war eine Überraschung.",
+  "Verletzung": "Die ___ am Knie braucht Zeit zum Heilen.",
+  "Übersetzung": "Die ___ aus dem Englischen war schwierig.",
+  "Einschätzung": "Meiner ___ nach wird das klappen.",
+  "Schätzung": "Laut dieser ___ leben hier 5000 Menschen.",
+  "Nutzung": "Die ___ des Handys ist im Unterricht verboten.",
+  "Stützung": "Die ___ des schwachen Schülers ist wichtig.",
+  "Sommer": "Im ___ fahren wir ans Meer.",
+  "Hammer": "Mit dem ___ schlägt er den Nagel in die Wand.",
+  "Nummer": "Welche ___ hat dein Haus?",
+  "Gramm": "Das Rezept braucht 200 ___ Mehl.",
+  "Programm": "Das ___ muss zuerst installiert werden.",
+  "Komma": "Vergiss nicht das ___ vor weil!",
+  "Lamm": "Das kleine ___ läuft hinter der Mutter her.",
+  "Kamm": "Er zieht den ___ durch sein nasses Haar.",
+  "kennen": "Ich ___ dieses Lied auswendig.",
+  "nennen": "Kannst du drei Beispiele ___?",
+  "brennen": "Die Kerze begann zu ___.",
+  "Tonne": "Der Müll kommt in die braune ___.",
+  "Wanne": "Das Baby badet in einer kleinen ___.",
+  "Mann": "Der ___ mit dem roten Hut ist mein Onkel.",
+  "spinnen": "Die Spinne kann dünne Fäden ___.",
+  "Tanne": "Im Wald steht eine hohe ___.",
+  "Rinne": "Das Wasser fließt durch die ___.",
+  "Ball": "Der ___ fliegt über das Netz.",
+  "toll": "Das Konzert war wirklich ___!",
+  "voll": "Die Tasse ist ___ mit Kakao.",
+  "hell": "Das Zimmer ist schön ___ und freundlich.",
+  "Halle": "Die ___ fasst tausend Zuschauer.",
+  "Welle": "Die große ___ warf ihn um.",
+  "Stelle": "An dieser ___ habe ich meinen Schlüssel verloren.",
+  "stellen": "Bitte ___ die Schuhe ans Regal.",
+  "fallen": "Im Herbst beginnen die Blätter zu ___.",
+  "Rolle": "Die ___ Klebeband ist leer.",
+  "Quelle": "Das Wasser sprudelt frisch aus der ___.",
+  "Millionen": "In dieser Stadt leben drei ___ Menschen.",
+  "Bett": "Er liegt noch im ___ und schläft.",
+  "Blatt": "Auf dem ___ steht die Aufgabe.",
+  "satt": "Nach dem großen Mittagessen bin ich ___.",
+  "nett": "Die neue Lehrerin ist sehr ___.",
+  "bitte": "Kannst du mir ___ helfen?",
+  "Mitte": "Das Buch liegt in der ___ des Regals.",
+  "Ratte": "Die ___ huscht durch den Keller.",
+  "Wetter": "Das ___ morgen soll schön werden.",
+  "Suppe": "Mama kocht eine warme ___.",
+  "Affe": "Der ___ klettert geschickt auf den Baum.",
+  "Koffer": "Er packt seinen ___ für die Reise.",
+  "Pfeffer": "Das Essen braucht noch etwas ___.",
+  "Löffel": "Sie rührt mit dem ___ in der Tasse.",
+  "Schiff": "Das ___ fährt langsam in den Hafen.",
+  "treffen": "Wir wollen uns morgen ___.",
+  "hoffen": "Wir ___ auf gutes Wetter.",
+  "offen": "Das Fenster ist noch ___.",
+  "wissen": "Ich ___ nicht, wo mein Heft ist.",
+  "messen": "Der Arzt möchte die Temperatur ___.",
+  "passen": "Die Schuhe ___ genau.",
+  "Messer": "Mit dem ___ schneidet er das Brot.",
+  "besser": "Nach dem Schlaf fühle ich mich ___.",
+  "Schirm": "Bei Regen brauche ich meinen ___.",
+  "Kissen": "Das ___ ist weich und bequem.",
+  "Hilfe": "Er brauchte ___ beim Tragen der schweren Kiste.",
+  "Stille": "In der ___ hört man jeden Atemzug.",
+  "Hülle": "Das Handy steckt in einer bunten ___.",
+  "Fülle": "Eine ___ an Ideen hatte sie immer.",
+  "Grille": "Die ___ zirpt die ganze Nacht.",
+  "Pille": "Die ___ muss mit viel Wasser geschluckt werden.",
+  "Brillant": "Der Ring hat einen funkelnden ___.",
+  "Gott": "In vielen Religionen glaubt man an ___.",
+  "Ritter": "Der ___ trug eine schwere Rüstung.",
+  "bitter": "Der Kaffee schmeckt ___.",
+  "Zitter": "Ein ___ lief ihr bei der Nachricht durch den Körper.",
+  "zittern": "Vor Kälte begann er zu ___.",
+  "Otter": "Der ___ schwimmt geschickt im Fluss.",
+  "Euter": "Die Kuh gibt Milch aus dem ___.",
+  "Flotte": "Die ___ aus zehn Schiffen lief aus dem Hafen.",
+  "flott": "Das Mädchen ist ___ und immer gut gelaunt.",
+  "Watte": "Die Wunde wird mit ___ gereinigt.",
+  "matt": "Nach dem langen Rennen war er völlig ___.",
+  "glatt": "Die Straße ist nach dem Frost ___.",
+  "Gitter": "Hinter dem ___ liegt der Schatz.",
+  "Kittel": "Der Arzt trägt einen weißen ___.",
+  "Mittel": "Gegen Kopfschmerzen gibt es ein gutes ___.",
+  "mittels": "Sie löste das Problem ___ einer Karte.",
+  "Kette": "Sie trägt eine goldene ___ um den Hals.",
+  "Latte": "Der Zaun besteht aus vielen schmalen ___n.",
+  "retten": "Der Feuerwehrmann konnte das Kind ___.",
+  "wetten": "Ich ___ , dass du das schaffst!",
+  "Gewitter": "Das ___ kam plötzlich und war sehr stark.",
+  "Sitte": "Es ist eine gute ___, die Türen aufzuhalten.",
+  "Sippe": "Die ganze ___ traf sich zum Familienfest.",
+  "Lippe": "Er biss sich auf die ___ vor Aufregung.",
+  "Kippe": "Das Glas steht auf der ___ des Tisches.",
+  "knapp": "Die Zeit wurde am Ende ___.",
+  "Rippe": "Beim Sturz brach er sich eine ___.",
+  "Knappe": "Der ___ half dem Ritter beim Anlegen der Rüstung.",
+  "Mappe": "Die ___ ist voller Zeichnungen.",
+  "Rappe": "Der ___ ist ein schwarzes Pferd.",
+  "Kappe": "Er setzt sich eine rote ___ auf.",
+  "Pappe": "Das Modell wird aus ___ gebaut.",
+  "Steppe": "In der ___ gibt es wenig Regen.",
+  "schlapp": "Nach der langen Wanderung fühlte sie sich ___.",
+  "Krampf": "Beim Schwimmen bekam er einen ___ im Bein.",
+  "Dummheit": "Das war eine echte ___!",
+  "dumm": "Fragen darf man immer, das ist nicht ___.",
+  "Summe": "Die ___ aller Zahlen ergibt hundert.",
+  "Klemme": "Er steckt in der ___ und braucht Hilfe.",
+  "Flamme": "Die ___ der Kerze flackerte im Wind.",
+  "Schwämme": "Die ___ wachsen nach dem Regen.",
+  "Grimm": "Voller ___ stampfte er aus dem Zimmer.",
+  "grimmig": "Der Wächter schaute ___ auf die Kinder.",
+  "Schlamm": "Nach dem Regen sind die Stiefel voller ___.",
+  "Schwamm": "Er wischte die Tafel mit dem ___ sauber.",
+  "schlimm": "Zum Glück war die Verletzung nicht ___.",
+  "Atem": "Nach dem Rennen ging ihm der ___ aus.",
+  "Atom": "Ein ___ ist der kleinste Baustein der Materie.",
+  "Abfluss": "Der ___ in der Badewanne ist verstopft.",
+  "Ausfluss": "Der ___ des Sees fließt in den Fluss.",
+  "Genuss": "Das Eis war ein echter ___.",
+  "Überfluss": "In unserem Land leben viele im ___.",
+  "auffassen": "Bitte ___, das kommt in der Prüfung vor!",
+  "abfassen": "Er musste den Bericht neu ___.",
+  "erfassen": "Der Computer kann Daten schnell ___.",
+  "umfassen": "Das Buch soll alle Themen ___.",
+  "zulassen": "Das Gesetz lässt das nicht ___.",
+  "verlassen": "Du kannst dich auf mich ___.",
+  "überlassen": "Er wollte die Entscheidung ihr ___.",
+  "abwässern": "Die Felder müssen nach dem Regen ___.",
+  "wässern": "Die Pflanzen muss man täglich ___.",
+  "Ohr": "Sie flüsterte ihm etwas ins ___.",
+  "Fahrrad": "Er fährt jeden Tag mit dem ___ zur Schule.",
+  "Gefahr": "Auf Glatteis besteht ___.",
+  "zahlen": "An der Kasse muss er ___.",
+  "Kuh": "Die ___ gibt täglich frische Milch.",
+  "froh": "Er ist ___, dass das Wetter gut ist.",
+  "roh": "Karotten kann man ___ essen.",
+  "Lohn": "Für seine Arbeit bekommt er einen fairen ___.",
+  "Wohnung": "Die neue ___ liegt im dritten Stock.",
+  "Bühne": "Die Schauspieler stehen auf der ___.",
+  "fühlen": "Wie ___ du dich heute?",
+  "kühlen": "Stell das Getränk bitte zum ___.",
+  "führen": "Der Pfad wird uns durch den Wald ___.",
+  "Gefühl": "Sie hat ein gutes ___ für Zahlen.",
+  "stehlen": "Es ist unehrlich zu ___.",
+  "Fehler": "Aus einem ___ kann man viel lernen.",
+  "ähnlich": "Die beiden Bilder sind sich sehr ___.",
+  "Strahl": "Ein ___ Sonnenlicht fiel ins Zimmer.",
+  "drehen": "Die Erde fängt an sich zu ___.",
+  "wohl": "Bei uns zu Hause fühle ich mich ___.",
+  "Kohle": "Früher wurde mit ___ geheizt.",
+  "Befehl": "Der Soldat führte den ___ aus.",
+  "bohren": "Er muss ein Loch in die Wand ___.",
+  "Bahnhof": "Der Zug fährt pünktlich vom ___ ab.",
+  "Lehre": "Er macht eine ___ als Tischler.",
+  "lehren": "Der Lehrer will uns Mathematik ___.",
+  "Lehrer": "Unser ___ erklärt alles sehr geduldig.",
+  "Ehe": "Sie haben eine lange, glückliche ___ geführt.",
+  "Höhle": "Der Bär schläft den Winter in einer ___ .",
+  "Kohl": "Aus ___ kann man leckere Suppe kochen.",
+  "Jahrzehnt": "In einem ___ vergehen zehn Jahre.",
+  "Fahrplan": "Im ___ steht, wann der Zug fährt.",
+  "Fahrkarte": "Er kaufte sich eine ___ für den Zug.",
+  "Ahnung": "Ich habe keine ___, wo mein Stift ist.",
+  "ahnen": "Das konnte sie nicht ___.",
+  "Ruhm": "Der Sportler gewann ___ und Ehre.",
+  "mähen": "Papa muss noch den Rasen ___.",
+  "Mähne": "Das Pferd schüttelt seine lange ___.",
+  "dehnen": "Vor dem Sport sollte man sich ___.",
+  "Dehnungs-h": "Das ___ macht ein Wort länger.",
+  "mahnen": "Die Lehrerin muss ihn zum Aufpassen ___.",
+  "stählen": "Sport und Training ___ den Körper.",
+  "Pfähle": "Die ___ stecken tief im Boden.",
+  "Pfahl": "Der ___ wird in den Boden gerammt.",
+  "vorhaben": "Was habt ihr morgen ___?",
+  "Taler": "Im Märchen erhält er drei goldene ___.",
+  "zahm": "Das Kaninchen ist sehr ___ geworden.",
+  "Ruhepause": "Nach der Arbeit brauchen wir eine ___.",
+  "Uhrmacher": "Der ___ repariert alte Uhren.",
+  "Bahnsteig": "Der Zug fährt auf ___ drei ein.",
+  "Jahreszeit": "Der Frühling ist meine liebste ___.",
+  "Hoheit": "Seine ___ begrüßte die Gäste.",
+  "Rohheit": "Seine ___ im Umgang mit anderen überraschte alle.",
+  "Frühjahr": "Im ___ blühen die ersten Blumen.",
+  "Frühling": "Im ___ werden die Tage länger.",
+  "Wohnort": "Trage deinen ___ ins Formular ein.",
+  "Lehnwort": "Computer ist ein ___ aus dem Englischen.",
+  "fehlerfrei": "Der Aufsatz wurde ___ geschrieben.",
+  "Übernahme": "Die ___ der Firma dauerte viele Monate.",
+  "aufnehmen": "Er möchte ein neues Lied ___.",
+  "abnehmen": "Der Arzt rät ihm, ___.",
+  "zunehmen": "Es ist bekannt, dass die Dunkelstunden im Winter ___.",
+  "Einnahme": "Die ___ der Medizin muss täglich erfolgen.",
+  "Mahlzeit": "Eine warme ___ am Abend ist gemütlich.",
+  "Hühner": "Die ___ laufen frei auf dem Hof.",
+  "kühn": "Der ___ Plan gelang gegen alle Erwartungen.",
+  "Rehe": "Im Morgengrauen sehen wir zwei ___ auf der Wiese.",
+  "Reh": "Das ___ springt über den Zaun.",
+  "Weh": "Das ___ in seinem Herzen ließ nicht nach.",
+  "Zehe": "Er hat sich die große ___ gestoßen.",
+  "Kühe": "Die ___ stehen friedlich auf der Weide.",
+  "beziehen": "Das Bett sollte man regelmäßig frisch ___.",
+  "Erziehung": "Gute ___ beginnt in der Familie.",
+  "erziehen": "Kinder zu ___ ist eine verantwortungsvolle Aufgabe.",
+  "Annäherung": "Eine friedliche ___ der Länder ist das Ziel.",
+  "Wahrhaftigkeit": "___ bedeutet, immer die Wahrheit zu sagen.",
+  "wahrhaftig": "Er meinte es ___ gut mit uns.",
+  "Vorsicht": "___ ist besser als Nachsicht.",
+  "Übersicht": "Die Tabelle gibt eine gute ___ über die Daten.",
+  "Absicht": "Das war keine ___, es war ein Versehen.",
+  "Hahn": "Der ___ kräht jeden Morgen früh.",
+  "Mohn": "Auf dem Feld blüht roter ___.",
+  "Krönung": "Die ___ der Königin war ein großes Fest.",
+  "Söhne": "Das Ehepaar hat zwei ___.",
+  "Zähne": "Zweimal täglich soll man die ___ putzen.",
+  "Mahd": "Nach der ___ riecht es frisch nach Gras.",
+  "nahm": "Er ___ seinen Rucksack und ging.",
+  "zählte": "Sie ___ alle Kinder durch.",
+  "Gehalt": "Sein ___ wird jeden Monat überwiesen.",
+  "Inhalt": "Was ist der ___ des Buches?",
+  "Hafen": "Das Schiff läuft in den ___ ein.",
+  "Hafer": "Pferde fressen gerne ___.",
+  "verlieren": "Ich darf meine Schlüssel nicht ___.",
+  "verantworten": "Wer muss das ___?",
+  "besuchen": "Wir möchten Oma am Sonntag ___.",
+  "bedeuten": "Was soll das ___?",
+  "beachten": "Bitte alle Hinweise ___!",
+  "gewinnen": "Wir wollen das Spiel ___.",
+  "gehören": "Dieses Buch ___ mir.",
+  "gefallen": "Das Lied wird dir bestimmt ___.",
+  "Geschichte": "Im Unterricht lernen wir ___ .",
+  "Gedanke": "Ein guter ___ kam ihm plötzlich.",
+  "Gesicht": "Sein ___ war vor Freude ganz rot.",
+  "entscheiden": "Sie muss sich bald ___.",
+  "entwickeln": "Kinder ___ sich in ihrem eigenen Tempo.",
+  "entlassen": "Der Arzt konnte den Patienten ___.",
+  "erklären": "Kannst du mir das bitte ___?",
+  "erkennen": "Im Dunkeln konnte er sie kaum ___.",
+  "erreichen": "Das Ziel ist schwer zu ___.",
+  "erfahren": "Davon habe ich erst heute ___.",
+  "Erfahrung": "Durch Übung macht man ___.",
+  "zerreißen": "Das Papier lässt sich leicht ___.",
+  "zerstören": "Ein Sturm kann viel ___.",
+  "zusammen": "Wir lösen die Aufgabe ___.",
+  "zunächst": "Wir müssen ___ die Aufgabe lesen.",
+  "Zusammenhang": "In welchem ___ steht das?",
+  "übertragen": "Die Krankheit kann sich ___.",
+  "übernehmen": "Sie möchte mehr Verantwortung ___.",
+  "übersetzen": "Kannst du den Satz ___?",
+  "untersuchen": "Der Arzt möchte ihn ___.",
+  "unterscheiden": "Die zwei Begriffe muss man genau ___.",
+  "unterstützen": "Freunde ___ sich gegenseitig.",
+  "aufmerksam": "Im Unterricht sollte man ___ sein.",
+  "aufgeben": "Niemals ___ — es lohnt sich!",
+  "ausführen": "Den Auftrag muss er sorgfältig ___.",
+  "aussuchen": "Du darfst dir ein Buch ___.",
+  "mitmachen": "Alle Kinder wollen beim Spiel ___.",
+  "nachdenken": "Bitte kurz ___, bevor du antwortest.",
+  "vorstellen": "Darf ich mich kurz ___?",
+  "Vorstellung": "Die ___ des Theaterstücks war toll.",
+  "hinzufügen": "Möchtest du noch etwas ___?",
+  "herstellen": "In dieser Fabrik werden Autos ___.",
+  "ablehnen": "Er musste das Angebot leider ___.",
+  "abbrechen": "Das Gespräch musste er plötzlich ___.",
+  "enttäuschen": "Ich hoffe, ich werde dich nicht ___.",
+  "Enttäuschung": "Die ___ war groß, als es nicht klappte.",
+  "entfernen": "Den Fleck kann man leicht ___.",
+  "entgegen": "Er lief ihr ___ .",
+  "enthalten": "Der Saft soll keinen Zucker ___.",
+  "entsprechen": "Das Ergebnis muss den Erwartungen ___.",
+  "entnehmen": "Er konnte dem Text die Lösung ___.",
+  "entstehen": "Wie kann Freundschaft ___?",
+  "erhalten": "Sie hat einen Brief ___.",
+  "erlauben": "Darf ich das ___?",
+  "ermöglichen": "Übung kann viel ___.",
+  "erscheinen": "Das neue Buch wird nächste Woche ___.",
+  "erwarten": "Was ___ uns bei der Reise?",
+  "erweisen": "Das wird sich noch ___.",
+  "erzählen": "Opa kann tolle Geschichten ___.",
+  "Erzählung": "Die ___ handelt von einem mutigen Mädchen.",
+  "vollständig": "Bitte die Aufgabe ___ ausfüllen.",
+  "Vollständigkeit": "Auf ___ sollte man beim Aufsatz achten.",
+  "angemessen": "Eine ___ Antwort ist kurz und klar.",
+  "anscheinend": "Er hat ___ die Aufgabe vergessen.",
+  "ausreichend": "Für die Prüfung haben wir ___ Zeit.",
+  "ausgezeichnet": "Das Essen schmeckte ___.",
+  "Umgebung": "In der ___ des Parks gibt es viele Tiere.",
+  "Misserfolg": "Aus einem ___ kann man lernen.",
+  "misslingen": "Manchmal kann ein Experiment ___.",
+  "missverstehen": "Man kann sich leicht ___.",
+  "Missverständnis": "Das war ein ___ — es tut mir leid.",
+  "weitgehend": "Die Aufgabe ist ___ gelöst.",
+  "weitreichend": "Die Entscheidung hat ___ Folgen.",
+  "Schule": "Morgen fängt die ___ wieder an.",
+  "Heft": "Das ___ liegt auf dem Tisch.",
+  "Buch": "Das ___ hat 300 Seiten.",
+  "Stift": "Mein ___ ist auf den Boden gerollt.",
+  "Tafel": "Die Lehrerin schreibt an die ___.",
+  "Lineal": "Mit dem ___ zieht er gerade Linien.",
+  "Schere": "Die ___ liegt im Mäppchen.",
+  "Aufgabe": "Die ___ war schwieriger als erwartet.",
+  "Vater": "Mein ___ kocht heute Abend.",
+  "Eltern": "Meine ___ kommen heute Abend nach Hause.",
+  "Bruder": "Mein ___ ist drei Jahre jünger als ich.",
+  "Schwester": "Meine ___ geht in die zweite Klasse.",
+  "Oma": "___ backt die besten Kekse.",
+  "Opa": "___ erzählt gerne Geschichten.",
+  "Familie": "Die ganze ___ feiert gemeinsam.",
+  "Vogel": "Der ___ singt früh am Morgen.",
+  "Fisch": "Der ___ schwimmt im klaren Wasser.",
+  "Maus": "Die kleine ___ huscht unter das Sofa.",
+  "Schwein": "Das ___ grunzt laut im Stall.",
+  "Schaf": "Das ___ hat ein weiches Fell.",
+  "Löwe": "Der ___ ist der König der Savanne.",
+  "rot": "Das Stoppschild ist ___.",
+  "blau": "Der Himmel ist heute strahlend ___.",
+  "grün": "Das Gras ist schön ___.",
+  "schwarz": "Die Nacht ist ___.",
+  "grau": "Der Elefant ist ___.",
+  "braun": "Der Bär hat ein ___ Fell.",
+  "rosa": "Das Kleid ist ___.",
+  "lila": "Die Lavendelblüten sind ___.",
+  "orange": "Die Karotte ist ___.",
+  "violett": "Die Blume hat ___ Blütenblätter.",
+  "eins": "Auf dem Siegertreppchen steht ___ ganz oben.",
+  "zwei": "Ich habe ___ Hände.",
+  "drei": "Ein Dreieck hat ___ Ecken.",
+  "vier": "Eine Katze hat ___ Pfoten.",
+  "fünf": "Eine Hand hat ___ Finger.",
+  "sechs": "Ein Würfel hat ___ Seiten.",
+  "acht": "Eine Spinne hat ___ Beine.",
+  "neun": "Eine Spieluhr spielt ___ verschiedene Melodien.",
+  "zehn": "Beide Hände haben zusammen ___ Finger.",
+  "zwölf": "Ein Jahr hat ___ Monate.",
+  "zwanzig": "Er kann bis ___ zählen.",
+  "dreißig": "Die Klasse hat ___ Schüler.",
+  "vierzig": "Nach ___ Jahren gingen sie in Rente.",
+  "fünfzig": "Mir fehlen noch ___ Cent.",
+  "hundert": "Ein Euro hat ___ Cent.",
+  "tausend": "In dem Buch sind über ___ Seiten.",
+  "Kopf": "Mir tut der ___ weh.",
+  "Auge": "Sie hat ein ___ zugekniffen.",
+  "Arm": "Er trägt das Kind auf dem ___.",
+  "Finger": "Er zeigte mit dem ___ auf die Tafel.",
+  "Herz": "Das ___ schlägt schneller beim Sport.",
+  "Bauch": "Mir tut der ___ weh.",
+  "Mensch": "Jeder ___ verdient Respekt.",
+  "Welt": "Die ___ ist größer als wir denken.",
+  "Zeit": "Die ___ vergeht schnell beim Spielen.",
+  "Leben": "Das ___ hält viele Überraschungen bereit.",
+  "Haus": "Das ___ hat einen großen Garten.",
+  "Stadt": "In unserer ___ gibt es einen schönen Park.",
+  "Land": "Auf dem ___ ist es ruhiger als in der Stadt.",
+  "Luft": "Die frische ___ auf dem Berg ist herrlich.",
+  "Erde": "Die ___ dreht sich um die Sonne.",
+  "Natur": "Die ___ muss geschützt werden.",
+  "Energie": "Solar___ kommt von der Sonne.",
+  "Gesellschaft": "In einer ___ tragen alle Verantwortung.",
+  "Möglichkeit": "Es gibt mehr als eine ___ , das zu lösen.",
+  "Entwicklung": "Die technische ___ geht schnell voran.",
+  "Bedeutung": "Die ___ des Wortes war ihm unklar.",
+  "Ergebnis": "Das ___ der Rechnung ist richtig.",
+  "Lösung": "Die ___ steht auf der letzten Seite.",
+  "Beispiel": "Nenne ein ___!",
+  "Unterschied": "Was ist der ___ zwischen den beiden?",
+  "Vergleich": "Im ___ ist die erste Antwort besser.",
+  "Zusammenfassung": "Schreibe eine kurze ___ des Textes.",
+  "arbeiten": "Wir ___ heute in Gruppen.",
+  "helfen": "Kannst du mir bitte ___?",
+  "lernen": "Man muss täglich ___.",
+  "schreiben": "Ich möchte einen Brief ___.",
+  "sprechen": "Im Unterricht sollte man laut ___.",
+  "hören": "Kannst du das Lied ___?",
+  "sehen": "Von hier aus kann man den Berg ___.",
+  "denken": "Bitte kurz ___, bevor du antwortest.",
+  "beschreiben": "Kannst du das Bild ___?",
+  "vergleichen": "Versuche die beiden Texte zu ___.",
+  "zusammenfassen": "Bitte den Text kurz ___!",
+  "überprüfen": "Vergiss nicht, deine Antwort zu ___!",
+  "darstellen": "Das Diagramm soll die Daten ___.",
+  "wichtig": "Hausaufgaben sind ___ für den Lernerfolg.",
+  "schnell": "Das Pferd läuft sehr ___.",
+  "langsam": "Die Schildkröte bewegt sich ___.",
+  "schwierig": "Die Aufgabe war ___.",
+  "einfach": "Der erste Teil ist noch ___.",
+  "möglich": "Alles ist ___, wenn man es versucht.",
+  "richtig": "Das ist die ___ Antwort.",
+  "falsch": "Das ist leider ___.",
+  "interessant": "Der Film war wirklich ___.",
+  "langweilig": "Die Wartezeit war sehr ___.",
+  "notwendig": "Übung ist ___ zum Lernen.",
+  "erfolgreich": "Mit viel Fleiß kann man ___ sein.",
+  "unterschiedlich": "Die Meinungen sind sehr ___.",
+  "verantwortlich": "Jeder ist für sein Handeln ___ .",
+  "selbstständig": "Hausaufgaben soll man ___ machen.",
+  "zuverlässig": "Ein guter Freund ist immer ___.",
+  "begeistert": "Die Kinder waren ___ vom Ausflug.",
+  "Verantwortung": "Jeder trägt ___ für sein Handeln.",
+  "Konsequenz": "Die ___ seines Handelns wurde ihm klar.",
+  "Perspektive": "Wir sollten das aus einer anderen ___ sehen.",
+  "Kommunikation": "Gute ___ ist wichtig in einer Gruppe.",
+  "Demokratie": "In einer ___ darf jeder wählen.",
+  "Philosophie": "___ fragt nach dem Sinn des Lebens.",
+  "Hypothese": "Eine ___ ist eine noch ungeprüfte Annahme.",
+  "Analyse": "Die ___ des Textes zeigte viele Details.",
+  "Synthese": "In der ___ werden Ergebnisse zusammengeführt.",
+  "Interpretation": "Die ___ des Gedichts war schwierig.",
+  "Argumentation": "Deine ___ war klar und überzeugend.",
+  "Charakteristik": "Die ___ der Figur zeigt viele Schwächen.",
+  "Kompromiss": "Ein ___ bedeutet, dass beide Seiten nachgeben.",
+  "Reflexion": "Die ___ über das Gelernte hilft beim Verstehen.",
+  "Motivation": "Mit viel ___ lernt man schneller.",
+  "Konzentration": "Für die Prüfung braucht man volle ___.",
+  "Verantwortungsbewusstsein": "___ bedeutet, Folgen zu bedenken.",
+  "Widerspruch": "Er wollte keinen ___ dulden.",
+  "Auswirkung": "Die ___ des Sturms war enorm.",
+  "Schlussfolgerung": "Welche ___ ziehst du daraus?",
+  "Voraussetzung": "Eine gute ___ fürs Lernen ist ausreichend Schlaf.",
+  "Gegebenheit": "Die ___ vor Ort muss man kennen.",
+  "Schwierigkeit": "Bei der ersten ___ nicht aufgeben!",
+  "Meinungsverschiedenheit": "Eine ___ kann man im Gespräch lösen.",
+  "annehmen": "Wir können ___, dass die Antwort stimmt.",
+  "nachweisen": "Das lässt sich leicht ___.",
+  "widersprechen": "Er wollte der Aussage ___.",
+  "hervorheben": "Du solltest die wichtigen Punkte ___.",
+  "berücksichtigen": "Bitte alle Hinweise ___!",
+  "veranschaulichen": "Ein Beispiel kann das gut ___.",
+  "schlussfolgern": "Was lässt sich daraus ___?",
+  "charakterisieren": "Versuche die Hauptfigur zu ___.",
+  "analysieren": "Wir sollen den Text genau ___.",
+  "formulieren": "Bitte deinen Gedanken klar ___!",
+  "strukturieren": "Ein Plan hilft, den Aufsatz zu ___.",
+  "argumentieren": "Lerne, deine Meinung klar zu ___.",
+  "reflektieren": "Es lohnt sich, über Fehler zu ___.",
+  "präsentieren": "Die Gruppe soll ihre Ergebnisse ___.",
+  "recherchieren": "Für das Referat muss ich ___.",
+  "diskutieren": "In der Klasse wollen wir das ___.",
+  "kritisieren": "Man darf Ideen sachlich ___.",
+  "dokumentieren": "Das Experiment muss man genau ___.",
+  "interpretieren": "Das Bild kann man unterschiedlich ___.",
+  "Abschnitt": "Lese den zweiten ___ noch einmal.",
+  "Hauptsatz": "Ein ___ kann allein stehen.",
+  "Nebensatz": "Ein ___ braucht immer einen Hauptsatz.",
+  "Pronomen": "Er ist ein ___.",
+  "Adjektiv": "Schön ist ein ___.",
+  "Substantiv": "Hund ist ein ___.",
+  "Konjunktion": "Und ist eine ___.",
+  "Prädikat": "Das ___ ist das wichtigste Element des Satzes.",
+  "Subjekt": "Das ___ sagt, wer etwas tut.",
+  "Objekt": "Das ___ sagt, wen oder was man tut.",
+  "Paragraph": "Im dritten ___ steht die Regel.",
+  "Kommentar": "Schreibe einen ___ zum Text.",
+  "Inhaltsangabe": "Die ___ fasst den Text kurz zusammen.",
+  "Gedicht": "Das ___ hat drei Strophen.",
+  "Strophe": "Die zweite ___ ist die schönste.",
+  "Metapher": "Das Herz aus Stein ist eine ___.",
+  "Experiment": "Im Labor führen wir ein ___ durch.",
+  "Diagramm": "Das ___ zeigt die Temperaturen der letzten Woche.",
+  "Tabelle": "Trage die Ergebnisse in die ___ ein.",
+  "Gleichung": "Die ___ hat zwei Unbekannte.",
+  "Berechnung": "Zeige die ___ in allen Schritten.",
+  "Formel": "Die ___ für den Kreisumfang lautet pi mal d.",
+  "Dreieck": "Ein ___ hat drei Winkel.",
+  "Viereck": "Ein Quadrat ist ein besonderes ___.",
+  "Geschwindigkeit": "Die ___ des Zuges beträgt 200 km/h.",
+  "Beschleunigung": "Die ___ eines Autos hängt vom Motor ab.",
+  "Photosynthese": "Durch ___ wandeln Pflanzen Licht in Energie um.",
+  "Chromosom": "Im ___ ist die Erbinformation gespeichert.",
+  "Arbeit": "Gute ___ braucht Zeit und Geduld.",
+  "Beruf": "Sie hat ihren Traum___ gefunden.",
+  "Wirtschaft": "Die ___ eines Landes hängt von vielen Faktoren ab.",
+  "Politik": "___ betrifft das Leben aller Menschen.",
+  "Kultur": "Jedes Land hat eine eigene ___.",
+  "Bildung": "___ ist der Schlüssel zu vielen Türen.",
+  "Gesundheit": "___ ist das Wichtigste im Leben.",
+  "Umwelt": "Die ___ muss geschützt werden.",
+  "Technik": "Moderne ___ erleichtert viele Aufgaben.",
+  "Freiheit": "___ bedeutet, selbst entscheiden zu dürfen.",
+  "Gleichheit": "___ vor dem Gesetz gilt für alle.",
+  "Gerechtigkeit": "Für ___ kämpfen viele Menschen.",
+  "Sicherheit": "Im Straßenverkehr ist ___ das Wichtigste.",
+  "Zuverlässigkeit": "___ ist eine wichtige Eigenschaft.",
+  "Kreativität": "___ zeigt sich auf viele Arten.",
+  "Globalisierung": "Durch ___ sind Länder eng verbunden.",
+  "Nachhaltigkeit": "___ bedeutet, die Zukunft zu schützen.",
+  "Digitalisierung": "___ verändert die Arbeitswelt.",
+  "Gebirge": "Im ___ liegt im Winter viel Schnee.",
+  "Wüste": "In der ___ ist es sehr heiß und trocken.",
+  "Küste": "An der ___ riecht man das Meer.",
+  "Tal": "Das ___ liegt zwischen zwei Bergen.",
+  "Vulkan": "Der ___ brach vor hundert Jahren aus.",
+  "Atmosphäre": "Die ___ schützt die Erde vor Strahlung.",
+  "Ökosystem": "Der Wald ist ein wichtiges ___.",
+  "Klimawandel": "Der ___ betrifft alle Menschen weltweit.",
+  "Erdbeben": "Das ___ zerstörte viele Häuser.",
+  "Kontinente": "Die Erde hat sieben ___.",
+  "Kaufmann": "Der ___ verkauft seine Waren.",
+  "Kauffrau": "Die ___ berät ihre Kunden freundlich.",
+  "Rechtsanwalt": "Der ___ verteidigt seinen Mandanten.",
+  "Bürgermeister": "Der ___ eröffnete das Stadtfest.",
+  "Bundeskanzler": "Der ___ leitet die Regierung.",
+  "Abgeordneter": "Der ___ stimmt im Parlament ab.",
+  "Bundesregierung": "Die ___ beschloss ein neues Gesetz.",
+  "Nachricht": "Eine gute ___ kann den Tag verbessern.",
+  "Fernsehen": "Im ___ läuft heute ein guter Film.",
+  "Zeitschrift": "Die ___ über Natur ist sehr interessant.",
+  "Informationen": "___ findet man im Internet.",
+  "Veröffentlichung": "Die ___ des Berichts sorgte für Aufsehen.",
+  "Bewerbung": "Die ___ um die Stelle wurde abgeschickt.",
+  "Ausbildung": "Nach der Schule beginnt er eine ___.",
+  "Weiterbildung": "___ ist im Beruf sehr wichtig.",
+  "Wissenschaft": "Die ___ sucht nach Antworten.",
+  "Forschung": "___ hilft, neue Erkenntnisse zu gewinnen.",
+  "Erkenntnis": "Diese ___ veränderte die Forschung.",
+  "Untersuchung": "Die ___ ergab keine Auffälligkeiten.",
+  "Beobachtung": "Genaue ___ ist in der Wissenschaft wichtig.",
+  "Aufzeichnung": "Die ___ wurde sorgfältig archiviert.",
+  "Auswertung": "Die ___ der Daten dauerte lange.",
+  "Grundlage": "Gute Ernährung ist eine wichtige ___ .",
+  "Addition": "___ bedeutet zusammenzählen.",
+  "Subtraktion": "Bei der ___ zieht man eine Zahl ab.",
+  "Multiplikation": "___ ist wiederholtes Addieren.",
+  "Division": "Bei der ___ teilt man eine Zahl.",
+  "Bruchrechnung": "___ braucht viel Übung.",
+  "Dezimalzahl": "3,14 ist eine ___.",
+  "Rechnung": "Die ___ hat leider einen Fehler.",
+  "Prozent": "Zwanzig ___ der Klasse fehlten.",
+  "Wahrscheinlichkeit": "Die ___ des Regens beträgt achtzig Prozent.",
+  "Verhältnis": "Das ___ von Länge zu Breite ist zwei zu eins.",
+  "Durchschnitt": "Der ___ der Klasse lag bei sieben Punkten.",
+  "Differenz": "Die ___ zwischen acht und drei ist fünf.",
+  "Produkt": "Das ___ von vier mal fünf ist zwanzig.",
+  "Quotient": "Der ___ von zehn geteilt durch zwei ist fünf.",
+  "Mittelalter": "Im ___ lebten Ritter und Burgfräulein.",
+  "Aufklärung": "Die ___ brachte neue Ideen über Freiheit.",
+  "Revolution": "Die ___ veränderte die Gesellschaft.",
+  "Kolonialismus": "Der ___ hatte viele negative Folgen.",
+  "Industrialisierung": "Die ___ veränderte die Arbeitswelt.",
+  "Verfassung": "Die ___ ist das wichtigste Gesetz eines Landes.",
+  "Menschenrechte": "___ gelten für alle Menschen.",
+  "Grundgesetz": "Das ___ schützt unsere Grundrechte.",
+  "Parlamentarismus": "Im ___ werden Gesetze durch gewählte Vertreter gemacht.",
+  "Bürgerrechte": "___ sichern die Freiheit des Einzelnen.",
+  "Organismus": "Jeder ___ braucht Energie zum Überleben.",
+  "Zelle": "Die ___ ist die kleinste Einheit des Lebens.",
+  "Zellkern": "Im ___ befindet sich die DNA.",
+  "Evolution": "Die ___ erklärt die Vielfalt des Lebens.",
+  "Verdauung": "Die ___ beginnt schon im Mund.",
+  "Blutkreislauf": "Das Herz treibt den ___ an.",
+  "Atmungssystem": "Das ___ versorgt den Körper mit Sauerstoff.",
+  "Immunsystem": "Das ___ schützt uns vor Krankheiten.",
+  "Verbindung": "Wasser ist eine chemische ___.",
+  "Reaktion": "Bei der ___ entstehen neue Stoffe.",
+  "Aggregatzustand": "Eis, Wasser und Dampf sind ___ desselben Stoffs.",
+  "Aggregation": "Bei der ___ schließen sich Teilchen zusammen.",
+  "Magnetismus": "Durch ___ werden Eisenobjekte angezogen.",
+  "Elektrizität": "___ ermöglicht das Leuchten der Glühbirne.",
+  "Schwerkraft": "Die ___ hält uns auf dem Boden.",
+  "Wellenlänge": "Jede Farbe hat eine bestimmte ___.",
+  "Frequenz": "Die ___ gibt an, wie oft eine Welle schwingt.",
+  "Unternehmen": "Das ___ beschäftigt hundert Mitarbeiter.",
+  "Aktionär": "Ein ___ besitzt Anteile an einem Unternehmen.",
+  "Kapitalismus": "Im ___ bestimmt der Markt die Preise.",
+  "Gewinn": "Das Unternehmen erzielte hohen ___.",
+  "Verlust": "Nach dem Sturm entstand ein großer ___.",
+  "Investition": "Eine ___ in Bildung lohnt sich immer.",
+  "Beschäftigung": "___ ist wichtig für das Wohlbefinden.",
+  "Arbeitslosigkeit": "___ ist ein gesellschaftliches Problem.",
+  "Steuererhöhung": "Die ___ wurde intensiv diskutiert.",
+  "Inflation": "Bei hoher ___ verliert Geld an Wert.",
+  "Rechtschreibung": "Auf ___ sollte man immer achten.",
+  "Grammatik": "___ ist das Regelwerk einer Sprache.",
+  "Zeichensetzung": "Korrekte ___ macht Texte verständlicher.",
+  "Satzzeichen": "Punkt und Komma sind ___.",
+  "Aufsatz": "Der ___ soll zwei Seiten lang sein.",
+  "Erörterung": "In einer ___ werden Argumente abgewogen.",
+  "Beschreibung": "Eine genaue ___ hilft beim Verstehen.",
+  "Charakterisierung": "Die ___ der Hauptfigur war sehr detailliert.",
+  "Textanalyse": "Bei der ___ wird der Text genau untersucht.",
+  "Gedichtinterpretation": "Eine ___ braucht Belege aus dem Text.",
+  "Sprachkompetenz": "Lesen fördert die ___.",
+  "Wortschatz": "Ein großer ___ hilft beim Schreiben.",
+  "Grammatikfehler": "Bitte die ___ verbessern!",
+  "Fremdsprache": "Englisch ist seine erste ___.",
+  "Muttersprache": "Deutsch ist meine ___.",
+  "abbilden": "Das Diagramm soll die Daten ___.",
+  "ableiten": "Daraus lässt sich eine Regel ___.",
+  "abschreiben": "Beim Test ist ___ verboten.",
+  "achten": "Bitte auf Sauberkeit ___!",
+  "anbieten": "Er kann seine Hilfe ___.",
+  "andeuten": "Er wollte etwas ___, ohne es direkt zu sagen.",
+  "anfordern": "Weitere Informationen kannst du ___.",
+  "anlegen": "Sie möchte ein Tagebuch ___.",
+  "anpassen": "Das Tempo muss man an die Gruppe ___.",
+  "anwenden": "Die Regel sollst du jetzt ___.",
+  "auflösen": "Das Salz beginnt sich im Wasser zu ___.",
+  "aufzeigen": "Das Experiment kann Zusammenhänge ___.",
+  "ausdrücken": "Versuche deinen Gedanken klar zu ___.",
+  "auslösen": "Das Lachen konnte er nicht ___.",
+  "auswählen": "Du darfst ein Thema frei ___.",
+  "beantworten": "Kannst du die Frage ___?",
+  "begründen": "Bitte deine Meinung ___!",
+  "behalten": "Die Regel musst du dir ___.",
+  "bemerken": "Hast du den Fehler ___?",
+  "benutzen": "Im Unterricht darf man das Wörterbuch ___.",
+  "beraten": "Der Lehrer kann dich gut ___.",
+  "bestätigen": "Die Antwort konnte er ___.",
+  "bewegen": "Sport ___ dich und hält dich gesund.",
+  "beweisen": "Das musst du erst ___.",
+  "bezeichnen": "Wie kann man das ___?",
+  "bilden": "Zusammen ___ wir ein starkes Team.",
+  "durchführen": "Wir sollen das Experiment morgen ___.",
+  "einhalten": "Regeln muss man ___.",
+  "einleiten": "Wie kann man den Aufsatz ___?",
+  "einteilen": "Die Zeit muss man gut ___.",
+  "einwirken": "Musik kann positiv auf die Stimmung ___.",
+  "festhalten": "Bitte die Ergebnisse ___!",
+  "feststellen": "Wir konnten ___, dass die Lösung stimmt.",
+  "gelingen": "Mit Übung wird es dir ___.",
+  "gestalten": "Du kannst das Plakat frei ___.",
+  "gliedern": "Den Aufsatz sollte man sinnvoll ___.",
+  "herausfinden": "Versuche die Antwort selbst zu ___!",
+  "hinweisen": "Die Lehrerin möchte auf einen Fehler ___.",
+  "nachvollziehen": "Kannst du meinen Gedankengang ___?",
+  "prüfen": "Bitte deine Antwort nochmal ___!",
+  "sammeln": "Informationen kann man im Internet ___.",
+  "stützen": "Deine Meinung musst du mit Belegen ___.",
+  "umgehen": "Mit Konflikten kann man lösungsorientiert ___.",
+  "verdeutlichen": "Ein Beispiel kann das gut ___.",
+  "vereinfachen": "Versuche die Erklärung zu ___.",
+  "verfassen": "Sie soll einen Brief ___.",
+  "vorgehen": "Wie soll man bei der Aufgabe ___?",
+  "zeichnen": "Bitte ein Diagramm ___!",
+  "zuordnen": "Ordne die Begriffe den Kategorien ___!",
+  "zurückführen": "Das lässt sich auf einen Fehler ___.",
+  "zusammenstellen": "Eine Liste von Quellen muss man ___.",
+  "ausführlich": "Bitte ___ antworten!",
+  "eigenständig": "Die Aufgabe soll ___ gelöst werden.",
+  "einheitlich": "Das Schriftbild sollte ___ sein.",
+  "entsprechend": "Wähle das ___ Werkzeug!",
+  "erheblich": "Der Unterschied ist ___.",
+  "fähig": "Mit Übung ist jeder dazu ___.",
+  "gründlich": "Bitte die Aufgabe ___ bearbeiten!",
+  "inhaltlich": "Der Aufsatz war ___ sehr gut.",
+  "konsequent": "Sie lernte ___ jeden Tag.",
+  "kreativ": "Beim Basteln darf man ___ sein.",
+  "logisch": "Die Erklärung ist ___ und klar.",
+  "nachhaltig": "Umweltschutz muss ___ sein.",
+  "objektiv": "Ein Journalist sollte ___ berichten.",
+  "offensichtlich": "Er hat ___ die Aufgabe vergessen.",
+  "praktisch": "Das Werkzeug ist sehr ___.",
+  "sachlich": "Bitte ___ antworten!",
+  "sorgfältig": "Die Arbeit wurde ___ erledigt.",
+  "spezifisch": "Das ist ein sehr ___ Fachbegriff.",
+  "systematisch": "Sie geht ___ vor.",
+  "typisch": "Das ist ___ für einen Herbsttag.",
+  "umfangreich": "Das Projekt war sehr ___.",
+  "umfassend": "Der Bericht war ___ und detailliert.",
+  "verständlich": "Die Erklärung war klar und ___.",
+  "wesentlich": "Der ___ Punkt fehlt noch.",
+  "wirkungsvoll": "Die Präsentation war sehr ___.",
+  "wissenschaftlich": "Das Experiment wurde ___ ausgewertet.",
+  "zutreffend": "Welche Aussage ist ___?",
+  "Prüfung": "Die ___ wird morgen geschrieben.",
+  "Hausaufgabe": "Vergiss deine ___ nicht!",
+  "Klassenarbeit": "Die ___ war schwieriger als erwartet.",
+  "Schulaufgabe": "Heute haben wir eine ___.",
+  "Überschrift": "Schreibe eine passende ___ für den Text.",
+  "Fachbegriff": "Der ___ muss genau erklärt werden.",
+  "Fachvokabular": "In der Biologie gibt es viel ___.",
+  "Lernziel": "Das ___ dieser Stunde ist klar.",
+  "Unterricht": "Der ___ beginnt um acht Uhr.",
+  "Verständnis": "Gutes ___ braucht Übung und Geduld.",
+  "Bewertung": "Die ___ erfolgt nach festen Kriterien.",
+  "Beurteilung": "Die ___ des Lehrers war fair.",
+  "Halbjahr": "Am Ende des ___ gibt es Zeugnisse.",
+  "Schuljahr": "Das neue ___ beginnt im September.",
+  "Nachhilfe": "Er geht einmal pro Woche zur ___.",
+  "Lerngruppe": "In der ___ hilft man sich gegenseitig.",
+  "Klassenraum": "Der ___ wurde neu gestrichen.",
+  "Schulbuch": "Das ___ liegt auf dem Tisch.",
+  "Mannschaft": "Unsere ___ hat gewonnen!",
+  "Wettkampf": "Beim ___ gab jeder sein Bestes.",
+  "Meisterschaft": "Die ___ findet nächsten Monat statt.",
+  "Wettbewerb": "Am ___ nehmen zwanzig Schulen teil.",
+  "Sportplatz": "Auf dem ___ wird trainiert.",
+  "Schiedsrichter": "Der ___ pfiff das Foul.",
+  "Halbzeit": "In der ___ gab es Wasser für alle.",
+  "Aufstellung": "Der Trainer änderte die ___.",
+  "Training": "Heute ist ___ um vier Uhr.",
+  "Schwimmbad": "Im ___ ist das Wasser gut geheizt.",
+  "Fitnessstudio": "Er geht dreimal pro Woche ins ___.",
+  "Arzt": "Der ___ hat mich untersucht.",
+  "Krankenhaus": "Er musste ins ___ gebracht werden.",
+  "Medikament": "Das ___ muss dreimal täglich eingenommen werden.",
+  "Behandlung": "Die ___ hat geholfen.",
+  "Impfung": "Die ___ schützt vor der Krankheit.",
+  "Allergie": "Sie hat eine ___ gegen Hausstaub.",
+  "Entzündung": "Die ___ am Finger schmerzt.",
+  "Erkältung": "Bei einer ___ hilft viel Schlaf.",
+  "Krankheit": "Die ___ brach plötzlich aus.",
+  "Schmerzen": "Die ___ lassen nach einer Weile nach.",
+  "Temperatur": "Der Arzt misst die ___.",
+  "Diagnose": "Die ___ des Arztes war eindeutig.",
+  "Therapie": "Die ___ dauert mehrere Wochen.",
+  "Psychiatrie": "Die ___ kümmert sich um seelische Gesundheit.",
+  "Computer": "Der ___ startet heute langsam.",
+  "Software": "Die neue ___ läuft besser als die alte.",
+  "Internet": "Im ___ findet man viele Informationen.",
+  "Tastatur": "Er tippte auf der ___.",
+  "Bildschirm": "Der ___ ist zu hell eingestellt.",
+  "Algorithmus": "Ein ___ löst ein Problem Schritt für Schritt.",
+  "Datenverarbeitung": "___ erfolgt heute meistens automatisch.",
+  "Netzwerk": "Das ___ verbindet alle Computer im Haus.",
+  "Programmierung": "___ ist eine wichtige Fähigkeit.",
+  "Schnittstelle": "Die ___ zwischen den Geräten funktioniert.",
+  "Dateiverwaltung": "Gute ___ spart Zeit.",
+  "Verschlüsselung": "___ schützt wichtige Daten.",
+  "anschließend": "Wir bearbeiten ___ die zweite Aufgabe.",
+  "schließlich": "Die Lösung kam ___ wie von selbst.",
+  "zusammenfassend": "Man kann ___ sagen, dass alles geklappt hat.",
+  "abschließend": "Die Klasse bedankte sich ___ beim Lehrer.",
+  "einerseits": "Es ist ___ einfach, andererseits riskant.",
+  "andererseits": "Einerseits macht es Spaß, ___ kostet es Zeit.",
+  "zum einen": "Es ist ___ billig, zum anderen praktisch.",
+  "zum anderen": "Zum einen ist es schnell, ___ auch sicher.",
+  "ebenso": "Mathematik ist wichtig, ___ Deutsch.",
+  "hingegen": "Er lacht viel, sie ___ selten.",
+  "dagegen": "Alle stimmten zu, er ___ nicht.",
+  "dennoch": "Es regnete, ___ gingen wir spazieren.",
+  "allerdings": "Es war schön, ___ auch anstrengend.",
+  "infolgedessen": "Es schneite, ___ fuhr der Zug nicht.",
+  "dementsprechend": "Die Regel ist bekannt, ___ sollte man sie kennen.",
+  "demzufolge": "Er fehlte gestern, ___ weiß er nichts.",
+  "diesbezüglich": "Es gibt ___ noch offene Fragen.",
+  "letzten Endes": "Das ist ___ deine Entscheidung.",
+  "gleichzeitig": "Sie lacht und weint ___.",
+  "folglich": "Er lernte viel, ___ bestand er die Prüfung.",
+  "beispielsweise": "Tiere wie ___ Hunde sind treue Freunde.",
+  "unter anderem": "Der Bericht enthält ___ Statistiken.",
+  "im Gegensatz dazu": "Er ist still, ___ seine Schwester sehr laut.",
+  "in diesem Zusammenhang": "Das Wetter ist ___ auch wichtig.",
+  "Frühstück": "Zum ___ esse ich Brot mit Marmelade.",
+  "Mittagessen": "Das ___ gibt es um zwölf Uhr.",
+  "Abendessen": "Zum ___ kochen wir Nudeln.",
+  "Getränk": "Ein kühles ___ schmeckt gut im Sommer.",
+  "Einkauf": "Den ___ erledigt Mama am Samstag.",
+  "Schlafzimmer": "Im ___ ist es ruhig und dunkel.",
+  "Kühlschrank": "Der ___ muss aufgeräumt werden.",
+  "Waschmaschine": "Die ___ läuft schon seit einer Stunde.",
+  "Führerschein": "Mit achtzehn kann man den ___ machen.",
+  "Ausweise": "Alle ___ müssen vorgezeigt werden.",
+  "Reisepass": "Für die Reise brauche ich meinen ___.",
+  "Geburtsurkunde": "Die ___ wird beim Standesamt ausgestellt.",
+  "Krankenversicherung": "Jeder braucht eine ___.",
+  "Rentenversicherung": "Die ___ sichert das Alter ab.",
+  "Sozialversicherung": "Die ___ schützt Arbeitnehmer.",
+  "Arbeitgeber": "Der ___ zahlt das Gehalt.",
+  "Arbeitnehmer": "Der ___ arbeitet für das Unternehmen.",
+  "kochen": "Mama kann sehr gut ___.",
+  "waschen": "Du musst dir die Hände ___.",
+  "schlafen": "Kinder sollen genug ___.",
+  "aufwachen": "Er ___ jeden Morgen um sieben.",
+  "anziehen": "Vergiss nicht, die Jacke ___.",
+  "einkaufen": "Wir müssen noch ___ gehen.",
+  "bezahlen": "An der Kasse muss er ___.",
+  "spazieren": "Nach dem Essen gehen wir ___.",
+  "telefonieren": "Er kann stundenlang ___.",
+  "fotografieren": "Im Urlaub liebt sie es zu ___.",
+  "sparen": "Sie möchte Geld für ein Fahrrad ___.",
+  "verdienen": "Mit einem Nebenjob kann man Geld ___.",
+  "ausgeben": "Er neigt dazu, zu viel Geld zu ___.",
+  "überweisen": "Den Betrag muss sie noch ___.",
+  "versichern": "Das Auto muss man ___.",
+  "wählen": "Mit achtzehn darf man ___.",
+  "abstimmen": "Die Klasse möchte über das Thema ___.",
+  "kandidieren": "Er möchte für den Klassensprecher ___.",
+  "regieren": "Ein Präsident darf vier Jahre ___.",
+  "verwalten": "Eine Gemeinde muss Finanzen gut ___.",
+  "aufgeregt": "Vor dem Auftritt war sie sehr ___.",
+  "ängstlich": "Das Kind ist ___ vor großen Hunden.",
+  "mutig": "Der Feuerwehrmann ist sehr ___.",
+  "tapfer": "Sie war ___ und ließ sich nicht einschüchtern.",
+  "freundlich": "Die Verkäuferin war sehr ___.",
+  "höflich": "Man sollte immer ___ sein.",
+  "ehrlich": "Sei immer ___, auch wenn es schwer fällt.",
+  "pünktlich": "Er ist immer ___ zur Schule.",
+  "fleißig": "Sie ist sehr ___ und macht immer ihre Hausaufgaben.",
+  "faul": "Heute war er sehr ___ und hat nichts getan.",
+  "lustig": "Der Film war sehr ___.",
+  "traurig": "Er war ___, weil sein Freund weggezogen war.",
+  "wütend": "Sie war sehr ___ über die Ungerechtigkeit.",
+  "stolz": "Er war ___ auf seine gute Note.",
+  "neugierig": "Kinder sind von Natur aus ___.",
+  "geduldig": "Man muss ___ sein, wenn man etwas Neues lernt.",
+  "ungeduldig": "Er wurde ___, weil es so lange dauerte.",
+  "verständnisvoll": "Die Lehrerin war sehr ___ .",
+  "rücksichtsvoll": "Im Verkehr sollte man ___ sein.",
+  "Thema": "Das ___ des Aufsatzes ist der Klimawandel.",
+  "Theorie": "Eine ___ muss bewiesen werden.",
+  "These": "Deine ___ klingt interessant.",
+  "Thesen": "Die drei ___ des Vortrags waren klar.",
+  "Phase": "In der zweiten ___ wird das Experiment wiederholt.",
+  "Phrase": "Diese ___ hört man sehr oft.",
+  "Physik": "In ___ lernen wir über Kräfte.",
+  "Fotograf": "Der ___ machte viele schöne Aufnahmen.",
+  "Rhythmus": "Das Lied hat einen schönen ___.",
+  "Mathematik": "___ ist mein Lieblingsfach.",
+  "Chemie": "In ___ führen wir Experimente durch.",
+  "Cholesterin": "Zu viel ___ ist ungesund.",
+  "Chronik": "Die ___ der Stadt ist sehr interessant.",
+  "Chaos": "Im Zimmer herrschte völliges ___.",
+  "chaotisch": "Die Situation war ziemlich ___.",
+  "Mechanik": "___ beschäftigt sich mit Bewegungen.",
+  "Psychologie": "___ untersucht das menschliche Verhalten.",
+  "Ökologie": "___ beschäftigt sich mit Lebensräumen.",
+  "Biologie": "In ___ lernen wir über Pflanzen und Tiere.",
+  "Geographie": "In ___ lernen wir Länder und Kontinente kennen.",
+  "Pädagogik": "___ ist die Wissenschaft vom Lehren.",
+  "Linguistik": "___ ist die Wissenschaft der Sprache.",
+  "Rhetorik": "In der ___ lernt man überzeugend zu sprechen.",
+  "Hymne": "Die Nationalhymne ist eine ___ .",
+  "Symphonie": "Die neunte ___ von Beethoven ist berühmt.",
+  "Gymnasium": "Das ___ ist eine weiterführende Schule.",
+  "Bundesverfassung": "Die ___ legt die Grundrechte fest.",
+  "Rechtsstaatlichkeit": "___ bedeutet, dass das Recht für alle gilt.",
+  "Gewaltenteilung": "___ verhindert Machtmissbrauch.",
+  "Meinungsfreiheit": "___ ist ein wichtiges Grundrecht.",
+  "Pressefreiheit": "___ schützt Journalisten.",
+  "Religionsfreiheit": "___ gilt in Deutschland für alle.",
+  "Versammlungsfreiheit": "___ erlaubt friedliche Demonstrationen.",
+  "Gewissensfreiheit": "___ schützt persönliche Überzeugungen.",
+  "Redefreiheit": "___ gilt überall in der Demokratie.",
+  "Gleichberechtigung": "___ bedeutet, dass alle gleiche Rechte haben.",
+  "Eigenverantwortung": "___ ist ein Zeichen von Reife.",
+  "Selbstbestimmung": "___ bedeutet, selbst zu entscheiden.",
+  "Auseinandersetzung": "Eine friedliche ___ ist wichtig.",
+  "Wechselwirkung": "Zwischen Ursache und Wirkung gibt es eine ___.",
+  "Interessenkonflikt": "Ein ___ entsteht, wenn Meinungen sich widersprechen.",
+  "Bevölkerungsentwicklung": "Die ___ zeigt, wie die Einwohnerzahl sich verändert.",
+  "Wirtschaftswachstum": "___ bedeutet, dass mehr produziert wird.",
+  "Umweltverschmutzung": "___ schadet Tieren und Menschen.",
+  "Klimaschutzpolitik": "___ ist heute wichtiger denn je.",
+  "Zukunftsperspektive": "Mit Bildung hat man gute ___n.",
+  "aufpassen": "Bitte im Unterricht ___!",
+  "aufräumen": "Dein Zimmer musst du ___.",
+  "Bescheid wissen": "Er möchte über alles ___.",
+  "Fortschritte machen": "Du wirst beim Lesen bald ___ .",
+  "in Frage stellen": "Man sollte auch bewährte Methoden ___.",
+  "zur Verfügung stehen": "Die Geräte werden ab morgen ___.",
+  "in Anspruch nehmen": "Die Hilfe kann man jederzeit ___.",
+  "zum Ausdruck bringen": "Deine Gefühle kannst du durch Schreiben ___.",
+};
+
+
+
 /* ─── CHALLENGE GENERATOR ─────────────────────────────────────────────────── */
 const CAT_QUESTIONS = {
   1: ["Mit ie oder ei?", "ie, ih oder ieh?", "Hör genau hin:"],
@@ -1748,23 +3311,30 @@ const CAT_QUESTIONS = {
   10: ["Tippe das Wort:", "Hör genau hin:"],
 };
 
-function generateChallenges(monsterId, difficulty) {
+function generateChallenges(monsterId, difficulty, wordStats = {}) {
   const words = getWordsForMonster(monsterId, difficulty);
   if (!words.length) return [];
-  const shuffled = fisherYates(words);
+  // Fällige und fehlerhafte Wörter zuerst, dann Rest zufällig
+  const prioritized = sortWordsByPriority(words, wordStats);
+  // Die ersten 60% nach Priorität, Rest shuffled – für Balance
+  const cutoff = Math.ceil(prioritized.length * 0.6);
+  const front = prioritized.slice(0, cutoff);
+  const back  = fisherYates(prioritized.slice(cutoff));
+  const shuffled = [...front, ...back];
   const challenges = [];
 
   for (let i = 0; i < shuffled.length; i++) {
     const [word, catId, typErr] = shuffled[i];
     const qs = CAT_QUESTIONS[catId] || ["Tippe das Wort:"];
 
+    const sentence = SENTENCES[word] || null;
     if (i % 2 === 0) {
-      challenges.push({ q: qs[Math.floor(Math.random() * qs.length)], word, audio: true, type: "input" });
+      challenges.push({ q: qs[Math.floor(Math.random() * qs.length)], word, audio: true, type: "input", sentence });
     } else {
       const allErrs = generateErrors(word, catId, typErr);
       const wrong = fisherYates(allErrs).slice(0, 2);
       while (wrong.length < 2) wrong.push(word.slice(0,-1) + (wrong.length === 0 ? "e" : "n"));
-      challenges.push({ q: "Was ist richtig?", word, options: fisherYates([word, ...wrong]), correct: word, type: "choice" });
+      challenges.push({ q: "Was ist richtig?", word, options: fisherYates([word, ...wrong]), correct: word, type: "choice", sentence });
     }
   }
   return challenges;
@@ -1788,13 +3358,14 @@ function generatePruferQuestions() {
     for (let i = 0; i < picked.length; i++) {
       const [word, catId, typErr] = picked[i];
       const hint = catNames[catId] || "Rechtschreibung";
+      const sentence = SENTENCES[word] || null;
       if (i % 2 === 0) {
-        questions.push({ q: "Tippe das Wort:", word, audio: true, type: "input", diff, hint });
+        questions.push({ q: "Tippe das Wort:", word, audio: true, type: "input", diff, hint, sentence });
       } else {
         const allErrs = generateErrors(word, catId, typErr);
         const wrong = fisherYates(allErrs).slice(0, 2);
         while (wrong.length < 2) wrong.push(word.slice(0,-1) + "e");
-        questions.push({ q: "Was ist richtig?", word, options: fisherYates([word, ...wrong]), correct: word, type: "choice", diff, hint });
+        questions.push({ q: "Was ist richtig?", word, options: fisherYates([word, ...wrong]), correct: word, type: "choice", diff, hint, sentence });
       }
     }
   }
@@ -1818,7 +3389,7 @@ const MONSTERS = [
     zoneEmoji: "🌫️",
     type: "ei_ie",
     level: 1,
-    maxHp: 80,
+    maxHp: 120,
     attack: 12,
     color: "#06b6d4",
     darkColor: "#0e4f60",
@@ -1837,13 +3408,13 @@ const MONSTERS = [
     zoneEmoji: "🪞",
     type: "bd",
     level: 2,
-    maxHp: 90,
+    maxHp: 130,
     attack: 15,
     color: "#a78bfa",
     darkColor: "#2d1b69",
     bgFrom: "#0a0315",
     bgTo: "#150828",
-    battleCry: "b… d… d… b… welches ist welches? Bahahaha!",
+    battleCry: "b… d… d… b… welches ist welches?",
     weakMsg: "Du erkennst den Unterschied! Spiegelgeist ist verwirrt!",
     defeatMsg: "Der Spiegelgeist zerspringt in tausend Splitter. b ist b und d ist d!",
     lore: "Verwandelt b in d und zurück. Lauert in Spiegeln und verdreht Buchstaben.",
@@ -1856,13 +3427,13 @@ const MONSTERS = [
     zoneEmoji: "⚡",
     type: "doppel",
     level: 3,
-    maxHp: 100,
+    maxHp: 140,
     attack: 18,
     color: "#f59e0b",
     darkColor: "#78350f",
     bgFrom: "#120800",
     bgTo: "#1f1000",
-    battleCry: "Kommen oder kommen?? Zwei m oder einss???",
+    battleCry: "Kommen oder kommen? Zwei m oder eins?",
     weakMsg: "Dein Regelwissen trifft den Troll! Doppelt hält besser!",
     defeatMsg: "Der Doppel-Troll schrumpft auf Einzel-Trollgröße. Klar: kommen mit mm!",
     lore: "Streut überall doppelte Konsonanten – oder lässt sie weg. Lebt in der Ungewissheit.",
@@ -1875,13 +3446,13 @@ const MONSTERS = [
     zoneEmoji: "🌑",
     type: "auslaut",
     level: 4,
-    maxHp: 110,
+    maxHp: 150,
     attack: 20,
     color: "#64748b",
     darkColor: "#1e293b",
     bgFrom: "#030508",
     bgTo: "#0a0f18",
-    battleCry: "Hund oder Hunt? Das klingt doch gleich! Mwahaha!",
+    battleCry: "Hund oder Hunt? Das klingt doch gleich!",
     weakMsg: "Verlängerungstrick! Der Schattenfürst verliert seine Kraft!",
     defeatMsg: "Der Schattenfürst weicht dem Licht der Verlängerungsregel!",
     lore: "Verhärtet alle Auslaute. Hund klingt wie Hunt – und er WILL, dass du es falsch schreibst.",
@@ -1894,13 +3465,13 @@ const MONSTERS = [
     zoneEmoji: "📚",
     type: "mixed",
     level: 5,
-    maxHp: 130,
+    maxHp: 160,
     attack: 22,
     color: "#ec4899",
     darkColor: "#831843",
     bgFrom: "#150010",
     bgTo: "#1f0018",
-    battleCry: "Regeln? REGELN?! Ich zerreisse alle Regeln! Muhahaha!",
+    battleCry: "Regeln? Ich zerreisse alle Regeln!",
     weakMsg: "Dein Regelwissen macht den Regelbrecher schwach!",
     defeatMsg: "Der Regelbrecher kapituliert! Du hast alle seine Tricks durchschaut!",
     lore: "Der mächtigste Monster. Mischt alle Fehlertypen durcheinander. Besiege ihn und du hast alle Angstmonster überwunden.",
@@ -1913,13 +3484,13 @@ const MONSTERS = [
     zoneEmoji: "💀",
     type: "allgemein",
     level: 6,
-    maxHp: 140,
+    maxHp: 170,
     attack: 24,
     color: "#84cc16",
     darkColor: "#365314",
     bgFrom: "#050a00",
     bgTo: "#0f1a05",
-    battleCry: "Nom nom nom… ich fresse alle Buchstaben! Schreib schneller!",
+    battleCry: "Ich fresse alle Buchstaben! Schreib schneller!",
     weakMsg: "Der Wortfresser verschluckt sich an deiner Antwort!",
     defeatMsg: "Der Wortfresser ist satt und gibt auf. Du beherrschst die Wörter!",
     lore: "Frisst ganze Wörter und spuckt sie falsch geschrieben wieder aus. Der hungrigste aller Monster.",
@@ -1927,8 +3498,8 @@ const MONSTERS = [
 ];
 
 // Dynamic challenge generation from word bank
-function getChallenges(monster, difficulty) {
-  return generateChallenges(monster.id, difficulty);
+function getChallenges(monster, difficulty, wordStats = {}) {
+  return generateChallenges(monster.id, difficulty, wordStats);
 }
 
 /* ─── PRÜFER DATA (Diagnostic Boss) ─────────────────────────────────────── */
@@ -2199,7 +3770,28 @@ function ChallengePanel({ challenge, onCorrect, onWrong, monsterColor }) {
       <div style={{ fontSize: 11, fontWeight: 700, color: monsterColor, letterSpacing: 2, textTransform: "uppercase", marginBottom: 12, fontFamily: "'Outfit', sans-serif" }}>
         ⚔️ ANGRIFF
       </div>
-      <div style={{ fontSize: 14, color: "#c7cde8", marginBottom: 14, fontFamily: "'Outfit', sans-serif" }}>{challenge.q}</div>
+      <div style={{ fontSize: 14, color: "#c7cde8", marginBottom: challenge.sentence ? 8 : 14, fontFamily: "'Outfit', sans-serif" }}>{challenge.q}</div>
+
+      {challenge.sentence && (
+        <div style={{
+          fontSize: 15, color: "#94a3b8", marginBottom: 14, fontFamily: "'Outfit', sans-serif",
+          background: "#07091a", borderRadius: 8, padding: "8px 12px",
+          borderLeft: `3px solid ${monsterColor}66`, lineHeight: 1.6,
+        }}>
+          {challenge.sentence.split("___").map((part, i, arr) => (
+            <span key={i}>
+              {part}
+              {i < arr.length - 1 && (
+                <span style={{
+                  display: "inline-block", minWidth: 60, borderBottom: "2px dashed #475569",
+                  textAlign: "center", margin: "0 2px", color: "#fbbf24", fontWeight: 700,
+                  fontFamily: "'JetBrains Mono', monospace",
+                }}>{submitted ? challenge.word : "\u00A0?\u00A0"}</span>
+              )}
+            </span>
+          ))}
+        </div>
+      )}
 
       {challenge.type === "input" && (
         <>
@@ -2292,9 +3884,9 @@ function DiagnoseBoss({ onComplete }) {
   const BOSS_HP_MAX = 100;
 
   useEffect(() => {
-    // TTS nur fuer Woerter, nicht fuer Monster-Texte
     setLog([{ text: "Der Prüfer erscheint!", color: "#a78bfa" },
             { text: '"Ich bin der Prüfer! Zeig mir… was du kannst!"', color: "#ef4444" }]);
+    tts.monster("Ich bin der Prüfer! Zeig mir, was du kannst!");
     setTimeout(() => setPhase("battle"), 2200);
   }, []);
 
@@ -2456,7 +4048,27 @@ function DiagnoseBoss({ onComplete }) {
         {/* Challenge */}
         <div style={{ background: "#0d1333", border: "2px solid #a78bfa44", borderRadius: 14, padding: "18px 20px" }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: "#a78bfa", letterSpacing: 2, textTransform: "uppercase", marginBottom: 12, fontFamily: "'Outfit', sans-serif" }}>⚔️ ANGRIFF</div>
-          <div style={{ fontSize: 14, color: "#c7cde8", marginBottom: 14, fontFamily: "'Outfit', sans-serif" }}>{q.q}</div>
+          <div style={{ fontSize: 14, color: "#c7cde8", marginBottom: q.sentence ? 8 : 14, fontFamily: "'Outfit', sans-serif" }}>{q.q}</div>
+          {q.sentence && (
+            <div style={{
+              fontSize: 15, color: "#94a3b8", marginBottom: 14, fontFamily: "'Outfit', sans-serif",
+              background: "#07091a", borderRadius: 8, padding: "8px 12px",
+              borderLeft: "3px solid #a78bfa66", lineHeight: 1.6,
+            }}>
+              {q.sentence.split("___").map((part, i, arr) => (
+                <span key={i}>
+                  {part}
+                  {i < arr.length - 1 && (
+                    <span style={{
+                      display: "inline-block", minWidth: 60, borderBottom: "2px dashed #475569",
+                      textAlign: "center", margin: "0 2px", color: "#fbbf24", fontWeight: 700,
+                      fontFamily: "'JetBrains Mono', monospace",
+                    }}>{submitted ? q.word : "\u00A0?\u00A0"}</span>
+                  )}
+                </span>
+              ))}
+            </div>
+          )}
           {q.type === "input" && (
             <>
               {q.audio && (
@@ -2480,6 +4092,141 @@ function DiagnoseBoss({ onComplete }) {
             </div>
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── SESSION PAUSE SCREEN ───────────────────────────────────────────────── */
+function SessionPauseScreen({ roundNum, roundCorrect, roundWrong, roundVictory, sessionCorrect, threshold, monsterName, monsterEmoji, onNext }) {
+  const [countdown, setCountdown] = useState(PAUSE_DURATION);
+
+  useEffect(() => {
+    const t = setInterval(() => {
+      setCountdown(c => {
+        if (c <= 1) { clearInterval(t); onNext(); return 0; }
+        return c - 1;
+      });
+    }, 1000);
+    return () => clearInterval(t);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return (
+    <div style={{ minHeight: "100%", background: "linear-gradient(160deg, #030712 0%, #0d1333 100%)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "'Outfit', sans-serif" }}>
+      <div style={{ maxWidth: 420, width: "100%", textAlign: "center" }}>
+
+        {/* Runden-Fortschritt */}
+        <div style={{ display: "flex", justifyContent: "center", gap: 6, marginBottom: 20 }}>
+          {Array.from({ length: SESSION_ROUNDS }, (_, i) => (
+            <div key={i} style={{ width: 28, height: 6, borderRadius: 3, background: i < roundNum ? "#a78bfa" : "#1e293b", transition: "background 0.3s" }} />
+          ))}
+        </div>
+
+        <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 9, color: "#475569", marginBottom: 12, letterSpacing: 1 }}>
+          RUNDE {roundNum} / {SESSION_ROUNDS}
+        </div>
+
+        <div style={{ fontSize: 40, marginBottom: 8 }}>{roundVictory ? "✅" : "⏱️"}</div>
+        <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 10, color: roundVictory ? "#4ade80" : "#f59e0b", marginBottom: 4 }}>
+          {roundVictory ? "GESCHAFFT!" : "ZEIT UM"}
+        </div>
+        <div style={{ color: "#64748b", fontSize: 13, marginBottom: 24 }}>{monsterEmoji} {monsterName}</div>
+
+        {/* Stats */}
+        <div style={{ display: "flex", gap: 10, justifyContent: "center", marginBottom: 24 }}>
+          <div style={{ background: "#0d1333", border: "1px solid #22c55e33", borderRadius: 12, padding: "12px 20px", minWidth: 110 }}>
+            <div style={{ fontSize: 10, color: "#64748b", marginBottom: 4 }}>Diese Runde</div>
+            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 26, fontWeight: 900, color: "#4ade80", lineHeight: 1 }}>
+              {roundCorrect}<span style={{ color: "#334155", fontSize: 14 }}>/{threshold}</span>
+            </div>
+            <div style={{ fontSize: 10, color: "#475569", marginTop: 3 }}>{roundWrong > 0 ? `${roundWrong} falsch` : "perfekt!"}</div>
+          </div>
+          <div style={{ background: "#0d1333", border: "1px solid #fbbf2433", borderRadius: 12, padding: "12px 20px", minWidth: 110 }}>
+            <div style={{ fontSize: 10, color: "#64748b", marginBottom: 4 }}>Session gesamt</div>
+            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 26, fontWeight: 900, color: "#fbbf24", lineHeight: 1 }}>
+              {sessionCorrect}
+            </div>
+            <div style={{ fontSize: 10, color: "#475569", marginTop: 3 }}>richtige Wörter</div>
+          </div>
+        </div>
+
+        {/* Countdown */}
+        <div style={{ background: "#1e293b", borderRadius: 8, overflow: "hidden", height: 6, marginBottom: 10 }}>
+          <div style={{ width: `${(countdown / PAUSE_DURATION) * 100}%`, height: "100%", background: "#a78bfa", transition: "width 1s linear" }} />
+        </div>
+        <div style={{ fontSize: 12, color: "#475569", marginBottom: 20 }}>
+          Nächste Runde in <span style={{ color: "#a78bfa", fontWeight: 700 }}>{countdown}s</span>
+        </div>
+
+        <button onClick={onNext} style={{ background: "#a78bfa", color: "#07091a", border: "none", borderRadius: 12, padding: "12px 28px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "'Outfit', sans-serif" }}>
+          Weiter →
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ─── SESSION END SCREEN ─────────────────────────────────────────────────── */
+function SessionEndScreen({ rounds, totalCorrect, totalWrong, streak, xpEarned, onBack }) {
+  const total = totalCorrect + totalWrong;
+  const pct = total > 0 ? Math.round((totalCorrect / total) * 100) : 0;
+
+  return (
+    <div style={{ minHeight: "100%", background: "linear-gradient(160deg, #030712 0%, #0a0a1a 100%)", overflowY: "auto", padding: "32px 16px", fontFamily: "'Outfit', sans-serif" }}>
+      <div style={{ maxWidth: 460, margin: "0 auto", textAlign: "center" }}>
+
+        <div style={{ fontSize: 60, marginBottom: 10, animation: "bounce 0.6s ease-out" }}>🏆</div>
+        <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 11, color: "#fbbf24", marginBottom: 8, lineHeight: 1.8 }}>
+          SESSION ABGESCHLOSSEN!
+        </div>
+        <div style={{ color: "#64748b", fontSize: 13, marginBottom: 24 }}>
+          {SESSION_ROUNDS} Runden · ~10 Minuten Übung
+        </div>
+
+        {/* Streak */}
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#120800", border: "1px solid #f59e0b44", borderRadius: 20, padding: "8px 20px", marginBottom: 24 }}>
+          <span style={{ fontSize: 22 }}>🔥</span>
+          <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 20, fontWeight: 900, color: "#f59e0b" }}>{streak}</span>
+          <span style={{ fontSize: 13, color: "#92400e" }}>Tag{streak !== 1 ? "e" : ""} in Folge</span>
+        </div>
+
+        {/* Hauptzahl */}
+        <div style={{ background: "#0d1333", border: "1px solid #4ade8055", borderRadius: 16, padding: "20px 24px", marginBottom: 16 }}>
+          <div style={{ fontSize: 11, color: "#64748b", letterSpacing: 1, marginBottom: 8 }}>HEUTE RICHTIG GESCHRIEBEN</div>
+          <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 64, fontWeight: 900, color: "#4ade80", lineHeight: 1 }}>{totalCorrect}</div>
+          <div style={{ fontSize: 13, color: "#475569", marginTop: 8 }}>Wörter · {pct}% Genauigkeit</div>
+        </div>
+
+        {/* XP */}
+        <div style={{ background: "#0d1333", border: "1px solid #fbbf2433", borderRadius: 12, padding: "12px 16px", marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+          <span style={{ fontSize: 20 }}>⚡</span>
+          <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 20, fontWeight: 900, color: "#fbbf24" }}>+{xpEarned} XP</span>
+          <span style={{ fontSize: 13, color: "#475569" }}>diese Session</span>
+        </div>
+
+        {/* Runden-Übersicht */}
+        <div style={{ background: "#0d1333", border: "1px solid #1e293b", borderRadius: 12, padding: "14px 16px", marginBottom: 28, textAlign: "left" }}>
+          <div style={{ fontSize: 10, color: "#475569", fontWeight: 700, letterSpacing: 1, marginBottom: 12 }}>RUNDENÜBERSICHT</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {rounds.map((r, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 8, color: "#334155", minWidth: 24 }}>R{i + 1}</span>
+                <span style={{ fontSize: 18 }}>{r.monster.zoneEmoji}</span>
+                <span style={{ fontSize: 12, color: "#64748b", flex: 1 }}>{r.monster.name}</span>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <div style={{ background: "#052e16", border: "1px solid #22c55e33", borderRadius: 6, padding: "2px 8px", fontFamily: "'JetBrains Mono', monospace", fontSize: 13, fontWeight: 700, color: "#4ade80" }}>
+                    {r.correct} ✓
+                  </div>
+                  <span style={{ fontSize: 16 }}>{r.victory ? "✅" : "⏱️"}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <button onClick={onBack} style={{ background: "#a78bfa", color: "#07091a", border: "none", borderRadius: 12, padding: "14px 40px", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "'Outfit', sans-serif" }}>
+          Zur Karte 🗺️
+        </button>
       </div>
     </div>
   );
@@ -2569,12 +4316,26 @@ function DifficultyPanel({ autoLevel, onConfirm }) {
 }
 
 /* ─── WORLD MAP ──────────────────────────────────────────────────────────── */
-function WorldMap({ onBattle, defeatedIds, xp, difficulty, onChangeDifficulty, onReset }) {
+function WorldMap({ onBattle, onStartSession, defeatedIds, xp, streak, difficulty, onChangeDifficulty, onReset, wordStats = {} }) {
+  const today = new Date().toISOString().split('T')[0];
+
+  // Berechne fällige Wörter pro Monster
+  function getDueCount(monsterId) {
+    const words = getWordsForMonster(monsterId, difficulty);
+    return words.filter(w => {
+      const s = wordStats[w[0]];
+      return !s || s.dueDate <= today;
+    }).length;
+  }
+
+  const totalDue = MONSTERS.reduce((sum, m) => sum + getDueCount(m.id), 0);
+
   return (
     <div style={{ minHeight: "100%", background: "linear-gradient(180deg, #030712 0%, #0a0a1a 100%)", padding: "24px 16px", fontFamily: "'Outfit', sans-serif" }}>
       <div style={{ maxWidth: 560, margin: "0 auto" }}>
+
         {/* Header */}
-        <div style={{ textAlign: "center", marginBottom: 32 }}>
+        <div style={{ textAlign: "center", marginBottom: 24 }}>
           <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 14, color: "#fbbf24", marginBottom: 8, lineHeight: 1.8 }}>
             WORT<br/>SCHMIEDE
           </div>
@@ -2583,10 +4344,14 @@ function WorldMap({ onBattle, defeatedIds, xp, difficulty, onChangeDifficulty, o
             <div style={{ background: "#1e293b", border: "1px solid #334155", borderRadius: 20, padding: "6px 16px", fontSize: 13, fontWeight: 700, color: "#fbbf24" }}>
               ⚡ {xp} XP
             </div>
+            {streak > 0 && (
+              <div style={{ background: "#120800", border: "1px solid #f59e0b44", borderRadius: 20, padding: "6px 16px", fontSize: 13, fontWeight: 700, color: "#f59e0b" }}>
+                🔥 {streak} Tag{streak !== 1 ? "e" : ""}
+              </div>
+            )}
             <div style={{ background: "#1e293b", border: "1px solid #334155", borderRadius: 20, padding: "6px 16px", fontSize: 13, fontWeight: 700, color: "#94a3b8" }}>
               {defeatedIds.length}/{MONSTERS.length} besiegt
             </div>
-            {/* Difficulty badge with change button */}
             <button onClick={onChangeDifficulty} style={{
               background: `${DIFF_COLORS[difficulty]}18`,
               border: `1px solid ${DIFF_COLORS[difficulty]}55`,
@@ -2600,47 +4365,83 @@ function WorldMap({ onBattle, defeatedIds, xp, difficulty, onChangeDifficulty, o
           </div>
         </div>
 
+        {/* SESSION START BUTTON */}
+        <div style={{ marginBottom: 28 }}>
+          <button
+            onClick={onStartSession}
+            style={{
+              width: "100%", background: "linear-gradient(135deg, #7c3aed, #a78bfa)",
+              border: "none", borderRadius: 16, padding: "18px 24px",
+              cursor: "pointer", fontFamily: "'Outfit', sans-serif",
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+              boxShadow: "0 4px 24px #7c3aed44",
+              transition: "transform 0.15s, box-shadow 0.15s",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 32px #7c3aed66"; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 4px 24px #7c3aed44"; }}
+          >
+            <div style={{ textAlign: "left" }}>
+              <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 10, color: "#07091a", marginBottom: 4 }}>
+                ▶ HEUTIGE SESSION
+              </div>
+              <div style={{ fontSize: 13, color: "#1e0f40", fontWeight: 600 }}>
+                {SESSION_ROUNDS} Runden · ~10 Minuten
+                {totalDue > 0 && <span style={{ marginLeft: 10, background: "#07091a33", borderRadius: 10, padding: "1px 8px" }}>🔁 {totalDue} fällig</span>}
+              </div>
+            </div>
+            <div style={{ fontSize: 32 }}>🗡️</div>
+          </button>
+        </div>
+
         {/* Lore */}
-        <div style={{ background: "#0d1333", border: "1px solid #1e293b", borderRadius: 14, padding: "16px 20px", marginBottom: 28, color: "#64748b", fontSize: 13, lineHeight: 1.7 }}>
+        <div style={{ background: "#0d1333", border: "1px solid #1e293b", borderRadius: 14, padding: "14px 18px", marginBottom: 24, color: "#64748b", fontSize: 12, lineHeight: 1.7 }}>
           🗺️ <strong style={{ color: "#94a3b8" }}>Die Angstmonster</strong> leben in deinem Kopf – überall dort, wo du unsicher bist beim Schreiben. Aber du kannst sie besiegen! Jede richtige Antwort ist ein Treffer. Jedes besiegte Monster macht dich stärker.
         </div>
 
         {/* Monster list */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {MONSTERS.map((m, i) => {
             const defeated = defeatedIds.includes(m.id);
-            const locked = i > 0 && !defeatedIds.includes(MONSTERS[i - 1].id);
+            const dueCount = getDueCount(m.id);
             return (
               <div
                 key={m.id}
-                onClick={() => !locked && onBattle(m)}
+                onClick={() => onBattle(m)}
                 style={{
                   background: defeated ? "#0a1a0a" : "#0d1333",
-                  border: `2px solid ${defeated ? "#22c55e44" : locked ? "#1e293b" : m.color + "55"}`,
-                  borderRadius: 16, padding: "18px 20px",
-                  cursor: locked ? "not-allowed" : "pointer",
-                  opacity: locked ? 0.45 : 1,
+                  border: `2px solid ${defeated ? "#22c55e44" : m.color + "55"}`,
+                  borderRadius: 16, padding: "16px 18px",
+                  cursor: "pointer",
                   transition: "transform 0.2s, box-shadow 0.2s",
-                  display: "flex", alignItems: "center", gap: 16,
+                  display: "flex", alignItems: "center", gap: 14,
                   position: "relative", overflow: "hidden",
                 }}
-                onMouseEnter={e => { if (!locked) { e.currentTarget.style.transform = "translateX(4px)"; e.currentTarget.style.boxShadow = `0 4px 24px ${m.color}22`; } }}
+                onMouseEnter={e => { e.currentTarget.style.transform = "translateX(4px)"; e.currentTarget.style.boxShadow = `0 4px 24px ${m.color}22`; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; }}
               >
-                {/* Glow accent */}
                 <div style={{ position: "absolute", top: 0, right: 0, width: 80, height: "100%", background: `linear-gradient(90deg, transparent, ${m.color}08)`, pointerEvents: "none" }}/>
-                <div style={{ fontSize: 36, minWidth: 44, textAlign: "center" }}>{m.zoneEmoji}</div>
+                <div style={{ fontSize: 34, minWidth: 40, textAlign: "center" }}>{m.zoneEmoji}</div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
                     <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 10, color: m.color }}>{m.name}</span>
                     <span style={{ background: "#1e293b", borderRadius: 4, padding: "2px 7px", fontSize: 10, color: "#64748b", fontWeight: 700 }}>Lv.{m.level}</span>
-                    {defeated && <span style={{ fontSize: 16 }}>✅</span>}
+                    {defeated && <span style={{ fontSize: 15 }}>✅</span>}
+                    {dueCount > 0 && (
+                      <span style={{
+                        background: "#7c3aed", color: "#fff",
+                        borderRadius: 10, padding: "1px 8px",
+                        fontSize: 10, fontWeight: 700,
+                        animation: "pulse 1.5s ease-in-out infinite",
+                      }}>
+                        🔁 {dueCount} fällig
+                      </span>
+                    )}
                   </div>
-                  <div style={{ fontSize: 12, color: "#64748b" }}>{m.title} · {m.zone}</div>
-                  <div style={{ fontSize: 11, color: "#475569", marginTop: 3, lineHeight: 1.4 }}>{m.lore}</div>
+                  <div style={{ fontSize: 11, color: "#64748b" }}>{m.title} · {m.zone}</div>
+                  <div style={{ fontSize: 11, color: "#475569", marginTop: 2, lineHeight: 1.4 }}>{m.lore}</div>
                 </div>
-                <div style={{ fontSize: 13, color: locked ? "#334155" : m.color, fontWeight: 700 }}>
-                  {locked ? "🔒" : defeated ? "Revanche" : "Kämpfen →"}
+                <div style={{ fontSize: 12, color: m.color, fontWeight: 700, whiteSpace: "nowrap" }}>
+                  {defeated ? "Revanche →" : "Kämpfen →"}
                 </div>
               </div>
             );
@@ -2698,14 +4499,21 @@ function spawnParticles(container, color, count = 9) {
   }
 }
 
-/* ─── BATTLE SCREEN ──────────────────────────────────────────────────────── */
-const PLAYER_MAX_HP = 100;
+/* ─── BATTLE SCREEN (Timer-basiert, kein Game-Over) ──────────────────────── */
+const ROUND_DURATION = 60; // 1 Minute pro Runde
 
-function BattleScreen({ monster, onVictory, onDefeat, onBack, addXP, difficulty }) {
-  const [playerHp, setPlayerHp] = useState(PLAYER_MAX_HP);
-  const [monsterHp, setMonsterHp] = useState(monster.maxHp);
+// Anzahl richtig geschriebener Wörter, die zum Sieg (nächstes Level) nötig sind
+const LEVEL_THRESHOLD = { leicht: 6, mittel: 8, hart: 10 };
+
+// Session-Konzept: 8 Runden à 1 Minute = ~10 Minuten täglich
+const SESSION_ROUNDS = 8;
+const PAUSE_DURATION = 12; // Sekunden Pause zwischen Runden
+
+function BattleScreen({ monster, onMonsterDefeated, onBack, difficulty, wordStats, onUpdateWordStats, timeLeft, onCorrectAnswer, onWrongAnswer, threshold }) {
+  const [monsterHp, setMonsterHp] = useState(threshold);
   const [chalIdx, setChalIdx] = useState(0);
-  const [phase, setPhase] = useState("intro"); // intro | battle | victory | defeat
+  const [chalKey, setChalKey] = useState(0);
+  const [phase, setPhase] = useState("intro"); // intro | battle
   const [log, setLog] = useState([{ text: `${monster.name} erscheint!`, color: monster.color }]);
   const [shake, setShake] = useState(false);
   const [playerShake, setPlayerShake] = useState(false);
@@ -2716,170 +4524,121 @@ function BattleScreen({ monster, onVictory, onDefeat, onBack, addXP, difficulty 
   const [isDying, setIsDying] = useState(false);
   const monsterRef = useRef(null);
 
-  // Challenges einmal generieren und stabil halten
-  const [challenges] = useState(() => getChallenges(monster, difficulty));
-
-  // Random sampling: shuffle challenge order so no word repeats until all shown
+  const [challenges] = useState(() => getChallenges(monster, difficulty, wordStats));
   const shuffledRef = useRef([]);
   const posRef = useRef(-1);
+  const wrongQueueRef = useRef([]);
+  const wrongCountRef = useRef({});
+  const currentWord = challenges[chalIdx]?.word ?? null;
 
   function shuffleAndStart() {
     const a = Array.from({ length: challenges.length }, (_, i) => i);
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    shuffledRef.current = a;
-    posRef.current = 0;
-    setChalIdx(a[0]);
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+    shuffledRef.current = a; posRef.current = 0; setChalIdx(a[0]);
   }
 
   function nextChallenge() {
+    setChalKey(k => k + 1);
+    if (wrongQueueRef.current.length > 0) { setChalIdx(wrongQueueRef.current.shift()); return; }
     posRef.current++;
-    if (posRef.current >= shuffledRef.current.length) {
-      shuffleAndStart();
-    } else {
-      setChalIdx(shuffledRef.current[posRef.current]);
-    }
+    if (posRef.current >= shuffledRef.current.length) shuffleAndStart();
+    else setChalIdx(shuffledRef.current[posRef.current]);
   }
 
   useEffect(() => {
     shuffleAndStart();
-    // TTS nur fuer Woerter, nicht fuer Monster-Texte
     addLog({ text: `"${monster.battleCry}"`, color: "#ef4444" });
-    setTimeout(() => {
-      setIntro(false);
-      setPhase("battle");
-      addLog({ text: "Was tust du?", color: "#94a3b8" });
-    }, 2000);
+    tts.monster(monster.battleCry);
+    setTimeout(() => { setIntro(false); setPhase("battle"); addLog({ text: "Was tust du?", color: "#94a3b8" }); }, 2000);
   }, []);
 
   function addLog(msg) { setLog(p => [...p.slice(-10), msg]); }
-
   function triggerShake(who) {
     if (who === "monster") { setShake(true); setTimeout(() => setShake(false), 500); }
     else { setPlayerShake(true); setTimeout(() => setPlayerShake(false), 500); }
   }
 
   function handleCorrect() {
+    if (currentWord && onUpdateWordStats) onUpdateWordStats(currentWord, true);
+    if (onCorrectAnswer) onCorrectAnswer(currentWord);
+
+    // Cosmetic damage display (nur visuell, kein Einfluss auf Wertung)
     const dmg = Math.floor(18 + Math.random() * 12);
     const crit = Math.random() < 0.2;
     const finalDmg = crit ? dmg * 2 : dmg;
 
-    // Phase 1: Spieler sprintet los
     setPlayerAnim("attack");
-
-    // Phase 2: Nach 250ms kommt der Schlag an → Monster reagiert
     setTimeout(() => {
-      sfx.crit();
-      setMonsterAnim("hurt");
-      triggerShake("monster");
+      sfx.crit(); setMonsterAnim("hurt"); triggerShake("monster");
       setFloatDmg({ value: finalDmg, isPlayer: false });
       spawnParticles(monsterRef.current, monster.color, crit ? 14 : 9);
     }, 250);
-
-    // Phase 3: Alles zuruecksetzen
     setTimeout(() => { setMonsterAnim("float"); setPlayerAnim("idle"); setFloatDmg(null); }, 1200);
 
-    const newHp = Math.max(0, monsterHp - finalDmg);
+    // Jede richtige Antwort = 1 Schritt zum Ziel (threshold)
+    const newHp = Math.max(0, monsterHp - 1);
     setMonsterHp(newHp);
 
-    if (crit) addLog({ text: `💥 KRITISCHER TREFFER! ${finalDmg} Schaden!`, color: "#fbbf24" });
-    else addLog({ text: `⚔️ Richtig! Du triffst ${monster.name} für ${finalDmg} Schaden.`, color: "#4ade80" });
+    const correctSoFar = threshold - newHp;
+    if (crit) addLog({ text: `💥 KRITISCHER TREFFER! +1 richtig (${correctSoFar}/${threshold})`, color: "#fbbf24" });
+    else addLog({ text: `⚔️ Richtig! ${correctSoFar} von ${threshold} Wörtern!`, color: "#4ade80" });
 
     if (newHp <= 0) {
-      addXP(monster.level * 30);
       setIsDying(true);
-      setTimeout(() => { setPhase("victory"); sfx.win(); }, 950);
+      sfx.win();
+      addLog({ text: `🏆 ${monster.defeatMsg}`, color: "#4ade80" });
+      setTimeout(() => { if (onMonsterDefeated) onMonsterDefeated(monster.id); }, 1500);
       return;
     }
-    if (Math.random() < 0.3) {
-      addLog({ text: monster.weakMsg, color: "#fbbf24" });
-    }
+    if (Math.random() < 0.3) addLog({ text: monster.weakMsg, color: "#fbbf24" });
     setTimeout(nextChallenge, 600);
   }
 
   function handleWrong() {
-    const dmg = monster.attack;
-    sfx.hurt();
-    setPlayerAnim("hurt");
-    setMonsterAnim("attack");
-    triggerShake("player");
-    setFloatDmg({ value: dmg, isPlayer: true });
-    setTimeout(() => { setPlayerAnim("idle"); setMonsterAnim("float"); setFloatDmg(null); }, 1000);
-
-    const newHp = Math.max(0, playerHp - dmg);
-    setPlayerHp(newHp);
-    addLog({ text: `💢 Falsch! ${monster.name} greift an und macht ${dmg} Schaden!`, color: "#f87171" });
-
-    if (newHp <= 0) {
-      setTimeout(() => { setPhase("defeat"); sfx.lose(); }, 800);
-      return;
+    if (currentWord && onUpdateWordStats) onUpdateWordStats(currentWord, false);
+    if (onWrongAnswer) onWrongAnswer(currentWord);
+    if (currentWord) {
+      const count = wrongCountRef.current[currentWord] ?? 0;
+      if (count < 2) {
+        wrongQueueRef.current.push(chalIdx);
+        wrongCountRef.current[currentWord] = count + 1;
+        addLog({ text: `🔁 "${currentWord}" kommt nochmal!`, color: "#a78bfa" });
+      }
     }
+    sfx.hurt(); setPlayerAnim("hurt"); setMonsterAnim("attack"); triggerShake("player");
+    setFloatDmg({ value: "✗", isPlayer: true });
+    setTimeout(() => { setPlayerAnim("idle"); setMonsterAnim("float"); setFloatDmg(null); }, 1000);
+    addLog({ text: `💢 Falsch! ${monster.name} greift an!`, color: "#f87171" });
     setTimeout(nextChallenge, 600);
   }
 
+  // Timer-Anzeige formatieren
+  const mins = Math.floor(timeLeft / 60);
+  const secs = timeLeft % 60;
+  const timerColor = timeLeft <= 30 ? "#ef4444" : timeLeft <= 60 ? "#f59e0b" : "#4ade80";
   const bgStyle = { background: `linear-gradient(160deg, ${monster.bgFrom} 0%, ${monster.bgTo} 100%)` };
-
-  if (phase === "victory") {
-    const earned = monster.level * 30;
-    return (
-      <div style={{ ...bgStyle, minHeight: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "'Outfit', sans-serif" }}>
-        <div style={{ maxWidth: 480, width: "100%", textAlign: "center" }}>
-          <div style={{ fontSize: 64, marginBottom: 16, animation: "bounce 0.6s ease-out" }}>🏆</div>
-          <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 12, color: "#fbbf24", marginBottom: 12, lineHeight: 1.8 }}>SIEG!</div>
-          <div style={{ color: "#4ade80", fontSize: 15, marginBottom: 8 }}>{monster.defeatMsg}</div>
-          <div style={{ background: "#0d1333", border: `2px solid ${monster.color}44`, borderRadius: 14, padding: "20px 24px", margin: "20px 0" }}>
-            <div style={{ fontSize: 11, color: "#64748b", marginBottom: 8 }}>BELOHNUNG</div>
-            <div style={{ fontSize: 32, fontWeight: 900, color: "#fbbf24" }}>+{earned} XP</div>
-            <div style={{ color: "#94a3b8", fontSize: 13, marginTop: 8 }}>Du hast <strong style={{ color: monster.color }}>{monster.name}</strong> besiegt!</div>
-          </div>
-          <button onClick={() => onVictory(monster.id)} style={{ background: "#fbbf24", color: "#07091a", border: "none", borderRadius: 12, padding: "14px 36px", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "'Outfit', sans-serif" }}>
-            Zur Weltkarte →
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (phase === "defeat") return (
-    <div style={{ ...bgStyle, minHeight: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "'Outfit', sans-serif" }}>
-      <div style={{ maxWidth: 480, width: "100%", textAlign: "center" }}>
-        <div style={{ fontSize: 64, marginBottom: 16 }}>💪</div>
-        <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 11, color: "#f87171", marginBottom: 12, lineHeight: 1.8 }}>NICHT AUFGEBEN!</div>
-        <div style={{ color: "#94a3b8", fontSize: 14, lineHeight: 1.7, marginBottom: 24 }}>
-          {monster.name} war diesmal stärker – aber jeder Kampf macht dich besser. Probiere es nochmal!
-        </div>
-        <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
-          <button onClick={() => { setPlayerHp(PLAYER_MAX_HP); setMonsterHp(monster.maxHp); shuffleAndStart(); setPhase("intro"); setLog([{ text: `${monster.name} erscheint erneut!`, color: monster.color }]); setIntro(true); setTimeout(() => { setIntro(false); setPhase("battle"); }, 1500); }} style={{ background: "#fbbf24", color: "#07091a", border: "none", borderRadius: 12, padding: "13px 28px", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "'Outfit', sans-serif" }}>
-            Nochmal! ⚔️
-          </button>
-          <button onClick={onBack} style={{ background: "transparent", border: "1px solid #334155", color: "#94a3b8", borderRadius: 12, padding: "13px 24px", fontSize: 14, cursor: "pointer", fontFamily: "'Outfit', sans-serif" }}>
-            Zurück
-          </button>
-        </div>
-      </div>
-    </div>
-  );
 
   return (
     <div style={{ ...bgStyle, minHeight: "100%", display: "flex", flexDirection: "column", fontFamily: "'Outfit', sans-serif" }}>
-      {/* Top bar */}
+      {/* Top bar mit Timer */}
       <div style={{ background: "rgba(0,0,0,0.5)", borderBottom: "1px solid #1e293b", padding: "10px 16px", display: "flex", alignItems: "center", gap: 12 }}>
         <button onClick={onBack} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: 20 }}>‹</button>
-        <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 9, color: monster.color }}>{monster.zone}</span>
+        <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 9, color: monster.color, flex: 1 }}>{monster.zone}</span>
+        <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 16, fontWeight: 700, color: timerColor, minWidth: 60, textAlign: "right" }}>
+          {mins}:{secs.toString().padStart(2, "0")}
+        </div>
       </div>
 
-      {/* Battle arena */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "16px 16px 24px", maxWidth: 560, margin: "0 auto", width: "100%" }}>
+      {/* Timer-Balken */}
+      <div style={{ height: 4, background: "#1e293b" }}>
+        <div style={{ height: "100%", width: `${(timeLeft / ROUND_DURATION) * 100}%`, background: timerColor, transition: "width 1s linear, background 0.5s" }} />
+      </div>
 
-        {/* HP bars */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "16px 16px 24px", maxWidth: 560, margin: "0 auto", width: "100%" }}>
+        {/* Fortschrittsbalken: Richtige Wörter */}
         <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
           <div style={{ background: "rgba(0,0,0,0.5)", border: "1px solid #1e293b", borderRadius: 12, padding: "10px 14px", flex: 1 }}>
-            <HPBar current={monsterHp} max={monster.maxHp} color={monster.color} label={monster.name} />
-          </div>
-          <div style={{ background: "rgba(0,0,0,0.5)", border: "1px solid #1e293b", borderRadius: 12, padding: "10px 14px", flex: 1 }}>
-            <HPBar current={playerHp} max={PLAYER_MAX_HP} color="#fbbf24" label="Du" />
+            <HPBar current={threshold - monsterHp} max={threshold} color="#4ade80" label={`✓ Richtige Wörter (Ziel: ${threshold})`} />
           </div>
         </div>
 
@@ -2890,64 +4649,146 @@ function BattleScreen({ monster, onVictory, onDefeat, onBack, addXP, difficulty 
           display: "flex", alignItems: "flex-end", justifyContent: "space-between",
           padding: "12px 20px", overflow: "hidden", marginBottom: 14,
         }}>
-          {/* Atmospheric ground line */}
           <div style={{ position: "absolute", bottom: 48, left: 0, right: 0, height: 1, background: `linear-gradient(90deg, transparent, ${monster.color}33, transparent)` }}/>
-
-          {/* Monster side */}
-          <div style={{
-            display: "flex", flexDirection: "column", alignItems: "center",
-            animation: shake ? "shakeX 0.4s ease-out" : "none",
-          }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", animation: shake ? "shakeX 0.4s ease-out" : "none" }}>
             <div style={{ fontSize: 9, fontFamily: "'Press Start 2P', monospace", color: monster.color, marginBottom: 8 }}>Lv.{monster.level}</div>
             <div ref={monsterRef} style={{ position: "relative" }}>
               <MonsterSprite monster={monster} isHurt={monsterAnim === "hurt"} isAttacking={monsterAnim === "attack"} isDying={isDying} />
             </div>
           </div>
-
-          {/* Damage float */}
           {floatDmg && <DamageFloat value={floatDmg.value} isPlayer={floatDmg.isPlayer} />}
-
-          {/* Player side */}
-          <div style={{
-            display: "flex", flexDirection: "column", alignItems: "center",
-            animation: playerShake ? "shakeX 0.4s ease-out" : "none",
-          }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", animation: playerShake ? "shakeX 0.4s ease-out" : "none" }}>
             <div style={{ fontSize: 9, fontFamily: "'Press Start 2P', monospace", color: "#fbbf24", marginBottom: 8 }}>DU</div>
             <PlayerSprite isAttacking={playerAnim === "attack"} isHurt={playerAnim === "hurt"} />
           </div>
-
-          {/* Intro overlay */}
           {intro && (
-            <div style={{
-              position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center",
-              background: "rgba(0,0,0,0.7)", borderRadius: 16,
-            }}>
-              <div style={{
-                fontFamily: "'Press Start 2P', monospace", fontSize: 11, color: monster.color,
-                textAlign: "center", lineHeight: 2, padding: "0 20px",
-                animation: "fadeIn 0.3s ease",
-              }}>
-                {monster.name}<br/>
-                <span style={{ fontSize: 8, color: "#94a3b8" }}>erscheint!</span>
+            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.7)", borderRadius: 16 }}>
+              <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 11, color: monster.color, textAlign: "center", lineHeight: 2, padding: "0 20px", animation: "fadeIn 0.3s ease" }}>
+                {monster.name}<br/><span style={{ fontSize: 8, color: "#94a3b8" }}>erscheint!</span>
               </div>
             </div>
           )}
         </div>
 
-        {/* Battle log */}
-        <div style={{ marginBottom: 14 }}>
-          <BattleLog messages={log} />
+        <div style={{ marginBottom: 14 }}><BattleLog messages={log} /></div>
+
+        {phase === "battle" && !intro && (
+          <ChallengePanel key={chalKey} challenge={challenges[chalIdx]} onCorrect={handleCorrect} onWrong={handleWrong} monsterColor={monster.color} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ─── SESSION RESULT SCREEN ──────────────────────────────────────────────── */
+function RoundResultScreen({ stats, victory, monster, nextMonster, onContinue, onRetry, onBack, threshold }) {
+  const { correct, wrong, wrongWords } = stats;
+  const total = correct + wrong;
+  const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
+  const needed = threshold ?? 8;
+  const missing = Math.max(0, needed - correct);
+
+  // Schwache Wörter dieser Runde
+  const weakWords = Object.entries(wrongWords)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
+
+  return (
+    <div style={{ minHeight: "100%", background: "linear-gradient(160deg, #030712 0%, #0d1333 100%)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "'Outfit', sans-serif" }}>
+      <div style={{ maxWidth: 460, width: "100%", textAlign: "center" }}>
+        {/* Sieg oder Niederlage */}
+        <div style={{ fontSize: 56, marginBottom: 10, animation: "bounce 0.6s ease-out" }}>
+          {victory ? "🏆" : "⏱️"}
+        </div>
+        <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 11, color: victory ? "#4ade80" : "#f59e0b", marginBottom: 6, lineHeight: 1.8 }}>
+          {victory ? "MONSTER BESIEGT!" : "ZEIT UM!"}
+        </div>
+        <div style={{ color: "#94a3b8", fontSize: 14, marginBottom: 20 }}>
+          {victory
+            ? `${monster.name} wurde besiegt! Du kannst ins nächste Level!`
+            : `${correct} von ${needed} Wörtern richtig — noch ${missing} mehr zum Aufstieg!`
+          }
         </div>
 
-        {/* Challenge */}
-        {phase === "battle" && !intro && (
-          <ChallengePanel
-            challenge={challenges[chalIdx]}
-            onCorrect={handleCorrect}
-            onWrong={handleWrong}
-            monsterColor={monster.color}
-          />
+        {/* Fortschrittsanzeige: X von Y richtig */}
+        <div style={{ background: "#0d1333", border: "1px solid #1e293b", borderRadius: 12, padding: "14px 16px", marginBottom: 16 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: victory ? "#4ade80" : "#f59e0b" }}>
+              {victory ? "✓ Ziel erreicht!" : "Fortschritt"}
+            </span>
+            <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 14, fontWeight: 900, color: victory ? "#4ade80" : "#fbbf24" }}>
+              {correct} / {needed}
+            </span>
+          </div>
+          <div style={{ height: 14, background: "#1e293b", borderRadius: 8, overflow: "hidden", border: "1px solid #334155" }}>
+            <div style={{
+              width: `${Math.min(100, (correct / needed) * 100)}%`,
+              height: "100%",
+              background: victory ? "linear-gradient(90deg, #22c55e, #4ade80)" : "linear-gradient(90deg, #f59e0b, #fbbf24)",
+              borderRadius: 8,
+              transition: "width 0.8s cubic-bezier(.34,1.56,.64,1)",
+              boxShadow: victory ? "0 0 12px #4ade8088" : "0 0 8px #fbbf2466",
+            }} />
+          </div>
+          {!victory && (
+            <div style={{ marginTop: 6, fontSize: 11, color: "#64748b" }}>
+              Ziel: {needed} richtige Wörter in 1 Minute → nächstes Level
+            </div>
+          )}
+        </div>
+
+        {/* Statistik */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 20 }}>
+          {[
+            { label: "Richtig", value: correct, color: "#4ade80" },
+            { label: "Falsch", value: wrong, color: "#f87171" },
+            { label: "Genauigkeit", value: `${pct}%`, color: "#fbbf24" },
+          ].map(({ label, value, color }) => (
+            <div key={label} style={{ background: "#0d1333", border: "1px solid #1e293b", borderRadius: 12, padding: "12px 8px" }}>
+              <div style={{ fontSize: 10, color: "#64748b", marginBottom: 4 }}>{label}</div>
+              <div style={{ fontSize: 22, fontWeight: 900, color, fontFamily: "'JetBrains Mono', monospace" }}>{value}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Schwache Wörter */}
+        {weakWords.length > 0 && (
+          <div style={{ background: "#0d1333", border: "1px solid #ef444444", borderRadius: 12, padding: "12px 14px", marginBottom: 20, textAlign: "left" }}>
+            <div style={{ fontSize: 10, color: "#f87171", fontWeight: 700, marginBottom: 8, letterSpacing: 1 }}>NOCHMAL ÜBEN</div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {weakWords.map(([word, count]) => (
+                <span key={word} style={{ background: "#1e0a0a", border: "1px solid #ef444444", borderRadius: 8, padding: "3px 8px", fontSize: 12, color: "#fca5a5", fontFamily: "'JetBrains Mono', monospace" }}>
+                  {word} <span style={{ color: "#ef4444", fontSize: 10 }}>×{count}</span>
+                </span>
+              ))}
+            </div>
+          </div>
         )}
+
+        {/* Naechstes Level Vorschau (bei Sieg) */}
+        {victory && nextMonster && (
+          <div style={{ background: "#0d1333", border: `1px solid ${nextMonster.color}44`, borderRadius: 12, padding: "12px 14px", marginBottom: 20 }}>
+            <div style={{ fontSize: 10, color: nextMonster.color, fontWeight: 700, marginBottom: 4, letterSpacing: 1 }}>NÄCHSTER GEGNER</div>
+            <div style={{ fontSize: 16, fontWeight: 700, color: "#e2e8f0" }}>{nextMonster.zoneEmoji} {nextMonster.name}</div>
+            <div style={{ fontSize: 11, color: "#64748b", marginTop: 2 }}>Lv.{nextMonster.level} — {nextMonster.title}</div>
+          </div>
+        )}
+
+        {/* Buttons */}
+        <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+          {victory && nextMonster ? (
+            <button onClick={onContinue} style={{ background: "#4ade80", color: "#07091a", border: "none", borderRadius: 12, padding: "14px 32px", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "'Outfit', sans-serif" }}>
+              Weiter! ⚔️
+            </button>
+          ) : (
+            <button onClick={onRetry} style={{ background: "#fbbf24", color: "#07091a", border: "none", borderRadius: 12, padding: "14px 32px", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "'Outfit', sans-serif" }}>
+              Nochmal! 🔁
+            </button>
+          )}
+          <button onClick={onBack} style={{ background: "transparent", border: "1px solid #334155", color: "#94a3b8", borderRadius: 12, padding: "14px 24px", fontSize: 14, cursor: "pointer", fontFamily: "'Outfit', sans-serif" }}>
+            Zur Karte
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -3099,12 +4940,77 @@ function writeSave(data) {
   try { localStorage.setItem(SAVE_KEY, JSON.stringify(data)); } catch {}
 }
 
+/* ─── SUPABASE SYNC HELPERS ────────────────────────────────────────────── */
+
+async function supabaseLoadProgress(sb, userId) {
+  const { data, error } = await sb
+    .from('wortschmiede_progress')
+    .select('*')
+    .eq('user_id', userId)
+    .maybeSingle();
+  if (error) { console.error('[Wortschmiede] load progress error:', error); return null; }
+  return data;
+}
+
+async function supabaseLoadWordStats(sb, userId) {
+  const { data, error } = await sb
+    .from('wortschmiede_word_stats')
+    .select('*')
+    .eq('user_id', userId);
+  if (error) { console.error('[Wortschmiede] load word_stats error:', error); return null; }
+  if (!data) return null;
+  // Array → Object { word: { interval, repetition, efactor, dueDate, totalCorrect, totalWrong } }
+  const stats = {};
+  for (const row of data) {
+    stats[row.word] = {
+      interval: row.interval,
+      repetition: row.repetition,
+      efactor: row.efactor,
+      dueDate: row.due_date,
+      totalCorrect: row.total_correct,
+      totalWrong: row.total_wrong,
+    };
+  }
+  return stats;
+}
+
+async function supabaseUpsertProgress(sb, userId, { defeatedIds, xp, difficulty, autoLevel }) {
+  const { error } = await sb
+    .from('wortschmiede_progress')
+    .upsert({
+      user_id: userId,
+      defeated_ids: defeatedIds,
+      xp,
+      difficulty,
+      auto_level: autoLevel,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'user_id' });
+  if (error) console.error('[Wortschmiede] upsert progress error:', error);
+}
+
+async function supabaseUpsertWordStat(sb, userId, word, stat) {
+  const { error } = await sb
+    .from('wortschmiede_word_stats')
+    .upsert({
+      user_id: userId,
+      word,
+      interval: stat.interval,
+      repetition: stat.repetition,
+      efactor: stat.efactor,
+      due_date: stat.dueDate,
+      total_correct: stat.totalCorrect,
+      total_wrong: stat.totalWrong,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'user_id,word' });
+  if (error) console.error('[Wortschmiede] upsert word_stat error:', error);
+}
+
 /* ─── ROOT APP ────────────────────────────────────────────────────────────── */
-export default function WortschmiedeBattle({ onClose, onXPEarned }) {
+export default function WortschmiedeBattle({ onClose, onXPEarned, userId, supabaseUrl, supabaseAnonKey }) {
   // Einmalig gespeicherten Stand laden
   const [saved] = useState(loadSave);
 
-  // flow: "diagnose" | "difficulty" | "map" | "battle"
+  // flow: "diagnose" | "difficulty" | "map" | "round" | "roundResult" | "session_pause" | "session_end"
   // Diagnose ueberspringen wenn autoLevel schon gespeichert ist
   const [screen, setScreen]             = useState(saved?.autoLevel ? "map" : "diagnose");
   const [currentMonster, setCurrentMonster] = useState(null);
@@ -3112,13 +5018,73 @@ export default function WortschmiedeBattle({ onClose, onXPEarned }) {
   const [xp, setXp]                     = useState(saved?.xp || 0);
   const [difficulty, setDifficulty]     = useState(saved?.difficulty || "mittel");
   const [autoLevel, setAutoLevel]       = useState(saved?.autoLevel || "mittel");
+
+  // SM-2 Wortstatistiken: { [wort]: { interval, repetition, efactor, dueDate, totalCorrect, totalWrong } }
+  const [wordStats, setWordStats]       = useState(saved?.wordStats || {});
+
+  // Session-State
+  const [sessionRound, setSessionRound]           = useState(0);
+  const [sessionTotalStats, setSessionTotalStats] = useState({ correct: 0, wrong: 0, rounds: [] });
+  const [sessionXp, setSessionXp]                 = useState(0);
+  const [streak, setStreak]                       = useState(saved?.streak || 0);
+  const [lastPlayedDate, setLastPlayedDate]       = useState(saved?.lastPlayedDate || null);
+  const sessionQueueRef   = useRef([]);
+  const sessionRoundRef   = useRef(0);
+  const sessionStatsRef   = useRef({ correct: 0, wrong: 0, rounds: [] });
+  const sessionXpRef      = useRef(0);
+  const inSessionRef      = useRef(false);
+  const streakRef         = useRef(saved?.streak || 0);
+  const lastPlayedRef     = useRef(saved?.lastPlayedDate || null);
+
+  // Runden-State (1-Minute pro Runde)
+  const [timeLeft, setTimeLeft]         = useState(ROUND_DURATION);
+  const [roundStats, setRoundStats]     = useState(null);
+  const [roundVictory, setRoundVictory] = useState(false);
+  const [nextMonster, setNextMonster]   = useState(null); // Vorschau naechstes Monster
+  const [monsterKey, setMonsterKey]     = useState(0);
+  const roundStatsRef = useRef(null);
+  const timerRef = useRef(null);
+
   // XP-Tracking fuer onXPEarned Callback
   const prevXpRef = useRef(xp);
 
-  // Bei jeder Aenderung speichern
+  // Supabase Client (Chat-Widget-Pattern: useRef + einmalige Initialisierung)
+  const sbRef = useRef(null);
+  const supabaseReady = !!(userId && supabaseUrl && supabaseAnonKey);
+
   useEffect(() => {
-    writeSave({ defeatedIds, xp, difficulty, autoLevel });
-  }, [defeatedIds, xp, difficulty, autoLevel]);
+    if (!supabaseReady) return;
+    if (!sbRef.current) {
+      sbRef.current = createClient(supabaseUrl, supabaseAnonKey);
+    }
+    // Supabase-Daten laden und localStorage ueberschreiben (Source of Truth)
+    (async () => {
+      const sb = sbRef.current;
+      const [progress, stats] = await Promise.all([
+        supabaseLoadProgress(sb, userId),
+        supabaseLoadWordStats(sb, userId),
+      ]);
+      if (progress) {
+        setDefeatedIds(progress.defeated_ids || []);
+        setXp(progress.xp ?? 0);
+        setDifficulty(progress.difficulty || "mittel");
+        setAutoLevel(progress.auto_level || "mittel");
+        if (progress.auto_level) setScreen(s => s === "diagnose" ? "map" : s);
+      }
+      if (stats && Object.keys(stats).length > 0) {
+        setWordStats(stats);
+      }
+    })();
+  }, [supabaseReady]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Bei jeder Aenderung speichern (inkl. wordStats) — localStorage + Supabase
+  useEffect(() => {
+    writeSave({ defeatedIds, xp, difficulty, autoLevel, wordStats, streak, lastPlayedDate });
+    // Fire-and-forget Supabase upsert
+    if (sbRef.current && userId) {
+      supabaseUpsertProgress(sbRef.current, userId, { defeatedIds, xp, difficulty, autoLevel });
+    }
+  }, [defeatedIds, xp, difficulty, autoLevel, wordStats, streak, lastPlayedDate]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // XP-Aenderungen an Parent melden
   useEffect(() => {
@@ -3129,7 +5095,52 @@ export default function WortschmiedeBattle({ onClose, onXPEarned }) {
     prevXpRef.current = xp;
   }, [xp, onXPEarned]);
 
+  // Runden-Timer: laeuft nur wenn screen === "round"
+  useEffect(() => {
+    if (screen !== "round") {
+      if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+      return;
+    }
+    timerRef.current = setInterval(() => {
+      setTimeLeft(t => {
+        if (t <= 1) {
+          clearInterval(timerRef.current);
+          timerRef.current = null;
+          // Zeit abgelaufen → Runde beenden (Niederlage)
+          const stats = roundStatsRef.current;
+          if (stats) {
+            if (inSessionRef.current) {
+              // Session-Modus: sammeln und weiter
+              handleSessionRoundEndRef.current(stats, false);
+            } else {
+              // Einzel-Modus: alter roundResult-Screen
+              setRoundStats({ ...stats });
+              setRoundVictory(false);
+              setNextMonster(null);
+              setScreen("roundResult");
+            }
+          }
+          return 0;
+        }
+        return t - 1;
+      });
+    }, 1000);
+    return () => { if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; } };
+  }, [screen]);
+
   function addXP(amt) { setXp(p => p + amt); }
+
+  // SM-2 Update für ein einzelnes Wort
+  function handleUpdateWordStats(word, correct) {
+    setWordStats(prev => {
+      const updated = sm2Update(prev[word], correct);
+      // Fire-and-forget Supabase upsert fuer dieses Wort
+      if (sbRef.current && userId) {
+        supabaseUpsertWordStat(sbRef.current, userId, word, updated);
+      }
+      return { ...prev, [word]: updated };
+    });
+  }
 
   function handleDiagnoseComplete(level) {
     setAutoLevel(level);
@@ -3142,16 +5153,170 @@ export default function WortschmiedeBattle({ onClose, onXPEarned }) {
     setScreen("map");
   }
 
-  function startBattle(monster) {
-    sfx.select();
-    setCurrentMonster(monster);
-    setScreen("battle");
+  // Naechstes Monster nach Level-Reihenfolge bestimmen
+  function getNextMonsterByLevel(currentId) {
+    const idx = MONSTERS.findIndex(m => m.id === currentId);
+    if (idx < 0 || idx >= MONSTERS.length - 1) return null; // letztes Level → kein naechstes
+    return MONSTERS[idx + 1];
   }
 
-  function handleVictory(monsterId) {
+  // Runde starten: 1-Minute-Timer, Monster setzen
+  function startRound(monster) {
+    sfx.select();
+    const stats = { correct: 0, wrong: 0, wrongWords: {} };
+    roundStatsRef.current = stats;
+    setRoundStats(stats);
+    setRoundVictory(false);
+    setNextMonster(null);
+    setTimeLeft(ROUND_DURATION);
+    setCurrentMonster(monster);
+    setMonsterKey(k => k + 1);
+    setScreen("round");
+  }
+
+  // Monster besiegt → Runde gewonnen
+  function handleMonsterDefeated(monsterId) {
+    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+
+    // XP vergeben: 15 + 5 pro Level
+    const monster = MONSTERS.find(m => m.id === monsterId);
+    const xpGain = monster ? 15 + monster.level * 5 : 20;
+    addXP(xpGain);
+    if (inSessionRef.current) sessionXpRef.current += xpGain;
+
+    // Monster als besiegt markieren (fuer WorldMap)
     setDefeatedIds(p => p.includes(monsterId) ? p : [...p, monsterId]);
+
+    const stats = roundStatsRef.current;
+    if (!stats) return;
+
+    if (inSessionRef.current) {
+      handleSessionRoundEndRef.current(stats, true);
+    } else {
+      // Einzel-Modus: alter Flow
+      const next = getNextMonsterByLevel(monsterId);
+      setRoundStats({ ...stats });
+      setRoundVictory(true);
+      setNextMonster(next);
+      setScreen("roundResult");
+    }
+  }
+
+  // Tracking-Callbacks fuer Runden-Stats
+  function handleRoundCorrect(word) {
+    if (roundStatsRef.current) roundStatsRef.current.correct++;
+  }
+
+  function handleRoundWrong(word) {
+    if (roundStatsRef.current) {
+      roundStatsRef.current.wrong++;
+      if (word) {
+        roundStatsRef.current.wrongWords[word] = (roundStatsRef.current.wrongWords[word] || 0) + 1;
+      }
+    }
+  }
+
+  // Runde abbrechen → zurueck zur Karte
+  function handleRoundBack() {
+    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+    inSessionRef.current = false;
     setScreen("map");
     setCurrentMonster(null);
+  }
+
+  // ── SESSION LOGIK ────────────────────────────────────────────────────────
+
+  // Session starten: Queue bauen, Runde 1 starten
+  function startSession() {
+    sfx.select();
+    const queue = buildSessionQueue(difficulty, wordStats);
+    sessionQueueRef.current = queue;
+    sessionRoundRef.current = 1;
+    sessionStatsRef.current = { correct: 0, wrong: 0, rounds: [] };
+    sessionXpRef.current = 0;
+    inSessionRef.current = true;
+    setSessionRound(1);
+    setSessionTotalStats({ correct: 0, wrong: 0, rounds: [] });
+    setSessionXp(0);
+    startRound(queue[0]);
+  }
+
+  // Nach jeder Runde (Sieg oder Niederlage): akkumulieren, weiter oder Ende
+  function handleSessionRoundEnd(roundStats, victory) {
+    const currentRound = sessionRoundRef.current;
+    const currentMonsterSnap = sessionQueueRef.current[currentRound - 1];
+
+    // Akkumulieren
+    const newStats = {
+      correct: sessionStatsRef.current.correct + (roundStats?.correct ?? 0),
+      wrong:   sessionStatsRef.current.wrong   + (roundStats?.wrong   ?? 0),
+      rounds:  [...sessionStatsRef.current.rounds, {
+        monster: currentMonsterSnap,
+        correct: roundStats?.correct ?? 0,
+        wrong:   roundStats?.wrong   ?? 0,
+        victory,
+      }],
+    };
+    sessionStatsRef.current = newStats;
+    setSessionTotalStats({ ...newStats });
+
+    // Runden-Stats auch fuer Pause-Screen
+    setRoundStats(roundStats ? { ...roundStats } : { correct: 0, wrong: 0, wrongWords: {} });
+    setRoundVictory(victory);
+
+    if (currentRound >= SESSION_ROUNDS) {
+      // Session beendet
+      finishSession(newStats);
+    } else {
+      setScreen("session_pause");
+    }
+  }
+
+  // Ref-Wrapper damit der Timer-Callback nie stale ist
+  const handleSessionRoundEndRef = useRef(handleSessionRoundEnd);
+  handleSessionRoundEndRef.current = handleSessionRoundEnd;
+
+  // Nächste Runde nach Pause starten
+  function handleNextSessionRound() {
+    if (!inSessionRef.current) return; // Session schon beendet
+    const nextRoundNum = sessionRoundRef.current + 1;
+    if (nextRoundNum > SESSION_ROUNDS) return; // Sicherheitscheck
+    sessionRoundRef.current = nextRoundNum;
+    setSessionRound(nextRoundNum);
+    const nextM = sessionQueueRef.current[nextRoundNum - 1];
+    if (!nextM) return;
+    startRound(nextM);
+  }
+
+  // Session abschließen: Streak berechnen, Screen wechseln
+  function finishSession(totalStats) {
+    const now = new Date();
+    const today = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    const yd = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+    const yesterday = `${yd.getFullYear()}-${String(yd.getMonth()+1).padStart(2,'0')}-${String(yd.getDate()).padStart(2,'0')}`;
+    const last = lastPlayedRef.current;
+    let newStreak;
+    if (last === today)      newStreak = streakRef.current;        // schon heute gespielt
+    else if (last === yesterday) newStreak = streakRef.current + 1; // gestern gespielt → weiter
+    else                         newStreak = 1;                     // Lücke → neu starten
+
+    streakRef.current = newStreak;
+    lastPlayedRef.current = today;
+    setStreak(newStreak);
+    setLastPlayedDate(today);
+    setSessionXp(sessionXpRef.current);
+    inSessionRef.current = false;
+    setScreen("session_end");
+  }
+
+  // Weiter zum naechsten Level (nach Sieg)
+  function handleContinue() {
+    if (nextMonster) startRound(nextMonster);
+  }
+
+  // Gleiches Level nochmal (nach Niederlage)
+  function handleRetry() {
+    if (currentMonster) startRound(currentMonster);
   }
 
   function handleResetProgress() {
@@ -3160,15 +5325,26 @@ export default function WortschmiedeBattle({ onClose, onXPEarned }) {
     setXp(0);
     setAutoLevel("mittel");
     setDifficulty("mittel");
+    setWordStats({});
+    setStreak(0);
+    setLastPlayedDate(null);
+    streakRef.current = 0;
+    lastPlayedRef.current = null;
+    inSessionRef.current = false;
     setScreen("diagnose");
+    // Supabase-Daten loeschen
+    if (sbRef.current && userId) {
+      sbRef.current.from('wortschmiede_progress').delete().eq('user_id', userId).then();
+      sbRef.current.from('wortschmiede_word_stats').delete().eq('user_id', userId).then();
+    }
   }
 
   return (
     <div className="wortschmiede-root" style={{ width: "100%", minHeight: "100%", background: "#030712" }}>
       <style dangerouslySetInnerHTML={{ __html: css }} />
       <FontLink />
-      {/* Zurueck-Button oben links */}
-      {onClose && (
+      {/* Zurueck-Button oben links (nur auf Map + Diagnose + Difficulty) */}
+      {onClose && screen !== "round" && screen !== "roundResult" && screen !== "session_pause" && screen !== "session_end" && (
         <button
           onClick={onClose}
           style={{
@@ -3192,22 +5368,65 @@ export default function WortschmiedeBattle({ onClose, onXPEarned }) {
       )}
       {screen === "map" && (
         <WorldMap
-          onBattle={startBattle}
+          onBattle={m => { inSessionRef.current = false; startRound(m); }}
+          onStartSession={startSession}
           defeatedIds={defeatedIds}
           xp={xp}
+          streak={streak}
           difficulty={difficulty}
           onChangeDifficulty={() => setScreen("difficulty")}
           onReset={handleResetProgress}
+          wordStats={wordStats}
         />
       )}
-      {screen === "battle" && currentMonster && (
+      {screen === "round" && currentMonster && (
         <BattleScreen
+          key={monsterKey}
           monster={currentMonster}
-          onVictory={handleVictory}
-          onDefeat={() => {}}
-          onBack={() => setScreen("map")}
-          addXP={addXP}
+          onMonsterDefeated={handleMonsterDefeated}
+          onBack={handleRoundBack}
           difficulty={difficulty}
+          wordStats={wordStats}
+          onUpdateWordStats={handleUpdateWordStats}
+          timeLeft={timeLeft}
+          onCorrectAnswer={handleRoundCorrect}
+          onWrongAnswer={handleRoundWrong}
+          threshold={LEVEL_THRESHOLD[difficulty] ?? 8}
+        />
+      )}
+      {screen === "roundResult" && roundStats && (
+        <RoundResultScreen
+          stats={roundStats}
+          victory={roundVictory}
+          monster={currentMonster}
+          nextMonster={nextMonster}
+          onContinue={handleContinue}
+          onRetry={handleRetry}
+          onBack={() => { inSessionRef.current = false; setScreen("map"); setCurrentMonster(null); }}
+          threshold={LEVEL_THRESHOLD[difficulty] ?? 8}
+        />
+      )}
+      {screen === "session_pause" && roundStats && currentMonster && (
+        <SessionPauseScreen
+          roundNum={sessionRound}
+          roundCorrect={roundStats.correct}
+          roundWrong={roundStats.wrong}
+          roundVictory={roundVictory}
+          sessionCorrect={sessionTotalStats.correct}
+          threshold={LEVEL_THRESHOLD[difficulty] ?? 8}
+          monsterName={currentMonster.name}
+          monsterEmoji={currentMonster.zoneEmoji}
+          onNext={handleNextSessionRound}
+        />
+      )}
+      {screen === "session_end" && (
+        <SessionEndScreen
+          rounds={sessionTotalStats.rounds}
+          totalCorrect={sessionTotalStats.correct}
+          totalWrong={sessionTotalStats.wrong}
+          streak={streak}
+          xpEarned={sessionXp}
+          onBack={() => { setScreen("map"); setCurrentMonster(null); }}
         />
       )}
     </div>

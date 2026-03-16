@@ -1,7 +1,7 @@
 // ============================================
 // RPG Schatzkarte - Main App Component
 // ============================================
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   Streamlit,
   withStreamlitConnection,
@@ -783,18 +783,25 @@ function RPGSchatzkarteContent({
     }
   }, [onAction]);
 
-  // Wortschmiede XP Handler
+  // Wortschmiede XP Handler — XP nur lokal sammeln, Streamlit-Meldung erst beim Schließen
+  const wortschmiedeXpRef = useRef(0);
   const handleWortschmiedeXP = useCallback((earned: number) => {
     setPlayerXP(prev => prev + earned);
-    if (onAction) {
+    wortschmiedeXpRef.current += earned;
+  }, []);
+  const handleWortschmiedeClose = useCallback(() => {
+    const totalXP = wortschmiedeXpRef.current;
+    if (totalXP > 0 && onAction) {
       onAction({
         action: 'minigame_completed',
         islandId: 'wortschmiede',
-        xpEarned: earned,
+        xpEarned: totalXP,
         goldEarned: 0,
-        description: `Wortschmiede: +${earned} XP`
+        description: `Wortschmiede: +${totalXP} XP`
       });
     }
+    wortschmiedeXpRef.current = 0;
+    setShowWortschmiede(false);
   }, [onAction]);
 
   // Avatar Shop Handlers
@@ -1273,8 +1280,11 @@ function RPGSchatzkarteContent({
       {showWortschmiede && (
         <div className="memory-game-modal" style={{ overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
           <WortschmiedeBattle
-            onClose={() => setShowWortschmiede(false)}
+            onClose={handleWortschmiedeClose}
             onXPEarned={handleWortschmiedeXP}
+            userId={arenaData?.userId || chatData?.userId}
+            supabaseUrl={arenaData?.supabaseUrl || chatData?.supabaseUrl}
+            supabaseAnonKey={arenaData?.supabaseAnonKey || chatData?.supabaseAnonKey}
           />
         </div>
       )}
