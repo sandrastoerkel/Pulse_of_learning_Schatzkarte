@@ -683,6 +683,7 @@ export function EinmaleinsArena({ isOpen, onClose, onXPEarned, onCoinsEarned, ar
         )}
       </div>
 
+      <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
       <style>{`
         @keyframes arena-pop { 0% { transform: scale(0.5); opacity: 0; } 70% { transform: scale(1.05); } 100% { transform: scale(1); opacity: 1; } }
         @keyframes arena-shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
