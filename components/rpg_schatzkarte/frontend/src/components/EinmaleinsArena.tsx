@@ -1385,10 +1385,10 @@ function QuizGame({ state, mode, onBack, onComplete }: {
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && submitAnswer()}
               style={{
-                width: 130, textAlign: 'center', fontSize: '1.8rem', fontFamily: 'Nunito, sans-serif', fontWeight: 700,
+                width: 180, textAlign: 'center', fontSize: '2.4rem', fontFamily: 'Nunito, sans-serif', fontWeight: 700,
                 background: 'rgba(255,255,255,0.05)',
                 border: `2px solid ${feedback === 'ok' ? S.green : feedback === 'bad' ? S.red : cfg.color}`,
-                borderRadius: 12, color: S.text, padding: '0.4rem', outline: 'none',
+                borderRadius: 12, color: S.text, padding: '0.6rem', outline: 'none',
               }}
               placeholder="..."
               autoFocus
@@ -1412,7 +1412,7 @@ function QuizGame({ state, mode, onBack, onComplete }: {
       ))}
 
       {/* Number pad */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '0.35rem', marginTop: '0.6rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '0.5rem', marginTop: '0.6rem' }}>
         {[1, 2, 3, 4, 5, 6, 7, 8, 9, '⌫', 0, '✓'].map(k => (
           <button
             key={k}
@@ -1422,7 +1422,7 @@ function QuizGame({ state, mode, onBack, onComplete }: {
               else setInput(i => i + k);
             }}
             style={{
-              padding: '0.6rem', fontSize: '1.05rem', ...rockFont,
+              padding: '0.9rem', fontSize: '1.4rem', ...rockFont,
               background: k === '✓' ? cfg.color + '30' : 'rgba(255,255,255,0.05)',
               border: `1px solid ${k === '✓' ? cfg.color : S.border}`,
               borderRadius: 10, color: k === '✓' ? cfg.color : S.text, cursor: 'pointer',
@@ -1835,9 +1835,9 @@ function BattleScreen({ state, onBack, onComplete }: {
               onKeyDown={e => e.key === 'Enter' && lockIn(1)}
               disabled={p1Locked}
               style={{
-                width: '100%', textAlign: 'center', fontSize: '1.3rem', ...rockFont,
+                width: '100%', textAlign: 'center', fontSize: '1.6rem', ...rockFont,
                 background: 'rgba(255,255,255,0.05)', border: `2px solid ${p1Locked ? S.green : S.cyan}`,
-                borderRadius: 10, color: S.text, padding: '0.35rem', outline: 'none',
+                borderRadius: 10, color: S.text, padding: '0.5rem', outline: 'none',
               }}
               placeholder="..."
             />
@@ -1864,9 +1864,9 @@ function BattleScreen({ state, onBack, onComplete }: {
                 onKeyDown={e => e.key === 'Enter' && lockIn(2)}
                 disabled={p2Locked}
                 style={{
-                  width: '100%', textAlign: 'center', fontSize: '1.3rem', ...rockFont,
+                  width: '100%', textAlign: 'center', fontSize: '1.6rem', ...rockFont,
                   background: 'rgba(255,255,255,0.05)', border: `2px solid ${p2Locked ? S.green : S.pink}`,
-                  borderRadius: 10, color: S.text, padding: '0.35rem', outline: 'none',
+                  borderRadius: 10, color: S.text, padding: '0.5rem', outline: 'none',
                 }}
                 placeholder="..."
               />
