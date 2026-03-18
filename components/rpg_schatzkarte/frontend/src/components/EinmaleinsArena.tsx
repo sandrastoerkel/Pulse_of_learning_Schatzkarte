@@ -207,6 +207,10 @@ function calcAnswerXP(speed: number, combo: number, mode: string): number {
 
 // --- Fragen-Generierung ---
 
+function normalizeMultKey(a: number, b: number): string {
+  return a <= b ? `${a}x${b}` : `${b}x${a}`;
+}
+
 function generateQuestion(focusTable: number | null, questionType: QuestionType): Question {
   const type = questionType === 'both' ? (Math.random() < 0.5 ? 'mult' : 'div') : questionType;
   const a = focusTable || Math.floor(Math.random() * 12) + 1;
@@ -224,7 +228,7 @@ function generateQuestion(focusTable: number | null, questionType: QuestionType)
   return {
     a, b, answer: a * b,
     displayText: `${a} × ${b}`,
-    heatmapKey: `${a}x${b}`,
+    heatmapKey: normalizeMultKey(a, b),
     isDivision: false,
   };
 }
@@ -234,9 +238,9 @@ function generateAdaptiveQuestion(heatmap: Record<string, HeatmapEntry>, questio
   const candidates: WeightedQ[] = [];
 
   for (let a = 1; a <= 12; a++) {
-    for (let b = 1; b <= 12; b++) {
+    for (let b = a; b <= 12; b++) {
       if (questionType !== 'div') {
-        const key = `${a}x${b}`;
+        const key = normalizeMultKey(a, b);
         const entry = heatmap[key];
         let weight = 10;
         if (entry) {
@@ -247,7 +251,9 @@ function generateAdaptiveQuestion(heatmap: Record<string, HeatmapEntry>, questio
             weight = 2 + errorRate * 8 + Math.min(avgTime / 2, 5);
           }
         }
-        candidates.push({ a, b, isDivision: false, weight });
+        // Zufaellige Reihenfolge (3x7 oder 7x3) bei Anzeige
+        const swap = a !== b && Math.random() < 0.5;
+        candidates.push({ a: swap ? b : a, b: swap ? a : b, isDivision: false, weight });
       }
       if (questionType !== 'mult') {
         const product = a * b;
@@ -284,7 +290,7 @@ function generateAdaptiveQuestion(heatmap: Record<string, HeatmapEntry>, questio
       return {
         a: c.a, b: c.b, answer: c.a * c.b,
         displayText: `${c.a} × ${c.b}`,
-        heatmapKey: `${c.a}x${c.b}`,
+        heatmapKey: normalizeMultKey(c.a, c.b),
         isDivision: false,
       };
     }
@@ -407,8 +413,9 @@ const modalOverlay: React.CSSProperties = {
 };
 
 const modalContent: React.CSSProperties = {
-  position: 'relative', width: '100%', maxWidth: 520, maxHeight: '95vh',
+  position: 'relative', width: '100%', maxWidth: 520, maxHeight: '95dvh',
   overflowY: 'auto', overflowX: 'hidden',
+  overscrollBehavior: 'none', WebkitOverflowScrolling: 'touch',
   background: `linear-gradient(135deg, ${S.navy}, ${S.navy2})`,
   borderRadius: 20, border: `1px solid ${S.border}`,
   padding: '1.5rem', color: S.text,
@@ -429,6 +436,7 @@ const btnBase: React.CSSProperties = {
   border: 'none', borderRadius: 12, cursor: 'pointer',
   display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
   transition: 'all 0.15s ease', fontFamily: "'Bangers', cursive", letterSpacing: 2,
+  touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent',
 };
 
 const btnPrimary: React.CSSProperties = {
@@ -577,7 +585,7 @@ export function EinmaleinsArena({ isOpen, onClose, onXPEarned, onCoinsEarned, ar
   }, [updateState]);
 
   // Modi die in die Rang-Wertung (letzte 10 Spiele) einfliessen
-  const RANKED_MODES = ['studio', 'training', 'turnier', 'soundcheck'];
+  const RANKED_MODES = ['studio', 'training', 'turnier'];
 
   const handleQuizComplete = useCallback(({ correct, wrong, coinsEarned, xpEarned, heatmap, mode, avgSpeed }: {
     correct: number; wrong: number; coinsEarned: number; xpEarned: number;
@@ -683,7 +691,7 @@ export function EinmaleinsArena({ isOpen, onClose, onXPEarned, onCoinsEarned, ar
         )}
       </div>
 
-      <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700;800;900&family=Source+Sans+3:wght@600;700;800;900&display=swap" rel="stylesheet" />
       <style>{`
         @keyframes arena-pop { 0% { transform: scale(0.5); opacity: 0; } 70% { transform: scale(1.05); } 100% { transform: scale(1); opacity: 1; } }
         @keyframes arena-shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
@@ -693,6 +701,7 @@ export function EinmaleinsArena({ isOpen, onClose, onXPEarned, onCoinsEarned, ar
         @keyframes arena-glow { 0%,100% { box-shadow: 0 0 8px rgba(245,200,66,0.3); } 50% { box-shadow: 0 0 20px rgba(245,200,66,0.6); } }
         @keyframes rankShimmer { 0% { transform: translateX(-100%); } 50% { transform: translateX(100%); } 100% { transform: translateX(100%); } }
         @keyframes rankPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.85; } }
+        * { -webkit-tap-highlight-color: transparent; }
       `}</style>
     </div>
   );
@@ -995,11 +1004,11 @@ function QuizGame({ state, mode, onBack, onComplete }: {
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
   const [questionTimes, setQuestionTimes] = useState<number[]>([]);
 
-  const inputRef = useRef<HTMLInputElement>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const perQuestionTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const questionStartRef = useRef<number>(0);
   const questionRef = useRef<Question | null>(null);
+  const questionHandledRef = useRef(false); // Verhindert Doppel-Auswertung bei Soundcheck
 
   // Keep questionRef in sync
   useEffect(() => { questionRef.current = question; }, [question]);
@@ -1015,6 +1024,7 @@ function QuizGame({ state, mode, onBack, onComplete }: {
   }, [isTraining, isStudio, focusTable, state.questionType, heatmap]);
 
   const nextQuestion = useCallback(() => {
+    questionHandledRef.current = false;
     const q = genQuestion();
     setQuestion(q);
     setInput('');
@@ -1032,7 +1042,7 @@ function QuizGame({ state, mode, onBack, onComplete }: {
     setTimeLeft(cfg.duration);
     questionStartRef.current = Date.now();
     nextQuestion();
-    setTimeout(() => inputRef.current?.focus(), 100);
+    // Kein Focus noetig — Numpad-Buttons steuern die Eingabe
   };
 
   // Global timer (studio, training, turnier)
@@ -1062,6 +1072,8 @@ function QuizGame({ state, mode, onBack, onComplete }: {
         if (t <= 1) {
           if (perQuestionTimerRef.current) clearInterval(perQuestionTimerRef.current);
           // Timeout: zaehlt als falsch
+          if (questionHandledRef.current) return 0;
+          questionHandledRef.current = true;
           const q = questionRef.current;
           if (q) {
             setWrong(w => w + 1);
@@ -1089,31 +1101,35 @@ function QuizGame({ state, mode, onBack, onComplete }: {
 
   const submitAnswer = useCallback(() => {
     if (!question || feedback) return;
+    if (isSoundcheck && questionHandledRef.current) return;
+    if (isSoundcheck) questionHandledRef.current = true;
     const userAns = parseInt(input, 10);
     const isCorrect = userAns === question.answer;
     const answerTime = (Date.now() - questionStartRef.current) / 1000;
     const trackTime = !isJamming; // Jamming schreibt keine Zeiten
 
-    const newHeat = doUpdateHeatmap(heatmap, question.heatmapKey, isCorrect, trackTime ? answerTime : null);
-    setHeatmap(newHeat);
+    setHeatmap(h => doUpdateHeatmap(h, question.heatmapKey, isCorrect, trackTime ? answerTime : null));
     setQuestionTimes(prev => [...prev, answerTime]);
 
     if (isCorrect) {
-      const newCombo = combo + 1;
       setCorrect(c => c + 1);
-      setCombo(newCombo);
-      setMaxCombo(m => Math.max(m, newCombo));
+      setCombo(prev => {
+        const newCombo = prev + 1;
+        setMaxCombo(m => Math.max(m, newCombo));
+
+        // XP basiert auf Antwortgeschwindigkeit: schneller = mehr Bonus (max 15 Punkte → speedBonus max 5)
+        const speedForXP = Math.max(0, 15 - answerTime * 2);
+        const answerXP = calcAnswerXP(speedForXP, newCombo, mode);
+        setSessionXP(x => x + answerXP);
+
+        const id = Date.now();
+        const pts = `+${answerXP} XP` + (newCombo >= 3 ? ' 🔥' : '');
+        setFloats(f => [...f, { id, text: pts }]);
+        setTimeout(() => setFloats(f => f.filter(x => x.id !== id)), 900);
+
+        return newCombo;
+      });
       setFeedback('ok');
-
-      // XP basiert auf Antwortgeschwindigkeit: schneller = mehr Bonus (max 15 Punkte → speedBonus max 5)
-      const speedForXP = Math.max(0, 15 - answerTime * 2);
-      const answerXP = calcAnswerXP(speedForXP, newCombo, mode);
-      setSessionXP(x => x + answerXP);
-
-      const id = Date.now();
-      const pts = `+${answerXP} XP` + (newCombo >= 3 ? ' 🔥' : '');
-      setFloats(f => [...f, { id, text: pts }]);
-      setTimeout(() => setFloats(f => f.filter(x => x.id !== id)), 900);
 
       if (isSoundcheck) {
         if (perQuestionTimerRef.current) clearInterval(perQuestionTimerRef.current);
@@ -1149,7 +1165,7 @@ function QuizGame({ state, mode, onBack, onComplete }: {
         setTimeout(() => nextQuestion(), 700);
       }
     }
-  }, [question, input, feedback, heatmap, combo, timeLeft, questionTimeLeft, mode, hasGlobalTimer, isSoundcheck, isJamming, nextQuestion]);
+  }, [question, input, feedback, timeLeft, questionTimeLeft, mode, hasGlobalTimer, isSoundcheck, isJamming, nextQuestion]);
 
   const finishJamming = useCallback(() => {
     setPhase('done');
@@ -1375,25 +1391,25 @@ function QuizGame({ state, mode, onBack, onComplete }: {
 
         {question && (
           <>
-            <div style={{ ...rockFont, fontSize: 'clamp(2rem, 9vw, 3.5rem)', color: S.text, marginBottom: '0.4rem' }}>
-              {question.displayText} = ?
+            <div style={{
+              fontFamily: "'Source Sans 3', 'Nunito', sans-serif", fontWeight: 700,
+              fontSize: 'clamp(2.4rem, 10vw, 4rem)', color: S.text,
+              marginBottom: '0.5rem', letterSpacing: 4,
+            }}>
+              {question.displayText} <span style={{ color: cfg.color }}>=</span> <span style={{ color: 'rgba(255,255,255,0.35)' }}>?</span>
             </div>
-            <input
-              ref={inputRef}
-              type="text"
-              inputMode="none"
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && submitAnswer()}
+            <div
               style={{
-                width: 180, textAlign: 'center', fontSize: '2.4rem', fontFamily: 'Nunito, sans-serif', fontWeight: 700,
+                width: 280, textAlign: 'center', fontSize: '2.4rem', fontFamily: "'Source Sans 3', 'Nunito', sans-serif", fontWeight: 700,
                 background: 'rgba(255,255,255,0.05)',
                 border: `2px solid ${feedback === 'ok' ? S.green : feedback === 'bad' ? S.red : cfg.color}`,
-                borderRadius: 12, color: S.text, padding: '0.6rem', outline: 'none',
+                borderRadius: 12, color: S.text, padding: '0.6rem',
+                minHeight: '3.6rem', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                transition: 'border-color 0.2s',
               }}
-              placeholder="..."
-              autoFocus
-            />
+            >
+              {input || <span style={{ color: 'rgba(255,255,255,0.2)' }}>...</span>}
+            </div>
             <div style={{ marginTop: '0.6rem' }}>
               <button style={btnPrimary} onClick={submitAnswer}>✓ Enter</button>
             </div>
@@ -1413,7 +1429,7 @@ function QuizGame({ state, mode, onBack, onComplete }: {
       ))}
 
       {/* Number pad */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '0.5rem', marginTop: '0.6rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '0.6rem', marginTop: '0.6rem', maxWidth: 420, width: '100%', margin: '0.6rem auto 0' }}>
         {[1, 2, 3, 4, 5, 6, 7, 8, 9, '⌫', 0, '✓'].map(k => (
           <button
             key={k}
@@ -1423,10 +1439,12 @@ function QuizGame({ state, mode, onBack, onComplete }: {
               else setInput(i => i + k);
             }}
             style={{
-              padding: '0.9rem', fontSize: '1.4rem', ...rockFont,
+              padding: '1rem 0.5rem', fontSize: '1.6rem',
+              fontFamily: "'Source Sans 3', 'Nunito', sans-serif", fontWeight: 700,
               background: k === '✓' ? cfg.color + '30' : 'rgba(255,255,255,0.05)',
               border: `1px solid ${k === '✓' ? cfg.color : S.border}`,
-              borderRadius: 10, color: k === '✓' ? cfg.color : S.text, cursor: 'pointer',
+              borderRadius: 12, color: k === '✓' ? cfg.color : S.text, cursor: 'pointer',
+              minHeight: 56, touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent',
             }}
           >
             {k}
@@ -1649,7 +1667,7 @@ function BattleScreen({ state, onBack, onComplete }: {
       setAiThinking(true);
       setTimeout(() => {
         const correct = Math.random() < difficulty;
-        const aiAnswer = correct ? q.answer : q.answer + (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 3) + 1);
+        const aiAnswer = correct ? q.answer : Math.max(1, q.answer + (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 3) + 1));
         setP2Input(String(aiAnswer));
         p2InputRef.current = String(aiAnswer);
         setP2Locked(true);
@@ -1665,23 +1683,25 @@ function BattleScreen({ state, onBack, onComplete }: {
     nextQuestion();
   };
 
-  const evaluateRound = useCallback((q: Question, a1: string, a2: string) => {
-    const c1 = parseInt(a1) === q.answer;
-    const c2 = parseInt(a2) === q.answer;
+  const roundRef = useRef(round);
+  roundRef.current = round;
 
-    const newScores = { p1: scores.p1 + (c1 ? 1 : 0), p2: scores.p2 + (c2 ? 1 : 0) };
-    setScores(newScores);
+  const evaluateRound = useCallback((q: Question, a1: string, a2: string) => {
+    const c1 = parseInt(a1, 10) === q.answer;
+    const c2 = parseInt(a2, 10) === q.answer;
+
+    setScores(prev => ({ p1: prev.p1 + (c1 ? 1 : 0), p2: prev.p2 + (c2 ? 1 : 0) }));
     setRoundResult({ p1Correct: c1, p2Correct: c2 });
     setPhase('result');
     setHeatmap(h => doUpdateHeatmap(h, q.heatmapKey, c1, null));
     if (timerRef.current) clearInterval(timerRef.current);
 
-    if (round >= BATTLE_ROUNDS) {
+    if (roundRef.current >= BATTLE_ROUNDS) {
       setTimeout(() => setPhase('done'), 1800);
     } else {
       setTimeout(() => { setRound(r => r + 1); nextQuestion(); }, 1500);
     }
-  }, [scores, round, nextQuestion]);
+  }, [nextQuestion]);
 
   useEffect(() => {
     if (phase !== 'question') return;
@@ -1903,7 +1923,7 @@ function HeatmapScreen({ state, onBack }: { state: ArenaState; onBack: () => voi
       const key = `${a * b}:${b}`;
       return heatmap[key] || null;
     }
-    return heatmap[`${a}x${b}`] || heatmap[`${b}x${a}`] || null;
+    return heatmap[normalizeMultKey(a, b)] || null;
   };
 
   const getTooltip = (a: number, b: number) => {

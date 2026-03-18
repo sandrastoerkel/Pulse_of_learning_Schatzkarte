@@ -170,7 +170,7 @@ function StimmenBattleScreen({ words, difficulty, onUpdateWordStats, onComplete,
     if (idx + 1 >= words.length) {
       onComplete({
         results,
-        totalPts: totalPts + roundPts,
+        totalPts,
         compPts,
       });
     } else {
@@ -354,12 +354,12 @@ function StimmenBattleScreen({ words, difficulty, onUpdateWordStats, onComplete,
 }
 
 /* ─── STIMMEN BATTLE END SCREEN ──────────────────────────────────────────── */
-function StimmenBattleEndScreen({ results, totalPts, compPts, monsterId, monsterStars, onBack }) {
+function StimmenBattleEndScreen({ results, totalPts, compPts, isLevelUp, monsterName, passed, onBack }) {
   const won = totalPts >= compPts;
   const pct = results.length > 0 ? Math.round((results.filter(r => r.wOk).length / results.length) * 100) : 0;
   const spokenPct = results.length > 0 ? Math.round((results.filter(r => r.sOk).length / results.length) * 100) : 0;
 
-  const isLevelUpMode = !!monsterId;
+  const isLevelUpMode = !!isLevelUp;
   const writePassed = pct >= 70;
   const speakPassed = spokenPct >= 70;
   const levelUpPassed = writePassed && speakPassed;

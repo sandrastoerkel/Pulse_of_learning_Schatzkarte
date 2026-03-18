@@ -1,19 +1,38 @@
 // ============================================
-// Insel der Fäden - Content nach Altersstufen
-// Basierend auf Vera F. Birkenbihl's Lehren
-// Quelle: utils/learnstrat_challenges/birkenbihl_content.py
+// Insel der Fäden – Content nach Altersstufen
+// Videos 7–10 als Serie unter "Weisheit erlangen"
+// Themen: Faden-Prinzip · ABC-Liste · Lücken-Jäger · KaWa
+// Basierend auf Vera F. Birkenbihl
 // ============================================
 
 import { AgeGroup } from '../types';
 
-interface ContentSection {
+// ============================================
+// INTERFACES
+// ============================================
+
+export interface ContentSection {
   title: string;
   content: string;
   type?: 'info' | 'success' | 'warning' | 'expander';
   expanded?: boolean;
 }
 
-interface IslandContent {
+export interface VideoEntry {
+  videoNumber: 7 | 8 | 9 | 10;
+  videoId: string;
+  placeholder: boolean;
+  title: string;
+  subtitle: string;
+  icon: string;
+  canvasAnimation: 'fadenNetz' | 'abcGrid' | 'ampelJaeger' | 'kawaRadiant';
+  intro: string;
+  sections: ContentSection[];
+  practicePrompt: string;
+}
+
+export interface IslandContent {
+  // Backward-compat fuer QuestModal (title, video, explanation, summary)
   title: string;
   video: {
     url: string;
@@ -24,365 +43,245 @@ interface IslandContent {
     sections: ContentSection[];
   };
   summary?: string;
+  // Neue Felder fuer Video-Serie
+  islandTitle?: string;
+  videos?: VideoEntry[];
 }
 
 // ============================================
-// GRUNDSCHULE
+// HILFSFUNKTION: Videos nach Altersgruppe
 // ============================================
-const GRUNDSCHULE_CONTENT: IslandContent = {
-  title: "Das Faden-Prinzip - Für kleine Entdecker",
-  video: {
-    url: "",
-    placeholder: true
-  },
-  explanation: {
-    intro: `**Stell dir dein Gehirn vor wie ein Freundschaftsband, das du knüpfst!** 🧶
 
-Jedes Mal wenn du etwas lernst, ist das wie ein neuer Faden, den du einwebst.
+function makeVideos(age: 'gs' | 'us' | 'ms'): VideoEntry[] {
+  return [
 
-Wenn jemand dir etwas Neues erzählt und du hast schon einen Faden dazu –
-dann kannst du das Neue einfach dranknüpfen! Easy! ✨
+    // ── VIDEO 7 · DAS FADEN-PRINZIP ──────────────────
+    {
+      videoNumber: 7,
+      videoId: 'aEfoUTZQQQM',
+      placeholder: false,
+      title: 'Das Faden-Prinzip',
+      subtitle: 'Warum manche Dinge hängenbleiben – und andere nicht',
+      icon: '🧵',
+      canvasAnimation: 'fadenNetz',
+      intro: age === 'gs'
+        ? `**Stell dir dein Gehirn vor wie ein Freundschaftsband!** 🧶\n\nJedes Mal, wenn du etwas lernst, knüpfst du einen neuen Faden.\nNeues Wissen kann nur bleiben, wenn es sich an EINEN dieser Fäden hängen kann.\n\nKein Faden? Das Wissen schwebt – und fällt runter.`
+        : age === 'us'
+        ? `**Die wichtigste Lern-Erkenntnis überhaupt.** 🎯\n\nVera Birkenbihl hat entdeckt:\n\n> "Ob Sie sich etwas leicht oder schwer merken können, hat NUR damit zu tun, ob Sie einen Faden haben."\n\nNeues Wissen dockt an bestehende Fäden an.\nKein Faden → geht rein, geht raus, weg.\nEigener Gedanke → Faden → bleibt.`
+        : `**Das Faden-Prinzip: Neurobiologische Grundlage des Lernens.**\n\nVera Birkenbihl modellierte Wissen als assoziatives Netzwerk.\nJeder Knoten ist mit anderen verbunden (Spreading Activation).\nNeue Information enkodiert nur tief, wenn sie an bestehende Knoten andockt.\n\nOhne Vorwissensaktivierung → Maintenance Rehearsal → schnell vergessen.\nMit eigenem Faden → Elaborative Rehearsal → Langzeitspeicherung.`,
+      sections: [
+        {
+          title: age === 'gs' ? '"Auf der Zunge" – kennst du das? 👅' : 'Blackout in der Klassenarbeit – warum? 🧠',
+          content: age === 'gs'
+            ? `Du weißt, dass du's weißt. Es ist da. Aber du kommst nicht dran.\n\n**Warum?**\nDas Wissen hat keinen festen Faden. Es schwebt.\nIn der Klassenarbeit, wenn du aufgeregt bist, fällt es runter.\n\n**Mit Faden:** "Ägypten! Wüste! Pharao!" ist dein Faden.\nDaran hängt dann "Pyramide" – für immer! 🧵`
+            : age === 'us'
+            ? `Du hast gelernt. Echt gelernt! Abends alles durchgelesen.\nIn der Klassenarbeit: **Blackout.**\n\nDu hattest keinen eigenen Faden.\nDu hast gelesen, was im Buch steht – aber nicht gedacht:\n"Was bedeutet das für MICH?"\n\nOhne Faden hängt das Wissen nicht richtig. Bei Stress: weg.\n**Mit Faden:** hält. Auch wenn du aufgeregt bist.`
+            : `Bulimielernen: rein, raus, weg.\nKeine eigenen Fäden geknüpft → keine elaborative Verarbeitung → schnell vergessen.\n\n**Craik & Tulving (1975), Levels of Processing:**\nJe tiefer die Verarbeitung, desto stabiler die Enkodierung.\nPersönliche Assoziation = tiefste Verarbeitungsebene.\n\nEffektstärke Elaboration: d ≈ 0.56 (Hattie) – kombiniert mit Self-Reference Effect noch höher.`,
+          type: 'warning',
+        },
+        {
+          title: 'Das Pyramide-Experiment 🔬',
+          content: `Birkenbihl machte dieses Experiment in jedem Vortrag:\n\nSie sagte ein Wort – alle schrieben auf, was IHNEN dazu einfällt.\n\n**Wort: "Pyramide."**\n\nWas fällt dir ein?\n→ Ägypten, Pharao, Wüste, Schoki-Pyramide, Videospiel...\n\nEgal was – das ist dein **Faden**.\nNicht das Wort, sondern dein Gedanke dazu.\n\nDaran hängt jetzt "Pyramide" – für immer. In der Klassenarbeit. Auch bei Stress. ✅`,
+          type: 'success',
+        },
+        {
+          title: 'Kopier-Modus vs. Denk-Modus ✍️',
+          content: `**Kopier-Modus** ❌\nMitschreiben was der Lehrer sagt.\nGehirn ist nur mit Übertragen beschäftigt.\nKein Faden entsteht.\n\n**Denk-Modus** ✅\nAufschreiben was DIR einfällt.\nJeder eigene Gedanke = ein neuer Faden.\n\n**Rand-Methode – Realitäts-Lösung:**\nDu MUSST mitschreiben? Kein Problem.\nLass einen kleinen Rand frei.\nDort: deine Assoziationen, Stichworte, Bilder.\n\nBeispiel: Lehrer sagt "Die Römer bauten Straßen."\nDu schreibst an den Rand: **"Asterix!"**\nAn "Asterix" hängt jetzt ALLES über römische Straßen. 🎉`,
+          type: 'success',
+        },
+        {
+          title: age === 'gs' ? 'Dein Gehirn ist ein Netz! 🕸️' : 'Das Wissensnetz – dichter = besser 🕸️',
+          content: `Je mehr Fäden du zu einem Thema hast, desto mehr bleibt hängen.\n\n**Fußball** ⚽ → tausend Fäden → bleibt sofort!\n**Quantenphysik** ⚛️ → null Fäden → rein, raus, weg.\n\nFäden baust du mit DEINEN eigenen Gedanken.\nNicht mit dem, was du abschreibst.`,
+          type: 'expander',
+        },
+      ],
+      practicePrompt: age === 'gs'
+        ? '🃏 **Karteikarten:** Schreib auf die Rückseite nicht nur die Antwort – schreib auch deinen eigenen Gedanken dazu. Ein Wort, ein Bild. Das ist dein Faden – der Kleber!'
+        : '🃏 **Karteikarten:** Ergänze jede Karte um deine persönliche Assoziation.\n🗺️ **Lernpfad:** Aktiviere vor jeder neuen Technik dein Vorwissen – "Was weiß ich schon dazu?"',
+    },
 
-Aber wenn du KEINEN Faden hast?
-Dann ist es wie ein loses Stück Wolle – es fällt einfach runter! 🧵
+    // ── VIDEO 8 · DIE ABC-LISTE ───────────────────────
+    {
+      videoNumber: 8,
+      videoId: 'SwSgGrZDGfc',
+      placeholder: false,
+      title: 'Die ABC-Liste',
+      subtitle: 'Fäden absichtlich aufspannen',
+      icon: '📋',
+      canvasAnimation: 'abcGrid',
+      intro: age === 'gs'
+        ? `**Dein Netz ist noch löchrig? Dann spann es auf!** 🕸️\n\nNeues Wissen braucht einen Faden – das weißt du jetzt.\nAber was, wenn du weißt, dass dein Netz noch löchrig ist?\n\nDann hilft automatisch nicht mehr.\nDann brauchst du die **ABC-Liste** – um dein Netz absichtlich aufzuspannen!`
+        : age === 'us'
+        ? `**Löchriges Netz? Absichtlich aufspannen!**\n\nIn Video 7 hast du gelernt: Neues Wissen braucht einen Faden.\nAber was, wenn in drei Tagen Klassenarbeit ist und du WEISST, dass dein Netz noch löchrig ist?\n\nDann reicht "automatisch" nicht mehr.\nDu brauchst die **ABC-Liste** – Birkenbihl's Werkzeug, um Lücken sofort sichtbar zu machen.`
+        : `**Advance Organizer durch strukturierte Vorwissensaktivierung.**\n\nDie ABC-Liste ist Birkenbihl's Werkzeug zur systematischen Netzwerk-Aktivierung.\nPrinzip: Alphabet als Struktur-Anker → erzwingt Spreading Activation über das gesamte Themenfeld.\n\nLücken (leere Felder) = fehlende Knoten im assoziativen Netzwerk → gezielter Lernbedarf.`,
+      sections: [
+        {
+          title: 'Was ist die ABC-Liste? 🔑',
+          content: `**So funktioniert sie:**\n\n1. Thema oben draufschreiben\n2. Alphabet links runter: A, B, C, D...\n3. Pro Buchstabe: sofort schreiben, was dir einfällt!\n\n**Regel Nr. 1: Die Augen wandern.**\nNicht grübeln. Nicht nachdenken.\nEinfach schreiben, was kommt – auch wenn es "weit weg" scheint.\n\nLeere Felder? Das sind deine **Lücken**.\nGenau die zeigen dir, wo du noch lernen musst. ✅`,
+          type: 'success',
+        },
+        {
+          title: 'Warum Buchstaben als Schlüssel? 🗝️',
+          content: `Das Alphabet ist ein **Suchsystem**.\n\nWenn du bei "B" anfängst zu denken, aktivierst du alle Wörter mit B, die du zu diesem Thema kennst.\nBei "K" alle mit K.\nUsw.\n\nDas Alphabet zwingt dich, das GESAMTE Thema abzusuchen – nicht nur die Teile, die dir gerade einfallen.\n\nErgebnis: Lücken werden sichtbar, die du sonst übersehen hättest.`,
+          type: 'info',
+        },
+        {
+          title: 'Was bringt die Liste? 🎯',
+          content: `**Vor dem Lernen:**\nDu siehst sofort – welche Buchstaben sind leer?\nGenau dort muss ich lernen. Nicht alles nochmal – nur die Lücken!\n\n**Vera Birkenbihl** hat das ihr ganzes Leben lang gemacht:\n"Immer: erst ABC-Liste. Dann lernen."\n\n**Profi-Modus:**\nNach dem Lernen nochmal eine ABC-Liste zum selben Thema anlegen.\nVorher vs. Nachher – du siehst deinen Fortschritt! 📈`,
+          type: 'success',
+        },
+        {
+          title: age === 'gs' ? 'Probier es gleich aus! 🚀' : 'Sofort anwenden',
+          content: `Nimm ein Fach, in dem du bald eine Arbeit schreibst.\n\nDann:\n1. Thema oben\n2. Alphabet links\n3. Augen wandern – was fällt dir ein?\n\nNur bis M reicht für den Anfang.\nNur 3 Minuten.\n\nLass deine Fäden sprechen – und schau, wo es noch löchrig ist.`,
+          type: 'expander',
+        },
+      ],
+      practicePrompt: age === 'gs'
+        ? '🃏 **Karteikarten:** Bevor du neue Karten erstellst – mach kurz eine ABC-Liste zum Thema! So siehst du sofort, welche Karten du wirklich brauchst.\n🗺️ **Lernpfad:** Starte eine neue Station mit der ABC-Liste als Einstieg.'
+        : '🃏 **Karteikarten:** ABC-Liste vor dem Erstellen neuer Karten – du lernst nur was fehlt, nicht alles nochmal.\n🗺️ **Lernpfad:** ABC-Liste am Stationsbeginn als systematischer Vorwissens-Check.',
+    },
 
-**Das Geheimnis:** Du musst erst einen Faden haben, dann hält alles zusammen!`,
-    sections: [
-      {
-        title: "Die Geschichte vom Zauberwort ✨",
-        content: `Lea hörte im Radio ein komisches Wort: "Meteorologie"
+    // ── VIDEO 9 · DER LÜCKEN-JÄGER ───────────────────
+    {
+      videoNumber: 9,
+      videoId: 'qxw9dDGKibc',
+      placeholder: false,
+      title: 'Der Lücken-Jäger',
+      subtitle: 'Die ABC-Liste wird zum persönlichen Lernplan',
+      icon: '🔍',
+      canvasAnimation: 'ampelJaeger',
+      intro: age === 'gs'
+        ? `**Du hast deine ABC-Liste. Ein paar Felder sind leer.**\n\nUnd jetzt? Alles nochmal lesen?\n\nNein! Es gibt einen viel besseren Weg:\nDen **Lücken-Jäger** – deine ABC-Liste wird zur Schatzkarte deines Lernens! 🗺️`
+        : age === 'us'
+        ? `**Du hast deine ABC-Liste. Ein paar Felder gefüllt, ein paar leer.**\n\nDie meisten Schüler machen jetzt das:\nSie legen den Zettel beiseite und lesen alles nochmal durch.\n\nDas ist Zeitverschwendung.\n\nIn diesem Video lernst du, wie du die ABC-Liste in deinen **persönlichen Lernplan** verwandelst.`
+        : `**Selektive Enkodierung durch Gap-Analysis.**\n\nDie meisten Schüler nutzen passive Wiederholung (alles nochmal lesen) – mit minimaler Effektstärke.\nDer Lücken-Jäger kombiniert Gap-Identifikation mit gezieltem Retrieval Practice.\n\nEffektstärke Retrieval Practice: d ≈ 0.73 (Hattie) – eine der stärksten Lernstrategien.`,
+      sections: [
+        {
+          title: 'Das Ampel-System 🚦',
+          content: `Nimm deine ABC-Liste und drei Stifte:\n\n🟢 **Grün:** Das weiß ich sicher. ✓\n🟡 **Orange:** Ich bin unsicher. ~\n🔴 **Rot:** Das weiß ich nicht. ✗\n\nFärbe jeden Buchstaben / jedes Feld ein.\n\nFertig?\n\nJetzt siehst du SOFORT:\n→ Grün = kein Zeitverschwendung mehr\n→ Orange + Rot = das lernst du jetzt`,
+          type: 'success',
+        },
+        {
+          title: 'Die 40%-Regel ⚡',
+          content: `Birkenbihl hat beobachtet:\n\nBei den meisten Schülern sind nach dem ersten Durchlesen\nnur etwa **40% der Felder rot**.\n\n**Was bedeutet das?**\n60% weißt du schon – die musst du nicht nochmal lernen!\n\nDu lernst nur die 40% echten Lücken.\nDas spart Zeit und macht Fortschritt sichtbar.\n\nNach dem Lernen: nochmal ABC-Liste anlegen.\nSiehst du, wie das Rot schrumpft? 📉`,
+          type: 'info',
+        },
+        {
+          title: 'Fortschritt sehen: Die zweite Liste 📈',
+          content: `Nachdem du die roten und orangen Felder gelernt hast:\n\n**Leg nochmal eine ABC-Liste zum selben Thema an.**\n\nVergleiche:\n- Vorher: wie viele rote Felder?\n- Nachher: wie viele rote Felder?\n\nDu siehst deinen Fortschritt direkt.\nNicht nach der Klassenarbeit – sondern JETZT, während du lernst.\n\nDas ist Motivation pur. 💪`,
+          type: 'success',
+        },
+        {
+          title: 'Echte Lücken weiterlernen 🎯',
+          content: `Hartnäckig rote Felder – die, die immer wieder rot bleiben?\n\nDie nimmst du mit in deine nächste Lernrunde.\n\n**Mit deinen vorhandenen Lerntools:**\n\n🃏 **Karteikarten:** Erstelle für jedes rote Feld eine Karte.\nNur für die echten Lücken – nicht für alles.\n\n🗺️ **Lernpfad:** Rote Felder werden zur nächsten Station.\nSo baut sich dein Lernweg aus deinen eigenen Lücken auf.`,
+          type: 'expander',
+        },
+      ],
+      practicePrompt: age === 'gs'
+        ? '🃏 **Karteikarten:** Nur für rote Felder neue Karten erstellen! Kein unnötiges Wiederholen was du schon kannst.\n🗺️ **Lernpfad:** Ampel-Check als erste Aktivität jeder Lernstation.'
+        : '🃏 **Karteikarten:** Rote Felder → neue Karten. Grüne Felder → keine Zeit verschwenden.\n🗺️ **Lernpfad:** Ampel-Status als Fortschrittsindikator in jeder Station nutzen.',
+    },
 
-Sie dachte: "Häh? Was soll das sein?" – und vergaß es sofort.
-
-Eine Woche später lernte sie in der Schule über das Wetter.
-Die Lehrerin sagte: "Wetter-Forscher heißen Meteorologen!"
-
-Lea dachte: "Aha! Meteor... wie die Sternschnuppen! Und -logie wie bei Zoo-logie!"
-
-Plötzlich hatte sie FÄDEN! Und jetzt vergisst sie das Wort nie mehr.
-
-**Das Geheimnis:** Sobald du einen Faden hast, bleibt alles hängen!`,
-        type: 'info'
-      },
-      {
-        title: "Das Geheimnis der Superlerner! 🦸",
-        content: `In der Schule lernt man: "Schreib auf, was die Lehrerin sagt!"
-
-Vera Birkenbihl sagt: **Das ist FALSCH!**
-
-Richtig ist: Schreib auf, was DU DENKST!
-
-**Beispiel:**
-Die Lehrerin sagt: "Schmetterlinge haben vier Flügel."
-
-❌ Falsch: "Schmetterlinge haben 4 Flügel" aufschreiben
-✅ Richtig: "Erinnert mich an den bunten im Garten!" aufschreiben
-
-Warum? Weil DEIN Gedanke der Faden ist, an dem das Neue hängt!`,
-        type: 'success'
-      },
-      {
-        title: "Dein Wissen ist wie ein Freundschaftsband! 🧶",
-        content: `Hast du schon mal ein **Freundschaftsband** geknüpft?
-Oder kennst du das **Straßennetz** in deiner Stadt?
-
-**🧶 Wie ein Freundschaftsband:**
-Jeder neue Faden, den du dazuknüpfst, macht das Band stärker!
-Am Anfang hast du nur einen dünnen Faden – aber je mehr du knüpfst, desto bunter und stabiler wird es!
-
-Genauso ist es mit deinem Wissen: Jede neue Sache, die du lernst, ist ein neuer Faden, den du an die anderen knüpfst!
-
-**🛣️ Wie ein Straßennetz:**
-Stell dir eine Stadt vor. Die Straßen verbinden alle Orte miteinander.
-Wenn du von der Schule zum Spielplatz willst, nimmst du eine Straße.
-Wenn eine Straße fehlt? Dann kommst du nicht hin!
-
-Dein Gehirn funktioniert genauso: Je mehr "Straßen" du baust, desto schneller findest du alles!
-
-**Das Problem:**
-Manche Kinder haben zu einem Thema NULL Fäden – wie ein Armband ohne Knoten oder eine Stadt ohne Straßen. Dann fällt alles auseinander!
-
-**Die Lösung:**
-Erst Fäden knüpfen! Erst Straßen bauen! DANN lernen!
-
-Wie? Indem du SELBER nachdenkst: "Was kenne ich schon dazu?"`,
-        type: 'expander'
-      },
-      {
-        title: "Birkenbihl-Training im Alltag! 🏋️",
-        content: `Du kannst die Faden-Methode ÜBERALL üben!
-
-**Beim Fernsehen:** 📺
-- Schau Nachrichten oder eine Sendung
-- Schreib auf, was DIR dazu einfällt!
-- Nicht was gesagt wird!
-
-**Bei Gesprächen:** 💬
-- Wenn jemand etwas erzählt
-- Achte auf DEINE Gedanken dazu
-- Merkst du, wie dein Gehirn Fäden sucht?
-
-**Beim Lesen:** 📚
-- Lies einen Abschnitt
-- Halt an: Was fällt MIR dazu ein?
-- Das sind deine Fäden!`,
-        type: 'expander'
-      },
-      {
-        title: "Fun Fact 🧠",
-        content: `Vera Birkenbihl sagte: "Ob etwas leicht oder schwer ist, hat nur damit zu tun, ob du einen Faden hast – nicht wie schlau du bist!"
-
-Wusstest du? Das längste Freundschaftsband der Welt ist über 2 Kilometer lang! 🧶 Und das größte Straßennetz (in den USA) hat über 6 Millionen Kilometer! 🛣️ Dein Wissensnetz kann noch viel größer werden!`,
-        type: 'info'
-      }
-    ]
-  },
-  summary: "Du wirst nicht besser, weil du schlau bist. Du wirst besser, weil du FÄDEN baust und nicht aufgibst!"
-};
-
-// ============================================
-// UNTERSTUFE
-// ============================================
-const UNTERSTUFE_CONTENT: IslandContent = {
-  title: "Das Faden-Prinzip - Dein Gehirn verstehen",
-  video: {
-    url: "",
-    placeholder: true
-  },
-  explanation: {
-    intro: `**Die wichtigste Lern-Erkenntnis überhaupt!** 🎯
-
-Vera Birkenbihl hat etwas Revolutionäres entdeckt:
-
-> "Wir haben in der Schule gelernt: Wenn wir uns was merken wollen,
-> aufschreiben. **Das ist FALSCH!**"
-
-Was ist richtig?
-- ❌ NICHT aufschreiben was der Lehrer sagt
-- ✅ Aufschreiben was DU SELBER denkst!
-
-**Warum?** Dein Gehirn ist wie ein Netz aus Fäden.
-Neues Wissen muss an einen bestehenden Faden "andocken".
-Ohne Faden? Geht rein, geht raus. Weg.
-Mit Faden? Bleibt für immer!`,
-    sections: [
-      {
-        title: "Kennst du das: Blackout? 🧠❌",
-        content: `Du hast gelernt. Echt gelernt! Abends vor der Arbeit alles durchgelesen.
-
-Dann sitzt du in der Klassenarbeit und... **nichts.**
-Dein Kopf ist leer. Totaler Blackout.
-
-Später, nach der Arbeit, fällt dir alles wieder ein. Zu spät!
-
-**Warum passiert das?**
-Du hattest keinen "Faden"! Du hast nur gelesen, was im Buch steht.
-Aber du hast nicht gedacht: "Was bedeutet das FÜR MICH?"
-
-Ohne eigenen Faden = Das Wissen "hängt" nicht richtig.
-Bei Stress? Weg!
-
-**Mit Faden:** Du verbindest neues Wissen mit deinen eigenen Gedanken.
-Das hält. Auch bei Stress!
-
-**Das ist das Faden-Prinzip:** Ohne Faden = Blackout-Gefahr. Mit Faden = bleibt!`,
-        type: 'warning'
-      },
-      {
-        title: "Die Anti-Mitschreib-Methode! ✍️",
-        content: `Was macht die Schule? "Schreib mit, was der Lehrer sagt!"
-Was sagt Birkenbihl? **"Das ist der größte Lernfehler!"**
-
-**Warum ist Mitschreiben schlecht?**
-- Du bist im "Kopier-Modus", nicht im "Denk-Modus"
-- Dein Gehirn ist nur mit Schreiben beschäftigt
-- Der Inhalt geht an dir vorbei!
-
-**Was sollst du stattdessen tun?**
-Schreib auf, was DU DENKST, während du zuhörst!
-
-**Beispiel aus dem Unterricht:**
-Der Lehrer erklärt die Römer und sagt: "Die Römer haben Straßen gebaut."
-Dir fällt ein: "Assassin's Creed! Da laufe ich immer durch Rom!"
-→ Du schreibst: "AC Rom"
-→ An "AC Rom" hängt ALLES was du über römische Straßen brauchst!`,
-        type: 'success'
-      },
-      {
-        title: "Das Wissensnetz-Prinzip",
-        content: `Birkenbihl erklärte: Dein Wissen ist wie ein Netz.
-
-**Je dichter das Netz, desto mehr bleibt hängen!**
-
-Stell dir vor:
-- Thema, zu dem du VIEL weißt = dichtes Netz
-- Thema, zu dem du NICHTS weißt = löchriges Netz
-
-**Beispiel: Fußball** ⚽
-Wenn du Fußball-Fan bist, hast du tausend Fäden:
-Spieler, Vereine, Regeln, Stadien, eigene Erfahrungen...
-
-Wenn jemand etwas über Fußball erzählt, bleibt ALLES hängen!
-
-**Beispiel: Quantenphysik** ⚛️
-Null Fäden? Dann geht es rein und direkt wieder raus!
-
-**Die Lösung:** Erst Fäden bauen, dann lernen!`,
-        type: 'expander'
-      },
-      {
-        title: "Fun Fact",
-        content: `Birkenbihl nannte das "Zuhören mit dem ganzen Gehirn" – nicht nur mit den Ohren! 👂🧠
-
-Sie übte jeden Tag beim Nachrichten-Schauen – bis zu ihrem Tod mit 65 Jahren! 📺`,
-        type: 'info'
-      }
-    ]
-  },
-  summary: "Dein Gehirn glaubt, was du ihm oft genug sagst. Notiere deine EIGENEN Gedanken – dann bleibt alles hängen!"
-};
+    // ── VIDEO 10 · DIE KAWA ───────────────────────────
+    {
+      videoNumber: 10,
+      videoId: 'J8uYPJpYhGE',
+      placeholder: false,
+      title: 'Die KaWa',
+      subtitle: 'Wenn ein Wort zum Schlüsselbund wird',
+      icon: '🗝️',
+      canvasAnimation: 'kawaRadiant',
+      intro: age === 'gs'
+        ? `**Bist du eher ein Text-Denker oder ein Bild-Denker?** 🤔\n\nBei manchen laufen Gedanken als Wörter ab. Bei anderen entstehen Bilder und Verbindungen.\n\nWenn du gerne in Netzen denkst – dann ist die **KaWa** dein Werkzeug!\nEin einziges Wort wird zum Schlüsselbund für ganz viel Wissen.`
+        : age === 'us'
+        ? `**KaWa – für alle, die in Verbindungen denken.**\n\nDu kennst die ABC-Liste – 26 Buchstaben, ganzes Themenfeld.\nDie KaWa macht dasselbe – aber mit einem einzigen Wort.\n\nEin Wort als Anker. Seine Buchstaben als Tore.\nPro Buchstabe: sofort assoziieren.\n\nKürzer als die ABC-Liste. Fokussierter. Kreativer.`
+        : `**KaWa: Kreativ-assoziative Verdichtung durch constraint-basierte Assoziation.**\n\nPrinzip: Ein zentrales Wort als Schlüsselknoten → seine Buchstaben als strukturierte Assoziationstrigger.\nDurch Einschränkung (nur Buchstaben des Wortes) entsteht gezielter Fokus – statt diffuser Mindmap-Ausbreitung.\n\nBirkenbihl nannte es "Klangwolke zu Faden": das Wort als Klang wird selbst zum Assoziationsanker.`,
+      sections: [
+        {
+          title: 'Was bedeutet KaWa? 🔑',
+          content: `**KaWa** steht für:\n**K**reative **a**usbeute – **W**ort – **A**ssoziationen\n\n**So funktioniert sie:**\n1. Ein Themenwort wählen (z.B. "ÄGYPTEN")\n2. Die Buchstaben des Wortes untereinander schreiben: Ä, G, Y, P, T, E, N\n3. Zu jedem Buchstaben sofort assoziieren\n\n**Ergebnis:**\nÄ → Ära, Ägyptologie\nG → Götter, Gold\nP → Pyramide, Pharao\n...\n\nKürzer als ABC-Liste – aber mit Tiefgang. ✅`,
+          type: 'success',
+        },
+        {
+          title: 'KaWa vs. Mindmap 🥊',
+          content: `**Mindmap** ❌ (für Lücken-Jagd)\nVerzweigt in alle Richtungen.\nKein Stopp, keine Kontrolle.\nSchnell: 3 Äste, dann nichts mehr...\n\n**KaWa** ✅\nFührt durch Buchstaben-Tore.\nJedes Tor zwingt dich zu einem neuen Bereich.\nEinschränkung macht kreativ!\n\n**Birkenbihl:** "Gerade weil du nicht überall hindenken kannst, findest du mehr."\n\nDas Gehirn sucht gezielter, wenn es einen Rahmen hat.`,
+          type: 'info',
+        },
+        {
+          title: 'Der Klangwolken-Trick 🔊',
+          content: `Birkenbihl hatte einen Extra-Trick:\n\nSprich das Wort laut aus.\nHör dir selbst zu.\n\n"Ä-gyp-ten."\n\nDas Wort als Klang – als Klangwolke – aktiviert andere Fäden als das Wort als Text.\n\nManche Assoziationen kommen nur über den Klang.\n\nProbier es: Was klingt "PHOTOSYNTHESE" für dich?\nPhoto? Synthese? Synth-Sound?\n\nJeder Klang-Eindruck ist ein neuer möglicher Faden. 🎵`,
+          type: 'expander',
+        },
+        {
+          title: 'ABC-Liste + KaWa = dichtes Netz 🕸️',
+          content: `Beide Methoden ergänzen sich perfekt:\n\n**ABC-Liste** → breiter Überblick, alle 26 Tore\n**KaWa** → tiefer Fokus auf ein Schlüsselwort\n\nManche Schüler machen erst die ABC-Liste –\nfinden die wichtigsten Begriffe –\nund machen dann für jeden Begriff eine KaWa.\n\nErgebnis: Ein dichtes, persönliches Wissensnetz.\n\nMit deinen eigenen Fäden. Nicht aus dem Buch. Deinen.`,
+          type: 'success',
+        },
+      ],
+      practicePrompt: age === 'gs'
+        ? '🃏 **Karteikarten:** Mach für jedes wichtige Schlüsselwort eine KaWa – und schreib die Assoziationen auf die Rückseite als Gedächtnisstütze.\n🗺️ **Lernpfad:** Nutze die KaWa als kreative Einstiegsübung zu einer neuen Station.'
+        : '🃏 **Karteikarten:** KaWa-Assoziationen als zusätzliche Fäden auf jeder Karte vermerken.\n🗺️ **Lernpfad:** KaWa für Schlüsselbegriffe → Verknüpfung zwischen Stationen sichtbar machen.',
+    },
+  ];
+}
 
 // ============================================
-// MITTELSTUFE
+// HELPER: Content-Objekt mit Backward-Compat bauen
+// Video 7 wird fuer title/video/explanation genutzt
 // ============================================
-const MITTELSTUFE_CONTENT: IslandContent = {
-  title: "Das Faden-Prinzip - Die Wissenschaft dahinter",
-  video: {
-    url: "",
-    placeholder: true
-  },
-  explanation: {
-    intro: `**Das Faden-Prinzip: Warum Lernen manchmal "schwer" scheint**
 
-Vera F. Birkenbihl revolutionierte unser Verständnis vom Lernen:
+function buildContent(islandTitle: string, videos: VideoEntry[], summary: string): IslandContent {
+  const firstVideo = videos[0];
+  return {
+    // Backward-compat fuer QuestModal
+    title: firstVideo.title,
+    video: {
+      url: firstVideo.videoId ? `https://www.youtube.com/watch?v=${firstVideo.videoId}` : '',
+      placeholder: firstVideo.placeholder,
+    },
+    explanation: {
+      intro: firstVideo.intro,
+      sections: firstVideo.sections,
+    },
+    summary,
+    // Neue Felder
+    islandTitle,
+    videos,
+  };
+}
 
-> "Ob etwas leicht oder schwer ist, hat NUR damit zu tun,
-> ob Sie einen Faden haben. Es hat NICHTS mit Intelligenz zu tun!"
+// ============================================
+// CONTENT PRO ALTERSGRUPPE
+// ============================================
 
-**Das Modell:**
-- Dein Gehirn = Wissensnetz aus verbundenen Fäden
-- Neues Wissen = muss an bestehenden Faden "andocken"
-- Kein Faden da = Information "prallt ab"
-- Faden vorhanden = Information "hängt sich dran"
+const GRUNDSCHULE_CONTENT: IslandContent = buildContent(
+  'Station der Fäden',
+  makeVideos('gs'),
+  'Wissen bleibt nur, wenn es einen Faden findet. Deine Gedanken sind deine Fäden – bau sie überall, wo du lernst!',
+);
 
-**Die Konsequenz:**
-Bevor du etwas Neues lernst, finde deinen FADEN!
-Frag dich: "Was weiß ich SCHON darüber? Was fällt mir dazu ein?"
+const UNTERSTUFE_CONTENT: IslandContent = buildContent(
+  'Station der Fäden',
+  makeVideos('us'),
+  'Das Faden-Prinzip ist das Gegenmittel gegen Bulimielernen. Eigene Assoziationen → tiefe Verarbeitung → stabile Langzeitspeicherung.',
+);
 
-So aktivierst du dein bestehendes Netz – und das Neue kann andocken.`,
-    sections: [
-      {
-        title: "Bulimielernen – Kennst du das? 🤮📚",
-        content: `Sei ehrlich: Hast du schon mal so gelernt?
-
-1. Klausur morgen → Panik
-2. Abends alles "reinprügeln"
-3. In der Klausur "auskotzen"
-4. Eine Woche später: Alles vergessen
-
-Das nennt man **Bulimielernen**. Rein, raus, weg.
-
-**Warum funktioniert das nicht?**
-Du hast keine eigenen Fäden geknüpft!
-Du hast nur fremde Informationen kurz "geparkt" – ohne sie mit DEINEN Gedanken zu verbinden.
-
-**Das Faden-Prinzip ist das Gegenteil:**
-- Du fragst: "Was bedeutet das für MICH?"
-- Du notierst DEINE Assoziationen
-- Du baust DEIN Netz
-
-**Ergebnis:** Das Wissen bleibt. Nicht nur bis zur Klausur – für immer.
-
-Ab jetzt wirst du das Wort "Bulimielernen" überall hören. Weil du jetzt einen Faden hast.`,
-        type: 'warning'
-      },
-      {
-        title: "Elaboratives vs. Mechanisches Lernen",
-        content: `Vera Birkenbihl unterschied zwei Arten des Notierens:
-
-**1. Mechanisches Mitschreiben** ❌
-- Kopieren was gesagt wird
-- Gehirn im "Stenografie-Modus"
-- Oberflächliche Verarbeitung
-- Schnell vergessen!
-
-**2. Elaboratives Notieren** ✅
-- Eigene Gedanken festhalten
-- Gehirn im "Versteh-Modus"
-- Tiefe Verarbeitung
-- Dauerhaft gespeichert!
-
-**Die Wissenschaft dahinter:**
-Craik & Tulving (1975) zeigten: "Levels of Processing"
-Je tiefer die Verarbeitung, desto besser die Erinnerung.
-
-**Eigene Gedanken = tiefste Verarbeitung**
-(Persönlicher Bezug, Emotionen, bestehendes Wissen)`,
-        type: 'success'
-      },
-      {
-        title: "Assoziative Netzwerke und Spreading Activation",
-        content: `Vera Birkenbihl nutzte das Modell der assoziativen Netzwerke:
-
-**Das Konzept:**
-- Wissen ist in Netzwerken organisiert (nicht linear!)
-- Jeder Knoten ist mit anderen Knoten verbunden
-- Aktivierung "breitet sich aus" (Spreading Activation)
-
-**Die Konsequenz für Lernen:**
-- Viele Verbindungen = schnelle Aktivierung = leichtes Lernen
-- Wenige Verbindungen = langsame Aktivierung = schweres Lernen
-
-**Birkenbihl's Beispiel "Adipositas":**
-Wort ohne Netzwerk = "Klangwolke" (wird nicht verarbeitet)
-Wort MIT Netzwerk = sofort erkannt, überall wahrgenommen
-
-**Strategie:**
-Vor dem Lernen: Netzwerk AKTIVIEREN oder AUFBAUEN!
-
-**Übung: Spreading Activation Test**
-Ich sage ein Wort. Du hast 30 Sekunden.
-Schreib ALLES auf, was dir einfällt – auch wenn es "weit weg" scheint!
-
-Beispiel: "Bank"
-→ Geld, Sitzen, Park, Sparkasse, Räuber, Tresor, Holz, Fluss...
-
-Siehst du? Von "Bank" (Sitzen) zu "Fluss" (Flussufer) – alles verbunden!`,
-        type: 'expander'
-      },
-      {
-        title: "Wissenschaftliche Grundlagen",
-        content: `**Birkenbihl's Methoden kombinieren mehrere evidenzbasierte Prinzipien:**
-
-- **Elaborative Rehearsal** (statt Maintenance Rehearsal)
-- **Self-Reference Effect** - Information mit Selbstbezug wird besser erinnert
-- **Aktivierung von Vorwissen** (Advance Organizers)
-- **Metakognition** ("eigenes Denken beobachten")
-
-**Neurobiologische Validierung:**
-- Tiefere Verarbeitung durch persönliche Assoziationen
-- Aktivierung bestehender neuronaler Netzwerke
-- Bessere Enkodierung durch Selbst-Bezug
-
-**Effektstärke:** Elaboration d=0.56 nach Hattie – kombiniert mit Self-Reference Effect noch stärker!
-
-**Fun Fact:** In deinem Gehirn gibt es 86 Milliarden Neuronen mit je 7.000 Verbindungen – das größte Netzwerk im Universum! 🌌`,
-        type: 'info'
-      }
-    ]
-  },
-  summary: "Das Faden-Prinzip ist das Gegenmittel gegen Bulimielernen. Eigene Assoziationen = tiefe Verarbeitung = stabile Langzeitspeicherung."
-};
+const MITTELSTUFE_CONTENT: IslandContent = buildContent(
+  'Station der Fäden',
+  makeVideos('ms'),
+  'Elaboratives Lernen durch assoziative Netzwerke: Faden-Prinzip, ABC-Liste, Lücken-Jäger und KaWa bilden ein vollständiges System zur Selbststeuerung des Lernens.',
+);
 
 // ============================================
 // EXPORT
 // ============================================
+
 export const FAEDEN_CONTENT: Record<AgeGroup, IslandContent> = {
   grundschule: GRUNDSCHULE_CONTENT,
-  unterstufe: UNTERSTUFE_CONTENT,
+  unterstufe:  UNTERSTUFE_CONTENT,
   mittelstufe: MITTELSTUFE_CONTENT,
-  oberstufe: MITTELSTUFE_CONTENT, // Fallback
-  paedagoge: MITTELSTUFE_CONTENT  // Fallback
+  oberstufe:   MITTELSTUFE_CONTENT, // Fallback
+  paedagoge:   MITTELSTUFE_CONTENT, // Fallback
 };
 
-export type { IslandContent, ContentSection };
+// Types already exported via `export interface` above

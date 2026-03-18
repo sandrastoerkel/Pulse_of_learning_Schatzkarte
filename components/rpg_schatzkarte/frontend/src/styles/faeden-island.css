@@ -671,6 +671,274 @@
 }
 
 /* ============================================
+   VIDEO STEPPER (4-Schritt-Navigation)
+   ============================================ */
+
+.faeden-island .video-stepper {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.15);
+  flex-wrap: wrap;
+}
+
+.faeden-island .stepper-dot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: var(--radius-md);
+  border: 2px solid rgba(155, 89, 182, 0.3);
+  background: rgba(155, 89, 182, 0.08);
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 60px;
+  color: var(--white);
+}
+
+.faeden-island .stepper-dot:hover {
+  background: rgba(155, 89, 182, 0.15);
+  border-color: rgba(155, 89, 182, 0.5);
+}
+
+.faeden-island .stepper-dot.active {
+  background: rgba(155, 89, 182, 0.25);
+  border-color: #9b59b6;
+  box-shadow: 0 0 12px rgba(155, 89, 182, 0.4);
+}
+
+.faeden-island .stepper-dot.done {
+  border-color: rgba(39, 174, 96, 0.6);
+  background: rgba(39, 174, 96, 0.1);
+}
+
+.faeden-island .stepper-dot.done.active {
+  border-color: #27ae60;
+  box-shadow: 0 0 12px rgba(39, 174, 96, 0.3);
+}
+
+.faeden-island .stepper-icon {
+  font-size: 1.2rem;
+}
+
+.faeden-island .stepper-label {
+  font-size: 0.6rem;
+  font-weight: 600;
+  opacity: 0.8;
+  white-space: nowrap;
+}
+
+.faeden-island .stepper-check {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #27ae60;
+  color: white;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  font-weight: 700;
+}
+
+/* ============================================
+   CANVAS ANIMATION WRAPPER
+   ============================================ */
+
+.faeden-island .video-canvas-wrapper {
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: 1rem;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.faeden-island .video-canvas-wrapper canvas {
+  display: block;
+  width: 100%;
+  height: 180px;
+}
+
+.faeden-island .video-canvas-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+}
+
+.faeden-island .canvas-icon {
+  font-size: 1.2rem;
+}
+
+.faeden-island .canvas-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--white);
+}
+
+.faeden-island .canvas-subtitle {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ============================================
+   VIDEO INTRO BOX & PRACTICE PROMPT
+   ============================================ */
+
+.faeden-island .video-intro-box {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+  color: var(--white);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.faeden-island .video-intro-box strong {
+  color: #ce93d8;
+}
+
+.faeden-island .practice-prompt {
+  background: rgba(155, 89, 182, 0.12);
+  border: 1px solid rgba(155, 89, 182, 0.25);
+  border-left: 4px solid #9b59b6;
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+  font-size: 0.88rem;
+  color: var(--white);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.faeden-island .practice-prompt strong {
+  color: #ce93d8;
+}
+
+/* ============================================
+   VIDEO NAVIGATION (prev/next)
+   ============================================ */
+
+.faeden-island .video-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.faeden-island .nav-btn {
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius-md);
+  border: none;
+  color: var(--white);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.faeden-island .nav-prev {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.faeden-island .nav-prev:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.faeden-island .nav-next {
+  background: #9b59b6;
+}
+
+.faeden-island .nav-next:hover {
+  box-shadow: 0 0 12px rgba(155, 89, 182, 0.4);
+}
+
+.faeden-island .video-counter {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 600;
+}
+
+/* ============================================
+   GROUPED SCROLL PHASE (Video-Gruppen)
+   ============================================ */
+
+.faeden-island .scroll-video-group {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(155, 89, 182, 0.2);
+}
+
+.faeden-island .scroll-video-group:last-of-type {
+  border-bottom: none;
+}
+
+.faeden-island .scroll-group-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(155, 89, 182, 0.15);
+  border-radius: var(--radius-md);
+  margin-bottom: 0.75rem;
+  border-left: 4px solid #9b59b6;
+}
+
+.faeden-island .group-icon {
+  font-size: 1.5rem;
+}
+
+.faeden-island .group-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.faeden-island .group-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ce93d8;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.faeden-island .group-subtitle {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.faeden-island .scroll-practice-prompt {
+  background: rgba(155, 89, 182, 0.1);
+  border: 1px solid rgba(155, 89, 182, 0.2);
+  border-left: 3px solid #9b59b6;
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.8rem;
+  margin-top: 0.75rem;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--white);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.faeden-island .scroll-practice-prompt strong {
+  color: #ce93d8;
+}
+
+/* ============================================
    RESPONSIVE - TABLET
    ============================================ */
 

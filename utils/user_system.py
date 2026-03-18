@@ -383,6 +383,15 @@ def delete_user(user_id: str) -> bool:
         ("challenges", "user_id"),
         ("user_badges", "user_id"),
         ("polarstern_goals", "user_id"),
+        ("island_progress", "user_id"),
+        ("user_treasures", "user_id"),
+        ("bandura_entries", "user_id"),
+        ("activity_log", "user_id"),
+        ("learnstrat_progress", "user_id"),
+        ("arena_progress", "user_id"),
+        ("wortschmiede_word_stats", "user_id"),
+        ("wortschmiede_progress", "user_id"),
+        ("user_avatars", "user_id"),
     ]:
         try:
             db.table(table).delete().eq(column, user_id).execute()
@@ -476,7 +485,11 @@ def logout_user():
     # Admin-Status NICHT löschen, damit Quick-Login-Liste sichtbar bleibt
     keys_to_delete = ["current_user_id", "current_user_name", "current_user_age_group",
                       "registration_step", "registration_name", "registration_age",
-                      "registration_password", "_cached_user_role", "_cached_user_role_id"]
+                      "registration_password", "_cached_user_role", "_cached_user_role_id",
+                      "_pending_login_cookie", "last_schatzkarte_action",
+                      "_cookie_invalidated", "_nav_to_schatzkarte",
+                      "auto_open_island", "auto_open_phase",
+                      "polarstern_source_island", "show_polarstern_modal"]
     for key in keys_to_delete:
         if key in st.session_state:
             del st.session_state[key]

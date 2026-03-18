@@ -26,6 +26,8 @@ export interface MeetingData {
     minutesRemaining?: number;
     canJoin?: boolean;
   };
+  scheduledStartISO?: string;
+  scheduledEndISO?: string;
   userRole: 'coach' | 'kind';
   jwt?: string | null;
   appId?: string;
@@ -79,6 +81,28 @@ function loadJaaSApi(appId: string): Promise<any> {
 const SMALL_DEFAULT = { width: 320, height: 280 };
 const MIN_SIZE = { width: 240, height: 200 };
 
+/** Berechnet Minuten bis zum Meeting-Start (5 Min Vorlauf) aus ISO-Timestamps.
+ *  Faellt auf den Python-Wert zurueck wenn kein ISO vorhanden. */
+function calcMinutesUntilStart(meeting: MeetingData): number {
+  if (meeting.scheduledStartISO) {
+    const start = new Date(meeting.scheduledStartISO).getTime();
+    const accessStart = start - 5 * 60_000; // 5 Min Vorlauf
+    const diff = accessStart - Date.now();
+    return Math.max(0, Math.round(diff / 60_000));
+  }
+  return meeting.timeStatus?.minutesUntilStart ?? 0;
+}
+
+/** Berechnet verbleibende Minuten eines aktiven Meetings aus ISO-Timestamps. */
+function calcMinutesRemaining(meeting: MeetingData): number {
+  if (meeting.scheduledEndISO) {
+    const end = new Date(meeting.scheduledEndISO).getTime();
+    const diff = end - Date.now();
+    return Math.max(0, Math.round(diff / 60_000));
+  }
+  return meeting.timeStatus?.minutesRemaining ?? 0;
+}
+
 const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
   meetingData,
   onAction,
@@ -112,9 +136,7 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
   // Jitsi ist aktiv wenn wir jemals in einen Video-State gewechselt haben
   const [jitsiActive, setJitsiActive] = useState(false);
   const [jitsiLoaded, setJitsiLoaded] = useState(false);
-  const [minutesUntil, setMinutesUntil] = useState(
-    activeMeeting.timeStatus?.minutesUntilStart ?? 0
-  );
+  const [minutesUntil, setMinutesUntil] = useState(() => calcMinutesUntilStart(activeMeeting));
 
   // --- Drag & Resize state ---
   const [pos, setPos] = useState({ x: -1, y: -1 }); // -1 = not yet placed
@@ -129,6 +151,29 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
   useEffect(() => {
     activeMeetingRef.current = activeMeeting;
   }, [activeMeeting]);
+
+  // Props-Sync: Wenn Streamlit neue meetingData sendet (Rerun),
+  // aktualisiere activeMeeting — aber nur wenn gleiches Meeting (gleiche ID)
+  const prevMeetingIdRef = useRef(meetingData.meetingId);
+  useEffect(() => {
+    // Gleiches Meeting → nur timeStatus/canJoin/jwt aktualisieren (kein Reset)
+    if (meetingData.meetingId === activeMeeting.meetingId) {
+      setActiveMeeting(prev => ({
+        ...prev,
+        canJoin: meetingData.canJoin,
+        timeStatus: meetingData.timeStatus,
+        scheduledStartISO: meetingData.scheduledStartISO,
+        scheduledEndISO: meetingData.scheduledEndISO,
+        jwt: meetingData.jwt,
+        allMeetings: meetingData.allMeetings,
+      }));
+      // View aktualisieren wenn Meeting jetzt joinbar geworden ist
+      if (meetingData.canJoin && (view === 'waiting' || view === 'join-button') && !jitsiActive) {
+        setView('join-button');
+      }
+    }
+    prevMeetingIdRef.current = meetingData.meetingId;
+  }, [meetingData.meetingId, meetingData.canJoin, meetingData.timeStatus?.reason]);
 
   // Force join from external trigger (Header-Button) — startet direkt im Large-Modus
   useEffect(() => {
@@ -313,20 +358,20 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
     };
   }, [jitsiActive]); // Nur von jitsiActive abhaengig, NICHT von view!
 
-  // Update waiting countdown
+  // Update waiting countdown — berechnet echte verbleibende Minuten
   useEffect(() => {
     if (view !== 'waiting') return;
 
-    const interval = setInterval(() => {
-      setMinutesUntil(prev => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          setView('join-button');
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 60_000);
+    const tick = () => {
+      const mins = calcMinutesUntilStart(activeMeetingRef.current);
+      setMinutesUntil(mins);
+      if (mins <= 0) {
+        setView('join-button');
+      }
+    };
+
+    tick(); // Sofort berechnen
+    const interval = setInterval(tick, 15_000); // Alle 15 Sek aktualisieren
 
     return () => clearInterval(interval);
   }, [view]);
@@ -540,7 +585,7 @@ const FloatingJitsiWidget: React.FC<FloatingJitsiWidgetProps> = ({
   // === JOIN BUTTON STATE (Video-Start ist jetzt im Header) ===
   if (view === 'join-button') {
     if (!activeMeeting.canJoin && activeMeeting.timeStatus?.reason === 'too_early') {
-      const mins = activeMeeting.timeStatus.minutesUntilStart ?? 0;
+      const mins = calcMinutesUntilStart(activeMeeting);
       return (
         <div className="fjw fjw--waiting">
           {hasMultipleMeetings && (

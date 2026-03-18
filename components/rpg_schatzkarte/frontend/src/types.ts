@@ -138,8 +138,11 @@ export interface Item {
 // Quest-Status
 export type QuestStatus = 'locked' | 'available' | 'in_progress' | 'completed';
 
-// Quest-Typen (entsprechen den Aktionen)
+// Quest-Typen fuer QuestModal (die 4 Basis-Quests)
 export type QuestType = 'wisdom' | 'scroll' | 'battle' | 'challenge';
+
+// Erweiterte Quest-Typen (Aliase die von Island-Experiences gesendet werden)
+export type QuestTypeExtended = QuestType | 'video' | 'video-watched' | 'quiz';
 
 // Props fuer die Hauptkomponente
 export interface SchatzkarteProp {
@@ -165,7 +168,7 @@ export interface SchatzkartAction {
   action: 'quest_completed' | 'treasure_collected' | 'xp_earned' | 'item_received' | 'bandura_entry' | 'hattie_entry' | 'hattie_prediction' | 'hattie_complete' | 'tagebuch_entry' | 'polarstern_clicked' | 'companion_selected' | 'minigame_completed' | 'auto_open_handled' | 'go_to_map' | 'start_preview' | 'show_login' | 'logout' | 'go_to_landing' | 'go_to_lernreise' | 'meeting_join' | 'meeting_leave' | 'message_send' | 'message_send_dm' | 'message_delete' | 'chat_seen';
   companionId?: CompanionType;
   islandId?: string;
-  questType?: QuestType;
+  questType?: QuestTypeExtended;
   treasureId?: string;
   xpEarned?: number;
   itemId?: string;

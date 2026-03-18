@@ -263,6 +263,8 @@ def _build_meeting_dict(access, uid, display_name, user_role):
         "meetingId": meeting.get("id"),
         "meetingTitle": meeting.get("title", "Schatzkarten-Treffen"),
         "timeStatus": access.get("timeStatus", {}),
+        "scheduledStartISO": meeting.get("scheduled_start"),
+        "scheduledEndISO": meeting.get("scheduled_end"),
         "userRole": user_role,
         "jwt": jaas_jwt,
         "appId": jaas_app_id
@@ -771,8 +773,11 @@ if result:
             # Fortschritt speichern
             progress_key = {
                 "wisdom": "video_watched",
+                "video": "video_watched",
+                "video-watched": "video_watched",
                 "scroll": "explanation_read",
                 "battle": "quiz_passed",
+                "quiz": "quiz_passed",
                 "challenge": "challenge_completed"
             }.get(quest_type)
 

@@ -1111,28 +1111,25 @@ function WorldMap({ onBattle, onStartSession, onStartStimmenBattle, defeatedIds,
             <div style={{ fontSize: 32 }}>🗡️</div>
           </button>
 
-          <button
-            onClick={() => onStartStimmenBattle(null)}
+          <div
             style={{
-              width: "100%", background: "linear-gradient(135deg, #0f4c2a, #166534)",
-              border: "1px solid #22c55e44", borderRadius: 16, padding: "14px 24px",
-              cursor: "pointer", fontFamily: "'Outfit', sans-serif",
+              width: "100%", background: "linear-gradient(135deg, #1a1a2e, #2a2a3e)",
+              border: "1px solid #555", borderRadius: 16, padding: "14px 24px",
+              fontFamily: "'Outfit', sans-serif",
               display: "flex", alignItems: "center", justifyContent: "space-between",
-              transition: "transform 0.15s, box-shadow 0.15s",
+              opacity: 0.5,
             }}
-            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 6px 24px #22c55e33"; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; }}
           >
             <div style={{ textAlign: "left" }}>
-              <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 9, color: "#4ade80", marginBottom: 4 }}>
+              <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 9, color: "#888", marginBottom: 4 }}>
                 🎤 STIMMEN-BATTLE
               </div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "#86efac" }}>
-                Hören · Schreiben · Sprechen · {STIMMEN_BATTLE_ROUNDS} Wörter
+              <div style={{ fontSize: 12, fontWeight: 600, color: "#999" }}>
+                Vorläufig deaktiviert
               </div>
             </div>
-            <div style={{ fontSize: 28 }}>🎙️</div>
-          </button>
+            <div style={{ fontSize: 28, filter: "grayscale(1)" }}>🎙️</div>
+          </div>
         </div>
 
         {/* Lore */}
@@ -1203,22 +1200,22 @@ function WorldMap({ onBattle, onStartSession, onStartStimmenBattle, defeatedIds,
               </div>
               {/* Level-Up-Button — direkt unter der Karte, nur wenn bereit */}
               {levelUpReady && (
-                <button
-                  onClick={e => { e.stopPropagation(); onStartStimmenBattle(m.id); }}
+                <div
                   style={{
-                    width: "100%", background: "linear-gradient(90deg, #78350f, #92400e)",
-                    border: "2px solid #fbbf24", borderTop: "none",
+                    width: "100%", background: "linear-gradient(90deg, #2a2a3e, #333)",
+                    border: "1px solid #555", borderTop: "none",
                     borderRadius: "0 0 16px 16px", padding: "10px 18px",
-                    cursor: "pointer", fontFamily: "'Outfit', sans-serif",
+                    fontFamily: "'Outfit', sans-serif",
                     display: "flex", alignItems: "center", justifyContent: "space-between",
+                    opacity: 0.5,
                   }}
                 >
                   <div style={{ textAlign: "left" }}>
-                    <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 8, color: "#fbbf24", marginBottom: 2 }}>⭐ LEVEL-UP TEST</div>
-                    <div style={{ fontSize: 11, color: "#fde68a" }}>Stimmen-Battle · {m.name}-Wörter · 70% zum Bestehen</div>
+                    <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 8, color: "#888", marginBottom: 2 }}>⭐ LEVEL-UP TEST</div>
+                    <div style={{ fontSize: 11, color: "#999" }}>Vorläufig deaktiviert</div>
                   </div>
-                  <div style={{ fontSize: 22 }}>🎤</div>
-                </button>
+                  <div style={{ fontSize: 22, filter: "grayscale(1)" }}>🎤</div>
+                </div>
               )}
               </div>
             );
@@ -1244,9 +1241,9 @@ function WorldMap({ onBattle, onStartSession, onStartStimmenBattle, defeatedIds,
 
 /* ─── PARTICLE BURST ─────────────────────────────────────────────────────── */
 function spawnParticles(container, color, count = 9) {
-  if (!container) return;
+  if (!container || !container.parentElement) return;
   const rect = container.getBoundingClientRect();
-  const parentRect = container.parentElement?.getBoundingClientRect() ?? rect;
+  const parentRect = container.parentElement.getBoundingClientRect();
   const cx = rect.left - parentRect.left + rect.width / 2;
   const cy = rect.top  - parentRect.top  + rect.height * 0.4;
 
@@ -1751,7 +1748,7 @@ async function supabaseLoadWordStats(sb, userId) {
   return stats;
 }
 
-async function supabaseUpsertProgress(sb, userId, { defeatedIds, xp, difficulty, autoLevel }) {
+async function supabaseUpsertProgress(sb, userId, { defeatedIds, xp, difficulty, autoLevel, streak, lastPlayedDate, firstDefeatedDates, monsterStars }) {
   const { error } = await sb
     .from('wortschmiede_progress')
     .upsert({
@@ -1760,6 +1757,10 @@ async function supabaseUpsertProgress(sb, userId, { defeatedIds, xp, difficulty,
       xp,
       difficulty,
       auto_level: autoLevel,
+      streak: streak ?? 0,
+      last_played_date: lastPlayedDate || null,
+      first_defeated_dates: firstDefeatedDates ?? {},
+      monster_stars: monsterStars ?? {},
       updated_at: new Date().toISOString(),
     }, { onConflict: 'user_id' });
   if (error) console.error('[Wortschmiede] upsert progress error:', error);
@@ -1856,6 +1857,21 @@ export default function WortschmiedeBattle({ onClose, onXPEarned, userId, supaba
         setXp(progress.xp ?? 0);
         setDifficulty(progress.difficulty || "mittel");
         setAutoLevel(progress.auto_level || "mittel");
+        // Streak & Level-Up-Daten aus Supabase laden
+        if (progress.streak !== undefined) {
+          setStreak(progress.streak);
+          streakRef.current = progress.streak;
+        }
+        if (progress.last_played_date !== undefined) {
+          setLastPlayedDate(progress.last_played_date);
+          lastPlayedRef.current = progress.last_played_date;
+        }
+        if (progress.first_defeated_dates) {
+          setFirstDefeatedDates(progress.first_defeated_dates);
+        }
+        if (progress.monster_stars) {
+          setMonsterStars(progress.monster_stars);
+        }
         if (progress.auto_level) setScreen(s => s === "diagnose" ? "map" : s);
       }
       if (stats && Object.keys(stats).length > 0) {
@@ -1869,7 +1885,7 @@ export default function WortschmiedeBattle({ onClose, onXPEarned, userId, supaba
     writeSave({ defeatedIds, xp, difficulty, autoLevel, wordStats, streak, lastPlayedDate, firstDefeatedDates, monsterStars });
     // Fire-and-forget Supabase upsert
     if (sbRef.current && userId) {
-      supabaseUpsertProgress(sbRef.current, userId, { defeatedIds, xp, difficulty, autoLevel });
+      supabaseUpsertProgress(sbRef.current, userId, { defeatedIds, xp, difficulty, autoLevel, streak, lastPlayedDate, firstDefeatedDates, monsterStars });
     }
   }, [defeatedIds, xp, difficulty, autoLevel, wordStats, streak, lastPlayedDate, firstDefeatedDates, monsterStars]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -2145,6 +2161,11 @@ export default function WortschmiedeBattle({ onClose, onXPEarned, userId, supaba
     } else {
       words = buildStimmenBattleQueue(difficulty, wordStats);
     }
+    if (!words || words.length === 0) {
+      // Keine Woerter verfuegbar → auf Map bleiben
+      console.warn('[Wortschmiede] Stimmen-Battle: keine Woerter fuer Schwierigkeit', difficulty);
+      return;
+    }
     setSbWords(words);
     setSbMonsterId(monsterId || null);
     setSbResults({ results: [], totalPts: 0, compPts: 0 });
@@ -2155,8 +2176,8 @@ export default function WortschmiedeBattle({ onClose, onXPEarned, userId, supaba
     setSbResults(data);
     // Level-Up-Modus: Stern vergeben wenn schreiben >= 70% UND sprechen >= 70%
     if (sbMonsterId && data.results?.length > 0) {
-      const writeOk = data.results.filter(r => r.writeCorrect).length;
-      const speakOk = data.results.filter(r => r.speakCorrect).length;
+      const writeOk = data.results.filter(r => r.wOk).length;
+      const speakOk = data.results.filter(r => r.sOk).length;
       const total = data.results.length;
       if (writeOk / total >= 0.7 && speakOk / total >= 0.7) {
         setMonsterStars(prev => ({ ...prev, [sbMonsterId]: true }));
@@ -2263,7 +2284,7 @@ export default function WortschmiedeBattle({ onClose, onXPEarned, userId, supaba
         <StimmenBattleScreen
           words={sbWords}
           difficulty={difficulty}
-          isLevelUp={!!sbMonsterId}
+          onUpdateWordStats={handleUpdateWordStats}
           onComplete={handleStimmenBattleComplete}
           onBack={() => setScreen("map")}
         />

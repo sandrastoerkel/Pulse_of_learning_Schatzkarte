@@ -5,7 +5,7 @@
 // leicht = Kl.5, mittel = Kl.6-7, hart = Kl.8+
 const DIFF_LABELS = { leicht: "⭐ Leicht", mittel: "⭐⭐ Mittel", hart: "⭐⭐⭐ Hart" };
 const DIFF_COLORS = { leicht: "#22c55e", mittel: "#f59e0b", hart: "#ef4444" };
-const KLASSE_TO_DIFF = { "5": "leicht", "6": "leicht", "7": "mittel", "8": "mittel", "9+": "hart" };
+const KLASSE_TO_DIFF = { "5": "leicht", "6": "mittel", "7": "mittel", "8": "hart", "9+": "hart" };
 
 /* ─── WORD BANK (1466 LRS-Wörter) ────────────────────────────────────────── */
 // [wort, kategorieId, fehler_oder_0, sterne]
@@ -1524,7 +1524,7 @@ function fisherYates(arr) {
 
 /* ─── SM-2 SPACED REPETITION ─────────────────────────────────────────────── */
 // Basierend auf SuperMemo-2 Algorithmus (Wozniak 1990)
-// grade: 4 = korrekt, 1 = falsch (vereinfacht für Kinder-Kontext)
+// grade: 5 = korrekt (perfekt), 1 = falsch (vereinfacht für Kinder-Kontext)
 function sm2Update(existingCard, correct) {
   const today = new Date().toISOString().split('T')[0];
   const card = existingCard || {
@@ -1536,7 +1536,7 @@ function sm2Update(existingCard, correct) {
     totalWrong: 0,
   };
 
-  const grade = correct ? 4 : 1;
+  const grade = correct ? 5 : 1;
   let { interval, repetition, efactor } = card;
 
   if (grade >= 3) {
@@ -1563,7 +1563,7 @@ function sm2Update(existingCard, correct) {
     efactor,
     dueDate,
     totalCorrect: card.totalCorrect + (correct ? 1 : 0),
-
+    totalWrong: card.totalWrong + (correct ? 0 : 1),
   };
 }
 
@@ -1592,10 +1592,11 @@ function sortWordsByPriority(words, wordStats) {
 
 /* ─── ERROR GENERATOR ─────────────────────────────────────────────────────── */
 function generateErrors(word, catId, typicalError) {
+  if (!word || word.length === 0) return [];
   const errs = new Set();
   const lo = word.toLowerCase();
 
-  if (typicalError && typicalError !== 0) errs.add(typicalError);
+  if (typicalError && typicalError !== 0 && typicalError !== "...") errs.add(typicalError);
 
   switch (catId) {
     case 1: // ie/ih/ieh

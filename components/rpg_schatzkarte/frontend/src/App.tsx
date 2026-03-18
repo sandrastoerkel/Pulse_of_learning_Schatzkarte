@@ -378,8 +378,11 @@ function RPGSchatzkarteContent({
     // Lokalen Progress basierend auf questType aktualisieren
     const questTypeToProgressKey: Record<string, keyof typeof userProgress[string]> = {
       'wisdom': 'video_watched',
+      'video': 'video_watched',
+      'video-watched': 'video_watched',
       'scroll': 'explanation_read',
       'battle': 'quiz_passed',
+      'quiz': 'quiz_passed',
       'challenge': 'challenge_completed'
     };
 
