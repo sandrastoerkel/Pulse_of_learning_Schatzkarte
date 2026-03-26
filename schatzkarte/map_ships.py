@@ -259,21 +259,19 @@ def render_hattie_ship_html(data: Dict[str, Any]) -> str:
 # ===============================================================
 
 def get_polarstern_data(user_id: str) -> Dict[str, Any]:
-    """Holt Polarstern-Daten für das Schiff."""
+    """Holt Polarstern-Daten für das Schiff.
+
+    OPTIMIERUNG: Nutzt get_all_polarstern_data() — 1 Query statt 3,
+    gecacht mit TTL=120s.
+    """
     try:
-        from utils.polarstern_widget import get_goal_stats, get_user_goals, get_achieved_goals
-        stats = get_goal_stats(user_id)
-        active_goals = get_user_goals(user_id)  # Nur aktive, nicht erreichte
-        achieved_goals = get_achieved_goals(user_id)  # Nur erreichte
-
-        # Alle Ziele für Dots (aktive + erreichte)
-        all_goals = active_goals + achieved_goals
-
+        from utils.polarstern_widget import get_all_polarstern_data
+        data = get_all_polarstern_data(user_id)
         return {
-            "active": stats.get('active', 0),
-            "achieved": stats.get('achieved', 0),
-            "total_xp": stats.get('total_xp', 0),
-            "goals": all_goals[:5]  # Maximal 5 für die Anzeige
+            "active": data.get('active', 0),
+            "achieved": data.get('achieved', 0),
+            "total_xp": data.get('total_xp', 0),
+            "goals": data.get('goals', [])
         }
     except Exception:
         # ImportError oder DB-Fehler (httpx.ReadError etc.) - Fallback

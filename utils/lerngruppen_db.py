@@ -168,6 +168,8 @@ def create_group(name: str, coach_id: str, start_date: str = None) -> Optional[s
             "start_date": start_date,
             "current_week": 0
         }).execute()
+        # ✅ Cache invalidieren nach Write
+        get_coach_groups.clear()
         return group_id
     except Exception as e:
         print(f"Error creating group: {e}")
@@ -183,8 +185,13 @@ def get_group(group_id: str) -> Optional[Dict]:
     return result.data[0] if result.data else None
 
 
+@st.cache_data(ttl=120)
 def get_coach_groups(coach_id: str) -> List[Dict]:
-    """Holt alle aktiven Gruppen eines Coaches, inkl. member_count."""
+    """Holt alle aktiven Gruppen eines Coaches, inkl. member_count.
+
+    OPTIMIERUNG: Gecacht mit TTL=120s. Wird 3x pro Load aufgerufen
+    (meeting, chat, arena). Spart N+1 Queries pro Aufruf.
+    """
     db = get_db()
     groups_result = db.table("learning_groups") \
         .select("*") \
@@ -218,6 +225,8 @@ def update_group(group_id: str, **kwargs) -> bool:
             .update(updates) \
             .eq("group_id", group_id) \
             .execute()
+        # ✅ Cache invalidieren nach Write
+        get_coach_groups.clear()
         return len(result.data) > 0
     except Exception as e:
         print(f"Error updating group: {e}")
@@ -243,6 +252,8 @@ def delete_group(group_id: str, soft_delete: bool = True) -> bool:
         db.table("group_invitations").delete().eq("group_id", group_id).execute()
         db.table("group_members").delete().eq("group_id", group_id).execute()
         db.table("learning_groups").delete().eq("group_id", group_id).execute()
+        # ✅ Cache invalidieren nach Write
+        get_coach_groups.clear()
         return True
     except Exception as e:
         print(f"Error deleting group: {e}")
@@ -326,6 +337,7 @@ def add_member(group_id: str, user_id: str) -> bool:
         }).execute()
         # ✅ Cache invalidieren nach Write
         get_user_group.clear()
+        get_group_members.clear()
         return True
     except Exception as e:
         print(f"User already in a group or error: {e}")
@@ -342,18 +354,19 @@ def remove_member(group_id: str, user_id: str) -> bool:
             .execute()
         # ✅ Cache invalidieren nach Write
         get_user_group.clear()
+        get_group_members.clear()
         return len(result.data) > 0
     except Exception as e:
         print(f"Error removing member: {e}")
         return False
 
 
+@st.cache_data(ttl=120)
 def get_group_members(group_id: str) -> List[Dict]:
     """Alle aktiven Mitglieder mit User-Details. Sortiert nach display_name.
 
-    OPTIMIERUNG: N+1 Query gefixt. Vorher: 1 + N Queries (bei 10 Mitgliedern = 11).
-    Jetzt: 2 Queries (members + batch user lookup via .in_()).
-    Spart ~8-9 REST-Calls bei einer typischen 10er-Gruppe.
+    OPTIMIERUNG: Gecacht mit TTL=120s + N+1 Query gefixt.
+    2 Queries (members + batch user lookup via .in_()).
     """
     db = get_db()
     members_result = db.table("group_members") \
@@ -885,6 +898,8 @@ def schedule_meeting(
             "created_by": coach_id
         }).execute()
 
+        # ✅ Cache invalidieren nach Write
+        get_next_meeting.clear()
         return {
             "id": meeting_id,
             "group_id": group_id,
@@ -976,9 +991,13 @@ def renew_recurring_meeting(meeting: Dict) -> Optional[Dict]:
         return None
 
 
+@st.cache_data(ttl=120)
 def get_next_meeting(group_id: str) -> Optional[Dict]:
     """Nächstes Meeting (scheduled_end > now, status != cancelled).
-    Erneuert automatisch wöchentliche Meetings wenn nötig."""
+    Erneuert automatisch wöchentliche Meetings wenn nötig.
+
+    OPTIMIERUNG: Gecacht mit TTL=120s. Macht 1-3 Queries pro Aufruf.
+    """
     group_tz = get_group_timezone(group_id)
     now = datetime.now(ZoneInfo(group_tz)).isoformat()
 
@@ -1194,6 +1213,8 @@ def cancel_meeting(meeting_id: str) -> bool:
             }) \
             .eq("id", meeting_id) \
             .execute()
+        # ✅ Cache invalidieren nach Write
+        get_next_meeting.clear()
         return len(result.data) > 0
     except Exception as e:
         print(f"Error cancelling meeting: {e}")

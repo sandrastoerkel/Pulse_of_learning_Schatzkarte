@@ -58,8 +58,8 @@ function makeVideos(age: 'gs' | 'us' | 'ms'): VideoEntry[] {
     // ── VIDEO 1 · WAS IST TRANSFER? ──────────────────
     {
       videoNumber: 1,
-      videoId: '',
-      placeholder: true,
+      videoId: 'kquouawyRjI',
+      placeholder: false,
       title: 'Was ist Transfer?',
       subtitle: 'Die Brücke zwischen Wissensinseln',
       icon: '🌉',
@@ -100,8 +100,8 @@ function makeVideos(age: 'gs' | 'us' | 'ms'): VideoEntry[] {
     // ── VIDEO 2 · NEAR & FAR TRANSFER ───────────────
     {
       videoNumber: 2,
-      videoId: '',
-      placeholder: true,
+      videoId: 'UzXBXxAbmAE',
+      placeholder: false,
       title: 'Near & Far Transfer',
       subtitle: 'Ähnliches erkennen, Verschiedenes verbinden',
       icon: '🧩',
@@ -142,8 +142,8 @@ function makeVideos(age: 'gs' | 'us' | 'ms'): VideoEntry[] {
     // ── VIDEO 3 · TRANSFER-RADAR ────────────────────
     {
       videoNumber: 3,
-      videoId: '',
-      placeholder: true,
+      videoId: '0_NAcnRj66Q',
+      placeholder: false,
       title: 'Transfer-Radar',
       subtitle: 'Transferchancen im Alltag erkennen',
       icon: '📡',
@@ -174,8 +174,8 @@ function makeVideos(age: 'gs' | 'us' | 'ms'): VideoEntry[] {
     // ── VIDEO 4 · TIEFENLERNEN & TRANSFER ───────────
     {
       videoNumber: 4,
-      videoId: '',
-      placeholder: true,
+      videoId: 'zZb9sa4-YIw',
+      placeholder: false,
       title: 'Tiefenlernen & Transfer',
       subtitle: 'Von der Oberfläche in die Tiefe',
       icon: '🧠',
@@ -206,8 +206,8 @@ function makeVideos(age: 'gs' | 'us' | 'ms'): VideoEntry[] {
     // ── VIDEO 5 · DEIN TRANSFER-MOMENT ──────────────
     {
       videoNumber: 5,
-      videoId: '',
-      placeholder: true,
+      videoId: 'EhI9doPxIgY',
+      placeholder: false,
       title: 'Dein Transfer-Moment',
       subtitle: 'Wissen verbinden und anwenden',
       icon: '⭐',

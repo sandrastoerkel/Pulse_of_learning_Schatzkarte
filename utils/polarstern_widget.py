@@ -246,6 +246,7 @@ def create_goal(user_id: str, goal_title: str, current_state: str, strategy: str
         "xp_earned": XP_REWARDS['goal_created']
     }).execute()
 
+    get_all_polarstern_data.clear()
     return result.data[0]["id"]
 
 
@@ -274,6 +275,7 @@ def update_goal(goal_id: int, goal_title: str = None, current_state: str = None,
         "updated_at": datetime.now().isoformat()
     }).eq("id", goal_id).execute()
 
+    get_all_polarstern_data.clear()
     return True
 
 
@@ -296,12 +298,14 @@ def mark_goal_achieved(goal_id: int, reflection: str = "") -> Dict[str, Any]:
         "xp_earned": new_xp
     }).eq("id", goal_id).execute()
 
+    get_all_polarstern_data.clear()
     return {"success": True, "xp_earned": XP_REWARDS['goal_achieved']}
 
 
 def delete_goal(goal_id: int) -> bool:
     """Löscht ein Ziel."""
     result = get_db().table("polarstern_goals").delete().eq("id", goal_id).execute()
+    get_all_polarstern_data.clear()
     return len(result.data) > 0
 
 
@@ -327,6 +331,45 @@ def get_achieved_goals(user_id: str) -> List[Dict]:
         .order("achieved_at", desc=True) \
         .execute()
     return result.data
+
+
+@st.cache_data(ttl=120)
+def get_all_polarstern_data(user_id: str) -> Dict[str, Any]:
+    """Holt ALLE Polarstern-Daten in einer einzigen Query.
+
+    OPTIMIERUNG: Ersetzt 3 separate Queries (get_goal_stats, get_user_goals,
+    get_achieved_goals) durch 1x SELECT + Python-Filterung.
+    Gecacht mit TTL=120s, invalidiert bei Schreibvorgaengen.
+    """
+    result = get_db().table("polarstern_goals") \
+        .select("*") \
+        .eq("user_id", user_id) \
+        .execute()
+
+    all_goals = result.data
+
+    # In Python filtern statt 3 separate DB-Queries
+    active_goals = sorted(
+        [g for g in all_goals if g.get("is_active") and not g.get("is_achieved")],
+        key=lambda g: (g.get("category", ""), -(datetime.fromisoformat(g["created_at"]).timestamp() if g.get("created_at") else 0))
+    )
+    achieved_goals = sorted(
+        [g for g in all_goals if g.get("is_achieved")],
+        key=lambda g: -(datetime.fromisoformat(g["achieved_at"]).timestamp() if g.get("achieved_at") else 0)
+    )
+
+    active_count = len(active_goals)
+    achieved_count = len(achieved_goals)
+    total_xp = sum(g.get("xp_earned") or 0 for g in all_goals)
+
+    return {
+        "active": active_count,
+        "achieved": achieved_count,
+        "total_xp": total_xp,
+        "active_goals": active_goals,
+        "achieved_goals": achieved_goals,
+        "goals": (active_goals + achieved_goals)[:5]
+    }
 
 
 def get_goal_by_id(goal_id: int) -> Optional[Dict]:

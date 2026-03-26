@@ -14,6 +14,7 @@ Verwendung:
 from datetime import datetime
 from typing import Dict, List, Optional, Any
 
+import streamlit as st
 from utils.database import get_db
 
 
@@ -403,8 +404,13 @@ def _load_group_chat(group: Dict, user_id: str, user_name: str) -> Dict[str, Any
     }
 
 
+@st.cache_data(ttl=120)
 def load_chat_data(user_id: str) -> Optional[Dict[str, Any]]:
     """Laedt alle Chat-Daten fuer die React-Komponente.
+
+    OPTIMIERUNG: Gecacht mit TTL=120s. Spart N+1 Queries pro Gruppe
+    (get_coach_groups, get_group_messages, get_group_members, get_unread_count).
+    Chat nutzt Supabase Realtime — Cache hat null Nachteil.
 
     Returns:
         Dict mit groupId, groupName, userId, userName, userRole,
@@ -412,7 +418,6 @@ def load_chat_data(user_id: str) -> Optional[Dict[str, Any]]:
         allGroups (fuer Coaches mit mehreren Gruppen)
         oder None wenn User in keiner Gruppe ist.
     """
-    import streamlit as st
     from utils.user_system import is_coach, get_user_by_id
     from utils.lerngruppen_db import get_user_group, get_coach_groups
 

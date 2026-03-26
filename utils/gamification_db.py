@@ -289,11 +289,11 @@ def get_open_challenges(user_id: str) -> List[Dict]:
 # STATISTICS
 # ============================================
 
-@st.cache_data(ttl=60)
+@st.cache_data(ttl=120)
 def get_user_stats(user_id: str) -> Dict[str, Any]:
     """Holt umfassende Statistiken eines Users.
 
-    OPTIMIERUNG: Gecacht mit TTL=60s. Wird 1x pro Render aufgerufen.
+    OPTIMIERUNG: Gecacht mit TTL=120s. Wird 1x pro Render aufgerufen.
     Spart ~2 REST-Calls pro Render (users + challenges).
     """
     db = get_db()

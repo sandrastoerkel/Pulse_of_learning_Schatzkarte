@@ -406,6 +406,20 @@ if unlocked_islands:
 # CSS fuer Vollbild-Schatzkarte
 st.markdown("""
 <style>
+    /* Streamlit-Hintergrund an Schatzkarte angleichen */
+    html, body, [data-testid="stAppViewContainer"],
+    .stApp, .stMain, section.main,
+    .stMainBlockContainer, .block-container,
+    header[data-testid="stHeader"],
+    [data-testid="stBottomBlockContainer"] {
+        background-color: #0c1a2a !important;
+    }
+
+    /* Sidebar-Toggle-Button auf dunklem Hintergrund sichtbar machen */
+    [data-testid="stExpandSidebarButton"] span {
+        color: #FFD700 !important;
+    }
+
     /* Streamlit-Container maximieren */
     .stMainBlockContainer {
         padding-top: 0.5rem !important;

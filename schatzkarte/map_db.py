@@ -55,11 +55,11 @@ def save_treasure_collected(user_id: str, island_id: str, treasure_id: str, xp: 
     return True
 
 
-@st.cache_data(ttl=60)
+@st.cache_data(ttl=120)
 def get_collected_treasures(user_id: str) -> List[Tuple[str, str]]:
     """Laedt alle gesammelten Schaetze. Returns: Liste von (island_id, treasure_id).
 
-    OPTIMIERUNG: Gecacht mit TTL=60s. Spart ~1 REST-Call pro Render.
+    OPTIMIERUNG: Gecacht mit TTL=120s. Spart ~1 REST-Call pro Render.
     """
     result = get_db().table("user_treasures") \
         .select("island_id, treasure_id") \
@@ -134,11 +134,11 @@ def get_island_progress(user_id: str, island_id: str) -> dict:
     }
 
 
-@st.cache_data(ttl=60)
+@st.cache_data(ttl=120)
 def get_all_island_progress(user_id: str) -> dict:
     """Holt den Fortschritt eines Users fuer ALLE Inseln in einer Query.
 
-    OPTIMIERUNG: Gecacht mit TTL=60s. Spart ~1 REST-Call pro Render.
+    OPTIMIERUNG: Gecacht mit TTL=120s. Spart ~1 REST-Call pro Render.
     HINWEIS: Doppelte Definition entfernt (war Zeile 123 + 196).
              Diese Version kombiniert die Felder beider Varianten.
     """
