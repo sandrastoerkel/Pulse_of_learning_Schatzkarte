@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
-import { W, SENTENCES, MONSTERS, MONSTER_CATS, STAR_TO_DIFF, DIFF_LABELS, DIFF_COLORS, KLASSE_TO_DIFF, getWordsForMonster, fisherYates, sm2Update, sortWordsByPriority, generateErrors, CAT_QUESTIONS, generateChallenges, generatePruferQuestions } from './wortschmiede_data.js';
-import { STIMMEN_BATTLE_ROUNDS, buildStimmenBattleQueue, buildStimmenBattleQueueForMonster, StimmenBattleScreen, StimmenBattleEndScreen } from './StimmenBattle.jsx';
+import { W, SENTENCES, MONSTERS, MONSTER_CATS, STAR_TO_DIFF, DIFF_LABELS, DIFF_COLORS, KLASSE_TO_DIFF, getWordsForMonster, fisherYates, sm2Update, sortWordsByPriority, generateErrors, CAT_QUESTIONS, generateChallenges, generatePruferQuestions } from './wortschmiede_data';
+import { STIMMEN_BATTLE_ROUNDS, buildStimmenBattleQueue, buildStimmenBattleQueueForMonster, StimmenBattleScreen, StimmenBattleEndScreen } from './StimmenBattle';
+import type { Difficulty, Monster, WordStats, Challenge, Screen, RoundStats, SessionTotalStats, StimmenBattleResults, WortschmiedeSave, SpriteData, PlayerSpriteData, SpeakOptions, VoicePreference, WortschmiedeBattleProps, BattleScreenProps, ChallengePanelProps, HPBarProps, WorldMapProps } from './wortschmiedeTypes';
 
 /* ─── FONTS ─────────────────────────────────────────────────────────────── */
 const FontLink = () => (
@@ -12,14 +13,14 @@ const FontLink = () => (
 /* ─── TTS ────────────────────────────────────────────────────────────────── */
 
 // Wait for voices to load, then return best German voice
-function getVoice(prefer = "any") {
+function getVoice(prefer: VoicePreference = "any"): SpeechSynthesisVoice | null {
   const voices = window.speechSynthesis.getVoices();
   if (!voices.length) return null;
 
   const de = voices.filter(v => v.lang?.startsWith("de"));
 
   // Hilfsfunktion: erste Stimme finden, die einen der Namen enthält
-  const findByNames = (list, names) => {
+  const findByNames = (list: SpeechSynthesisVoice[], names: string[]): SpeechSynthesisVoice | null => {
     for (const name of names) {
       const v = list.find(v => v.name.includes(name));
       if (v) return v;
@@ -70,7 +71,7 @@ function getVoice(prefer = "any") {
 }
 
 // Core speak – queues utterance, retries voice assignment if not loaded yet
-function speak(text, opts = {}) {
+function speak(text: string, opts: SpeakOptions = {}) {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
 
@@ -93,7 +94,7 @@ function speak(text, opts = {}) {
 }
 
 // Queue multiple utterances in sequence with optional gaps
-function speakSequence(items) {
+function speakSequence(items: Array<{ text: string; opts?: SpeakOptions; pauseAfter?: number }>) {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
   let delay = 0;
@@ -111,10 +112,10 @@ function speakSequence(items) {
 const tts = {
 
   // SPELLING WORD: deutlich, natürliches Tempo
-  word: (text) => speak(text, { rate: 0.9, pitch: 1.0, volume: 1.0, voiceType: "clear" }),
+  word: (text: string) => speak(text, { rate: 0.9, pitch: 1.0, volume: 1.0, voiceType: "clear" }),
 
   // MONSTER BATTLECRY: tiefere Stimme, dramatisch aber verständlich
-  monster: (text) => {
+  monster: (text: string) => {
     // Pausen bei Satzzeichen einfügen für natürlicheren Fluss
     const dramatic = text
       .replace(/…/g, "... ")
@@ -125,17 +126,17 @@ const tts = {
   },
 
   // VICTORY / DEFEAT: klar und verständlich
-  victory: (text) => speak(text, { rate: 0.85, pitch: 0.95, volume: 1.0, voiceType: "clear" }),
-  defeat:  (text) => speak(text, { rate: 0.80, pitch: 0.85, volume: 0.9, voiceType: "clear" }),
+  victory: (text: string) => speak(text, { rate: 0.85, pitch: 0.95, volume: 1.0, voiceType: "clear" }),
+  defeat:  (text: string) => speak(text, { rate: 0.80, pitch: 0.85, volume: 0.9, voiceType: "clear" }),
 
   // NARRATOR (Intro, Anweisungen)
-  narrate: (text) => speak(text, { rate: 0.85, pitch: 0.95, volume: 0.95, voiceType: "clear" }),
+  narrate: (text: string) => speak(text, { rate: 0.85, pitch: 0.95, volume: 0.95, voiceType: "clear" }),
 };
 
 /* ─── SFX (Web Audio) ────────────────────────────────────────────────────── */
-function playTone(freq, dur, type = "square", vol = 0.15) {
+function playTone(freq: number, dur: number, type: OscillatorType = "square", vol: number = 0.15) {
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.connect(gain); gain.connect(ctx.destination);
@@ -155,7 +156,7 @@ const sfx = {
 };
 
 // Baut eine 8-Runden-Queue, gewichtet nach fälligen SM-2-Wörtern pro Monster
-function buildSessionQueue(difficulty, wordStats) {
+function buildSessionQueue(difficulty: Difficulty, wordStats: WordStats): Monster[] {
   const today = new Date().toISOString().split("T")[0];
 
   // Wie viele fällige/neue Wörter hat jedes Monster?
@@ -200,7 +201,7 @@ function buildSessionQueue(difficulty, wordStats) {
 
 
 // Dynamic challenge generation from word bank
-function getChallenges(monster, difficulty, wordStats = {}) {
+function getChallenges(monster: Monster, difficulty: Difficulty, wordStats: WordStats = {}): Challenge[] {
   return generateChallenges(monster.id, difficulty, wordStats);
 }
 
@@ -208,7 +209,7 @@ function getChallenges(monster, difficulty, wordStats = {}) {
 // Dynamisch generiert: 10 Fragen aus 5 zufälligen Kategorien (3 leicht + 4 mittel + 3 hart)
 // Wird bei jedem Diagnose-Start neu erzeugt
 
-function calcDifficulty(score) {
+function calcDifficulty(score: number): Difficulty {
   if (score <= 3) return "leicht";
   if (score <= 7) return "mittel";
   return "hart";
@@ -216,7 +217,7 @@ function calcDifficulty(score) {
 
 /* ─── MONSTER SVG ART ────────────────────────────────────────────────────── */
 /* ─── SPRITE SHEET CONFIG ─────────────────────────────────────────────────── */
-const SPRITE_DATA = {
+const SPRITE_DATA: Record<string, SpriteData> = {
   nebelwurm: {
     frameW: 90, frameH: 90, scale: 1.8,
     idle:   { src: './sprites/fireworm-idle.png',   frames: 9,  dur: 1.2 },
@@ -263,7 +264,7 @@ const SPRITE_DATA = {
   },
 };
 
-const PLAYER_SPRITE = {
+const PLAYER_SPRITE: PlayerSpriteData = {
   frameW: 140, frameH: 140, scale: 1.0,
   idle:   { src: './sprites/hero-idle.png',   frames: 11, dur: 1.5 },
   attack: { src: './sprites/hero-attack.png', frames: 6,  dur: 0.5 },
@@ -274,12 +275,12 @@ const PLAYER_SPRITE = {
 function generateSpriteKeyframes() {
   let kf = '';
   for (const [id, data] of Object.entries(SPRITE_DATA)) {
-    for (const state of ['idle', 'attack', 'hurt', 'death']) {
-      const anim = data[state];
+    for (const state of ['idle', 'attack', 'hurt', 'death'] as const) {
+      const anim = data[state as keyof SpriteData] as import('./wortschmiedeTypes').SpriteAnim | undefined;
       if (!anim) continue;
       const s = data.scale;
       if (data.sheet) {
-        const yOff = -(anim.row * data.frameH * s);
+        const yOff = -(anim.row! * data.frameH * s);
         const xEnd = -(anim.frames * data.frameW * s);
         kf += `@keyframes ${id}_${state}{from{background-position:0 ${yOff}px}to{background-position:${xEnd}px ${yOff}px}}\n`;
       } else {
@@ -288,7 +289,7 @@ function generateSpriteKeyframes() {
       }
     }
   }
-  for (const state of ['idle', 'attack', 'hurt']) {
+  for (const state of ['idle', 'attack', 'hurt'] as const) {
     const anim = PLAYER_SPRITE[state];
     const xEnd = -(anim.frames * PLAYER_SPRITE.frameW * PLAYER_SPRITE.scale);
     kf += `@keyframes player_${state}{from{background-position-x:0}to{background-position-x:${xEnd}px}}\n`;
@@ -296,7 +297,7 @@ function generateSpriteKeyframes() {
   return kf;
 }
 
-function MonsterSprite({ monster, isHurt, isAttacking, isDying }) {
+function MonsterSprite({ monster, isHurt, isAttacking, isDying }: { monster: Monster; isHurt: boolean; isAttacking: boolean; isDying: boolean }) {
   const moveAnim = isDying ? "monsterDeath 0.9s ease-out forwards"
     : isHurt      ? "monsterHurt 0.55s ease-out"
     : isAttacking ? "monsterAttack 0.5s ease-out"
@@ -313,7 +314,7 @@ function MonsterSprite({ monster, isHurt, isAttacking, isDying }) {
 
   const src = data.sheet || animData.src;
   const bgSize = data.sheet
-    ? `${data.sheetW * s}px ${data.sheetH * s}px`
+    ? `${data.sheetW! * s}px ${data.sheetH! * s}px`
     : `${data.frameW * animData.frames * s}px ${displayH}px`;
 
   const loop = state === 'idle';
@@ -335,7 +336,7 @@ function MonsterSprite({ monster, isHurt, isAttacking, isDying }) {
 }
 
 /* ─── PLAYER SPRITE ──────────────────────────────────────────────────────── */
-function PlayerSprite({ isAttacking, isHurt }) {
+function PlayerSprite({ isAttacking, isHurt }: { isAttacking: boolean; isHurt: boolean }) {
   const moveAnim = isHurt      ? "playerHurt 0.55s ease-out"
     : isAttacking              ? "playerAttack 0.7s cubic-bezier(.2,.9,.3,1)"
     : "playerIdle 2.4s ease-in-out infinite";
@@ -368,7 +369,7 @@ function PlayerSprite({ isAttacking, isHurt }) {
 }
 
 /* ─── HP BAR ─────────────────────────────────────────────────────────────── */
-function HPBar({ current, max, color, label, small }) {
+function HPBar({ current, max, color, label, small }: HPBarProps) {
   const pct = Math.max(0, (current / max) * 100);
   const barColor = pct > 50 ? "#22c55e" : pct > 25 ? "#f59e0b" : "#ef4444";
   return (
@@ -385,7 +386,7 @@ function HPBar({ current, max, color, label, small }) {
 }
 
 /* ─── DAMAGE NUMBER ──────────────────────────────────────────────────────── */
-function DamageFloat({ value, isPlayer }) {
+function DamageFloat({ value, isPlayer }: { value: number | string; isPlayer: boolean }) {
   const color = isPlayer ? "#f87171" : "#fbbf24";
   return (
     <div style={{
@@ -401,8 +402,8 @@ function DamageFloat({ value, isPlayer }) {
 }
 
 /* ─── BATTLE LOG ─────────────────────────────────────────────────────────── */
-function BattleLog({ messages }) {
-  const ref = useRef();
+function BattleLog({ messages }: { messages: Array<{ text: string; color?: string }> }) {
+  const ref = useRef<HTMLDivElement>(null);
   useEffect(() => { if (ref.current) ref.current.scrollTop = ref.current.scrollHeight; }, [messages]);
   return (
     <div ref={ref} style={{
@@ -420,9 +421,9 @@ function BattleLog({ messages }) {
 }
 
 /* ─── CHALLENGE ──────────────────────────────────────────────────────────── */
-function ChallengePanel({ challenge, onCorrect, onWrong, monsterColor }) {
+function ChallengePanel({ challenge, onCorrect, onWrong, monsterColor }: ChallengePanelProps) {
   const [input, setInput] = useState("");
-  const [chosen, setChosen] = useState(null);
+  const [chosen, setChosen] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [celebrating, setCelebrating] = useState(false);
@@ -443,7 +444,7 @@ function ChallengePanel({ challenge, onCorrect, onWrong, monsterColor }) {
     setTimeout(() => { ok ? onCorrect() : onWrong(); }, 700);
   }
 
-  function chooseOption(opt) {
+  function chooseOption(opt: string) {
     if (chosen || submitted) return;
     setChosen(opt);
     setSubmitted(true);
@@ -541,7 +542,7 @@ function ChallengePanel({ challenge, onCorrect, onWrong, monsterColor }) {
 
       {challenge.type === "choice" && (
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {challenge.options.filter((v, i, a) => a.indexOf(v) === i).map((opt, i) => {
+          {challenge.options!.filter((v, i, a) => a.indexOf(v) === i).map((opt, i) => {
             let bg = "#07091a", border = "#1e2a5a", color = "#e8eaf6";
             const isCorrectOpt = chosen && opt === challenge.correct;
             if (chosen) {
@@ -569,17 +570,17 @@ function ChallengePanel({ challenge, onCorrect, onWrong, monsterColor }) {
 }
 
 /* ─── PRÜFER BOSS (Diagnostic entry battle) ─────────────────────────────── */
-function DiagnoseBoss({ onComplete }) {
-  const [phase, setPhase]   = useState("intro"); // intro | battle | result
+function DiagnoseBoss({ onComplete }: { onComplete: (difficulty: Difficulty) => void }) {
+  const [phase, setPhase]   = useState<"intro" | "battle" | "result">("intro");
   const [qIdx, setQIdx]     = useState(0);
   const [score, setScore]   = useState(0);
   const [input, setInput]   = useState("");
-  const [chosen, setChosen] = useState(null);
+  const [chosen, setChosen] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [bossHp, setBossHp] = useState(100);
   const [shake, setShake]   = useState(false);
-  const [log, setLog]       = useState([]);
+  const [log, setLog]       = useState<Array<{ text: string; color?: string }>>([]);
   const [pruferQuestions] = useState(() => generatePruferQuestions());
 
   const q = pruferQuestions[qIdx];
@@ -592,7 +593,7 @@ function DiagnoseBoss({ onComplete }) {
     setTimeout(() => setPhase("battle"), 2200);
   }, []);
 
-  function addLog(msg) { setLog(p => [...p.slice(-8), msg]); }
+  function addLog(msg: { text: string; color?: string }) { setLog(p => [...p.slice(-8), msg]); }
 
   function playWord() {
     setPlaying(true);
@@ -629,7 +630,7 @@ function DiagnoseBoss({ onComplete }) {
     input.trim().toLowerCase() === q.word.toLowerCase() ? handleCorrect() : handleWrong();
   }
 
-  function chooseOption(opt) {
+  function chooseOption(opt: string) {
     if (submitted) return;
     setChosen(opt); setSubmitted(true);
     opt === q.correct ? handleCorrect() : handleWrong();
@@ -703,7 +704,7 @@ function DiagnoseBoss({ onComplete }) {
             <HPBar current={bossHp} max={BOSS_HP_MAX} color="#a78bfa" label="Der Prüfer" />
           </div>
           <div style={{ background: "rgba(0,0,0,0.5)", border: "1px solid #1e293b", borderRadius: 12, padding: "10px 14px", flex: 1 }}>
-            <HPBar current={score} max={PRUFER_QUESTIONS.length} color="#4ade80" label="Richtig" />
+            <HPBar current={score} max={pruferQuestions.length} color="#4ade80" label="Richtig" />
           </div>
         </div>
 
@@ -786,7 +787,7 @@ function DiagnoseBoss({ onComplete }) {
           )}
           {q.type === "choice" && (
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {q.options.filter((v, i, a) => a.indexOf(v) === i).map((opt, i) => {
+              {q.options!.filter((v, i, a) => a.indexOf(v) === i).map((opt, i) => {
                 let bg = "#07091a", border = "#1e2a5a", col = "#e8eaf6";
                 if (chosen) { if (opt === q.correct) { bg="#052e16"; border="#22c55e"; col="#4ade80"; } else if (opt === chosen) { bg="#2e0516"; border="#ef4444"; col="#f87171"; } }
                 return <button key={i} onClick={() => chooseOption(opt)} style={{ background: bg, border: `2px solid ${border}`, borderRadius: 10, padding: "12px 18px", color: col, fontSize: 15, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, cursor: chosen ? "default" : "pointer", flex: "1 1 auto" }}>{opt}</button>;
@@ -800,7 +801,7 @@ function DiagnoseBoss({ onComplete }) {
 }
 
 /* ─── SESSION PAUSE SCREEN ───────────────────────────────────────────────── */
-function SessionPauseScreen({ roundNum, roundCorrect, roundWrong, roundVictory, sessionCorrect, threshold, monsterName, monsterEmoji, onNext }) {
+function SessionPauseScreen({ roundNum, roundCorrect, roundWrong, roundVictory, sessionCorrect, threshold, monsterName, monsterEmoji, onNext }: { roundNum: number; roundCorrect: number; roundWrong: number; roundVictory: boolean; sessionCorrect: number; threshold: number; monsterName: string; monsterEmoji: string; onNext: () => void }) {
   const [countdown, setCountdown] = useState(PAUSE_DURATION);
 
   useEffect(() => {
@@ -869,7 +870,7 @@ function SessionPauseScreen({ roundNum, roundCorrect, roundWrong, roundVictory, 
 }
 
 /* ─── SESSION END SCREEN ─────────────────────────────────────────────────── */
-function SessionEndScreen({ rounds, totalCorrect, totalWrong, streak, xpEarned, onBack }) {
+function SessionEndScreen({ rounds, totalCorrect, totalWrong, streak, xpEarned, onBack }: { rounds: SessionTotalStats['rounds']; totalCorrect: number; totalWrong: number; streak: number; xpEarned: number; onBack: () => void }) {
   const total = totalCorrect + totalWrong;
   const pct = total > 0 ? Math.round((totalCorrect / total) * 100) : 0;
 
@@ -935,12 +936,12 @@ function SessionEndScreen({ rounds, totalCorrect, totalWrong, streak, xpEarned, 
 }
 
 /* ─── DIFFICULTY PANEL ───────────────────────────────────────────────────── */
-function DifficultyPanel({ autoLevel, onConfirm }) {
-  const [selected, setSelected] = useState(autoLevel);
-  const [klasse, setKlasse] = useState(null);
+function DifficultyPanel({ autoLevel, onConfirm }: { autoLevel: Difficulty; onConfirm: (difficulty: Difficulty) => void }) {
+  const [selected, setSelected] = useState<Difficulty>(autoLevel);
+  const [klasse, setKlasse] = useState<string | null>(null);
   const klassen = ["5", "6", "7", "8", "9+"];
 
-  function pickKlasse(k) {
+  function pickKlasse(k: string) {
     setKlasse(k);
     setSelected(KLASSE_TO_DIFF[k]);
   }
@@ -984,7 +985,7 @@ function DifficultyPanel({ autoLevel, onConfirm }) {
         <div style={{ background: "#0d1333", border: "1px solid #1e293b", borderRadius: 14, padding: "16px 20px", marginBottom: 24 }}>
           <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 12, fontWeight: 700 }}>ODER: Manuell überschreiben</div>
           <div style={{ display: "flex", gap: 10 }}>
-            {["leicht", "mittel", "hart"].map(d => (
+            {(["leicht", "mittel", "hart"] as Difficulty[]).map(d => (
               <button key={d} onClick={() => { setSelected(d); setKlasse(null); }} style={{
                 flex: 1, padding: "12px 0", borderRadius: 12, fontSize: 13, fontWeight: 700,
                 background: selected === d ? `${DIFF_COLORS[d]}22` : "#07091a",
@@ -1018,11 +1019,11 @@ function DifficultyPanel({ autoLevel, onConfirm }) {
 }
 
 /* ─── WORLD MAP ──────────────────────────────────────────────────────────── */
-function WorldMap({ onBattle, onStartSession, onStartStimmenBattle, defeatedIds, xp, streak, difficulty, onChangeDifficulty, onReset, wordStats = {}, firstDefeatedDates = {}, monsterStars = {} }) {
+function WorldMap({ onBattle, onStartSession, onStartStimmenBattle, defeatedIds, xp, streak, difficulty, onChangeDifficulty, onReset, wordStats = {}, firstDefeatedDates = {}, monsterStars = {} }: WorldMapProps) {
   const today = new Date().toISOString().split('T')[0];
 
   // Berechne fällige Wörter pro Monster
-  function getDueCount(monsterId) {
+  function getDueCount(monsterId: string) {
     const words = getWordsForMonster(monsterId, difficulty);
     return words.filter(w => {
       const s = wordStats[w[0]];
@@ -1031,19 +1032,19 @@ function WorldMap({ onBattle, onStartSession, onStartStimmenBattle, defeatedIds,
   }
 
   // Ist Level-Up-Test verfuegbar? (14+ Tage nach erstem Sieg, noch kein Stern)
-  function isLevelUpReady(monsterId) {
+  function isLevelUpReady(monsterId: string) {
     if (monsterStars[monsterId]) return false;
     const firstDate = firstDefeatedDates[monsterId];
     if (!firstDate) return false;
-    const diffDays = Math.floor((new Date(today) - new Date(firstDate)) / 86400000);
+    const diffDays = Math.floor((new Date(today).getTime() - new Date(firstDate).getTime()) / 86400000);
     return diffDays >= 14;
   }
 
-  function daysUntilLevelUp(monsterId) {
+  function daysUntilLevelUp(monsterId: string) {
     if (monsterStars[monsterId]) return null;
     const firstDate = firstDefeatedDates[monsterId];
     if (!firstDate) return null;
-    const diffDays = Math.floor((new Date(today) - new Date(firstDate)) / 86400000);
+    const diffDays = Math.floor((new Date(today).getTime() - new Date(firstDate).getTime()) / 86400000);
     const remaining = 14 - diffDays;
     return remaining > 0 ? remaining : 0;
   }
@@ -1241,7 +1242,7 @@ function WorldMap({ onBattle, onStartSession, onStartStimmenBattle, defeatedIds,
 }
 
 /* ─── PARTICLE BURST ─────────────────────────────────────────────────────── */
-function spawnParticles(container, color, count = 9) {
+function spawnParticles(container: HTMLElement, color: string, count: number = 9) {
   if (!container || !container.parentElement) return;
   const rect = container.getBoundingClientRect();
   const parentRect = container.parentElement.getBoundingClientRect();
@@ -1278,32 +1279,32 @@ function spawnParticles(container, color, count = 9) {
 const ROUND_DURATION = 60; // 1 Minute pro Runde
 
 // Anzahl richtig geschriebener Wörter, die zum Sieg (nächstes Level) nötig sind
-const LEVEL_THRESHOLD = { leicht: 6, mittel: 8, hart: 10 };
+const LEVEL_THRESHOLD: Record<Difficulty, number> = { leicht: 6, mittel: 8, hart: 10 };
 
 // Session-Konzept: 8 Runden à 1 Minute = ~10 Minuten täglich
 const SESSION_ROUNDS = 8;
 const PAUSE_DURATION = 12; // Sekunden Pause zwischen Runden
 
-function BattleScreen({ monster, onMonsterDefeated, onBack, difficulty, wordStats, onUpdateWordStats, timeLeft, onCorrectAnswer, onWrongAnswer, threshold }) {
+function BattleScreen({ monster, onMonsterDefeated, onBack, difficulty, wordStats, onUpdateWordStats, timeLeft, onCorrectAnswer, onWrongAnswer, threshold }: BattleScreenProps) {
   const [monsterHp, setMonsterHp] = useState(threshold);
   const [chalIdx, setChalIdx] = useState(0);
   const [chalKey, setChalKey] = useState(0);
   const [phase, setPhase] = useState("intro"); // intro | battle
-  const [log, setLog] = useState([{ text: `${monster.name} erscheint!`, color: monster.color }]);
+  const [log, setLog] = useState<Array<{ text: string; color?: string }>>([{ text: `${monster.name} erscheint!`, color: monster.color }]);
   const [shake, setShake] = useState(false);
   const [playerShake, setPlayerShake] = useState(false);
   const [monsterAnim, setMonsterAnim] = useState("float");
   const [playerAnim, setPlayerAnim] = useState("idle");
-  const [floatDmg, setFloatDmg] = useState(null);
+  const [floatDmg, setFloatDmg] = useState<{ value: number | string; isPlayer: boolean } | null>(null);
   const [intro, setIntro] = useState(true);
   const [isDying, setIsDying] = useState(false);
-  const monsterRef = useRef(null);
+  const monsterRef = useRef<HTMLDivElement>(null);
 
   const [challenges] = useState(() => getChallenges(monster, difficulty, wordStats));
-  const shuffledRef = useRef([]);
+  const shuffledRef = useRef<number[]>([]);
   const posRef = useRef(-1);
-  const wrongQueueRef = useRef([]);
-  const wrongCountRef = useRef({});
+  const wrongQueueRef = useRef<number[]>([]);
+  const wrongCountRef = useRef<Record<string, number>>({});
   const currentWord = challenges[chalIdx]?.word ?? null;
 
   function shuffleAndStart() {
@@ -1314,7 +1315,7 @@ function BattleScreen({ monster, onMonsterDefeated, onBack, difficulty, wordStat
 
   function nextChallenge() {
     setChalKey(k => k + 1);
-    if (wrongQueueRef.current.length > 0) { setChalIdx(wrongQueueRef.current.shift()); return; }
+    if (wrongQueueRef.current.length > 0) { setChalIdx(wrongQueueRef.current.shift()!); return; }
     posRef.current++;
     if (posRef.current >= shuffledRef.current.length) shuffleAndStart();
     else setChalIdx(shuffledRef.current[posRef.current]);
@@ -1327,8 +1328,8 @@ function BattleScreen({ monster, onMonsterDefeated, onBack, difficulty, wordStat
     setTimeout(() => { setIntro(false); setPhase("battle"); addLog({ text: "Was tust du?", color: "#94a3b8" }); }, 2000);
   }, []);
 
-  function addLog(msg) { setLog(p => [...p.slice(-10), msg]); }
-  function triggerShake(who) {
+  function addLog(msg: { text: string; color?: string }) { setLog(p => [...p.slice(-10), msg]); }
+  function triggerShake(who: "monster" | "player") {
     if (who === "monster") { setShake(true); setTimeout(() => setShake(false), 500); }
     else { setPlayerShake(true); setTimeout(() => setPlayerShake(false), 500); }
   }
@@ -1346,7 +1347,7 @@ function BattleScreen({ monster, onMonsterDefeated, onBack, difficulty, wordStat
     setTimeout(() => {
       sfx.crit(); setMonsterAnim("hurt"); triggerShake("monster");
       setFloatDmg({ value: finalDmg, isPlayer: false });
-      spawnParticles(monsterRef.current, monster.color, crit ? 14 : 9);
+      if (monsterRef.current) spawnParticles(monsterRef.current, monster.color, crit ? 14 : 9);
     }, 250);
     setTimeout(() => { setMonsterAnim("float"); setPlayerAnim("idle"); setFloatDmg(null); }, 1200);
 
@@ -1456,7 +1457,7 @@ function BattleScreen({ monster, onMonsterDefeated, onBack, difficulty, wordStat
 }
 
 /* ─── SESSION RESULT SCREEN ──────────────────────────────────────────────── */
-function RoundResultScreen({ stats, victory, monster, nextMonster, onContinue, onRetry, onBack, threshold }) {
+function RoundResultScreen({ stats, victory, monster, nextMonster, onContinue, onRetry, onBack, threshold }: { stats: RoundStats; victory: boolean; monster: Monster; nextMonster: Monster | null; onContinue: () => void; onRetry: () => void; onBack: () => void; threshold: number }) {
   const { correct, wrong, wrongWords } = stats;
   const total = correct + wrong;
   const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
@@ -1704,20 +1705,20 @@ const css = `
 /* ─── SAVE / LOAD ────────────────────────────────────────────────────────── */
 const SAVE_KEY = "wortschmiede-save";
 
-function loadSave() {
+function loadSave(): WortschmiedeSave | null {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
-    return raw ? JSON.parse(raw) : null;
+    return raw ? JSON.parse(raw) as WortschmiedeSave : null;
   } catch { return null; }
 }
 
-function writeSave(data) {
+function writeSave(data: WortschmiedeSave) {
   try { localStorage.setItem(SAVE_KEY, JSON.stringify(data)); } catch {}
 }
 
 /* ─── SUPABASE SYNC HELPERS ────────────────────────────────────────────── */
 
-async function supabaseLoadProgress(sb, userId) {
+async function supabaseLoadProgress(sb: typeof supabase, userId: string) {
   const { data, error } = await sb
     .from('wortschmiede_progress')
     .select('*')
@@ -1727,7 +1728,7 @@ async function supabaseLoadProgress(sb, userId) {
   return data;
 }
 
-async function supabaseLoadWordStats(sb, userId) {
+async function supabaseLoadWordStats(sb: typeof supabase, userId: string) {
   const { data, error } = await sb
     .from('wortschmiede_word_stats')
     .select('*')
@@ -1735,7 +1736,7 @@ async function supabaseLoadWordStats(sb, userId) {
   if (error) { console.error('[Wortschmiede] load word_stats error:', error); return null; }
   if (!data) return null;
   // Array → Object { word: { interval, repetition, efactor, dueDate, totalCorrect, totalWrong } }
-  const stats = {};
+  const stats: WordStats = {};
   for (const row of data) {
     stats[row.word] = {
       interval: row.interval,
@@ -1749,7 +1750,7 @@ async function supabaseLoadWordStats(sb, userId) {
   return stats;
 }
 
-async function supabaseUpsertProgress(sb, userId, { defeatedIds, xp, difficulty, autoLevel, streak, lastPlayedDate, firstDefeatedDates, monsterStars }) {
+async function supabaseUpsertProgress(sb: typeof supabase, userId: string, { defeatedIds, xp, difficulty, autoLevel, streak, lastPlayedDate, firstDefeatedDates, monsterStars }: { defeatedIds: string[]; xp: number; difficulty: Difficulty; autoLevel: Difficulty; streak: number; lastPlayedDate: string | null; firstDefeatedDates: Record<string, string>; monsterStars: Record<string, boolean> }) {
   const { error } = await sb
     .from('wortschmiede_progress')
     .upsert({
@@ -1767,7 +1768,7 @@ async function supabaseUpsertProgress(sb, userId, { defeatedIds, xp, difficulty,
   if (error) console.error('[Wortschmiede] upsert progress error:', error);
 }
 
-async function supabaseUpsertWordStat(sb, userId, word, stat) {
+async function supabaseUpsertWordStat(sb: typeof supabase, userId: string, word: string, stat: import('./wortschmiedeTypes').WordStat) {
   const { error } = await sb
     .from('wortschmiede_word_stats')
     .upsert({
@@ -1785,7 +1786,7 @@ async function supabaseUpsertWordStat(sb, userId, word, stat) {
 }
 
 /* ─── ROOT APP ────────────────────────────────────────────────────────────── */
-export default function WortschmiedeBattle({ onClose, onXPEarned }) {
+export default function WortschmiedeBattle({ onClose, onXPEarned }: WortschmiedeBattleProps) {
   // SOURCE: useAuth hook — ersetzt userId/supabaseUrl/supabaseAnonKey Props
   const { legacyUserId } = useAuth();
   const userId = legacyUserId ?? '';
@@ -1795,34 +1796,34 @@ export default function WortschmiedeBattle({ onClose, onXPEarned }) {
 
   // flow: "diagnose" | "difficulty" | "map" | "round" | "roundResult" | "session_pause" | "session_end"
   // Diagnose ueberspringen wenn autoLevel schon gespeichert ist
-  const [screen, setScreen]             = useState(saved?.autoLevel ? "map" : "diagnose");
-  const [currentMonster, setCurrentMonster] = useState(null);
-  const [defeatedIds, setDefeatedIds]   = useState(saved?.defeatedIds || []);
+  const [screen, setScreen]             = useState<Screen>(saved?.autoLevel ? "map" : "diagnose");
+  const [currentMonster, setCurrentMonster] = useState<Monster | null>(null);
+  const [defeatedIds, setDefeatedIds]   = useState<string[]>(saved?.defeatedIds || []);
   const [xp, setXp]                     = useState(saved?.xp || 0);
-  const [difficulty, setDifficulty]     = useState(saved?.difficulty || "mittel");
-  const [autoLevel, setAutoLevel]       = useState(saved?.autoLevel || "mittel");
+  const [difficulty, setDifficulty]     = useState<Difficulty>(saved?.difficulty || "mittel");
+  const [autoLevel, setAutoLevel]       = useState<Difficulty>(saved?.autoLevel || "mittel");
 
   // SM-2 Wortstatistiken: { [wort]: { interval, repetition, efactor, dueDate, totalCorrect, totalWrong } }
-  const [wordStats, setWordStats]       = useState(saved?.wordStats || {});
+  const [wordStats, setWordStats]       = useState<WordStats>(saved?.wordStats || {});
 
   // Session-State
   const [sessionRound, setSessionRound]           = useState(0);
-  const [sessionTotalStats, setSessionTotalStats] = useState({ correct: 0, wrong: 0, rounds: [] });
+  const [sessionTotalStats, setSessionTotalStats] = useState<SessionTotalStats>({ correct: 0, wrong: 0, rounds: [] });
   const [sessionXp, setSessionXp]                 = useState(0);
   const [streak, setStreak]                       = useState(saved?.streak || 0);
-  const [lastPlayedDate, setLastPlayedDate]       = useState(saved?.lastPlayedDate || null);
-  const sessionQueueRef   = useRef([]);
+  const [lastPlayedDate, setLastPlayedDate]       = useState<string | null>(saved?.lastPlayedDate || null);
+  const sessionQueueRef   = useRef<Monster[]>([]);
   const sessionRoundRef   = useRef(0);
-  const sessionStatsRef   = useRef({ correct: 0, wrong: 0, rounds: [] });
+  const sessionStatsRef   = useRef<SessionTotalStats>({ correct: 0, wrong: 0, rounds: [] });
   const sessionXpRef      = useRef(0);
   const inSessionRef      = useRef(false);
   const streakRef         = useRef(saved?.streak || 0);
   const lastPlayedRef     = useRef(saved?.lastPlayedDate || null);
 
   // Stimmen-Battle-State
-  const [sbWords, setSbWords]           = useState([]);
-  const [sbResults, setSbResults]       = useState({ results: [], totalPts: 0, compPts: 0 });
-  const [sbMonsterId, setSbMonsterId]   = useState(null); // null = freies Battle, sonst Level-Up
+  const [sbWords, setSbWords]           = useState<import('./wortschmiedeTypes').WordEntry[]>([]);
+  const [sbResults, setSbResults]       = useState<StimmenBattleResults>({ results: [], totalPts: 0, compPts: 0 });
+  const [sbMonsterId, setSbMonsterId]   = useState<string | null>(null); // null = freies Battle, sonst Level-Up
 
   // Level-Up Tracking: { [monsterId]: "YYYY-MM-DD" } — Tag des ersten Siegs
   const [firstDefeatedDates, setFirstDefeatedDates] = useState(saved?.firstDefeatedDates || {});
@@ -1831,12 +1832,12 @@ export default function WortschmiedeBattle({ onClose, onXPEarned }) {
 
   // Runden-State (1-Minute pro Runde)
   const [timeLeft, setTimeLeft]         = useState(ROUND_DURATION);
-  const [roundStats, setRoundStats]     = useState(null);
+  const [roundStats, setRoundStats]     = useState<RoundStats | null>(null);
   const [roundVictory, setRoundVictory] = useState(false);
-  const [nextMonster, setNextMonster]   = useState(null); // Vorschau naechstes Monster
+  const [nextMonster, setNextMonster]   = useState<Monster | null>(null); // Vorschau naechstes Monster
   const [monsterKey, setMonsterKey]     = useState(0);
-  const roundStatsRef = useRef(null);
-  const timerRef = useRef(null);
+  const roundStatsRef = useRef<RoundStats | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // XP-Tracking fuer onXPEarned Callback
   const prevXpRef = useRef(xp);
@@ -1904,7 +1905,7 @@ export default function WortschmiedeBattle({ onClose, onXPEarned }) {
     timerRef.current = setInterval(() => {
       setTimeLeft(t => {
         if (t <= 1) {
-          clearInterval(timerRef.current);
+          clearInterval(timerRef.current!);
           timerRef.current = null;
           // Zeit abgelaufen → Runde beenden (Niederlage)
           const stats = roundStatsRef.current;
@@ -1928,10 +1929,10 @@ export default function WortschmiedeBattle({ onClose, onXPEarned }) {
     return () => { if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; } };
   }, [screen]);
 
-  function addXP(amt) { setXp(p => p + amt); }
+  function addXP(amt: number) { setXp(p => p + amt); }
 
   // SM-2 Update für ein einzelnes Wort
-  function handleUpdateWordStats(word, correct) {
+  function handleUpdateWordStats(word: string, correct: boolean) {
     setWordStats(prev => {
       const updated = sm2Update(prev[word], correct);
       // Fire-and-forget Supabase upsert fuer dieses Wort (globaler Client)
@@ -1942,26 +1943,26 @@ export default function WortschmiedeBattle({ onClose, onXPEarned }) {
     });
   }
 
-  function handleDiagnoseComplete(level) {
+  function handleDiagnoseComplete(level: Difficulty) {
     setAutoLevel(level);
     setDifficulty(level);
     setScreen("difficulty");
   }
 
-  function handleDifficultyConfirm(level) {
+  function handleDifficultyConfirm(level: Difficulty) {
     setDifficulty(level);
     setScreen("map");
   }
 
   // Naechstes Monster nach Level-Reihenfolge bestimmen
-  function getNextMonsterByLevel(currentId) {
+  function getNextMonsterByLevel(currentId: string) {
     const idx = MONSTERS.findIndex(m => m.id === currentId);
     if (idx < 0 || idx >= MONSTERS.length - 1) return null; // letztes Level → kein naechstes
     return MONSTERS[idx + 1];
   }
 
   // Runde starten: 1-Minute-Timer, Monster setzen
-  function startRound(monster) {
+  function startRound(monster: Monster) {
     sfx.select();
     const stats = { correct: 0, wrong: 0, wrongWords: {} };
     roundStatsRef.current = stats;
@@ -1975,7 +1976,7 @@ export default function WortschmiedeBattle({ onClose, onXPEarned }) {
   }
 
   // Monster besiegt → Runde gewonnen
-  function handleMonsterDefeated(monsterId) {
+  function handleMonsterDefeated(monsterId: string) {
     if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
 
     // XP vergeben: 15 + 5 pro Level
@@ -2011,11 +2012,11 @@ export default function WortschmiedeBattle({ onClose, onXPEarned }) {
   }
 
   // Tracking-Callbacks fuer Runden-Stats
-  function handleRoundCorrect(word) {
+  function handleRoundCorrect(word: string | null) {
     if (roundStatsRef.current) roundStatsRef.current.correct++;
   }
 
-  function handleRoundWrong(word) {
+  function handleRoundWrong(word: string | null) {
     if (roundStatsRef.current) {
       roundStatsRef.current.wrong++;
       if (word) {
@@ -2050,7 +2051,7 @@ export default function WortschmiedeBattle({ onClose, onXPEarned }) {
   }
 
   // Nach jeder Runde (Sieg oder Niederlage): akkumulieren, weiter oder Ende
-  function handleSessionRoundEnd(roundStats, victory) {
+  function handleSessionRoundEnd(roundStats: RoundStats | null, victory: boolean) {
     const currentRound = sessionRoundRef.current;
     const currentMonsterSnap = sessionQueueRef.current[currentRound - 1];
 
@@ -2097,7 +2098,7 @@ export default function WortschmiedeBattle({ onClose, onXPEarned }) {
   }
 
   // Session abschließen: Streak berechnen, Screen wechseln
-  function finishSession(totalStats) {
+  function finishSession(totalStats: SessionTotalStats) {
     const now = new Date();
     const today = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
     const yd = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
@@ -2151,7 +2152,7 @@ export default function WortschmiedeBattle({ onClose, onXPEarned }) {
 
   // ── STIMMEN-BATTLE ──────────────────────────────────────────────────────
 
-  function startStimmenBattle(monsterId) {
+  function startStimmenBattle(monsterId?: string | null) {
     let words;
     if (monsterId) {
       words = buildStimmenBattleQueueForMonster(monsterId, difficulty, wordStats);
@@ -2169,12 +2170,12 @@ export default function WortschmiedeBattle({ onClose, onXPEarned }) {
     setScreen("stimmen_battle");
   }
 
-  function handleStimmenBattleComplete(data) {
+  function handleStimmenBattleComplete(data: StimmenBattleResults) {
     setSbResults(data);
     // Level-Up-Modus: Stern vergeben wenn schreiben >= 70% UND sprechen >= 70%
     if (sbMonsterId && data.results?.length > 0) {
-      const writeOk = data.results.filter(r => r.wOk).length;
-      const speakOk = data.results.filter(r => r.sOk).length;
+      const writeOk = data.results.filter((r: { wOk: boolean }) => r.wOk).length;
+      const speakOk = data.results.filter((r: { sOk: boolean }) => r.sOk).length;
       const total = data.results.length;
       if (writeOk / total >= 0.7 && speakOk / total >= 0.7) {
         setMonsterStars(prev => ({ ...prev, [sbMonsterId]: true }));
@@ -2246,7 +2247,7 @@ export default function WortschmiedeBattle({ onClose, onXPEarned }) {
         <RoundResultScreen
           stats={roundStats}
           victory={roundVictory}
-          monster={currentMonster}
+          monster={currentMonster!}
           nextMonster={nextMonster}
           onContinue={handleContinue}
           onRetry={handleRetry}
@@ -2292,7 +2293,7 @@ export default function WortschmiedeBattle({ onClose, onXPEarned }) {
           totalPts={sbResults.totalPts}
           compPts={sbResults.compPts}
           isLevelUp={!!sbMonsterId}
-          monsterName={sbMonsterId ? MONSTERS.find(m => m.id === sbMonsterId)?.name : null}
+          monsterName={sbMonsterId ? MONSTERS.find(m => m.id === sbMonsterId)?.name ?? null : null}
           passed={sbMonsterId ? !!monsterStars[sbMonsterId] : false}
           onBack={() => setScreen("map")}
         />

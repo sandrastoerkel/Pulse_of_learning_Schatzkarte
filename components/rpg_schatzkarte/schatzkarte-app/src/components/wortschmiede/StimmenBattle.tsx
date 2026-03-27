@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
-import { W, STAR_TO_DIFF, getWordsForMonster } from './wortschmiede_data.js';
+import { W, STAR_TO_DIFF, getWordsForMonster } from './wortschmiede_data';
+import type { WordEntry, Difficulty, WordStats, StimmenBattleResult, StimmenBattleResults, StimmenBattleScreenProps, StimmenBattleEndScreenProps } from './wortschmiedeTypes';
 
 /* ─── STIMMEN-BATTLE ──────────────────────────────────────────────────────── */
 // Hören · Schreiben · Sprechen — 3-Schritt-Lernmodul
@@ -7,11 +8,11 @@ import { W, STAR_TO_DIFF, getWordsForMonster } from './wortschmiede_data.js';
 const STIMMEN_BATTLE_ROUNDS = 10;
 
 // Prioritaetskette: SM-2 faellig+Fehler → nur faellig → Fehlerhistorie → Schwierigkeit → Fallback
-function buildStimmenBattleQueue(difficulty, wordStats) {
+function buildStimmenBattleQueue(difficulty: Difficulty, wordStats: WordStats): WordEntry[] {
   const today = new Date().toISOString().split("T")[0];
   const all = W;
 
-  const byDiff = (words) => words.filter(w => STAR_TO_DIFF[w[3]] === difficulty);
+  const byDiff = (words: WordEntry[]) => words.filter(w => STAR_TO_DIFF[w[3]] === difficulty);
 
   // Prio 1: Heute faellig UND schon mal falsch
   const p1 = byDiff(all).filter(w => {
@@ -39,7 +40,7 @@ function buildStimmenBattleQueue(difficulty, wordStats) {
   const p5 = all.filter(w => !byDiff(all).find(x => x[0] === w[0]));
 
   // Pool zusammenstellen bis 10 Woerter erreicht
-  const pool = [];
+  const pool: WordEntry[] = [];
   for (const group of [p1, p2, p3, p4, p5]) {
     const shuffled = [...group].sort(() => Math.random() - 0.5);
     for (const w of shuffled) {
@@ -52,7 +53,7 @@ function buildStimmenBattleQueue(difficulty, wordStats) {
 }
 
 // Level-Up-Modus: nur Woerter des spezifischen Monsters
-function buildStimmenBattleQueueForMonster(monsterId, difficulty, wordStats) {
+function buildStimmenBattleQueueForMonster(monsterId: string, difficulty: Difficulty, wordStats: WordStats): WordEntry[] {
   const today = new Date().toISOString().split("T")[0];
   const words = getWordsForMonster(monsterId, difficulty);
 
@@ -71,9 +72,9 @@ function buildStimmenBattleQueueForMonster(monsterId, difficulty, wordStats) {
 }
 
 /* ─── STIMMEN BATTLE SCREEN ──────────────────────────────────────────────── */
-function StimmenBattleScreen({ words, difficulty, onUpdateWordStats, onComplete, onBack }) {
+function StimmenBattleScreen({ words, difficulty, onUpdateWordStats, onComplete, onBack }: StimmenBattleScreenProps) {
   const [idx, setIdx]           = useState(0);
-  const [phase, setPhase]       = useState("listen"); // listen | write | speak | result
+  const [phase, setPhase]       = useState<"listen" | "write" | "speak" | "result">("listen");
   const [writeVal, setWriteVal] = useState("");
   const [speakVal, setSpeakVal] = useState("");
   const [wOk, setWOk]           = useState(false);
@@ -81,18 +82,18 @@ function StimmenBattleScreen({ words, difficulty, onUpdateWordStats, onComplete,
   const [roundPts, setRoundPts] = useState(0);
   const [totalPts, setTotalPts] = useState(0);
   const [compPts, setCompPts]   = useState(0);
-  const [results, setResults]   = useState([]);
+  const [results, setResults]   = useState<StimmenBattleResult[]>([]);
   const [ttsStatus, setTtsStatus] = useState("");
   const [heard, setHeard]       = useState("");
-  const spDebounceRef           = useRef(null);
-  const writeRef                = useRef(null);
-  const speakRef                = useRef(null);
+  const spDebounceRef           = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const writeRef                = useRef<HTMLInputElement>(null);
+  const speakRef                = useRef<HTMLInputElement>(null);
 
   const cur = words[idx];
   const word = cur ? cur[0] : "";
 
   // iOS-sicheres TTS
-  function playWord(rate) {
+  function playWord(rate?: number) {
     if (!window.speechSynthesis) return;
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(word);
@@ -136,17 +137,17 @@ function StimmenBattleScreen({ words, difficulty, onUpdateWordStats, onComplete,
     setTimeout(() => speakRef.current?.focus(), 120);
   }
 
-  function handleSpeakInput(e) {
+  function handleSpeakInput(e: React.ChangeEvent<HTMLInputElement>) {
     const val = e.target.value;
     setSpeakVal(val);
-    clearTimeout(spDebounceRef.current);
+    if (spDebounceRef.current) clearTimeout(spDebounceRef.current);
     if (val.trim()) {
       spDebounceRef.current = setTimeout(() => finishSpeak(val.trim()), 1500);
     }
   }
 
-  function finishSpeak(val) {
-    clearTimeout(spDebounceRef.current);
+  function finishSpeak(val?: string) {
+    if (spDebounceRef.current) clearTimeout(spDebounceRef.current);
     const spokenVal = val || speakVal.trim();
     if (!spokenVal) return;
     setHeard(spokenVal);
@@ -290,7 +291,7 @@ function StimmenBattleScreen({ words, difficulty, onUpdateWordStats, onComplete,
               type="text"
               value={speakVal}
               onChange={handleSpeakInput}
-              onKeyDown={e => { if (e.key === "Enter") { clearTimeout(spDebounceRef.current); finishSpeak(speakVal.trim()); } }}
+              onKeyDown={e => { if (e.key === "Enter") { if (spDebounceRef.current) clearTimeout(spDebounceRef.current); finishSpeak(speakVal.trim()); } }}
               placeholder="..."
               autoComplete="off"
               autoCorrect="off"
@@ -302,7 +303,7 @@ function StimmenBattleScreen({ words, difficulty, onUpdateWordStats, onComplete,
               <button onClick={() => playWord(0.75)} style={{ flex: 1, background: "transparent", border: "1px solid #334155", color: "#94a3b8", borderRadius: 10, padding: "11px", fontSize: 12, cursor: "pointer", fontFamily: "'Outfit', sans-serif" }}>
                 🔊 Nochmal hören
               </button>
-              <button onClick={() => { clearTimeout(spDebounceRef.current); finishSpeak(speakVal.trim()); }} disabled={!speakVal.trim()} style={{ flex: 2, background: speakVal.trim() ? "#fbbf24" : "#1e293b", color: speakVal.trim() ? "#07091a" : "#334155", border: "none", borderRadius: 10, padding: "11px", fontSize: 14, fontWeight: 700, cursor: speakVal.trim() ? "pointer" : "default", fontFamily: "'Outfit', sans-serif", transition: "background 0.2s" }}>
+              <button onClick={() => { if (spDebounceRef.current) clearTimeout(spDebounceRef.current); finishSpeak(speakVal.trim()); }} disabled={!speakVal.trim()} style={{ flex: 2, background: speakVal.trim() ? "#fbbf24" : "#1e293b", color: speakVal.trim() ? "#07091a" : "#334155", border: "none", borderRadius: 10, padding: "11px", fontSize: 14, fontWeight: 700, cursor: speakVal.trim() ? "pointer" : "default", fontFamily: "'Outfit', sans-serif", transition: "background 0.2s" }}>
                 Fertig →
               </button>
             </div>
@@ -354,7 +355,7 @@ function StimmenBattleScreen({ words, difficulty, onUpdateWordStats, onComplete,
 }
 
 /* ─── STIMMEN BATTLE END SCREEN ──────────────────────────────────────────── */
-function StimmenBattleEndScreen({ results, totalPts, compPts, isLevelUp, monsterName, passed, onBack }) {
+function StimmenBattleEndScreen({ results, totalPts, compPts, isLevelUp, monsterName, passed, onBack }: StimmenBattleEndScreenProps) {
   const won = totalPts >= compPts;
   const pct = results.length > 0 ? Math.round((results.filter(r => r.wOk).length / results.length) * 100) : 0;
   const spokenPct = results.length > 0 ? Math.round((results.filter(r => r.sOk).length / results.length) * 100) : 0;

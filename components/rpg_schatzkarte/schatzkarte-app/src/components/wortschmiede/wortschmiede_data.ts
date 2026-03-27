@@ -1,18 +1,20 @@
 /* ─── SHARED WORTSCHMIEDE DATA ─────────────────────────────────────────── */
 // Gemeinsame Daten und Funktionen fuer WortschmiedeBattle und StimmenBattle
 
+import type { WordEntry, Difficulty, WordStat, WordStats, Monster, Challenge, PruferQuestion } from './wortschmiedeTypes';
+
 /* ─── DIFFICULTY ─────────────────────────────────────────────────────────── */
 // leicht = Kl.5, mittel = Kl.6-7, hart = Kl.8+
-const DIFF_LABELS = { leicht: "⭐ Leicht", mittel: "⭐⭐ Mittel", hart: "⭐⭐⭐ Hart" };
-const DIFF_COLORS = { leicht: "#22c55e", mittel: "#f59e0b", hart: "#ef4444" };
-const KLASSE_TO_DIFF = { "5": "leicht", "6": "mittel", "7": "mittel", "8": "hart", "9+": "hart" };
+const DIFF_LABELS: Record<Difficulty, string> = { leicht: "⭐ Leicht", mittel: "⭐⭐ Mittel", hart: "⭐⭐⭐ Hart" };
+const DIFF_COLORS: Record<Difficulty, string> = { leicht: "#22c55e", mittel: "#f59e0b", hart: "#ef4444" };
+const KLASSE_TO_DIFF: Record<string, Difficulty> = { "5": "leicht", "6": "mittel", "7": "mittel", "8": "hart", "9+": "hart" };
 
 /* ─── WORD BANK (1466 LRS-Wörter) ────────────────────────────────────────── */
 // [wort, kategorieId, fehler_oder_0, sterne]
 // Kategorien: 1=ie/ih/ieh, 2=Dehnungs-h, 3=Funktionswörter, 4=Vorsilben/Morpheme,
 //   5=Doppelkonsonanten, 6=ck/tz, 7=Auslautverhärtung, 8=s/ss/ß,
 //   9=Groß-/Kleinschreibung, 10=Allgemeiner Wortschatz
-const W=[
+const W: WordEntry[] =[
 ["der",3,"dei",2],
 ["die",3,"di",2],
 ["das",3,"dass",3],
@@ -1482,7 +1484,7 @@ const W=[
 ];
 
 // Monster → Kategorien-Mapping
-const MONSTER_CATS = {
+const MONSTER_CATS: Record<string, number[]> = {
   nebelwurm: [1, 2],
   spiegelgeist: [3, 4],
   doppeltroll: [5, 6],
@@ -1491,9 +1493,9 @@ const MONSTER_CATS = {
   wortfresser: [10],
 };
 
-const STAR_TO_DIFF = { 1: "leicht", 2: "leicht", 3: "mittel", 4: "hart", 5: "hart" };
+const STAR_TO_DIFF: Record<number, Difficulty> = { 1: "leicht", 2: "leicht", 3: "mittel", 4: "hart", 5: "hart" };
 
-function getWordsForMonster(monsterId, difficulty) {
+function getWordsForMonster(monsterId: string, difficulty: Difficulty): WordEntry[] {
   const cats = MONSTER_CATS[monsterId];
   if (!cats) return [];
   const primary = W.filter(w => cats.includes(w[1]) && STAR_TO_DIFF[w[3]] === difficulty);
@@ -1513,7 +1515,7 @@ function getWordsForMonster(monsterId, difficulty) {
   return pool;
 }
 
-function fisherYates(arr) {
+function fisherYates<T>(arr: T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -1525,7 +1527,7 @@ function fisherYates(arr) {
 /* ─── SM-2 SPACED REPETITION ─────────────────────────────────────────────── */
 // Basierend auf SuperMemo-2 Algorithmus (Wozniak 1990)
 // grade: 5 = korrekt (perfekt), 1 = falsch (vereinfacht für Kinder-Kontext)
-function sm2Update(existingCard, correct) {
+function sm2Update(existingCard: WordStat | undefined, correct: boolean): WordStat {
   const today = new Date().toISOString().split('T')[0];
   const card = existingCard || {
     interval: 0,
@@ -1568,13 +1570,13 @@ function sm2Update(existingCard, correct) {
 }
 
 // Wörter nach Fälligkeit sortieren: überfällig → neu → schon gekonnt
-function sortWordsByPriority(words, wordStats) {
+function sortWordsByPriority(words: WordEntry[], wordStats: WordStats): WordEntry[] {
   const today = new Date().toISOString().split('T')[0];
   return [...words].sort((a, b) => {
     const sa = wordStats[a[0]];
     const sb = wordStats[b[0]];
 
-    const getPrio = (s) => {
+    const getPrio = (s: WordStat | undefined): number => {
       if (!s) return 1;                     // 1 = neu, hohe Priorität
       if (s.dueDate <= today) return 0;     // 0 = fällig, höchste Priorität
       return 2;                             // 2 = noch nicht fällig
@@ -1591,12 +1593,12 @@ function sortWordsByPriority(words, wordStats) {
 }
 
 /* ─── ERROR GENERATOR ─────────────────────────────────────────────────────── */
-function generateErrors(word, catId, typicalError) {
+function generateErrors(word: string, catId: number, typicalError: string | 0): string[] {
   if (!word || word.length === 0) return [];
-  const errs = new Set();
+  const errs = new Set<string>();
   const lo = word.toLowerCase();
 
-  if (typicalError && typicalError !== 0 && typicalError !== "...") errs.add(typicalError);
+  if (typeof typicalError === 'string' && typicalError !== "...") errs.add(typicalError);
 
   switch (catId) {
     case 1: // ie/ih/ieh
@@ -1683,7 +1685,7 @@ function generateErrors(word, catId, typicalError) {
 
 // Jedes Wort bekommt einen Kontext-Satz, damit klar ist welches Wort gemeint ist.
 // Das Zielwort wird im ChallengePanel als ___ angezeigt.
-const SENTENCES = {
+const SENTENCES: Record<string, string> = {
   "der": "Das ist ___ Hund von nebenan.",
   "die": "Heute kommt ___ Lehrerin.",
   "das": "Ich lese ___ Buch zum zweiten Mal.",
@@ -3108,7 +3110,7 @@ const SENTENCES = {
 
 
 /* ─── CHALLENGE GENERATOR ─────────────────────────────────────────────────── */
-const CAT_QUESTIONS = {
+const CAT_QUESTIONS: Record<number, string[]> = {
   1: ["Mit ie oder ei?", "ie, ih oder ieh?", "Hör genau hin:"],
   2: ["Mit oder ohne h?", "Dehnungs-h oder nicht?", "Hör genau hin:"],
   3: ["Tippe das Wort:", "Hör zu und tippe:"],
@@ -3121,7 +3123,7 @@ const CAT_QUESTIONS = {
   10: ["Tippe das Wort:", "Hör genau hin:"],
 };
 
-function generateChallenges(monsterId, difficulty, wordStats = {}) {
+function generateChallenges(monsterId: string, difficulty: Difficulty, wordStats: WordStats = {}): Challenge[] {
   const words = getWordsForMonster(monsterId, difficulty);
   if (!words.length) return [];
   // Fällige und fehlerhafte Wörter zuerst, dann Rest zufällig
@@ -3131,7 +3133,7 @@ function generateChallenges(monsterId, difficulty, wordStats = {}) {
   const front = prioritized.slice(0, cutoff);
   const back  = fisherYates(prioritized.slice(cutoff));
   const shuffled = [...front, ...back];
-  const challenges = [];
+  const challenges: Challenge[] = [];
 
   for (let i = 0; i < shuffled.length; i++) {
     const [word, catId, typErr] = shuffled[i];
@@ -3139,27 +3141,27 @@ function generateChallenges(monsterId, difficulty, wordStats = {}) {
 
     const sentence = SENTENCES[word] || null;
     if (i % 2 === 0) {
-      challenges.push({ q: qs[Math.floor(Math.random() * qs.length)], word, audio: true, type: "input", sentence });
+      challenges.push({ q: qs[Math.floor(Math.random() * qs.length)], word, audio: true, type: "input" as const, sentence });
     } else {
       const allErrs = generateErrors(word, catId, typErr);
       const wrong = fisherYates(allErrs).slice(0, 2);
       while (wrong.length < 2) wrong.push(word.slice(0,-1) + (wrong.length === 0 ? "e" : "n"));
-      challenges.push({ q: "Was ist richtig?", word, options: fisherYates([word, ...wrong]), correct: word, type: "choice", sentence });
+      challenges.push({ q: "Was ist richtig?", word, options: fisherYates([word, ...wrong]), correct: word, type: "choice" as const, sentence });
     }
   }
   return challenges;
 }
 
 /* ─── DIAGNOSE GENERATOR ──────────────────────────────────────────────────── */
-function generatePruferQuestions() {
+function generatePruferQuestions(): PruferQuestion[] {
   // 10 Fragen aus 5 zufälligen Kategorien: 3 leicht + 4 mittel + 3 hart
   const cats = fisherYates([1,2,3,4,5,6,7,8,9,10]).slice(0,5);
-  const catNames = {1:"ie/ih/ieh",2:"Dehnungs-h",3:"Funktionswörter",4:"Vorsilben",5:"Doppelkonsonant",6:"ck/tz",7:"Auslaut",8:"s/ss/ß",9:"Groß/Klein",10:"Wortschatz"};
-  const questions = [];
-  const diffCounts = [["leicht",3],["mittel",4],["hart",3]];
+  const catNames: Record<number, string> = {1:"ie/ih/ieh",2:"Dehnungs-h",3:"Funktionswörter",4:"Vorsilben",5:"Doppelkonsonant",6:"ck/tz",7:"Auslaut",8:"s/ss/ß",9:"Groß/Klein",10:"Wortschatz"};
+  const questions: PruferQuestion[] = [];
+  const diffCounts: [Difficulty, number][] = [["leicht",3],["mittel",4],["hart",3]];
 
   for (const [diff, count] of diffCounts) {
-    const pool = [];
+    const pool: WordEntry[] = [];
     for (const cat of cats) {
       const words = W.filter(w => w[1] === cat && STAR_TO_DIFF[w[3]] === diff);
       pool.push(...words);
@@ -3170,12 +3172,12 @@ function generatePruferQuestions() {
       const hint = catNames[catId] || "Rechtschreibung";
       const sentence = SENTENCES[word] || null;
       if (i % 2 === 0) {
-        questions.push({ q: "Tippe das Wort:", word, audio: true, type: "input", diff, hint, sentence });
+        questions.push({ q: "Tippe das Wort:", word, audio: true, type: "input" as const, diff, hint, sentence });
       } else {
         const allErrs = generateErrors(word, catId, typErr);
         const wrong = fisherYates(allErrs).slice(0, 2);
         while (wrong.length < 2) wrong.push(word.slice(0,-1) + "e");
-        questions.push({ q: "Was ist richtig?", word, options: fisherYates([word, ...wrong]), correct: word, type: "choice", diff, hint, sentence });
+        questions.push({ q: "Was ist richtig?", word, options: fisherYates([word, ...wrong]), correct: word, type: "choice" as const, diff, hint, sentence });
       }
     }
   }
@@ -3189,7 +3191,7 @@ function generatePruferQuestions() {
 }
 
 /* ─── MONSTER DATA ───────────────────────────────────────────────────────── */
-const MONSTERS = [
+const MONSTERS: Monster[] = [
   {
     id: "nebelwurm",
     name: "Nebelwurm",
