@@ -1,0 +1,1008 @@
+/* ==========================================================
+   TransferBoard – Styles
+   Namespace: .bruecken-island
+   ========================================================== */
+
+/* ── Base Container ────────────────────────────────────── */
+.bruecken-island .transferboard {
+  margin: 1.5rem 0;
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  border: 1px solid rgba(155, 89, 182, 0.12);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  color: var(--dark);
+  position: relative;
+}
+
+/* ── Header ────────────────────────────────────────────── */
+.bruecken-island .tb-header {
+  text-align: center;
+  padding: 20px 20px 14px;
+  background: linear-gradient(135deg, rgba(155, 89, 182, 0.06) 0%, rgba(102, 126, 234, 0.06) 100%);
+  border-bottom: 1px solid rgba(155, 89, 182, 0.08);
+}
+
+.bruecken-island .tb-badge {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--primary);
+  background: rgba(155, 89, 182, 0.08);
+  border: 1px solid rgba(155, 89, 182, 0.15);
+  border-radius: var(--radius-xl);
+  padding: 3px 14px;
+  margin-bottom: 8px;
+}
+
+.bruecken-island .tb-title {
+  font-size: clamp(22px, 4.5vw, 30px);
+  font-weight: 800;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0 0 10px 0;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+/* Squad names row */
+.bruecken-island .tb-squad {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--white);
+  border: 1px solid rgba(155, 89, 182, 0.1);
+  border-radius: var(--radius-md);
+  padding: 6px 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.bruecken-island .tb-squad-label {
+  color: rgba(44, 62, 80, 0.4);
+  font-size: 11.5px;
+}
+
+.bruecken-island .tb-squad-member {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.bruecken-island .tb-squad-dot {
+  color: rgba(44, 62, 80, 0.15);
+  margin: 0 2px;
+}
+
+.bruecken-island .tb-squad-edit-btn {
+  background: rgba(155, 89, 182, 0.06);
+  border: 1px solid rgba(155, 89, 182, 0.12);
+  color: rgba(44, 62, 80, 0.4);
+  cursor: pointer;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.bruecken-island .tb-squad-edit-btn:hover {
+  background: rgba(155, 89, 182, 0.12);
+  color: var(--primary);
+}
+
+.bruecken-island .tb-squad-input {
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12.5px;
+  width: 90px;
+  outline: none;
+  font-family: inherit;
+  border: 1px solid;
+}
+
+.bruecken-island .tb-squad-confirm {
+  background: var(--gradient-primary);
+  border: none;
+  border-radius: 6px;
+  color: var(--white);
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+/* Action buttons row */
+.bruecken-island .tb-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.bruecken-island .tb-btn {
+  padding: 7px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.25s;
+  font-family: inherit;
+}
+
+.bruecken-island .tb-btn-save {
+  border: 1px solid rgba(39, 174, 96, 0.3);
+  background: rgba(39, 174, 96, 0.06);
+  color: var(--success);
+}
+.bruecken-island .tb-btn-save:hover {
+  background: rgba(39, 174, 96, 0.12);
+  box-shadow: 0 0 12px rgba(39, 174, 96, 0.15);
+}
+.bruecken-island .tb-btn-save.flash {
+  background: rgba(39, 174, 96, 0.18);
+  box-shadow: 0 0 16px rgba(39, 174, 96, 0.25);
+}
+
+.bruecken-island .tb-btn-examples {
+  border: 1px solid rgba(155, 89, 182, 0.25);
+  background: rgba(155, 89, 182, 0.06);
+  color: var(--primary);
+}
+.bruecken-island .tb-btn-examples:hover {
+  background: rgba(155, 89, 182, 0.12);
+  box-shadow: 0 0 12px rgba(155, 89, 182, 0.15);
+}
+
+.bruecken-island .tb-btn-delete {
+  border: 1px solid rgba(231, 76, 60, 0.2);
+  background: rgba(231, 76, 60, 0.04);
+  color: var(--danger);
+}
+.bruecken-island .tb-btn-delete:hover {
+  background: rgba(231, 76, 60, 0.1);
+}
+
+/* ── Stepper ───────────────────────────────────────────── */
+.bruecken-island .tb-stepper {
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid rgba(155, 89, 182, 0.06);
+}
+
+.bruecken-island .tb-progress {
+  display: flex;
+  gap: 4px;
+  max-width: 440px;
+  margin: 0 auto 12px;
+}
+
+.bruecken-island .tb-progress-bar {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(155, 89, 182, 0.08);
+  transition: all 0.5s;
+}
+
+.bruecken-island .tb-progress-bar.active {
+  background: var(--primary);
+  box-shadow: 0 0 8px rgba(155, 89, 182, 0.3);
+}
+
+.bruecken-island .tb-step-info {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.bruecken-island .tb-step-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 3px;
+}
+
+.bruecken-island .tb-step-title {
+  color: var(--dark);
+  font-size: 17px;
+  font-weight: 700;
+  margin: 0 0 3px 0;
+}
+
+.bruecken-island .tb-step-subtitle {
+  color: rgba(44, 62, 80, 0.5);
+  font-size: 13px;
+  margin: 0;
+  font-style: italic;
+}
+
+.bruecken-island .tb-step-nav {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.bruecken-island .tb-btn-back {
+  padding: 8px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(44, 62, 80, 0.1);
+  background: var(--white);
+  color: rgba(44, 62, 80, 0.5);
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: 600;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.bruecken-island .tb-btn-back:hover {
+  border-color: rgba(44, 62, 80, 0.2);
+  color: var(--dark);
+}
+
+.bruecken-island .tb-btn-next {
+  padding: 8px 22px;
+  border-radius: var(--radius-sm);
+  border: none;
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: 700;
+  font-family: inherit;
+  transition: all 0.3s;
+}
+
+.bruecken-island .tb-btn-next.enabled {
+  background: var(--gradient-primary);
+  color: var(--white);
+  box-shadow: 0 0 16px rgba(155, 89, 182, 0.2);
+}
+
+.bruecken-island .tb-btn-next.disabled {
+  background: rgba(44, 62, 80, 0.06);
+  color: rgba(44, 62, 80, 0.25);
+  cursor: default;
+}
+
+/* ── Columns Layout ────────────────────────────────────── */
+.bruecken-island .tb-columns {
+  display: flex;
+  gap: 10px;
+  padding: 14px 14px 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Single column */
+.bruecken-island .tb-column {
+  flex: 1 1 0;
+  min-width: 260px;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  transition: opacity 0.4s, filter 0.4s;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid rgba(44, 62, 80, 0.08);
+  box-shadow: var(--shadow-sm);
+}
+
+.bruecken-island .tb-column.compact {
+  min-width: 220px;
+}
+
+.bruecken-island .tb-column.inactive {
+  opacity: 0.35;
+  pointer-events: none;
+  filter: grayscale(0.3);
+}
+
+/* Column header */
+.bruecken-island .tb-col-header {
+  padding: 12px 14px 10px;
+  text-align: center;
+  border-bottom: 2px solid;
+}
+
+.bruecken-island .tb-col-emoji {
+  font-size: 26px;
+  margin-bottom: 2px;
+  line-height: 1.2;
+}
+
+.bruecken-island .tb-column.compact .tb-col-emoji {
+  font-size: 22px;
+}
+
+.bruecken-island .tb-col-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 2px 0;
+}
+
+.bruecken-island .tb-column.compact .tb-col-title {
+  font-size: 13.5px;
+}
+
+.bruecken-island .tb-col-subtitle {
+  color: rgba(44, 62, 80, 0.45);
+  font-size: 11.5px;
+  margin: 0;
+  font-style: italic;
+}
+
+/* Column body (card list) */
+.bruecken-island .tb-col-body {
+  flex: 1;
+  padding: 8px;
+  min-height: 120px;
+  overflow-y: auto;
+  transition: background 0.3s, border-color 0.3s;
+  background: var(--light);
+}
+
+.bruecken-island .tb-column.compact .tb-col-body {
+  min-height: 70px;
+}
+
+.bruecken-island .tb-col-body.drag-over {
+  background: rgba(155, 89, 182, 0.04);
+}
+
+.bruecken-island .tb-col-empty {
+  color: rgba(44, 62, 80, 0.2);
+  text-align: center;
+  padding: 22px 12px;
+  font-size: 12.5px;
+  font-style: italic;
+}
+
+.bruecken-island .tb-column.compact .tb-col-empty {
+  padding: 14px 10px;
+}
+
+/* Column footer (input area) */
+.bruecken-island .tb-col-footer {
+  padding: 8px;
+  background: var(--white);
+  border-top: 1px solid rgba(44, 62, 80, 0.06);
+}
+
+.bruecken-island .tb-col-footer-inactive {
+  padding: 6px;
+  text-align: center;
+  background: var(--white);
+  border-top: 1px solid rgba(44, 62, 80, 0.04);
+}
+
+.bruecken-island .tb-col-footer-inactive span {
+  font-size: 11px;
+  color: rgba(44, 62, 80, 0.3);
+}
+
+/* Person toggle buttons */
+.bruecken-island .tb-person-toggles {
+  display: flex;
+  gap: 3px;
+  margin-bottom: 6px;
+}
+
+.bruecken-island .tb-person-toggle {
+  flex: 1;
+  padding: 5px 4px;
+  border-radius: 7px;
+  font-size: 11.5px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  background: rgba(44, 62, 80, 0.02);
+  border: 1.5px solid rgba(44, 62, 80, 0.06);
+  color: rgba(44, 62, 80, 0.4);
+  font-weight: 400;
+}
+
+.bruecken-island .tb-person-toggle.selected {
+  font-weight: 700;
+}
+
+/* Input row */
+.bruecken-island .tb-input-row {
+  display: flex;
+  gap: 6px;
+}
+
+.bruecken-island .tb-card-input {
+  flex: 1;
+  background: var(--white);
+  border: 1px solid rgba(44, 62, 80, 0.12);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  color: var(--dark);
+  font-size: 13.5px;
+  outline: none;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.bruecken-island .tb-card-input:focus {
+  border-color: rgba(155, 89, 182, 0.4);
+  box-shadow: 0 0 10px rgba(155, 89, 182, 0.1);
+}
+
+.bruecken-island .tb-card-input::placeholder {
+  color: rgba(44, 62, 80, 0.3);
+}
+
+.bruecken-island .tb-add-btn {
+  border: none;
+  border-radius: var(--radius-sm);
+  width: 40px;
+  font-size: 18px;
+  font-weight: bold;
+  transition: all 0.25s;
+  flex-shrink: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.bruecken-island .tb-add-btn.enabled {
+  color: var(--white);
+  box-shadow: var(--shadow-sm);
+}
+
+.bruecken-island .tb-add-btn.disabled {
+  background: rgba(44, 62, 80, 0.04);
+  color: rgba(44, 62, 80, 0.15);
+  cursor: default;
+}
+
+/* ── Cards ─────────────────────────────────────────────── */
+.bruecken-island .tb-card {
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  margin-bottom: 7px;
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid;
+  border-left-width: 3px;
+  background: var(--white);
+}
+
+.bruecken-island .tb-card:hover {
+  transform: translateX(2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.bruecken-island .tb-card.compact {
+  padding: 7px 10px;
+}
+
+.bruecken-island .tb-card.draggable {
+  cursor: grab;
+}
+
+.bruecken-island .tb-card.dragging {
+  opacity: 0.35;
+}
+
+.bruecken-island .tb-card-delete {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  background: none;
+  border: none;
+  color: rgba(44, 62, 80, 0.1);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.bruecken-island .tb-card-delete:hover {
+  color: var(--danger);
+}
+
+.bruecken-island .tb-card-text {
+  color: var(--dark);
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0 0 4px 0;
+  padding-right: 16px;
+}
+
+.bruecken-island .tb-card.compact .tb-card-text {
+  font-size: 13px;
+}
+
+.bruecken-island .tb-card-person {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.bruecken-island .tb-card-person-emoji {
+  font-size: 11px;
+}
+
+.bruecken-island .tb-card-person-name {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.bruecken-island .tb-card-drag-tag {
+  margin-left: auto;
+  font-size: 9px;
+  color: rgba(44, 62, 80, 0.25);
+  background: rgba(155, 89, 182, 0.06);
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+/* ── Mini Card (in connections & modal) ────────────────── */
+.bruecken-island .tb-minicard {
+  border-radius: var(--radius-sm);
+  padding: 7px 10px;
+  border: 1px solid;
+  border-left-width: 3px;
+  background: var(--white);
+}
+
+.bruecken-island .tb-minicard-text {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--dark);
+}
+
+.bruecken-island .tb-minicard-person {
+  font-size: 11px;
+  margin-left: 6px;
+}
+
+/* ── Connections Section ───────────────────────────────── */
+.bruecken-island .tb-connections {
+  padding: 0 14px 20px;
+}
+
+.bruecken-island .tb-connections-box {
+  background: rgba(155, 89, 182, 0.03);
+  border: 1px solid rgba(155, 89, 182, 0.1);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+
+.bruecken-island .tb-connections-title {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 17px;
+  font-weight: 800;
+  margin: 0 0 3px 0;
+  text-align: center;
+}
+
+.bruecken-island .tb-connections-subtitle {
+  color: rgba(44, 62, 80, 0.45);
+  font-size: 12.5px;
+  text-align: center;
+  margin: 0 0 14px 0;
+  font-style: italic;
+}
+
+.bruecken-island .tb-connections-empty {
+  text-align: center;
+  padding: 20px;
+  color: rgba(44, 62, 80, 0.2);
+  font-size: 13px;
+  font-style: italic;
+  border: 1px dashed rgba(155, 89, 182, 0.12);
+  border-radius: var(--radius-md);
+}
+
+.bruecken-island .tb-connections-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Single connection */
+.bruecken-island .tb-connection {
+  background: var(--white);
+  border: 1px solid rgba(155, 89, 182, 0.12);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  position: relative;
+  min-width: 280px;
+  flex: 1 1 340px;
+  max-width: 440px;
+  box-shadow: var(--shadow-sm);
+}
+
+.bruecken-island .tb-connection-delete {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: none;
+  border: none;
+  color: rgba(44, 62, 80, 0.1);
+  cursor: pointer;
+  font-size: 12px;
+  transition: color 0.2s;
+}
+
+.bruecken-island .tb-connection-delete:hover {
+  color: var(--danger);
+}
+
+.bruecken-island .tb-connection-pair {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.bruecken-island .tb-connection-side {
+  flex: 1;
+}
+
+.bruecken-island .tb-connection-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+.bruecken-island .tb-connection-arrow {
+  display: flex;
+  align-items: center;
+  font-size: 20px;
+  color: rgba(155, 89, 182, 0.35);
+  padding: 0 2px;
+  flex-shrink: 0;
+}
+
+.bruecken-island .tb-connection-note {
+  margin-top: 12px;
+  padding: 9px 11px;
+  background: rgba(155, 89, 182, 0.04);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(155, 89, 182, 0.1);
+}
+
+.bruecken-island .tb-connection-note-label {
+  font-size: 10px;
+  color: var(--primary);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+
+.bruecken-island .tb-connection-note-text {
+  color: var(--dark);
+  font-size: 13.5px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Modals ────────────────────────────────────────────── */
+.bruecken-island .tb-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.bruecken-island .tb-modal {
+  background: var(--white);
+  border: 1px solid rgba(155, 89, 182, 0.18);
+  border-radius: var(--radius-lg);
+  padding: 26px;
+  max-width: 460px;
+  width: 90%;
+  box-shadow: var(--shadow-lg), 0 0 40px rgba(155, 89, 182, 0.08);
+}
+
+.bruecken-island .tb-modal.danger {
+  border-color: rgba(231, 76, 60, 0.25);
+}
+
+.bruecken-island .tb-modal-icon {
+  font-size: 34px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.bruecken-island .tb-modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 14px 0;
+}
+
+.bruecken-island .tb-modal-title.gradient {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800;
+}
+
+.bruecken-island .tb-modal-desc {
+  color: rgba(44, 62, 80, 0.55);
+  font-size: 13.5px;
+  margin: 0 0 18px 0;
+  line-height: 1.5;
+}
+
+.bruecken-island .tb-modal-pair {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.bruecken-island .tb-modal-pair-side {
+  flex: 1;
+  min-width: 140px;
+}
+
+.bruecken-island .tb-modal-pair-arrow {
+  display: flex;
+  align-items: center;
+  color: rgba(155, 89, 182, 0.35);
+  font-size: 20px;
+}
+
+.bruecken-island .tb-modal-pair-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+/* Textarea in modal */
+.bruecken-island .tb-modal-textarea {
+  width: 100%;
+  background: var(--light);
+  border: 1px solid rgba(44, 62, 80, 0.1);
+  border-radius: var(--radius-sm);
+  padding: 11px;
+  color: var(--dark);
+  font-size: 14px;
+  resize: none;
+  outline: none;
+  margin-bottom: 8px;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.bruecken-island .tb-modal-textarea:focus {
+  border-color: rgba(155, 89, 182, 0.35);
+}
+
+.bruecken-island .tb-modal-textarea::placeholder {
+  color: rgba(44, 62, 80, 0.35);
+}
+
+/* Prompt helpers */
+.bruecken-island .tb-prompt-helpers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 14px;
+}
+
+.bruecken-island .tb-prompt-btn {
+  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 16px;
+  border: 1px solid rgba(155, 89, 182, 0.18);
+  background: rgba(155, 89, 182, 0.04);
+  color: var(--primary);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.bruecken-island .tb-prompt-btn:hover {
+  background: rgba(155, 89, 182, 0.1);
+  border-color: rgba(155, 89, 182, 0.3);
+}
+
+/* Modal action buttons */
+.bruecken-island .tb-modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.bruecken-island .tb-modal-btn {
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.bruecken-island .tb-modal-btn-cancel {
+  border: 1px solid rgba(44, 62, 80, 0.1);
+  background: none;
+  color: rgba(44, 62, 80, 0.5);
+}
+
+.bruecken-island .tb-modal-btn-secondary {
+  border: 1px solid rgba(155, 89, 182, 0.2);
+  background: rgba(155, 89, 182, 0.05);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.bruecken-island .tb-modal-btn-primary {
+  border: none;
+  background: var(--gradient-primary);
+  color: var(--white);
+  font-weight: 700;
+  box-shadow: 0 0 14px rgba(155, 89, 182, 0.2);
+}
+
+.bruecken-island .tb-modal-btn-primary.disabled {
+  background: rgba(155, 89, 182, 0.12);
+  color: rgba(155, 89, 182, 0.4);
+  cursor: default;
+  box-shadow: none;
+}
+
+.bruecken-island .tb-modal-btn-danger {
+  border: none;
+  background: linear-gradient(135deg, var(--danger), #c0392b);
+  color: var(--white);
+  font-weight: 700;
+  box-shadow: 0 0 14px rgba(231, 76, 60, 0.2);
+}
+
+/* Target pick list in modal */
+.bruecken-island .tb-target-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bruecken-island .tb-target-option {
+  background: var(--light);
+  border: 1px solid rgba(44, 62, 80, 0.08);
+  border-radius: var(--radius-sm);
+  padding: 11px 14px;
+  color: var(--dark);
+  font-size: 14px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.bruecken-island .tb-target-option:hover {
+  background: rgba(155, 89, 182, 0.06);
+  border-color: rgba(155, 89, 182, 0.15);
+}
+
+.bruecken-island .tb-target-option-person {
+  font-size: 11px;
+  margin-left: 8px;
+}
+
+/* ── Column color variants ─────────────────────────────── */
+
+/* Skills (green) */
+.bruecken-island .tb-col-skills .tb-col-header {
+  background: rgba(39, 174, 96, 0.06);
+  border-bottom-color: rgba(39, 174, 96, 0.4);
+}
+.bruecken-island .tb-col-skills .tb-col-title { color: #1e8449; }
+.bruecken-island .tb-col-skills .tb-card {
+  border-color: rgba(39, 174, 96, 0.15);
+  border-left-color: rgba(39, 174, 96, 0.5);
+  background: rgba(39, 174, 96, 0.03);
+}
+.bruecken-island .tb-col-skills .tb-card-input:focus {
+  border-color: rgba(39, 174, 96, 0.4);
+  box-shadow: 0 0 10px rgba(39, 174, 96, 0.1);
+}
+.bruecken-island .tb-col-skills .tb-add-btn.enabled {
+  background: linear-gradient(135deg, var(--success), #2ecc71);
+}
+
+/* Schulthemen (blue) */
+.bruecken-island .tb-col-schulthemen .tb-col-header {
+  background: rgba(52, 152, 219, 0.06);
+  border-bottom-color: rgba(52, 152, 219, 0.4);
+}
+.bruecken-island .tb-col-schulthemen .tb-col-title { color: #2471a3; }
+.bruecken-island .tb-col-schulthemen .tb-card {
+  border-color: rgba(52, 152, 219, 0.15);
+  border-left-color: rgba(52, 152, 219, 0.5);
+  background: rgba(52, 152, 219, 0.03);
+}
+.bruecken-island .tb-col-schulthemen .tb-card-input:focus {
+  border-color: rgba(52, 152, 219, 0.4);
+  box-shadow: 0 0 10px rgba(52, 152, 219, 0.1);
+}
+.bruecken-island .tb-col-schulthemen .tb-add-btn.enabled {
+  background: linear-gradient(135deg, var(--secondary), #5dade2);
+}
+
+/* Probleme (red/warm) */
+.bruecken-island .tb-col-probleme .tb-col-header {
+  background: rgba(231, 76, 60, 0.05);
+  border-bottom-color: rgba(231, 76, 60, 0.35);
+}
+.bruecken-island .tb-col-probleme .tb-col-title { color: #c0392b; }
+.bruecken-island .tb-col-probleme .tb-card {
+  border-color: rgba(231, 76, 60, 0.15);
+  border-left-color: rgba(231, 76, 60, 0.45);
+  background: rgba(231, 76, 60, 0.03);
+}
+.bruecken-island .tb-col-probleme .tb-card-input:focus {
+  border-color: rgba(231, 76, 60, 0.35);
+  box-shadow: 0 0 10px rgba(231, 76, 60, 0.1);
+}
+.bruecken-island .tb-col-probleme .tb-add-btn.enabled {
+  background: linear-gradient(135deg, var(--danger), #e74c3c);
+}
+
+/* ── Responsive ────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .bruecken-island .tb-columns {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .bruecken-island .tb-column {
+    min-width: unset;
+    max-width: unset;
+  }
+
+  .bruecken-island .tb-connection {
+    min-width: unset;
+    flex: 1 1 100%;
+    max-width: unset;
+  }
+
+  .bruecken-island .tb-modal {
+    width: 95%;
+    padding: 20px;
+  }
+
+  .bruecken-island .tb-modal-pair {
+    flex-direction: column;
+  }
+
+  .bruecken-island .tb-modal-pair-arrow {
+    justify-content: center;
+    transform: rotate(90deg);
+  }
+
+  .bruecken-island .tb-connection-pair {
+    flex-direction: column;
+  }
+
+  .bruecken-island .tb-connection-arrow {
+    justify-content: center;
+    transform: rotate(90deg);
+    padding: 4px 0;
+  }
+}

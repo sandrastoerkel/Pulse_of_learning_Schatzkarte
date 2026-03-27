@@ -1,0 +1,1702 @@
+/* ============================================
+   FÄDEN CHALLENGE - STYLES
+   Helllila Theme nach Birkenbihl
+   ============================================ */
+
+.faeden-challenge {
+  --primary: #9c27b0;
+  --primary-dark: #7b1fa2;
+  --primary-light: #ce93d8;
+  --secondary: #e1bee7;
+  --background: linear-gradient(180deg, #f3e5f5 0%, #e1bee7 100%);
+  --white: #ffffff;
+  --dark: #2c3e50;
+  --success: #4caf50;
+  --shadow: 0 4px 12px rgba(0,0,0,0.15);
+  --radius: 16px;
+  
+  font-family: 'Nunito', 'Comic Sans MS', 'Segoe UI', sans-serif;
+  background: var(--background);
+  min-height: 100vh;
+  padding: 1rem;
+  color: var(--dark);
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
+
+.faeden-challenge .challenge-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 1rem;
+}
+
+.faeden-challenge .back-btn {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  color: var(--primary);
+  cursor: pointer;
+  font-weight: 600;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.faeden-challenge .back-btn:hover {
+  background: var(--secondary);
+}
+
+.faeden-challenge .challenge-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--primary-dark);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.faeden-challenge .title-icon {
+  font-size: 1.75rem;
+}
+
+.faeden-challenge .xp-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: linear-gradient(135deg, #ffd700 0%, #ffb300 100%);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 700;
+  color: #5d4e37;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+}
+
+.faeden-challenge .xp-icon {
+  font-size: 1.25rem;
+}
+
+/* ============================================
+   SUBTITLE BAR
+   ============================================ */
+
+.faeden-challenge .subtitle-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.faeden-challenge .subtitle-text {
+  font-size: 0.9rem;
+  color: var(--primary-dark);
+  font-weight: 600;
+}
+
+.faeden-challenge .effect-badge {
+  background: var(--primary);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* ============================================
+   PROGRESS BAR
+   ============================================ */
+
+.faeden-challenge .progress-container {
+  margin-bottom: 1.5rem;
+}
+
+.faeden-challenge .progress-bar {
+  height: 12px;
+  background: rgba(255,255,255,0.5);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.faeden-challenge .progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+  border-radius: 6px;
+  transition: width 0.5s ease-out;
+}
+
+.faeden-challenge .progress-text {
+  display: block;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--primary-dark);
+  margin-top: 0.5rem;
+  font-weight: 600;
+}
+
+/* ============================================
+   XP REWARD POPUP
+   ============================================ */
+
+.faeden-challenge .xp-reward-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(135deg, #ffd700 0%, #ff9800 100%);
+  padding: 2rem 3rem;
+  border-radius: 20px;
+  text-align: center;
+  z-index: 1000;
+  box-shadow: 0 8px 32px rgba(255, 152, 0, 0.4);
+}
+
+.faeden-challenge .xp-reward-amount {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+.faeden-challenge .xp-reward-stars {
+  display: block;
+  font-size: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+/* ============================================
+   STATIONS OVERVIEW
+   ============================================ */
+
+.faeden-challenge .stations-overview {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.faeden-challenge .overview-intro {
+  text-align: center;
+  font-size: 1.1rem;
+  color: var(--dark);
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.faeden-challenge .stations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* ============================================
+   STATION CARD
+   ============================================ */
+
+.faeden-challenge .station-card {
+  position: relative;
+  background: var(--white);
+  border: none;
+  border-radius: var(--radius);
+  padding: 1.5rem 1rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+
+.faeden-challenge .station-card .card-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--station-color, var(--primary));
+}
+
+.faeden-challenge .station-card .station-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.faeden-challenge .station-card .station-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--dark);
+  text-align: center;
+}
+
+.faeden-challenge .station-card .station-description {
+  font-size: 0.8rem;
+  color: #666;
+  text-align: center;
+}
+
+.faeden-challenge .station-card .xp-preview {
+  margin-top: 0.5rem;
+  background: var(--station-color, var(--primary));
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.faeden-challenge .station-card.completed {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+}
+
+.faeden-challenge .station-card .completed-badge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 28px;
+  height: 28px;
+  background: var(--success);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.faeden-challenge .station-card .mission-progress-badge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: var(--primary);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* ============================================
+   BIRKENBIHL QUOTE
+   ============================================ */
+
+.faeden-challenge .birkenbihl-quote {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: var(--shadow);
+  margin-bottom: 1.5rem;
+  border-left: 4px solid var(--primary);
+}
+
+.faeden-challenge .birkenbihl-quote .quote-icon {
+  font-size: 1.5rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.faeden-challenge .birkenbihl-quote blockquote {
+  font-size: 1.1rem;
+  font-style: italic;
+  color: var(--dark);
+  margin: 0 0 0.5rem 0;
+  line-height: 1.5;
+}
+
+.faeden-challenge .birkenbihl-quote cite {
+  font-size: 0.9rem;
+  color: var(--primary-dark);
+  font-weight: 600;
+}
+
+/* ============================================
+   ALL COMPLETE BANNER
+   ============================================ */
+
+.faeden-challenge .all-complete-banner {
+  background: linear-gradient(135deg, #ffd700 0%, #ff9800 100%);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: 0 4px 16px rgba(255, 152, 0, 0.3);
+}
+
+.faeden-challenge .all-complete-banner .banner-icon {
+  font-size: 3rem;
+}
+
+.faeden-challenge .all-complete-banner .banner-text {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+
+.faeden-challenge .certificate-btn {
+  background: white;
+  color: var(--primary-dark);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 20px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.faeden-challenge .certificate-btn:hover {
+  transform: scale(1.05);
+}
+
+/* ============================================
+   STATION CONTAINER
+   ============================================ */
+
+.faeden-challenge .station-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.faeden-challenge .station-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: var(--radius);
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.faeden-challenge .station-back-btn {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.faeden-challenge .station-back-btn:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+.faeden-challenge .station-header-icon {
+  font-size: 2rem;
+}
+
+.faeden-challenge .station-header-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.faeden-challenge .station-content {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+/* ============================================
+   INTRO CONTENT
+   ============================================ */
+
+.faeden-challenge .intro-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.faeden-challenge .intro-card {
+  text-align: center;
+  padding: 1rem;
+}
+
+.faeden-challenge .intro-card .intro-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.faeden-challenge .intro-card h3 {
+  font-size: 1.25rem;
+  color: var(--primary-dark);
+  margin: 0 0 1rem 0;
+}
+
+.faeden-challenge .intro-card p {
+  margin: 0.5rem 0;
+  line-height: 1.5;
+}
+
+.faeden-challenge .rules-card,
+.faeden-challenge .example-card,
+.faeden-challenge .benefits-card,
+.faeden-challenge .mission-preview {
+  background: #f5f5f5;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.faeden-challenge .rules-card h4,
+.faeden-challenge .example-card h4,
+.faeden-challenge .benefits-card h4,
+.faeden-challenge .mission-preview h4 {
+  margin: 0 0 0.75rem 0;
+  color: var(--primary-dark);
+}
+
+.faeden-challenge .rules-card ul,
+.faeden-challenge .benefits-card ul,
+.faeden-challenge .mission-preview ul {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.faeden-challenge .rules-card li,
+.faeden-challenge .benefits-card li,
+.faeden-challenge .mission-preview li {
+  padding: 0.25rem 0;
+  line-height: 1.4;
+}
+
+.faeden-challenge .start-btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 25px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 1rem;
+  box-shadow: 0 4px 12px rgba(156, 39, 176, 0.3);
+}
+
+/* ============================================
+   WORD EXERCISE (Station 1)
+   ============================================ */
+
+.faeden-challenge .word-exercise,
+.faeden-challenge .fact-exercise {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.faeden-challenge .word-counter,
+.faeden-challenge .fact-counter {
+  background: var(--secondary);
+  padding: 0.25rem 1rem;
+  border-radius: 15px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary-dark);
+}
+
+.faeden-challenge .word-card {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  padding: 2rem 3rem;
+  border-radius: var(--radius);
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(156, 39, 176, 0.3);
+}
+
+.faeden-challenge .word-card .word-icon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.faeden-challenge .word-card .word-text {
+  font-size: 1.75rem;
+  font-weight: 800;
+}
+
+.faeden-challenge .word-hint {
+  font-size: 0.9rem;
+  color: #666;
+  text-align: center;
+  font-style: italic;
+}
+
+.faeden-challenge .association-input-container,
+.faeden-challenge .thought-input-container {
+  width: 100%;
+}
+
+.faeden-challenge .association-input-container label,
+.faeden-challenge .thought-input-container label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--dark);
+}
+
+.faeden-challenge .association-input,
+.faeden-challenge .thought-input,
+.faeden-challenge .reflection-input {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid var(--secondary);
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: none;
+  transition: border-color 0.2s;
+}
+
+.faeden-challenge .association-input:focus,
+.faeden-challenge .thought-input:focus,
+.faeden-challenge .reflection-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.faeden-challenge .next-btn,
+.faeden-challenge .complete-btn,
+.faeden-challenge .complete-day-btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 1rem;
+  box-shadow: 0 4px 12px rgba(156, 39, 176, 0.3);
+}
+
+.faeden-challenge .next-btn:disabled,
+.faeden-challenge .complete-btn:disabled,
+.faeden-challenge .complete-day-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ============================================
+   RECALL PHASE
+   ============================================ */
+
+.faeden-challenge .recall-phase {
+  text-align: center;
+}
+
+.faeden-challenge .recall-header {
+  margin-bottom: 1.5rem;
+}
+
+.faeden-challenge .recall-header .recall-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.faeden-challenge .recall-header h3 {
+  margin: 0;
+  color: var(--primary-dark);
+}
+
+.faeden-challenge .recall-hint {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.faeden-challenge .recall-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.faeden-challenge .recall-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.faeden-challenge .recall-input {
+  width: 100%;
+  padding: 0.75rem 2.5rem 0.75rem 1rem;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  background: white;
+}
+
+.faeden-challenge .recall-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.2);
+}
+
+.faeden-challenge .recall-input.correct {
+  border-color: #4caf50;
+  background: #e8f5e9;
+}
+
+.faeden-challenge .correct-mark {
+  position: absolute;
+  right: 0.75rem;
+  color: #4caf50;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.faeden-challenge .recall-result {
+  background: #f5f5f5;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+
+.faeden-challenge .recall-result .result-count {
+  font-size: 1.25rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.faeden-challenge .recall-result .result-success {
+  color: var(--success);
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+}
+
+.faeden-challenge .recall-result .result-explanation {
+  font-size: 0.95rem;
+  color: #555;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ============================================
+   QUIZ PHASE (Gedankenjagd)
+   ============================================ */
+
+.faeden-challenge .quiz-phase {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.faeden-challenge .quiz-header {
+  text-align: center;
+}
+
+.faeden-challenge .quiz-header .quiz-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.faeden-challenge .quiz-header h3 {
+  margin: 0 0 0.5rem 0;
+  color: var(--primary);
+}
+
+.faeden-challenge .quiz-header p {
+  margin: 0;
+  color: #555;
+}
+
+.faeden-challenge .quiz-hint {
+  font-size: 0.9rem;
+  color: #888;
+  font-style: italic;
+}
+
+.faeden-challenge .quiz-questions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.faeden-challenge .quiz-fact-group {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.faeden-challenge .quiz-fact-header {
+  text-align: center;
+  margin-bottom: 0.75rem;
+}
+
+.faeden-challenge .quiz-fact-icon {
+  font-size: 2rem;
+}
+
+.faeden-challenge .quiz-question-item {
+  margin-bottom: 0.75rem;
+}
+
+.faeden-challenge .quiz-question-item:last-of-type {
+  margin-bottom: 0;
+}
+
+.faeden-challenge .quiz-question-text {
+  display: block;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.faeden-challenge .quiz-answer-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.faeden-challenge .quiz-answer-input {
+  width: 100%;
+  padding: 0.75rem 2.5rem 0.75rem 1rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.faeden-challenge .quiz-answer-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.2);
+}
+
+.faeden-challenge .quiz-answer-input.correct {
+  border-color: #4caf50;
+  background: #e8f5e9;
+}
+
+.faeden-challenge .your-thought {
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: #f3e5f5;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #7b1fa2;
+}
+
+.faeden-challenge .your-thought .thought-label {
+  font-weight: 600;
+}
+
+.faeden-challenge .quiz-result {
+  background: #f5f5f5;
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  width: 100%;
+}
+
+.faeden-challenge .quiz-result .result-count {
+  font-size: 1.25rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.faeden-challenge .quiz-result .result-success {
+  color: var(--success);
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+}
+
+.faeden-challenge .quiz-result .result-explanation {
+  font-size: 0.95rem;
+  color: #555;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ============================================
+   CHECKER JULIAN STATION
+   ============================================ */
+
+.faeden-challenge .checker-station .video-phase {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.faeden-challenge .prepare-card {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border: 2px solid #ff9800;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  text-align: center;
+  width: 100%;
+}
+
+.faeden-challenge .prepare-card h4 {
+  margin: 0 0 0.75rem 0;
+  color: #e65100;
+  font-size: 1.1rem;
+}
+
+.faeden-challenge .prepare-card p {
+  margin: 0.25rem 0;
+  font-size: 1rem;
+}
+
+.faeden-challenge .video-with-instructions {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  align-items: flex-start;
+}
+
+.faeden-challenge .video-side {
+  flex: 1;
+  min-width: 0;
+}
+
+.faeden-challenge .video-container {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.faeden-challenge .video-container iframe {
+  display: block;
+}
+
+.faeden-challenge .video-duration {
+  color: #666;
+  font-size: 0.85rem;
+  margin: 0.5rem 0 0 0;
+  text-align: center;
+}
+
+.faeden-challenge .writing-instructions {
+  flex: 0 0 160px;
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border: 2px solid #4caf50;
+  border-radius: 12px;
+  padding: 0.75rem;
+}
+
+.faeden-challenge .writing-header {
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.faeden-challenge .writing-icon {
+  font-size: 1.5rem;
+}
+
+.faeden-challenge .writing-header h4 {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.9rem;
+  color: #2e7d32;
+}
+
+.faeden-challenge .writing-instructions p {
+  margin: 0.5rem 0;
+  font-size: 0.8rem;
+  line-height: 1.3;
+}
+
+.faeden-challenge .writing-instructions ul {
+  margin: 0.5rem 0;
+  padding-left: 1rem;
+  font-size: 0.75rem;
+}
+
+.faeden-challenge .writing-instructions li {
+  margin: 0.25rem 0;
+  color: #555;
+}
+
+.faeden-challenge .writing-warning {
+  background: #fff3e0;
+  border-radius: 6px;
+  padding: 0.4rem;
+  font-size: 0.7rem;
+  text-align: center;
+  color: #e65100;
+  font-weight: 600;
+}
+
+@media (max-width: 500px) {
+  .faeden-challenge .video-with-instructions {
+    flex-direction: column;
+  }
+
+  .faeden-challenge .writing-instructions {
+    flex: none;
+    width: 100%;
+  }
+}
+
+.faeden-challenge .thoughts-examples p {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+}
+
+.faeden-challenge .thoughts-input.large {
+  width: 100%;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.faeden-challenge .checker-questions {
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.faeden-challenge .checker-questions .quiz-question-item {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.faeden-challenge .checker-questions .quiz-question-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.faeden-challenge .checker-questions .quiz-question-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.faeden-challenge .checker-questions .quiz-question-text {
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+/* Checker Julian Quiz Result Comparison */
+.faeden-challenge .checker-result h4 {
+  margin: 0 0 1rem 0;
+  text-align: center;
+  color: var(--primary-dark);
+}
+
+.faeden-challenge .result-comparison {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.faeden-challenge .comparison-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.faeden-challenge .comparison-label {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.faeden-challenge .comparison-row.yours .comparison-label {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.faeden-challenge .comparison-bar-container {
+  position: relative;
+  height: 24px;
+  background: #e0e0e0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.faeden-challenge .comparison-bar {
+  height: 100%;
+  border-radius: 12px;
+}
+
+.faeden-challenge .comparison-bar.average {
+  background: linear-gradient(90deg, #bdbdbd 0%, #9e9e9e 100%);
+}
+
+.faeden-challenge .comparison-bar.yours {
+  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+}
+
+.faeden-challenge .comparison-percent {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.faeden-challenge .comparison-value {
+  font-size: 0.8rem;
+  color: #888;
+  text-align: right;
+}
+
+.faeden-challenge .wow-banner {
+  background: linear-gradient(135deg, #ffd54f 0%, #ffb300 100%);
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.faeden-challenge .wow-banner .wow-icon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.faeden-challenge .wow-banner p {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #5d4037;
+}
+
+.faeden-challenge .result-hint {
+  background: #fff3e0;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #e65100;
+  margin: 0.5rem 0;
+}
+
+/* ============================================
+   FACT CARD (Station 2)
+   ============================================ */
+
+.faeden-challenge .fact-card {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  text-align: center;
+  width: 100%;
+  box-shadow: 0 8px 24px rgba(156, 39, 176, 0.3);
+}
+
+.faeden-challenge .fact-card .fact-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.faeden-challenge .fact-card .fact-text {
+  font-size: 1.1rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ============================================
+   WORKSHEET (Station 3)
+   ============================================ */
+
+.faeden-challenge .worksheet-simulation {
+  max-width: 100%;
+}
+
+.faeden-challenge .worksheet-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.faeden-challenge .worksheet-header .worksheet-icon {
+  font-size: 2rem;
+}
+
+.faeden-challenge .worksheet-header h3 {
+  margin: 0.5rem 0;
+  color: var(--primary-dark);
+}
+
+.faeden-challenge .worksheet-instruction {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0;
+}
+
+.faeden-challenge .worksheet-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.faeden-challenge .worksheet-section {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.75rem;
+  background: #f9f9f9;
+  padding: 1rem;
+  border-radius: 12px;
+  border-left: 4px solid var(--primary);
+}
+
+.faeden-challenge .section-text p {
+  margin: 0;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+.faeden-challenge .section-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  min-width: 150px;
+}
+
+.faeden-challenge .pencil-indicator {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.faeden-challenge .pencil-note-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 2px dashed var(--secondary);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-family: 'Comic Sans MS', cursive;
+  background: #fffef0;
+  resize: none;
+}
+
+.faeden-challenge .pencil-note-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.faeden-challenge .worksheet-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: #fff3e0;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+
+.faeden-challenge .worksheet-tip .tip-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.faeden-challenge .worksheet-tip p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+/* ============================================
+   MISSION TRACKER (Station 4)
+   ============================================ */
+
+.faeden-challenge .mission-tracker {
+  text-align: center;
+}
+
+.faeden-challenge .mission-header {
+  margin-bottom: 1.5rem;
+}
+
+.faeden-challenge .mission-header .mission-ship {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.faeden-challenge .mission-header h3 {
+  margin: 0;
+  color: var(--primary-dark);
+}
+
+.faeden-challenge .mission-status {
+  font-size: 0.95rem;
+  color: #666;
+  margin: 0.5rem 0 0 0;
+}
+
+.faeden-challenge .preview-mode-badge {
+  display: inline-block;
+  margin-top: 0.75rem;
+  padding: 0.4rem 0.75rem;
+  background: linear-gradient(135deg, #42a5f5 0%, #1976d2 100%);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: white;
+}
+
+.faeden-challenge .days-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.faeden-challenge .day-card {
+  position: relative;
+  background: var(--white);
+  border: 2px solid var(--secondary);
+  border-radius: 12px;
+  padding: 1rem 0.5rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  transition: all 0.2s;
+}
+
+.faeden-challenge .day-card .day-icon {
+  font-size: 1.75rem;
+}
+
+.faeden-challenge .day-card .day-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--dark);
+}
+
+.faeden-challenge .day-card .day-number {
+  font-size: 0.7rem;
+  color: #888;
+}
+
+.faeden-challenge .day-card.completed {
+  background: #e8f5e9;
+  border-color: var(--success);
+}
+
+.faeden-challenge .day-card.current {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.2);
+}
+
+.faeden-challenge .day-card.future {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.faeden-challenge .day-card .day-check {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  background: var(--success);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.faeden-challenge .day-card .current-indicator {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--primary);
+  color: white;
+  padding: 0.15rem 0.5rem;
+  border-radius: 8px;
+  font-size: 0.6rem;
+  font-weight: 700;
+}
+
+.faeden-challenge .day-card .lock-indicator {
+  font-size: 1rem;
+  position: absolute;
+  bottom: 0.25rem;
+  right: 0.25rem;
+}
+
+/* ============================================
+   DAY DETAIL
+   ============================================ */
+
+.faeden-challenge .day-detail {
+  text-align: left;
+}
+
+.faeden-challenge .day-back-btn {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  margin-bottom: 1rem;
+}
+
+.faeden-challenge .day-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.faeden-challenge .day-header .day-big-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.faeden-challenge .day-header h3 {
+  margin: 0;
+  color: var(--primary-dark);
+}
+
+.faeden-challenge .day-task-card {
+  background: #f5f5f5;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.faeden-challenge .day-task-card h4 {
+  margin: 0 0 0.5rem 0;
+  color: var(--primary-dark);
+}
+
+.faeden-challenge .day-task-card p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.faeden-challenge .reflection-section {
+  margin-bottom: 1rem;
+}
+
+.faeden-challenge .reflection-section label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--dark);
+}
+
+.faeden-challenge .already-complete {
+  text-align: center;
+  padding: 1rem;
+  background: #e8f5e9;
+  border-radius: 12px;
+}
+
+.faeden-challenge .already-complete .check-icon {
+  font-size: 2rem;
+  color: var(--success);
+}
+
+.faeden-challenge .already-complete p {
+  margin: 0.5rem 0 0 0;
+}
+
+.faeden-challenge .already-complete .complete-date {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.faeden-challenge .mission-complete-banner {
+  background: linear-gradient(135deg, #ffd700 0%, #ff9800 100%);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  text-align: center;
+  color: white;
+}
+
+.faeden-challenge .mission-complete-banner .complete-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.faeden-challenge .mission-complete-banner p {
+  margin: 0;
+  font-weight: 600;
+}
+
+.faeden-challenge .mission-complete-banner .bonus-xp {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin-top: 0.5rem;
+}
+
+/* ============================================
+   CERTIFICATE
+   ============================================ */
+
+.faeden-challenge .certificate-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.faeden-challenge .certificate-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.faeden-challenge .download-btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.faeden-challenge .download-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.faeden-challenge .certificate {
+  background: white;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.faeden-challenge .certificate-border {
+  border: 8px solid var(--primary);
+  border-radius: var(--radius);
+  padding: 4px;
+  background: linear-gradient(45deg, var(--primary), var(--primary-light), var(--primary));
+}
+
+.faeden-challenge .certificate-inner {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.faeden-challenge .certificate-header .certificate-icon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.faeden-challenge .certificate-header .certificate-title {
+  font-size: 2rem;
+  color: var(--primary-dark);
+  margin: 0;
+}
+
+.faeden-challenge .certificate-header .certificate-subtitle {
+  font-size: 1rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.faeden-challenge .certificate-body {
+  margin: 2rem 0;
+}
+
+.faeden-challenge .certificate-body .certificate-text {
+  font-size: 1rem;
+  color: #666;
+  margin: 0;
+}
+
+.faeden-challenge .certificate-body .certificate-name-line {
+  font-size: 1.5rem;
+  color: var(--dark);
+  margin: 1rem 0;
+  font-style: italic;
+}
+
+.faeden-challenge .certificate-body .certificate-achievement {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 1rem 0;
+}
+
+.faeden-challenge .certificate-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1.5rem 0;
+}
+
+.faeden-challenge .cert-badge {
+  background: var(--secondary);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary-dark);
+}
+
+.faeden-challenge .certificate-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.faeden-challenge .certificate-stats .stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.faeden-challenge .certificate-stats .stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+.faeden-challenge .certificate-stats .stat-label {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.faeden-challenge .certificate-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.faeden-challenge .certificate-date,
+.faeden-challenge .certificate-signature {
+  text-align: center;
+}
+
+.faeden-challenge .date-label,
+.faeden-challenge .signature-label {
+  display: block;
+  font-size: 0.75rem;
+  color: #888;
+  text-transform: uppercase;
+}
+
+.faeden-challenge .date-value {
+  font-weight: 600;
+  color: var(--dark);
+}
+
+.faeden-challenge .signature-line {
+  display: block;
+  color: var(--dark);
+  margin-bottom: 0.25rem;
+}
+
+.faeden-challenge .certificate-quote {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.faeden-challenge .certificate-quote blockquote {
+  font-style: italic;
+  color: #666;
+  margin: 0;
+}
+
+.faeden-challenge .certificate-quote cite {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--primary);
+}
+
+/* ============================================
+   CONFETTI
+   ============================================ */
+
+.faeden-challenge .confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 999;
+  overflow: hidden;
+}
+
+.faeden-challenge .confetti-piece {
+  position: absolute;
+  top: 0;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 600px) {
+  .faeden-challenge .challenge-title {
+    font-size: 1.1rem;
+  }
+  
+  .faeden-challenge .stations-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .faeden-challenge .days-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .faeden-challenge .worksheet-section {
+    grid-template-columns: 1fr;
+  }
+  
+  .faeden-challenge .section-note {
+    min-width: auto;
+  }
+  
+  .faeden-challenge .certificate-stats {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .faeden-challenge .certificate-footer {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}

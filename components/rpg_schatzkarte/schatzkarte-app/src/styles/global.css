@@ -1,0 +1,58 @@
+/* ============================================================
+ * Schatzkarte — Global Styles
+ * 
+ * Die bestehenden CSS-Dateien aus styles/ werden in Phase 4
+ * hierher migriert. Aktuell: nur Reset und CSS-Variablen.
+ * ============================================================ */
+
+:root {
+  /* Schatzkarte Farbpalette */
+  --sk-gold: #c8a84e;
+  --sk-gold-light: #e8d48e;
+  --sk-blue-dark: #0a1628;
+  --sk-blue-mid: #1a2744;
+  --sk-blue-light: #2a3754;
+  --sk-text-primary: #e8e0d0;
+  --sk-text-secondary: #8899aa;
+  --sk-accent-green: #4ade80;
+  --sk-accent-red: #ef4444;
+  
+  /* Fonts */
+  --sk-font-primary: 'Nunito', sans-serif;
+  --sk-font-serif: 'Lora', serif;
+}
+
+/* Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: var(--sk-font-primary);
+  color: var(--sk-text-primary);
+  background: var(--sk-blue-dark);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--sk-blue-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--sk-blue-light);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--sk-gold);
+}
