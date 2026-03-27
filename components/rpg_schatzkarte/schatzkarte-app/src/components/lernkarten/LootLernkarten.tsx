@@ -1,6 +1,20 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from 'framer-motion';
 import '@/styles/loot-lernkarten.css';
+import {
+  useLernkartenDecks,
+  useLernkartenCards,
+  useCreateDeck,
+  useRenameDeck as useRenameDeckMutation,
+  useDeleteDeck as useDeleteDeckMutation,
+  useAddCard as useAddCardMutation,
+  useAddCardsBulk,
+  useDeleteCard as useDeleteCardMutation,
+  useReviewCard,
+  useLernkartenDueCount,
+  type LernkartenCard,
+  type LernkartenDeck as LernkartenDeckDB,
+} from '@/hooks';
 
 // Tesseract.js wird via CDN geladen
 declare const Tesseract: {
@@ -155,6 +169,20 @@ function isDue(card: Lernkarte): boolean {
   return new Date(card.nextReview) <= new Date();
 }
 
+// ─── DB ↔ Internal Type Mappers ─────────────────────────────
+function dbDeckToInternal(d: LernkartenDeckDB): LernkartenDeck {
+  return { id: d.id, subjectId: d.subject_id, name: d.name, createdAt: d.created_at };
+}
+
+function dbCardToInternal(c: LernkartenCard): Lernkarte {
+  return {
+    id: c.id, deckId: c.deck_id, front: c.front, back: c.back,
+    interval: c.interval_days, repetitions: c.repetitions,
+    easeFactor: c.ease_factor, nextReview: c.next_review,
+    lastReview: c.last_review, reviewCount: c.review_count,
+  };
+}
+
 // ─── TEXT PARSER ────────────────────────────────────────────
 function parseText(text: string): { front: string; back: string }[] {
   const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
@@ -169,26 +197,6 @@ function parseText(text: string): { front: string; back: string }[] {
     if (i > 0) return { front: l.slice(0, i).trim(), back: l.slice(i + best.length).trim() };
     return null;
   }).filter((x): x is { front: string; back: string } => x !== null);
-}
-
-// ─── SAMPLE DATA ────────────────────────────────────────────
-function getSampleData(): { decks: LernkartenDeck[]; cards: Lernkarte[] } {
-  const decks: LernkartenDeck[] = [
-    { id: "d1", subjectId: "eng", name: "Unit 3 – Vocabulary", createdAt: new Date().toISOString() },
-    { id: "d2", subjectId: "lat", name: "Lektion 12 – Verben", createdAt: new Date().toISOString() },
-  ];
-  const cards: Lernkarte[] = [
-    createCard("d1", "ubiquitous", "allgegenwärtig"),
-    createCard("d1", "serendipity", "glücklicher Zufall"),
-    createCard("d1", "ephemeral", "vergänglich, kurzlebig"),
-    createCard("d1", "to accomplish", "erreichen, vollbringen"),
-    createCard("d1", "resilient", "widerstandsfähig"),
-    createCard("d2", "amare", "lieben"),
-    createCard("d2", "videre", "sehen"),
-    createCard("d2", "audire", "hören"),
-    createCard("d2", "scribere", "schreiben"),
-  ];
-  return { decks, cards };
 }
 
 // ─── SVG ICONS ──────────────────────────────────────────────
@@ -1541,10 +1549,17 @@ interface LootLernkartenProps {
 }
 
 export function LootLernkarten({ isOpen, onClose, onXPEarned, onCoinsEarned }: LootLernkartenProps) {
-  const sample = useMemo(() => getSampleData(), []);
-  const [decks, setDecks] = useState<LernkartenDeck[]>(sample.decks);
-  const [cards, setCards] = useState<Lernkarte[]>(sample.cards);
-  const [coins, setCoins] = useState(50);
+  // ── Supabase Data ──
+  const { data: dbDecks = [], isLoading: decksLoading } = useLernkartenDecks();
+  const { data: dbAllCards = [] } = useLernkartenCards(null);
+  const { data: dueCount = 0 } = useLernkartenDueCount();
+
+  // Map DB types → internal types (component uses camelCase)
+  const decks = useMemo(() => dbDecks.map(dbDeckToInternal), [dbDecks]);
+  const cards = useMemo(() => dbAllCards.map(dbCardToInternal), [dbAllCards]);
+
+  // UI-only state (not persisted)
+  const [coins, setCoins] = useState(0);
   const [streak, setStreak] = useState(1);
   const [studiedToday, setStudiedToday] = useState(false);
 
@@ -1553,40 +1568,50 @@ export function LootLernkarten({ isOpen, onClose, onXPEarned, onCoinsEarned }: L
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
   const [selectedDeck, setSelectedDeck] = useState<string | null>(null);
 
-  // ── Actions ──
+  // ── Mutations ──
+  const createDeckMutation = useCreateDeck();
+  const renameDeckMutation = useRenameDeckMutation();
+  const deleteDeckMutation = useDeleteDeckMutation();
+  const addCardMutation = useAddCardMutation();
+  const addCardsBulkMutation = useAddCardsBulk();
+  const deleteCardMutation = useDeleteCardMutation();
+  const reviewCardMutation = useReviewCard();
+
+  // ── Actions (same API as before, but backed by Supabase) ──
   const addDeck = useCallback((subjectId: string, name: string) => {
-    setDecks(prev => [...prev, { id: uid(), subjectId, name, createdAt: new Date().toISOString() }]);
-  }, []);
+    createDeckMutation.mutate({ subjectId, name });
+  }, [createDeckMutation]);
 
   const renameDeck = useCallback((deckId: string, newName: string) => {
-    setDecks(prev => prev.map(d => d.id === deckId ? { ...d, name: newName } : d));
-  }, []);
+    renameDeckMutation.mutate({ deckId, name: newName });
+  }, [renameDeckMutation]);
 
   const deleteDeck = useCallback((deckId: string) => {
-    setDecks(prev => prev.filter(d => d.id !== deckId));
-    setCards(prev => prev.filter(c => c.deckId !== deckId));
-  }, []);
+    deleteDeckMutation.mutate(deckId);
+  }, [deleteDeckMutation]);
 
   const addCard = useCallback((deckId: string, front: string, back: string) => {
-    setCards(prev => [...prev, createCard(deckId, front, back)]);
-  }, []);
+    addCardMutation.mutate({ deckId, front, back });
+  }, [addCardMutation]);
 
   const addCards = useCallback((deckId: string, pairs: { front: string; back: string }[]) => {
-    const newCards = pairs.map(p => createCard(deckId, p.front, p.back));
-    setCards(prev => [...prev, ...newCards]);
-  }, []);
+    addCardsBulkMutation.mutate({ deckId, pairs });
+  }, [addCardsBulkMutation]);
 
   const deleteCard = useCallback((cardId: string) => {
-    setCards(prev => prev.filter(c => c.id !== cardId));
-  }, []);
+    const card = cards.find(c => c.id === cardId);
+    deleteCardMutation.mutate({ cardId, deckId: card?.deckId ?? '' });
+  }, [deleteCardMutation, cards]);
 
   const reviewCard = useCallback((cardId: string, quality: number, coinsEarned: number) => {
-    setCards(prev => prev.map(c => c.id === cardId ? sm2(c, quality) : c));
+    const dbCard = dbAllCards.find(c => c.id === cardId);
+    if (dbCard) {
+      reviewCardMutation.mutate({ card: dbCard, quality });
+    }
     if (coinsEarned > 0) {
       setCoins(prev => prev + coinsEarned);
       onCoinsEarned?.(coinsEarned);
     }
-    // XP basierend auf Qualität
     const xp = quality >= 4 ? 15 : quality >= 3 ? 10 : 5;
     onXPEarned?.(xp);
 
@@ -1594,7 +1619,7 @@ export function LootLernkarten({ isOpen, onClose, onXPEarned, onCoinsEarned }: L
       setStreak(prev => prev + 1);
       setStudiedToday(true);
     }
-  }, [studiedToday, onCoinsEarned, onXPEarned]);
+  }, [dbAllCards, reviewCardMutation, studiedToday, onCoinsEarned, onXPEarned]);
 
   // ── Study all due cards ──
   const handleStudyAllDue = () => {
@@ -1612,8 +1637,8 @@ export function LootLernkarten({ isOpen, onClose, onXPEarned, onCoinsEarned }: L
   // ── Render ──
   const currentDeck = decks.find(d => d.id === selectedDeck);
 
-  // Calculate due count for badge
-  const dueCount = cards.filter(isDue).length;
+  // Calculate due count for badge (local, from mapped cards)
+  const localDueCount = cards.filter(isDue).length;
 
   if (!isOpen) return null;
 

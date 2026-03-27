@@ -34,6 +34,7 @@ import {
   HattieWaageIcon,
   PolarsternIcon,
   LootIcon,
+  DenkariumIcon,
   BaseCampIcon,
   FestungIcon,
   WerkzeugeIcon,
@@ -328,7 +329,7 @@ const QuestMarker: React.FC<QuestMarkerProps> = ({
 
 // Schwimmendes Schiff — DIRECT: JSX 1:1 aus altem Code
 interface FloatingShipProps {
-  type: 'bandura' | 'hattie' | 'polarstern' | 'loot';
+  type: 'bandura' | 'hattie' | 'polarstern' | 'loot' | 'denkarium';
   onClick?: () => void;
   badge?: number;
 }
@@ -354,6 +355,11 @@ const FloatingShip: React.FC<FloatingShipProps> = ({ type, onClick, badge }) => 
       label: 'Lernkarten',
       title: 'Dein Loot: Lernkarten mit Spaced Repetition',
       duration: 3.2,
+    },
+    denkarium: {
+      label: 'Denkarium',
+      title: 'Denkarium: Dein Gehirn-Fitnessstudio',
+      duration: 3.4,
     },
   };
 
@@ -382,6 +388,7 @@ const FloatingShip: React.FC<FloatingShipProps> = ({ type, onClick, badge }) => 
         {type === 'hattie' && <HattieWaageIcon size={56} animated={true} glowing={true} />}
         {type === 'polarstern' && <PolarsternIcon size={64} animated={true} glowing={true} />}
         {type === 'loot' && <LootIcon size={56} animated={true} glowing={true} />}
+        {type === 'denkarium' && <DenkariumIcon size={56} animated={true} glowing={true} />}
       </div>
       <div className="ship-label">{shipConfig.label}</div>
       {badge !== undefined && badge > 0 && (
@@ -700,8 +707,12 @@ export function WorldMapIllustrated() {
           />
           <FloatingShip
             type="loot"
-            onClick={() => navigate('/karte/denkarium')}
+            onClick={() => navigate('/karte/lernkarten')}
             badge={lootDueCount}             /* COMPUTED: from useDueWords */
+          />
+          <FloatingShip
+            type="denkarium"
+            onClick={() => navigate('/karte/denkarium')}
           />
 
           {/* TODO: Tagebuch-Widget entfernt — tagebuchEntries nicht in Hooks verfügbar.

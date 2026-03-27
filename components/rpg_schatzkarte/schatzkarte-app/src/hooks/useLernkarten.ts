@@ -153,22 +153,29 @@ export function useDeleteDeck() {
 
 // ─── Card Hooks ──────────────────────────────────────────────────────────────
 
-export function useLernkartenCards(deckId: string | null | undefined) {
-  return useQuery({
-    queryKey: ['lernkarten-cards', deckId],
-    queryFn: async () => {
-      if (!deckId) return [];
+export function useLernkartenCards(deckId?: string | null) {
+  const userId = useLegacyUserId();
 
-      const { data, error } = await supabase
+  return useQuery({
+    queryKey: ['lernkarten-cards', userId, deckId],
+    queryFn: async () => {
+      if (!userId) return [];
+
+      let query = supabase
         .from('lernkarten_cards')
         .select('*')
-        .eq('deck_id', deckId)
+        .eq('user_id', userId)
         .order('created_at', { ascending: true });
 
+      if (deckId) {
+        query = query.eq('deck_id', deckId);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       return (data ?? []) as LernkartenCard[];
     },
-    enabled: !!deckId,
+    enabled: !!userId,
   });
 }
 

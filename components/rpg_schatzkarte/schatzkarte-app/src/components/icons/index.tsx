@@ -47,3 +47,4 @@ export const GoldenKeyIcon = makeStubIcon('🔑', 'Goldener Schlüssel');
 export const HattieWaageIcon = makeStubIcon('⚖️', 'Hattie-Waage');
 export const PolarsternIcon = makeStubIcon('⭐', 'Polarstern');
 export const LootIcon = makeStubIcon('🎴', 'Loot');
+export const DenkariumIcon = makeStubIcon('🧩', 'Denkarium');
