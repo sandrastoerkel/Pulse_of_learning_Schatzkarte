@@ -5,6 +5,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { useLegacyUserId } from './useLegacyUserId';
+import { useAuth } from '../contexts/AuthContext';
+import { useAwardXP } from './useAwardXP';
+import { XP_REWARDS } from '../config/xpRewards';
 import type { IslandProgress, IslandAction } from '../types/database';
 
 // ─── Query: Alle Insel-Fortschritte laden ───────────────────────────────────
@@ -63,6 +66,8 @@ interface CompleteActionParams {
 export function useCompleteIslandAction() {
   const legacyId = useLegacyUserId();
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
+  const { awardXP } = useAwardXP();
 
   return useMutation({
     mutationFn: async ({ islandId, action, quizScore }: CompleteActionParams) => {
@@ -116,9 +121,13 @@ export function useCompleteIslandAction() {
         if (error) throw error;
       }
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       // Cache invalidieren → Karte wird neu gerendert
       queryClient.invalidateQueries({ queryKey: ['island_progress', legacyId] });
+      // XP vergeben (wie map_db.py:198-203)
+      if (profile?.id) {
+        awardXP(profile.id, XP_REWARDS[variables.action]);
+      }
     },
   });
 }

@@ -16,7 +16,7 @@ import './runner-game.css';
 
 interface RunnerGameProps {
   playerXP: number;
-  playerGold: number;
+  playerGold?: number;
   playerAvatar: CustomAvatar;
   playerAgeGroup: 'grundschule' | 'unterstufe' | 'mittelstufe';
   onGameEnd: (result: GameResult) => void;
@@ -225,7 +225,7 @@ const TouchControls: React.FC<{
 
 export const RunnerGame: React.FC<RunnerGameProps> = ({
   playerXP,
-  playerGold,
+  playerGold = 0,
   playerAvatar,
   playerAgeGroup,
   onGameEnd,

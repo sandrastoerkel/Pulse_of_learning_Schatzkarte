@@ -63,7 +63,7 @@ const createCards = (pairCount: number): MemoryCardType[] => {
 
 const MemoryGame: React.FC<MemoryGameProps> = ({
   playerXP,
-  playerGold,
+  playerGold = 0,
   playerAvatar,
   onGameEnd,
   onClose

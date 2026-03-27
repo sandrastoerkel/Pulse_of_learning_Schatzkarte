@@ -3,7 +3,7 @@
 
 import { useMemo } from 'react';
 import { WorldMapIllustrated } from '@/components/WorldMapIllustrated';
-import { HeroStatus } from '@/components/HeroStatus';
+import { TopBarHUD } from '@/components/TopBarHUD';
 import FloatingChatWidget from '@/components/chat/FloatingChatWidget';
 import FloatingJitsiWidget from '@/components/video/FloatingJitsiWidget';
 import type { MeetingData } from '@/components/video/FloatingJitsiWidget';
@@ -67,7 +67,7 @@ export default function SchatzkartePage() {
 
   return (
     <>
-      <HeroStatus />
+      <TopBarHUD />
       <WorldMapIllustrated />
 
       {myGroup && (

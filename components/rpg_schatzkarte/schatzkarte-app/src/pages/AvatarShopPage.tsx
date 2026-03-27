@@ -3,10 +3,11 @@
 
 import { useNavigate } from 'react-router-dom';
 import AvatarShop from '@/components/AvatarShop/AvatarShop';
+import { useHeroData } from '@/hooks';
 import { DEFAULT_AVATAR_VISUALS, DEFAULT_AVATAR_EQUIPPED } from '@/components/AvatarParts';
 import type { CustomAvatar, ShopItem, ItemSlot } from '@/types/legacy-ui';
 
-// TODO: Aus Supabase laden (usePlayerProfile Hook)
+// TODO: Avatar aus useAvatarPersistence laden
 const DEFAULT_AVATAR: CustomAvatar = {
   visuals: DEFAULT_AVATAR_VISUALS,
   equipped: DEFAULT_AVATAR_EQUIPPED,
@@ -16,14 +17,15 @@ const DEFAULT_AVATAR: CustomAvatar = {
 
 export default function AvatarShopPage() {
   const navigate = useNavigate();
+  const heroData = useHeroData();
 
-  // TODO: Echte Daten aus Supabase
-  const playerGold = 500;
+  // XP als Währung (Gold entfernt)
+  const playerXP = heroData?.xp ?? 0;
   const ownedItems: string[] = [];
 
   return (
     <AvatarShop
-      playerGold={playerGold}
+      playerGold={playerXP}
       playerAvatar={DEFAULT_AVATAR}
       ownedItems={ownedItems}
       onPurchase={(item: ShopItem) => console.log('[AvatarShop] Purchase:', item.id)}

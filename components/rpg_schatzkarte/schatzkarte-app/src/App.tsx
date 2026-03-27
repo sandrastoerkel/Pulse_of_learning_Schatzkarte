@@ -51,6 +51,19 @@ const AvatarShopPage = React.lazy(() => import('@/pages/AvatarShopPage'));
 // Coach-Bereich (nur für Coaches)
 const CoachDashboard = React.lazy(() => import('@/pages/coach/CoachDashboard'));
 
+// Einladungs-Annahme (öffentlich)
+const EinladungPage = React.lazy(() => import('@/pages/EinladungPage'));
+
+// ============================================================
+// SmartRedirect — Root-Route: eingeloggt → /karte, sonst → /login
+// ============================================================
+
+function SmartRedirect() {
+  const { user, initialized } = useAuth();
+  if (!initialized) return <LoadingScreen />;
+  return <Navigate to={user ? '/karte' : '/login'} replace />;
+}
+
 // ============================================================
 // MustChangePasswordGuard — fängt migrierte User ab
 // ============================================================
@@ -75,8 +88,9 @@ export default function App() {
     <Suspense fallback={<LoadingScreen />}>
       <Routes>
         {/* Öffentliche Routen */}
-        <Route path="/" element={<LandingPage />} />
+        <Route path="/" element={<SmartRedirect />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/einladung" element={<EinladungPage />} />
 
         {/* Passwort ändern (nach Migration) — geschützt aber ohne MustChangePassword-Guard */}
         <Route path="/passwort-aendern" element={

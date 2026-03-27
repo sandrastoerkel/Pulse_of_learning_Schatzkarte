@@ -16,7 +16,7 @@ import './avatar-shop.css';
 // ═══════════════════════════════════════
 
 interface AvatarShopProps {
-  playerGold: number;
+  playerGold?: number;
   playerAvatar: CustomAvatar;
   ownedItems: string[];
   onPurchase: (item: ShopItem) => void;
@@ -30,7 +30,7 @@ interface AvatarShopProps {
 // ═══════════════════════════════════════
 
 const AvatarShop: React.FC<AvatarShopProps> = ({
-  playerGold,
+  playerGold = 0,
   playerAvatar,
   ownedItems,
   onPurchase,

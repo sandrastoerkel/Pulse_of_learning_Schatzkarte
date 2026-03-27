@@ -5,6 +5,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { useLegacyUserId } from './useLegacyUserId';
+import { useAuth } from '../contexts/AuthContext';
+import { useAwardXP } from './useAwardXP';
 import type { PolarsternGoal, PolarsternGoalInsert } from '../types/database';
 
 // ─── Query: Alle Ziele laden ────────────────────────────────────────────────
@@ -91,6 +93,8 @@ export function useUpdateGoal() {
 export function useAchieveGoal() {
   const legacyId = useLegacyUserId();
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
+  const { awardXP } = useAwardXP();
 
   return useMutation({
     mutationFn: async ({
@@ -115,8 +119,12 @@ export function useAchieveGoal() {
 
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['polarstern_goals', legacyId] });
+      // XP in profiles.xp_total schreiben
+      if (profile?.id) {
+        awardXP(profile.id, variables.xpEarned ?? 50);
+      }
     },
   });
 }

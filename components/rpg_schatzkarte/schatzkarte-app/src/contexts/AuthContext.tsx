@@ -28,6 +28,8 @@ interface AuthContextValue extends AuthState {
   signOut: () => Promise<void>;
   /** Passwort ändern (für must_change_password nach Migration) */
   changePassword: (newPassword: string) => Promise<{ error: string | null }>;
+  /** Profil neu laden (z.B. nach XP-Vergabe) */
+  refreshProfile: () => Promise<void>;
   /** Convenience: Coach oder Admin? */
   isCoach: boolean;
   /** Convenience: Admin? */
@@ -187,6 +189,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // State wird vom onAuthStateChange-Listener zurückgesetzt
   }, []);
 
+  const refreshProfile = useCallback(async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+    if (data) setProfile(data as Profile);
+  }, [user]);
+
   const changePassword = useCallback(async (newPassword: string) => {
     const { error } = await supabase.auth.updateUser({
       password: newPassword,
@@ -217,6 +229,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signUp,
       signOut,
       changePassword,
+      refreshProfile,
       isCoach,
       isAdmin,
       legacyUserId,
@@ -231,6 +244,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signUp,
       signOut,
       changePassword,
+      refreshProfile,
       isCoach,
       isAdmin,
       legacyUserId,

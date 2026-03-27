@@ -101,5 +101,8 @@ export type { LernkartenDeck, LernkartenCard } from './useLernkarten';
 export { useDenkariumProgress, useStationProgress, useDueExercises, useDenkariumDueCount, useCompleteExercise, useDenkariumSessions } from './useDenkarium';
 export type { DenkariumStation, ChildRating, DenkariumProgress, DenkariumExercise, DenkariumSession } from './useDenkarium';
 
+// XP Awarding
+export { useAwardXP } from './useAwardXP';
+
 // Auth (Phase 2)
 export { useLegacyUserId } from './useLegacyUserId';

@@ -1,6 +1,6 @@
 // src/pages/LoginPage.tsx
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 type Mode = 'login' | 'register';
@@ -19,8 +19,13 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  // Schon eingeloggt? → Weiter zur Karte
-  const from = (location.state as { from?: Location })?.from?.pathname ?? '/karte';
+  // Redirect-Ziel: ?redirect= Query-Param hat Vorrang, dann location.state, dann /karte
+  const [searchParams] = useSearchParams();
+  const redirectParam = searchParams.get('redirect');
+  const stateFrom = (location.state as { from?: Location })?.from?.pathname;
+  const from = redirectParam ?? stateFrom ?? '/karte';
+
+  // Schon eingeloggt? → Weiter zum Ziel
   if (user && !authLoading) {
     navigate(from, { replace: true });
     return null;

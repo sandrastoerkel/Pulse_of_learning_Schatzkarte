@@ -3,7 +3,7 @@
 
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useHattieEntries, useCreateHattieEntry, useUpdateHattieEntry } from '@/hooks';
+import { useHattieEntries, useCreateHattieEntry, useUpdateHattieEntry, useAwardXP } from '@/hooks';
 import { HattieChallenge } from '@/components/challenges/HattieChallenge';
 import type { HattieSubjectId, HattieEntry as UIHattieEntry, HattieStats as UIHattieStats } from '@/types/hattieTypes';
 import { DEFAULT_HATTIE_STATS } from '@/types/hattieTypes';
@@ -126,6 +126,7 @@ export default function HattiePage() {
   const { data: rawEntries = [] } = useHattieEntries();
   const createChallenge = useCreateHattieEntry();
   const updateChallenge = useUpdateHattieEntry();
+  const { awardXP } = useAwardXP();
 
   const entries = rawEntries.length > 0
     ? mapEntries(rawEntries)
@@ -149,11 +150,17 @@ export default function HattiePage() {
       }}
       onCompleteEntry={(entryId, result, reflection) => {
         // → ChallengeUpdate & { id }: { id, actual_result, reflection, completed }
+        const xp = 50; // Base-XP fuer Challenge-Abschluss (wie gamification_db.py)
         updateChallenge.mutate({
           id: Number(entryId),                   // COMPUTED: string → number
           actual_result: result,                 // DIRECT
           reflection,                            // DIRECT
           completed: true,                       // HARDCODED: completing = true
+          xp_earned: xp,
+        }, {
+          onSuccess: () => {
+            if (profile?.id) awardXP(profile.id, xp);
+          },
         });
       }}
       onClose={() => navigate('/karte')}

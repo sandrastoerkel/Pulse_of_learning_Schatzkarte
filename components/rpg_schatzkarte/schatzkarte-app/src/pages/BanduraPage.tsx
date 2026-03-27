@@ -3,7 +3,7 @@
 
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useBanduraEntries, useBanduraStreak, useCreateBanduraEntry } from '@/hooks';
+import { useBanduraEntries, useBanduraStreak, useCreateBanduraEntry, useAwardXP } from '@/hooks';
 import { BanduraChallenge } from '@/components/challenges/BanduraChallenge';
 import type { BanduraSourceId, BanduraEntry as UIBanduraEntry, BanduraStats } from '@/types/banduraTypes';
 import { DEFAULT_BANDURA_STATS } from '@/types/banduraTypes';
@@ -79,6 +79,7 @@ export default function BanduraPage() {
   const { data: rawEntries = [] } = useBanduraEntries();
   const { data: streak = 0 } = useBanduraStreak();
   const createEntry = useCreateBanduraEntry();
+  const { awardXP } = useAwardXP();
 
   const entries = rawEntries.length > 0
     ? mapEntries(rawEntries)
@@ -98,6 +99,10 @@ export default function BanduraPage() {
           source_type: sourceType,
           description,
           xp_earned: xp,
+        }, {
+          onSuccess: () => {
+            if (profile?.id) awardXP(profile.id, xp);
+          },
         });
       }}
       onClose={() => navigate('/karte')}

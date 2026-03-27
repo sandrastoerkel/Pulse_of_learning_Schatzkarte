@@ -3,10 +3,12 @@
 
 import { useNavigate } from 'react-router-dom';
 import RunnerGame from '@/components/MiniGames/Runner/RunnerGame';
+import { useHeroData, useAwardXP } from '@/hooks';
+import { useAuth } from '@/contexts/AuthContext';
 import { DEFAULT_AVATAR_VISUALS, DEFAULT_AVATAR_EQUIPPED } from '@/components/AvatarParts';
 import type { CustomAvatar } from '@/types/legacy-ui';
 
-// TODO: Aus Supabase laden (usePlayerProfile Hook)
+// TODO: Avatar aus useAvatarPersistence laden
 const DEFAULT_AVATAR: CustomAvatar = {
   visuals: DEFAULT_AVATAR_VISUALS,
   equipped: DEFAULT_AVATAR_EQUIPPED,
@@ -16,18 +18,20 @@ const DEFAULT_AVATAR: CustomAvatar = {
 
 export default function RunnerGamePage() {
   const navigate = useNavigate();
-
-  // TODO: Echte Daten aus Supabase
-  const playerXP = 100;
-  const playerGold = 500;
+  const heroData = useHeroData();
+  const { profile } = useAuth();
+  const { awardXP } = useAwardXP();
 
   return (
     <RunnerGame
-      playerXP={playerXP}
-      playerGold={playerGold}
+      playerXP={heroData?.xp ?? 0}
       playerAvatar={DEFAULT_AVATAR}
       playerAgeGroup="mittelstufe"
-      onGameEnd={(result) => console.log('[RunnerGame] Result:', result)}
+      onGameEnd={(result) => {
+        if (profile?.id && result.xpWon > 0) {
+          awardXP(profile.id, result.xpWon);
+        }
+      }}
       onClose={() => navigate('/karte')}
     />
   );

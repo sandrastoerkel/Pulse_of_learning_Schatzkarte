@@ -5,6 +5,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { useLegacyUserId } from './useLegacyUserId';
+import { useAuth } from '../contexts/AuthContext';
+import { useAwardXP } from './useAwardXP';
 import type { UserTreasure } from '../types/database';
 
 // ─── Query: Alle gesammelten Schätze ────────────────────────────────────────
@@ -57,6 +59,8 @@ interface CollectTreasureParams {
 export function useCollectTreasure() {
   const legacyId = useLegacyUserId();
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
+  const { awardXP } = useAwardXP();
 
   return useMutation({
     mutationFn: async ({ islandId, treasureId, xpEarned = 0 }: CollectTreasureParams) => {
@@ -72,13 +76,18 @@ export function useCollectTreasure() {
         });
 
       if (error) {
-        // Duplicate key = schon gesammelt → kein Fehler
-        if (error.code === '23505') return;
+        // Duplicate key = schon gesammelt → kein Fehler, kein XP
+        if (error.code === '23505') return { newCollection: false };
         throw error;
       }
+      return { newCollection: true };
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['user_treasures', legacyId] });
+      // XP nur bei erstmaliger Sammlung vergeben (wie map_db.py:47-50)
+      if (data?.newCollection && profile?.id && variables.xpEarned) {
+        awardXP(profile.id, variables.xpEarned);
+      }
     },
   });
 }

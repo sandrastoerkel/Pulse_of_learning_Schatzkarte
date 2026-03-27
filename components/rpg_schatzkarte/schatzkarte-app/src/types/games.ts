@@ -76,7 +76,7 @@ export const GRID_SIZES: Record<Difficulty, { rows: number; cols: number }> = {
 
 export interface MiniGameProps {
   playerXP: number;
-  playerGold: number;
+  playerGold?: number;
   playerAvatar?: CustomAvatar;  // Optional für Avatar-Darstellung im Spiel
   onGameEnd: (result: GameResult) => void;
   onClose: () => void;

@@ -7,6 +7,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { useLegacyUserId } from './useLegacyUserId';
+import { useAuth } from '@/contexts/AuthContext';
+import { useAwardXP } from './useAwardXP';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -191,6 +193,8 @@ export function useDenkariumDueCount() {
 export function useCompleteExercise() {
   const queryClient = useQueryClient();
   const userId = useLegacyUserId();
+  const { profile } = useAuth();
+  const { awardXP } = useAwardXP();
 
   return useMutation({
     mutationFn: async ({
@@ -300,10 +304,14 @@ export function useCompleteExercise() {
 
       return { xpEarned, quality, rating };
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['denkarium-progress'] });
       queryClient.invalidateQueries({ queryKey: ['denkarium-due'] });
       queryClient.invalidateQueries({ queryKey: ['denkarium-due-count'] });
+      // XP in profiles.xp_total schreiben
+      if (profile?.id && data.xpEarned) {
+        awardXP(profile.id, data.xpEarned);
+      }
     },
   });
 }
