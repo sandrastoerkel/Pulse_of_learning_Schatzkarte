@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useAuth } from '@/contexts/AuthContext';
+import { useCompleteExercise, useDenkariumProgress } from '@/hooks';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // SCHATZKARTE DESIGN SYSTEM
@@ -286,15 +288,26 @@ const EXERCISE_BANK = {
 // ═══════════════════════════════════════════════════════════════════════════
 // CREATE ITEMS FROM BANK
 // ═══════════════════════════════════════════════════════════════════════════
-function createInitialItems() {
+function createInitialItems(dbExercises = []) {
   const items = [];
   for (const [stationId, exercises] of Object.entries(EXERCISE_BANK)) {
     exercises.forEach((ex, i) => {
+      const itemId = `${stationId}_${i}`;
+      // Merge with DB state if available
+      const dbMatch = dbExercises.find(
+        d => d.station === stationId && d.level === ex.level && d.exercise_title === ex.title
+      );
       items.push({
-        id: `${stationId}_${i}`, station: stationId, title: ex.title,
+        id: itemId, station: stationId, title: ex.title,
         level: ex.level, type: ex.type, data: ex.data,
-        sr: { repetition: 0, interval: 0, easeFactor: INIT_EF },
-        lastReviewedAt: null, totalReviews: 0, correctReviews: 0, totalXP: 0,
+        sr: dbMatch
+          ? { repetition: dbMatch.repetitions, interval: dbMatch.interval_days, easeFactor: dbMatch.ease_factor }
+          : { repetition: 0, interval: 0, easeFactor: INIT_EF },
+        lastReviewedAt: dbMatch?.last_review || null,
+        totalReviews: dbMatch?.times_practiced || 0,
+        correctReviews: 0,  // not tracked separately in DB
+        totalXP: dbMatch?.total_xp || 0,
+        dbId: dbMatch?.id || null,  // track DB row ID for updates
       });
     });
   }
@@ -1098,7 +1111,30 @@ function Ring({ progress, size = 48, stroke = 3, color }) {
 const V = { HUB: 0, EXERCISE: 1, RATE: 2, RESULT: 3, DONE: 4, PASS: 5 };
 
 export default function DenkariumExpanded() {
-  const [items, setItems] = useState(createInitialItems);
+  const { legacyUserId } = useAuth();
+  const completeExercise = useCompleteExercise();
+  const { data: progressData } = useDenkariumProgress();
+
+  // Load exercise state from Supabase
+  const [dbLoaded, setDbLoaded] = useState(false);
+  const [items, setItems] = useState(() => createInitialItems());
+
+  useEffect(() => {
+    if (!legacyUserId || dbLoaded) return;
+    import('@/lib/supabase').then(({ supabase }) => {
+      supabase
+        .from('denkarium_exercises')
+        .select('*')
+        .eq('user_id', legacyUserId)
+        .then(({ data }) => {
+          if (data && data.length > 0) {
+            setItems(createInitialItems(data));
+          }
+          setDbLoaded(true);
+        });
+    });
+  }, [legacyUserId, dbLoaded]);
+
   const [view, setView] = useState(V.HUB);
   const [station, setStation] = useState(null);
   const [queue, setQueue] = useState([]);
@@ -1155,6 +1191,15 @@ export default function DenkariumExpanded() {
     } : i));
     setReviews(prev => [...prev, { station: cur.station, title: cur.title, rating: r.key, quality: r.q, xp, interval: newSR.interval }]);
     setView(V.RESULT);
+
+    // ── Persist to Supabase ──
+    completeExercise.mutate({
+      station: cur.station,
+      level: cur.level,
+      exerciseTitle: cur.title,
+      rating: selRating,
+      score: exResult?.pct != null ? Math.round(exResult.pct * 100) : undefined,
+    });
   };
 
   const nextItem = () => {

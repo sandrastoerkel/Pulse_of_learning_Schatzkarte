@@ -16,7 +16,7 @@ import {
   UI,
   FEEDBACK
 } from '../../constants';
-import { VoiceTextInput } from '@/components/VoiceTextInput';
+import { VoiceTextInput } from '../../../../components/VoiceTextInput';
 
 // =============================================================================
 // TYPES

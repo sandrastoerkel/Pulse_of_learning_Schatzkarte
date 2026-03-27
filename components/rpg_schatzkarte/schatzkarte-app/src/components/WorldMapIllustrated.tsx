@@ -35,6 +35,8 @@ import {
   PolarsternIcon,
   LootIcon,
   DenkariumIcon,
+  WortschmiedeIcon,
+  EinmaleinsIcon,
   BaseCampIcon,
   FestungIcon,
   WerkzeugeIcon,
@@ -329,7 +331,7 @@ const QuestMarker: React.FC<QuestMarkerProps> = ({
 
 // Schwimmendes Schiff — DIRECT: JSX 1:1 aus altem Code
 interface FloatingShipProps {
-  type: 'bandura' | 'hattie' | 'polarstern' | 'loot' | 'denkarium';
+  type: 'bandura' | 'hattie' | 'polarstern' | 'loot' | 'denkarium' | 'wortschmiede' | 'einmaleins' | 'memory' | 'brickbreaker' | 'avatarshop';
   onClick?: () => void;
   badge?: number;
 }
@@ -361,6 +363,31 @@ const FloatingShip: React.FC<FloatingShipProps> = ({ type, onClick, badge }) => 
       title: 'Denkarium: Dein Gehirn-Fitnessstudio',
       duration: 3.4,
     },
+    wortschmiede: {
+      label: 'Wortschmiede',
+      title: 'Wortschmiede: Rechtschreibung meistern',
+      duration: 3.6,
+    },
+    einmaleins: {
+      label: '1×1 Arena',
+      title: '1×1 Arena: Das Einmaleins trainieren',
+      duration: 3.3,
+    },
+    memory: {
+      label: 'Memory',
+      title: 'Memory: Teste dein Gedächtnis!',
+      duration: 3.1,
+    },
+    brickbreaker: {
+      label: 'Brick Breaker',
+      title: 'Brick Breaker: Zerstöre alle Blöcke!',
+      duration: 3.5,
+    },
+    avatarshop: {
+      label: 'Avatar Shop',
+      title: 'Avatar Shop: Style deinen Avatar!',
+      duration: 2.8,
+    },
   };
 
   const shipConfig = config[type];
@@ -389,6 +416,11 @@ const FloatingShip: React.FC<FloatingShipProps> = ({ type, onClick, badge }) => 
         {type === 'polarstern' && <PolarsternIcon size={64} animated={true} glowing={true} />}
         {type === 'loot' && <LootIcon size={56} animated={true} glowing={true} />}
         {type === 'denkarium' && <DenkariumIcon size={56} animated={true} glowing={true} />}
+        {type === 'wortschmiede' && <WortschmiedeIcon size={56} animated={true} glowing={true} />}
+        {type === 'einmaleins' && <EinmaleinsIcon size={56} animated={true} glowing={true} />}
+        {type === 'memory' && <span style={{ fontSize: 40 }}>🧠</span>}
+        {type === 'brickbreaker' && <span style={{ fontSize: 40 }}>🧱</span>}
+        {type === 'avatarshop' && <span style={{ fontSize: 40 }}>👤</span>}
       </div>
       <div className="ship-label">{shipConfig.label}</div>
       {badge !== undefined && badge > 0 && (
@@ -541,7 +573,15 @@ export function WorldMapIllustrated() {
   // Logik: Start ist immer offen. Eine Insel ist offen wenn MINDESTENS eine
   // Vorgänger-Insel (via PATH_CONNECTIONS) abgeschlossen ist.
   // Sonderfall: 'start' ist immer unlocked.
+  // DEV_UNLOCK_ALL: true = alle Inseln offen (zum Testen), false = normale Logik
+  const DEV_UNLOCK_ALL = true;
+
   const unlockedIslands = useMemo<string[]>(() => {
+    if (DEV_UNLOCK_ALL) {
+      // Alle Inseln freischalten zum Testen
+      return DEFAULT_ISLANDS.map(i => i.id);
+    }
+
     const unlocked = new Set<string>(['start']); // start ist immer offen
 
     // Iterativ: wenn eine Insel completed ist, werden ihre Nachfolger freigeschaltet
@@ -713,6 +753,26 @@ export function WorldMapIllustrated() {
           <FloatingShip
             type="denkarium"
             onClick={() => navigate('/karte/denkarium')}
+          />
+          <FloatingShip
+            type="wortschmiede"
+            onClick={() => navigate('/karte/wortschmiede')}
+          />
+          <FloatingShip
+            type="einmaleins"
+            onClick={() => navigate('/karte/einmaleins')}
+          />
+          <FloatingShip
+            type="memory"
+            onClick={() => navigate('/karte/memory')}
+          />
+          <FloatingShip
+            type="brickbreaker"
+            onClick={() => navigate('/karte/brick-breaker')}
+          />
+          <FloatingShip
+            type="avatarshop"
+            onClick={() => navigate('/karte/avatar-shop')}
           />
 
           {/* TODO: Tagebuch-Widget entfernt — tagebuchEntries nicht in Hooks verfügbar.

@@ -19,7 +19,7 @@ import {
   FEEDBACK
 } from '../../constants';
 import { formatRelativeDate } from '../../utils';
-import { VoiceTextInput } from '@/components/VoiceTextInput';
+import { VoiceTextInput } from '../../../../components/VoiceTextInput';
 
 // =============================================================================
 // TYPES

@@ -1,9 +1,56 @@
-// src/components/icons/index.ts
-// Stub-Icons — werden später durch echte SVG-Icons ersetzt
-// Interface kompatibel mit altem IconDefs.tsx
+/**
+ * Schatzkarte Icon Library
+ * Lern-Abenteuer Schatzkarte - Custom SVG Icons
+ *
+ * Original-Icons aus dem alten Frontend übernommen.
+ */
 
-export type { IconProps } from '@/types/ui';
-import type { IconProps } from '@/types/ui';
+// Shared Utilities
+export { SharedIconDefs, COLORS, Sparkle, GlowRing } from './IconDefs';
+export type { IconProps, IconDefsProps } from './IconDefs';
+
+// ============================================
+// INSEL-ICONS (Island Icons)
+// ============================================
+
+export { StartHafenIcon } from './StartHafenIcon';
+export { FestungIcon } from './FestungIcon';
+export { WerkzeugeIcon } from './WerkzeugeIcon';
+export { VulkanIcon } from './VulkanIcon';
+export { MeisterBergIcon } from './MeisterBergIcon';
+export { BrueckenIcon } from './BrueckenIcon';
+export { FaedenIcon } from './FaedenIcon';
+export { SpiegelSeeIcon } from './SpiegelSeeIcon';
+export { RuheOaseIcon } from './RuheOaseIcon';
+export { AusdauerGipfelIcon } from './AusdauerGipfelIcon';
+export { FokusLeuchtturmIcon } from './FokusLeuchtturmIcon';
+export { WachstumGartenIcon } from './WachstumGartenIcon';
+export { LehrerTurmIcon } from './LehrerTurmIcon';
+export { WohlfuehlDorfIcon } from './WohlfuehlDorfIcon';
+export { SchutzBurgIcon } from './SchutzBurgIcon';
+
+// ============================================
+// UI-ICONS (für Widgets)
+// ============================================
+
+export { LerntechnikenIcon } from './LerntechnikenIcon';
+export { StationenIcon } from './StationenIcon';
+export { BaseCampIcon } from './BaseCampIcon';
+
+// ============================================
+// SCHIFF-ICONS (Ship Icons)
+// ============================================
+
+export { GoldenKeyIcon } from './GoldenKeyIcon';
+export { HattieWaageIcon } from './HattieWaageIcon';
+export { PolarsternIcon } from './PolarsternIcon';
+export { LootIcon } from './LootIcon';
+
+// ============================================
+// STUB-ICONS (noch kein Original-SVG vorhanden)
+// ============================================
+
+import type { IconProps } from './IconDefs';
 
 function makeStubIcon(emoji: string, label: string) {
   return function StubIcon({ size = 32, className }: IconProps) {
@@ -20,31 +67,6 @@ function makeStubIcon(emoji: string, label: string) {
   };
 }
 
-// Insel-Icons
-export const StartHafenIcon = makeStubIcon('🏕️', 'Starthafen');
-export const FestungIcon = makeStubIcon('💪', 'Festung');
-export const WerkzeugeIcon = makeStubIcon('📚', 'Werkzeuge');
-export const BrueckenIcon = makeStubIcon('🌉', 'Brücken');
-export const FaedenIcon = makeStubIcon('🧵', 'Fäden');
-export const SpiegelSeeIcon = makeStubIcon('🧠', 'Spiegel-See');
-export const VulkanIcon = makeStubIcon('🔥', 'Vulkan');
-export const RuheOaseIcon = makeStubIcon('😌', 'Ruhe-Oase');
-export const AusdauerGipfelIcon = makeStubIcon('🏆', 'Ausdauer-Gipfel');
-export const FokusLeuchtturmIcon = makeStubIcon('🎯', 'Fokus-Leuchtturm');
-export const WachstumGartenIcon = makeStubIcon('🌱', 'Wachstum-Garten');
-export const LehrerTurmIcon = makeStubIcon('🏫', 'Lehrer-Turm');
-export const WohlfuehlDorfIcon = makeStubIcon('🏠', 'Wohlfühl-Dorf');
-export const SchutzBurgIcon = makeStubIcon('🛡', 'Schutz-Burg');
-export const MeisterBergIcon = makeStubIcon('⛰️', 'Meister-Berg');
-
-// UI-Icons
-export const LerntechnikenIcon = makeStubIcon('📖', 'Lerntechniken');
-export const StationenIcon = makeStubIcon('🧭', 'Stationen');
-export const BaseCampIcon = makeStubIcon('⛺', 'Base Camp');
-
-// Schiff-Icons
-export const GoldenKeyIcon = makeStubIcon('🔑', 'Goldener Schlüssel');
-export const HattieWaageIcon = makeStubIcon('⚖️', 'Hattie-Waage');
-export const PolarsternIcon = makeStubIcon('⭐', 'Polarstern');
-export const LootIcon = makeStubIcon('🎴', 'Loot');
 export const DenkariumIcon = makeStubIcon('🧩', 'Denkarium');
+export const WortschmiedeIcon = makeStubIcon('✍️', 'Wortschmiede');
+export const EinmaleinsIcon = makeStubIcon('🧮', 'Einmaleins');

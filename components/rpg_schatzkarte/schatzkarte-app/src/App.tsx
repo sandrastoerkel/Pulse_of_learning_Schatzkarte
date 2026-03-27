@@ -43,6 +43,11 @@ const PolarsternPage = React.lazy(() => import('@/pages/PolarsternPage'));
 const WortschmiedePage = React.lazy(() => import('@/pages/WortschmiedePage'));
 const LernkartenPage = React.lazy(() => import('@/pages/LernkartenPage'));
 
+// Spiele & Avatar-Shop
+const MemoryGamePage = React.lazy(() => import('@/pages/MemoryGamePage'));
+const RunnerGamePage = React.lazy(() => import('@/pages/RunnerGamePage'));
+const AvatarShopPage = React.lazy(() => import('@/pages/AvatarShopPage'));
+
 // Coach-Bereich (nur für Coaches)
 const CoachDashboard = React.lazy(() => import('@/pages/coach/CoachDashboard'));
 
@@ -160,6 +165,17 @@ export default function App() {
         } />
         <Route path="/karte/lernkarten" element={
           <ProtectedRoute><MustChangePasswordGuard><LernkartenPage /></MustChangePasswordGuard></ProtectedRoute>
+        } />
+
+        {/* Spiele & Avatar-Shop */}
+        <Route path="/karte/memory" element={
+          <ProtectedRoute><MustChangePasswordGuard><MemoryGamePage /></MustChangePasswordGuard></ProtectedRoute>
+        } />
+        <Route path="/karte/brick-breaker" element={
+          <ProtectedRoute><MustChangePasswordGuard><RunnerGamePage /></MustChangePasswordGuard></ProtectedRoute>
+        } />
+        <Route path="/karte/avatar-shop" element={
+          <ProtectedRoute><MustChangePasswordGuard><AvatarShopPage /></MustChangePasswordGuard></ProtectedRoute>
         } />
 
         {/* Coach-Bereich — nur für Coaches/Admins */}
