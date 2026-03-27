@@ -41,6 +41,7 @@ const BanduraPage = React.lazy(() => import('@/pages/BanduraPage'));
 const HattiePage = React.lazy(() => import('@/pages/HattiePage'));
 const PolarsternPage = React.lazy(() => import('@/pages/PolarsternPage'));
 const WortschmiedePage = React.lazy(() => import('@/pages/WortschmiedePage'));
+const LernkartenPage = React.lazy(() => import('@/pages/LernkartenPage'));
 
 // Coach-Bereich (nur für Coaches)
 const CoachDashboard = React.lazy(() => import('@/pages/coach/CoachDashboard'));
@@ -156,6 +157,9 @@ export default function App() {
         } />
         <Route path="/karte/wortschmiede" element={
           <ProtectedRoute><MustChangePasswordGuard><WortschmiedePage /></MustChangePasswordGuard></ProtectedRoute>
+        } />
+        <Route path="/karte/lernkarten" element={
+          <ProtectedRoute><MustChangePasswordGuard><LernkartenPage /></MustChangePasswordGuard></ProtectedRoute>
         } />
 
         {/* Coach-Bereich — nur für Coaches/Admins */}

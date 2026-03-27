@@ -81,5 +81,21 @@ export type { ScheduledMeeting, MeetingParticipant } from './useMeetingData';
 // Phase 4c — Lerntechniken
 export { useLearnstratProgress } from './useLearnstratProgress';
 
+// Phase 4d — Lernkarten
+export {
+  useLernkartenDecks,
+  useCreateDeck,
+  useRenameDeck,
+  useDeleteDeck,
+  useLernkartenCards,
+  useAddCard,
+  useAddCardsBulk,
+  useDeleteCard,
+  useReviewCard,
+  useDueCards,
+  useLernkartenDueCount,
+} from './useLernkarten';
+export type { LernkartenDeck, LernkartenCard } from './useLernkarten';
+
 // Auth (Phase 2)
 export { useLegacyUserId } from './useLegacyUserId';
