@@ -97,5 +97,9 @@ export {
 } from './useLernkarten';
 export type { LernkartenDeck, LernkartenCard } from './useLernkarten';
 
+// Phase 4e — Denkarium
+export { useDenkariumProgress, useStationProgress, useDueExercises, useDenkariumDueCount, useCompleteExercise, useDenkariumSessions } from './useDenkarium';
+export type { DenkariumStation, ChildRating, DenkariumProgress, DenkariumExercise, DenkariumSession } from './useDenkarium';
+
 // Auth (Phase 2)
 export { useLegacyUserId } from './useLegacyUserId';
